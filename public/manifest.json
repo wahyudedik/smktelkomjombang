@@ -1,0 +1,53 @@
+{
+    "name": "IG to Web - Sistem Manajemen Sekolah",
+    "short_name": "IG to Web",
+    "description": "Sistem manajemen sekolah terintegrasi dengan Instagram",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#116E63",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/assets/img/logo/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/img/logo/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "education",
+        "productivity"
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "Akses dashboard cepat",
+            "url": "/dashboard",
+            "icons": [
+                {
+                    "src": "/assets/img/logo/favicon.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "share_target": {
+        "action": "/share",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+    }
+}
