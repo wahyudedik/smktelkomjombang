@@ -3,14 +3,8 @@
         <div class="flex justify-between h-16">
             <!-- Logo & Brand -->
             <div class="flex items-center">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.555a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.43 0l5.01-2.147a1 1 0 00.71-.739 1 1 0 00-.71-1.26l-5.01-2.147a3 3 0 00-2.43 0L7 8.5V5.5a1 1 0 00-1.5-.5L3.5 6.5a1 1 0 00-.5 1.5v8a1 1 0 001.5.5L7 14.5v-1.5a1 1 0 011.5-.5L9.3 16.573z" />
-                        </svg>
-                    </div>
-                    <span class="text-xl font-bold text-slate-900">Sekolah</span>
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}" alt="Logo Telkom" style="max-height: 40px;">
                 </a>
             </div>
 
@@ -201,6 +195,18 @@
                                         <a href="{{ route('admin.pages.index') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-file-alt mr-2"></i>Page Management
+                                        </a>
+                                    @endif
+                                    @if (Auth::check() && (Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('events.view')))
+                                        <a href="{{ route('admin.events.index') }}"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                            <i class="fas fa-calendar-alt mr-2"></i>Events / Kegiatan
+                                        </a>
+                                    @endif
+                                    @if (Auth::check() && (Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('berita.view')))
+                                        <a href="{{ route('admin.berita.index') }}"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                            <i class="fas fa-newspaper mr-2"></i>Berita / News
                                         </a>
                                     @endif
                                     @if (Auth::check() && Auth::user()->hasRole('superadmin'))

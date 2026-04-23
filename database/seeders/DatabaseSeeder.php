@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class, // Create permissions and assign to superadmin
             UserSeeder::class, // Create superadmin user and assign role
             TestimonialLinksPermissionSeeder::class, // Assign testimonial-links permissions
+            EventPermissionSeeder::class, // Assign events permissions
+            BeritaPermissionSeeder::class, // Assign berita permissions
 
             // Data management seeders
             DataManagementSeeder::class, // Create kelas, jurusan, ekstrakurikuler
@@ -26,7 +28,7 @@ class DatabaseSeeder extends Seeder
 
             // Module-specific seeders (butuh UserSeeder untuk user_id)
             GuruSeeder::class, // Butuh UserSeeder
-            SiswaSeeder::class, // Butuh UserSeeder
+            SiswaSeeder::class, // Butuh UserSeeder 
             KelulusanSeeder::class, // Tidak ada dependency
             SarprasSeeder::class, // Butuh UserSeeder untuk maintenance user_id
             OSISSeeder::class, // Tidak ada dependency
@@ -37,6 +39,11 @@ class DatabaseSeeder extends Seeder
             NotificationSeeder::class, // Butuh UserSeeder
             LetterSeeder::class, // Format Surat
             AttendanceSeeder::class, // Absensi
+
+            // Telkom Landing Page seeders
+            PartnerSeeder::class, // Partner data
+            EventSeeder::class, // Event data
+            BeritaSeeder::class, // Berita/News data
         ]);
     }
 }

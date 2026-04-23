@@ -13,11 +13,18 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <!-- Apple Touch Icons -->
+    @if (cache('site_setting_favicon'))
+        <link rel="apple-touch-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
+    @else
+        <link rel="apple-touch-icon" href="{{ asset('assets_telkom/assets/images/logo-dark.png') }}">
+    @endif
+
     <!-- favicon -->
     @if (cache('site_setting_favicon'))
         <link rel="icon" type="image/x-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
     @else
-        <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo/favicon.png') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('assets_telkom/assets/images/fav.png') }}">
     @endif 
 
     <!-- Scripts -->

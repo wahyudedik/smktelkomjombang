@@ -19,7 +19,7 @@
     @if (cache('site_setting_favicon'))
         <link rel="apple-touch-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
     @else
-        <link rel="apple-touch-icon" href="{{ asset('assets/img/logo/favicon.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('assets_telkom/assets/images/logo-dark.png') }}">
     @endif
 
     <!-- title -->
@@ -36,11 +36,14 @@
     @if (cache('site_setting_favicon'))
         <link rel="icon" type="image/x-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
     @else
-        <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo/favicon.png') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('assets_telkom/assets/images/fav.png') }}">
     @endif
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Additional Styles -->
+    @stack('styles')
 </head>
 
 <body class="font-sans antialiased bg-slate-50">

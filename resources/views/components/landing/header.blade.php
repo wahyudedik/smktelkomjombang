@@ -72,9 +72,9 @@
                 <a class="navbar-brand" href="/">
                     @if (cache('site_setting_logo'))
                         <img src="{{ Storage::url(cache('site_setting_logo')) }}"
-                            alt="{{ cache('site_setting_site_name', 'MAUDU REJOSO') }}" style="max-height: 50px;">
+                            alt="{{ cache('site_setting_site_name', 'SMK Telekomunikasi') }}" style="max-height: 50px;">
                     @else
-                        <img src="{{ asset('assets/img/logo/logo.png') }}" alt="logo">
+                        <img src="{{ asset('assets_telkom/assets/images/logo.png') }}" alt="logo">
                     @endif
                 </a>
                 <div class="mobile-menu-right">

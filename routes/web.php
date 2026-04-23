@@ -28,7 +28,11 @@ use App\Http\Controllers\InstagramAnalyticsController;
 // PUBLIC ROUTES (Landing Page & Public Features)
 // ========================================
 
-Route::get('/', function () {
+// Telkom Landing Page (Main landing page)
+Route::get('/', [\App\Http\Controllers\LandingController::class, 'telkom'])->name('landing');
+
+// Legacy Welcome Page (for reference)
+Route::get('/welcome', function () {
     // Get menu data for header and footer
     $headerMenus = \App\Models\Page::where('is_menu', true)
         ->where('menu_position', 'header')
@@ -47,8 +51,8 @@ Route::get('/', function () {
     // Get Instagram posts for gallery section
     $instagramPosts = app(\App\Services\InstagramService::class)->getCachedPosts(6);
 
-    return view('welcome', compact('headerMenus', 'footerMenus', 'instagramPosts')); // Landing page - fully customizable
-})->name('landing');
+    return view('welcome', compact('headerMenus', 'footerMenus', 'instagramPosts')); // Legacy landing page
+})->name('landing.welcome');
 
 // Public graduation check
 Route::get('/check-graduation', [KelulusanController::class, 'checkStatus'])->name('public.graduation.check');
@@ -127,6 +131,40 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::put('/devices/{device}', [AttendanceController::class, 'updateDevice'])->name('devices.update');
     Route::get('/mapping', [AttendanceController::class, 'mapping'])->name('mapping.index');
     Route::post('/mapping', [AttendanceController::class, 'storeMapping'])->name('mapping.store');
+    
+    // User Management (CRUD PIN mapping)
+    Route::get('/users', [App\Http\Controllers\AttendanceUserController::class, 'index'])->name('users.index');
+    Route::post('/users', [App\Http\Controllers\AttendanceUserController::class, 'store'])->name('users.store');
+    Route::get('/users/{identity}/edit', [App\Http\Controllers\AttendanceUserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{identity}', [App\Http\Controllers\AttendanceUserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{identity}', [App\Http\Controllers\AttendanceUserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/users/{identity}/sync-status', [App\Http\Controllers\AttendanceUserController::class, 'syncStatus'])->name('users.sync-status');
+    Route::post('/users/sync-all', [App\Http\Controllers\AttendanceUserController::class, 'syncAll'])->name('users.sync-all');
+    
+    // Biometric Enrollment (NEW)
+    Route::get('/biometric', [App\Http\Controllers\BiometricEnrollmentController::class, 'index'])->name('biometric.index');
+    Route::get('/biometric/{identity}/fingerprint', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollFingerprintForm'])->name('biometric.fingerprint.form');
+    Route::post('/biometric/{identity}/fingerprint', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollFingerprint'])->name('biometric.fingerprint.store');
+    Route::get('/biometric/{identity}/face', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollFaceForm'])->name('biometric.face.form');
+    Route::post('/biometric/{identity}/face', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollFace'])->name('biometric.face.store');
+    Route::get('/biometric/{identity}/rfid', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollRFIDForm'])->name('biometric.rfid.form');
+    Route::post('/biometric/{identity}/rfid', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollRFID'])->name('biometric.rfid.store');
+    Route::post('/biometric/test-connection', [App\Http\Controllers\BiometricEnrollmentController::class, 'testConnection'])->name('biometric.test-connection');
+    
+    // Export (NEW)
+    Route::get('/export', [App\Http\Controllers\AttendanceExportController::class, 'index'])->name('export.index');
+    Route::post('/export/daily', [App\Http\Controllers\AttendanceExportController::class, 'exportDaily'])->name('export.daily');
+    Route::post('/export/period', [App\Http\Controllers\AttendanceExportController::class, 'exportPeriod'])->name('export.period');
+    Route::post('/export/summary', [App\Http\Controllers\AttendanceExportController::class, 'exportSummary'])->name('export.summary');
+    Route::post('/export/user/{identity}', [App\Http\Controllers\AttendanceExportController::class, 'exportUserDetail'])->name('export.user');
+    
+    // Report (NEW)
+    Route::get('/report', [App\Http\Controllers\AttendanceReportController::class, 'index'])->name('report.index');
+    Route::get('/report/daily', [App\Http\Controllers\AttendanceReportController::class, 'daily'])->name('report.daily');
+    Route::get('/report/weekly', [App\Http\Controllers\AttendanceReportController::class, 'weekly'])->name('report.weekly');
+    Route::get('/report/monthly', [App\Http\Controllers\AttendanceReportController::class, 'monthly'])->name('report.monthly');
+    Route::get('/report/user/{identity}', [App\Http\Controllers\AttendanceReportController::class, 'userDetail'])->name('report.user');
+    Route::get('/report/latecomers', [App\Http\Controllers\AttendanceReportController::class, 'latecomers'])->name('report.latecomers');
 });
 
 // ========================================
@@ -219,6 +257,17 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/
     Route::get('/{page}/versions', [PageController::class, 'versions'])->name('versions');
     Route::post('/{page}/versions/{version}/restore', [PageController::class, 'restoreVersion'])->name('versions.restore');
     Route::get('/{page}/versions/{version1}/compare/{version2}', [PageController::class, 'compareVersions'])->name('versions.compare');
+});
+
+// Events Management (Access: admin, superadmin)
+Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/events')->name('admin.events.')->group(function () {
+    Route::get('/', [App\Http\Controllers\EventController::class, 'index'])->name('index')->middleware('permission:events.view');
+    Route::get('/create', [App\Http\Controllers\EventController::class, 'create'])->name('create')->middleware('permission:events.create');
+    Route::post('/', [App\Http\Controllers\EventController::class, 'store'])->name('store')->middleware('permission:events.create');
+    Route::get('/{event}', [App\Http\Controllers\EventController::class, 'show'])->name('show')->middleware('permission:events.view');
+    Route::get('/{event}/edit', [App\Http\Controllers\EventController::class, 'edit'])->name('edit')->middleware('permission:events.edit');
+    Route::put('/{event}', [App\Http\Controllers\EventController::class, 'update'])->name('update')->middleware('permission:events.edit');
+    Route::delete('/{event}', [App\Http\Controllers\EventController::class, 'destroy'])->name('destroy')->middleware('permission:events.delete');
 });
 
 // ========================================
@@ -504,6 +553,22 @@ Route::get('/offline', function () {
 
 Route::get('/pages', [PageController::class, 'publicIndex'])->name('pages.public.index');
 Route::get('/page/{slug}', [PageController::class, 'publicShow'])->name('pages.public.show');
+
+// Berita / News Public Routes
+Route::get('/berita', [\App\Http\Controllers\BeritaController::class, 'publicIndex'])->name('berita.public.index');
+Route::get('/berita/{berita:slug}', [\App\Http\Controllers\BeritaController::class, 'publicShow'])->name('berita.public.show');
+
+// Berita Admin CRUD
+Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/berita')->name('admin.berita.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\BeritaController::class, 'index'])->name('index')->middleware('permission:berita.view');
+    Route::get('/create', [\App\Http\Controllers\BeritaController::class, 'create'])->name('create')->middleware('permission:berita.create');
+    Route::post('/', [\App\Http\Controllers\BeritaController::class, 'store'])->name('store')->middleware('permission:berita.create');
+    Route::post('/upload-image', [\App\Http\Controllers\BeritaController::class, 'uploadImage'])->name('upload-image')->middleware('permission:berita.create');
+    Route::get('/{berita}', [\App\Http\Controllers\BeritaController::class, 'show'])->name('show')->middleware('permission:berita.view');
+    Route::get('/{berita}/edit', [\App\Http\Controllers\BeritaController::class, 'edit'])->name('edit')->middleware('permission:berita.edit');
+    Route::put('/{berita}', [\App\Http\Controllers\BeritaController::class, 'update'])->name('update')->middleware('permission:berita.edit');
+    Route::delete('/{berita}', [\App\Http\Controllers\BeritaController::class, 'destroy'])->name('destroy')->middleware('permission:berita.delete');
+});
 
 // Documentation Routes
 Route::get('/docs/instagram-setup', function () {

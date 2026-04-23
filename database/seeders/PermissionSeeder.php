@@ -874,6 +874,74 @@ class PermissionSeeder extends Seeder
                 'action' => 'out.upload',
                 'guard_name' => 'web'
             ],
+
+            // Events / Kegiatan permissions
+            [
+                'name' => 'events.view',
+                'display_name' => 'Events - Lihat Data',
+                'description' => 'Permission untuk melihat daftar kegiatan sekolah',
+                'module' => 'events',
+                'action' => 'view',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'events.create',
+                'display_name' => 'Events - Tambah Data',
+                'description' => 'Permission untuk menambah kegiatan sekolah baru',
+                'module' => 'events',
+                'action' => 'create',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'events.edit',
+                'display_name' => 'Events - Edit Data',
+                'description' => 'Permission untuk mengedit data kegiatan sekolah',
+                'module' => 'events',
+                'action' => 'edit',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'events.delete',
+                'display_name' => 'Events - Hapus Data',
+                'description' => 'Permission untuk menghapus kegiatan sekolah',
+                'module' => 'events',
+                'action' => 'delete',
+                'guard_name' => 'web',
+            ],
+
+            // Berita / News permissions
+            [
+                'name' => 'berita.view',
+                'display_name' => 'Berita - Lihat Data',
+                'description' => 'Permission untuk melihat daftar berita',
+                'module' => 'berita',
+                'action' => 'view',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'berita.create',
+                'display_name' => 'Berita - Tambah Data',
+                'description' => 'Permission untuk menambah berita baru',
+                'module' => 'berita',
+                'action' => 'create',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'berita.edit',
+                'display_name' => 'Berita - Edit Data',
+                'description' => 'Permission untuk mengedit data berita',
+                'module' => 'berita',
+                'action' => 'edit',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'berita.delete',
+                'display_name' => 'Berita - Hapus Data',
+                'description' => 'Permission untuk menghapus berita',
+                'module' => 'berita',
+                'action' => 'delete',
+                'guard_name' => 'web',
+            ],
         ];
 
         foreach ($permissions as $permissionData) {

@@ -18,7 +18,7 @@
     @if (cache('site_setting_favicon'))
         <link rel="icon" type="image/x-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
     @else
-        <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo/favicon.png') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('assets_telkom/assets/images/fav.png') }}">
     @endif
 
     <!-- css -->

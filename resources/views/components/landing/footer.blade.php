@@ -11,10 +11,10 @@
                         <a href="/" class="footer-logo">
                             @if (cache('site_setting_logo'))
                                 <img src="{{ Storage::url(cache('site_setting_logo')) }}"
-                                    alt="{{ cache('site_setting_site_name', 'MAUDU REJOSO') }}"
+                                    alt="{{ cache('site_setting_site_name', 'SMK Telekomunikasi') }}"
                                     style="max-height: 50px; filter: brightness(0) invert(1);">
                             @else
-                                <img src="{{ asset('assets/img/logo/logo-light.png') }}" alt="">
+                                <img src="{{ asset('assets_telkom/assets/images/logo.png') }}" alt="">
                             @endif
                         </a>
                         <p class="mb-3">
