@@ -16,6 +16,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <a href="<?php echo e(route('admin.absensi.index')); ?>" class="btn btn-secondary">Rekap</a>
+                <a href="<?php echo e(route('admin.absensi.users.index')); ?>" class="btn btn-secondary">Users</a>
                 <a href="<?php echo e(route('admin.absensi.logs')); ?>" class="btn btn-secondary">Logs</a>
                 <a href="<?php echo e(route('admin.absensi.mapping.index')); ?>" class="btn btn-secondary">Mapping</a>
             </div>
@@ -82,12 +83,21 @@
 
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                                    <form id="device-<?php echo e($device->id); ?>" method="POST"
-                                        action="<?php echo e(route('admin.absensi.devices.update', $device)); ?>">
-                                        <?php echo csrf_field(); ?>
-                                        <?php echo method_field('PUT'); ?>
-                                        <button type="submit" class="btn btn-primary">Simpan</button>
-                                    </form>
+                                    <div class="flex items-center gap-2">
+                                        <form id="device-<?php echo e($device->id); ?>" method="POST"
+                                            action="<?php echo e(route('admin.absensi.devices.update', $device)); ?>">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('PUT'); ?>
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </form>
+                                        <form method="POST"
+                                            action="<?php echo e(route('admin.absensi.devices.destroy', $device)); ?>"
+                                            onsubmit="return confirm('Yakin hapus device <?php echo e($device->serial_number); ?>?')">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('DELETE'); ?>
+                                            <button type="submit" class="btn btn-danger">Hapus</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -114,4 +124,5 @@
 <?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
 <?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
 <?php endif; ?>
+
 <?php /**PATH E:\PROJEKU\telkom\resources\views/attendance/devices.blade.php ENDPATH**/ ?>

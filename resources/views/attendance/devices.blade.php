@@ -72,12 +72,21 @@
                                     {{ $device->last_seen_at?->format('Y-m-d H:i:s') ?? '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                                    <form id="device-{{ $device->id }}" method="POST"
-                                        action="{{ route('admin.absensi.devices.update', $device) }}">
-                                        @csrf
-                                        @method('PUT')
-                                        <button type="submit" class="btn btn-primary">Simpan</button>
-                                    </form>
+                                    <div class="flex items-center gap-2">
+                                        <form id="device-{{ $device->id }}" method="POST"
+                                            action="{{ route('admin.absensi.devices.update', $device) }}">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </form>
+                                        <form method="POST"
+                                            action="{{ route('admin.absensi.devices.destroy', $device) }}"
+                                            onsubmit="return confirm('Yakin hapus device {{ $device->serial_number }}?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger">Hapus</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

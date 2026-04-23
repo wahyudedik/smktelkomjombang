@@ -129,6 +129,7 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::get('/logs', [AttendanceController::class, 'logs'])->name('logs');
     Route::get('/devices', [AttendanceController::class, 'devices'])->name('devices.index');
     Route::put('/devices/{device}', [AttendanceController::class, 'updateDevice'])->name('devices.update');
+    Route::delete('/devices/{device}', [AttendanceController::class, 'destroyDevice'])->name('devices.destroy');
     Route::get('/mapping', [AttendanceController::class, 'mapping'])->name('mapping.index');
     Route::post('/mapping', [AttendanceController::class, 'storeMapping'])->name('mapping.store');
     

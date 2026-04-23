@@ -105,6 +105,16 @@ class AttendanceController extends BaseController
         return redirect()->route('admin.absensi.devices.index')->with('success', 'Perangkat berhasil diperbarui');
     }
 
+    public function destroyDevice(AttendanceDevice $device)
+    {
+        $this->requireAdminOrPermission('attendance.devices.delete');
+
+        $device->delete();
+
+        return redirect()->route('admin.absensi.devices.index')
+            ->with('success', "Device {$device->serial_number} berhasil dihapus.");
+    }
+
     public function mapping()
     {
         $this->requireAdminOrPermission('attendance.mapping.manage');
