@@ -33,17 +33,14 @@ class AttendanceUserController extends BaseController
             ->paginate(50);
 
         $availableUsers = User::query()
-            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
         $availableGurus = Guru::query()
-            ->where('is_active', true)
             ->orderBy('nama_lengkap')
             ->get();
 
         $availableSiswas = Siswa::query()
-            ->where('is_active', true)
             ->orderBy('nama_lengkap')
             ->get();
 
@@ -123,17 +120,14 @@ class AttendanceUserController extends BaseController
         $this->requireAdminOrPermission('attendance.users.manage');
 
         $availableUsers = User::query()
-            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
         $availableGurus = Guru::query()
-            ->where('is_active', true)
             ->orderBy('nama_lengkap')
             ->get();
 
         $availableSiswas = Siswa::query()
-            ->where('is_active', true)
             ->orderBy('nama_lengkap')
             ->get();
 
@@ -261,3 +255,5 @@ class AttendanceUserController extends BaseController
         abort(403);
     }
 }
+
+

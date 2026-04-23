@@ -7,6 +7,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('admin.absensi.index') }}" class="btn btn-secondary">Rekap</a>
+                <a href="{{ route('admin.absensi.users.index') }}" class="btn btn-secondary">Users</a>
                 <a href="{{ route('admin.absensi.devices.index') }}" class="btn btn-secondary">Devices</a>
                 <a href="{{ route('admin.absensi.mapping.index') }}" class="btn btn-secondary">Mapping</a>
             </div>
@@ -89,3 +90,4 @@
         </div>
     </div>
 </x-app-layout>
+

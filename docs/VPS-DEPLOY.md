@@ -148,7 +148,7 @@ systemctl status nginx
 
 ```bash
 apt install certbot python3-certbot-nginx -y
-certbot --nginx -d yourdomain.com -d www.yourdomain.com
+certbot --nginx -d smktelekomunikasidu.sch.id -d www.smktelekomunikasidu.sch.id;
 certbot renew --dry-run
 ```
 
@@ -161,7 +161,7 @@ mkdir -p /var/www/telkom
 chown -R $USER:$USER /var/www/telkom
 
 cd /var/www
-git clone https://github.com/USERNAME/REPO_NAME.git telkom
+git clone https://github.com/wahyudedik/smktelkomjombang.git telkom
 cd telkom
 ```
 
@@ -246,7 +246,7 @@ INSTAGRAM_REDIRECT_URI=https://yourdomain.com/instagram/callback
 INSTAGRAM_WEBHOOK_URI=https://yourdomain.com/instagram/webhook
 INSTAGRAM_WEBHOOK_TOKEN=
 
-# Push Notification (VAPID)
+# Push Notification (VAPID) — generate with: php artisan push:vapid-keys --generate
 VAPID_PUBLIC_KEY=
 VAPID_PRIVATE_KEY=
 VAPID_SUBJECT=https://yourdomain.com
@@ -291,7 +291,7 @@ Paste konfigurasi berikut:
 server {
     listen 80;
     listen [::]:80;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name smktelekomunikasidu.sch.id www.smktelekomunikasidu.sch.id;
     return 301 https://$server_name$request_uri;
 }
 
@@ -301,8 +301,8 @@ server {
     server_name yourdomain.com www.yourdomain.com;
     root /var/www/telkom/public;
 
-    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/smktelekomunikasidu.sch.id/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/smktelekomunikasidu.sch.id/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
@@ -349,7 +349,7 @@ server {
 ```
 
 ```bash
-ln -s /etc/nginx/sites-available/telkom /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/smktelekomunikasidu.sch.id /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl reload nginx
@@ -438,7 +438,7 @@ sudo -u www-data php /var/www/telkom/artisan schedule:run
 ### 18.1 Test Endpoint iClock
 
 ```bash
-curl -I "https://yourdomain.com/iclock/cdata?SN=TEST&token=ATTENDANCE_ICLOCK_SECRET"
+curl -I "https://smktelekomunikasidu.sch.id/iclock/cdata?SN=TEST&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara"
 # Harus return: HTTP/2 200
 ```
 
@@ -451,7 +451,7 @@ Menu → Communication → ADMS / Cloud Server
 
 Atur:
 ```
-Server URL:    https://yourdomain.com/iclock/cdata?token=ATTENDANCE_ICLOCK_SECRET
+Server URL:    https://smktelekomunikasidu.sch.id/iclock/cdata?token=iloveSMKkuYangIndahTelkomJayaAbadinusantara
 Push Interval: 60
 Enable Push:   ON
 ```
@@ -460,7 +460,7 @@ Simpan → Restart device.
 
 ### 18.3 Verifikasi Device Terhubung
 
-Buka: `https://yourdomain.com/admin/absensi/devices`
+Buka: `https://smktelekomunikasidu.sch.id/admin/absensi/devices`
 
 Device harus muncul dengan serial number dalam 1-2 menit.
 
