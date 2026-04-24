@@ -435,47 +435,172 @@ sudo -u www-data php /var/www/telkom/artisan schedule:run
 
 ## STEP 18 — SETUP ABSENSI ZKTECO
 
-### 18.1 Test Endpoint iClock
+⚠️ **PENTING: Baca ini dulu sebelum setup device!**
 
-```bash
-curl -I "https://smktelekomunikasidu.sch.id/iclock/cdata?SN=TEST&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara"
-# Harus return: HTTP/2 200
+### 18.0 Penjelasan Protokol ZKTeco (WAJIB TAHU)
+
+Device ZKTeco **TIDAK fleksibel** seperti REST API biasa. Dia hanya ngerti 3 endpoint:
+- `/iclock/getrequest` — Device minta perintah dari server
+- `/iclock/cdata` — Device kirim data absensi
+- `/iclock/devicecmd` — Device kirim hasil command
+
+**Format request dari device:**
+```
+GET /iclock/getrequest?SN=SERIAL_NUMBER&table=rtlog
+POST /iclock/cdata?SN=SERIAL_NUMBER&table=rtlog
 ```
 
-### 18.2 Setup Device MB20-VL
+**Token handling:**
+- ❌ Token BUKAN di URL (`?token=...`)
+- ✅ Token dikirim di **query parameter** atau **header**
+- Controller kita sudah handle ini di `requireToken()`
 
-Di device, masuk ke menu:
+**HTTPS vs HTTP:**
+- ⚠️ Banyak device ZKTeco lama gagal konek ke HTTPS
+- ✅ Gunakan **HTTP** untuk testing awal
+- ✅ Setelah stabil, bisa upgrade ke HTTPS dengan certificate yang valid
+
+---
+
+### 18.1 Pre-Setup: Konfigurasi .env
+
+Pastikan di `.env` sudah ada:
+```env
+ATTENDANCE_ICLOCK_SECRET=iloveSMKkuYangIndahTelkomJayaAbadinusantara
+ATTENDANCE_REQUIRE_USER_IDENTITY=true
+ATTENDANCE_REQUIRE_USER_VERIFIED=false
+```
+
+Token ini akan divalidasi di setiap request dari device.
+
+---
+
+### 18.2 Test Endpoint (Sebelum Setup Device)
+
+**Test via curl (HTTP dulu):**
+```bash
+# Test getrequest
+curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST123&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara"
+# Harus return: 200 OK + beberapa baris config
+
+# Test cdata
+curl -X POST "http://smktelekomunikasidu.sch.id/iclock/cdata?SN=TEST123&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara" \
+  -d "test data"
+# Harus return: 200 OK
+```
+
+**Cek log Laravel:**
+```bash
+tail -f /var/www/telkom/storage/logs/laravel.log | grep -i attendance
+```
+
+---
+
+### 18.3 Setup Device MB20-VL (BENAR)
+
+**STEP 1: Masuk ke menu device**
 ```
 Menu → Communication → ADMS / Cloud Server
 ```
 
-Atur:
+**STEP 2: Isi konfigurasi (PERHATIAN FORMAT INI):**
+
+| Setting | Value |
+|---------|-------|
+| **Server Address** | `smktelekomunikasidu.sch.id` |
+| **Port** | `80` (HTTP) atau `443` (HTTPS) |
+| **Protocol** | HTTP atau HTTPS |
+| **Path** | `/iclock/cdata` |
+| **Token** | `iloveSMKkuYangIndahTelkomJayaAbadinusantara` |
+| **Push Interval** | `60` (detik) |
+| **Enable Push** | `ON` |
+
+**ATAU jika device support URL lengkap:**
 ```
-Server URL:    https://smktelekomunikasidu.sch.id/iclock/cdata?token=iloveSMKkuYangIndahTelkomJayaAbadinusantara
-Push Interval: 60
-Enable Push:   ON
+Server URL: http://smktelekomunikasidu.sch.id/iclock/cdata?token=iloveSMKkuYangIndahTelkomJayaAbadinusantara
 ```
 
-Simpan → Restart device.
+**STEP 3: Simpan & Restart device**
+```
+Tekan: Save → Restart
+```
 
-### 18.3 Verifikasi Device Terhubung
+---
 
-Buka: `https://smktelekomunikasidu.sch.id/admin/absensi/devices`
+### 18.4 Verifikasi Device Terhubung
 
-Device harus muncul dengan serial number dalam 1-2 menit.
+**Cek di Laravel admin:**
+```
+https://smktelekomunikasidu.sch.id/admin/absensi/devices
+```
 
-### 18.4 Tambah User & Sync
+Device harus muncul dengan:
+- Serial number
+- IP address
+- Last seen (waktu terbaru)
 
-1. Buka: `/admin/absensi/users`
-2. Tambah user dengan PIN yang sesuai
+Jika belum muncul dalam 2 menit:
+1. Cek log Laravel: `tail -f storage/logs/laravel.log`
+2. Cek koneksi device ke server
+3. Pastikan token di device sama dengan `.env`
+
+---
+
+### 18.5 Tambah User & Sync ke Device
+
+1. Buka: `https://smktelekomunikasidu.sch.id/admin/absensi/users`
+2. Tambah user dengan:
+   - Nama
+   - PIN (harus unik, 1-5 digit)
+   - Kelas
 3. Klik **Sync Semua User ke Device**
-4. Tunggu status: **done**
+4. Tunggu status berubah menjadi **done**
 
-### 18.5 Enroll Biometric (di device langsung)
-
+**Cek log sync:**
+```bash
+tail -f /var/www/telkom/storage/logs/laravel.log | grep -i "sync\|user"
 ```
-Menu → Users → Pilih user → Fingerprint / Face / Card
-Ikuti instruksi di layar device
+
+---
+
+### 18.6 Enroll Biometric (di device langsung)
+
+**Fingerprint:**
+```
+Menu → Users → Pilih user → Fingerprint
+Ikuti instruksi: Letakkan jari 3-4 kali
+```
+
+**Face Recognition:**
+```
+Menu → Users → Pilih user → Face
+Ikuti instruksi: Hadap ke kamera, gerakkan kepala
+```
+
+**Card / Badge:**
+```
+Menu → Users → Pilih user → Card
+Tempelkan kartu ke reader
+```
+
+---
+
+### 18.7 Test Absensi (Scan Pertama)
+
+1. Scan fingerprint / face / card di device
+2. Cek di Laravel: `https://smktelekomunikasidu.sch.id/admin/absensi/logs`
+3. Data harus muncul dalam 1-2 menit
+
+**Jika tidak muncul:**
+```bash
+# Cek log Laravel
+tail -f /var/www/telkom/storage/logs/laravel.log
+
+# Cek database
+mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_logs ORDER BY created_at DESC LIMIT 5;"
+
+# Cek device connection
+curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=DEVICE_SERIAL&token=YOUR_TOKEN"
 ```
 
 ---
@@ -484,7 +609,7 @@ Ikuti instruksi di layar device
 
 ```bash
 # Website
-curl -I https://yourdomain.com
+curl -I https://smktelekomunikasidu.sch.id
 
 # Database
 mysql -u telkom_user -p -e "USE telkom_db; SHOW TABLES;"
@@ -575,14 +700,86 @@ supervisorctl restart telkom-worker:*
 tail -f /var/www/telkom/storage/logs/worker.log
 ```
 
-### Device absensi tidak muncul
-```bash
-# Cek endpoint
-curl -I "https://yourdomain.com/iclock/cdata?SN=TEST&token=YOUR_TOKEN"
+### Device absensi tidak muncul / tidak connect
 
-# Cek log
-tail -f /var/www/telkom/storage/logs/laravel.log | grep -i attendance
-```
+**Checklist debugging (urutan penting):**
+
+1. **Cek token di .env**
+   ```bash
+   grep ATTENDANCE_ICLOCK_SECRET /var/www/telkom/.env
+   ```
+   Pastikan sama dengan token di device.
+
+2. **Cek endpoint bisa diakses (HTTP dulu)**
+   ```bash
+   curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST&token=YOUR_TOKEN"
+   ```
+   Harus return `200 OK` + beberapa baris config.
+
+3. **Cek log Laravel**
+   ```bash
+   tail -f /var/www/telkom/storage/logs/laravel.log | grep -i "attendance\|iclock"
+   ```
+   Cari error atau warning.
+
+4. **Cek device setting**
+   - Server Address: `smktelekomunikasidu.sch.id` (tanpa https://)
+   - Port: `80` (HTTP) atau `443` (HTTPS)
+   - Token: sama dengan `.env`
+   - Push Interval: `60`
+   - Enable Push: `ON`
+
+5. **Restart device**
+   ```
+   Menu → System → Restart
+   ```
+
+6. **Cek database (device sudah terdaftar?)**
+   ```bash
+   mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_devices;"
+   ```
+
+7. **Jika masih tidak connect, coba HTTP dulu (bukan HTTPS)**
+   - HTTPS sering bermasalah di device lama
+   - Setelah stabil, baru upgrade ke HTTPS
+
+### Data absensi tidak masuk ke database
+
+**Checklist:**
+
+1. **Device sudah terhubung?**
+   ```bash
+   mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_devices WHERE last_seen_at > DATE_SUB(NOW(), INTERVAL 5 MINUTE);"
+   ```
+
+2. **User sudah di-sync ke device?**
+   ```bash
+   mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_identities LIMIT 5;"
+   ```
+
+3. **Cek log scan di device**
+   ```
+   Menu → Logs → Attendance
+   ```
+   Harus ada record scan.
+
+4. **Cek log Laravel saat scan**
+   ```bash
+   tail -f /var/www/telkom/storage/logs/laravel.log
+   # Lalu scan di device, lihat apa yang muncul
+   ```
+
+5. **Cek database attendance_logs**
+   ```bash
+   mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_logs ORDER BY created_at DESC LIMIT 10;"
+   ```
+
+6. **Jika queue worker tidak jalan**
+   ```bash
+   supervisorctl status telkom-worker:*
+   supervisorctl restart telkom-worker:*
+   tail -f /var/www/telkom/storage/logs/worker.log
+   ```
 
 ---
 
@@ -626,11 +823,23 @@ apt update && apt upgrade -y
 - [ ] Supervisor queue worker berjalan (2 proses)
 - [ ] Cron job scheduler aktif
 - [ ] Website bisa diakses via HTTPS
-- [ ] iClock endpoint return 200
-- [ ] Device absensi terhubung
-- [ ] User ditambahkan & sync ke device
-- [ ] Biometric enrolled
-- [ ] Test scan berhasil & log muncul
+- [ ] **[ZKTeco Setup]**
+  - [ ] ATTENDANCE_ICLOCK_SECRET sudah di .env
+  - [ ] Test endpoint HTTP: `/iclock/getrequest?SN=TEST&token=...`
+  - [ ] Device setting: Server Address (tanpa https://), Port 80, Token sesuai
+  - [ ] Device restart & tunggu 2 menit
+  - [ ] Device muncul di `/admin/absensi/devices`
+  - [ ] User ditambahkan & sync ke device
+  - [ ] Biometric enrolled (fingerprint/face/card)
+  - [ ] Test scan berhasil & log muncul di `/admin/absensi/logs`
+  - [ ] Database attendance_logs terisi data
+
+---
+
+## DOKUMENTASI TAMBAHAN
+
+- **[ZKTECO-SETUP.md](./ZKTECO-SETUP.md)** — Panduan lengkap setup ZKTeco iClock (troubleshooting, testing, monitoring)
+- **[ZKTECO-CORRECTIONS.md](./ZKTECO-CORRECTIONS.md)** — Koreksi penting dari feedback GPT (HTTP vs HTTPS, format endpoint, token placement)
 
 ---
 

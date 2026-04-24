@@ -70,9 +70,36 @@ Route::get('/instagram/callback', [InstagramController::class, 'handleOAuthCallb
 Route::get('/instagram/webhook', [InstagramController::class, 'verifyWebhook'])->name('instagram.webhook.verify');
 Route::post('/instagram/webhook', [InstagramController::class, 'handleWebhook'])->name('instagram.webhook.handle');
 
+// ZKTeco iClock Endpoints
 Route::match(['GET', 'POST'], '/iclock/cdata', [ZKTecoIClockController::class, 'cdata'])->name('zkteco.iclock.cdata');
 Route::match(['GET', 'POST'], '/iclock/getrequest', [ZKTecoIClockController::class, 'getrequest'])->name('zkteco.iclock.getrequest');
 Route::match(['GET', 'POST'], '/iclock/devicecmd', [ZKTecoIClockController::class, 'devicecmd'])->name('zkteco.iclock.devicecmd');
+
+// ZKTeco Debug Endpoints (untuk testing)
+Route::get('/iclock/test', function () {
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'ZKTeco endpoint is accessible',
+        'timestamp' => now(),
+        'url' => url('/iclock/getrequest'),
+    ]);
+})->name('zkteco.test');
+
+Route::get('/iclock/debug', function () {
+    \Log::info('ZKTeco debug endpoint accessed', [
+        'ip' => request()->ip(),
+        'user_agent' => request()->userAgent(),
+        'query' => request()->query(),
+    ]);
+    
+    return response()->json([
+        'status' => 'debug',
+        'ip' => request()->ip(),
+        'query' => request()->query(),
+        'headers' => request()->headers->all(),
+        'log' => 'Check storage/logs/laravel.log',
+    ]);
+})->name('zkteco.debug');
 
 // Custom pages example
 Route::get('/custom-example', function () {

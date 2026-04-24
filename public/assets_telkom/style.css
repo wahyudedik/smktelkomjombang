@@ -5681,6 +5681,7 @@ body .modal-backdrop {
 ---------------------------------------*/
 .rs-slider.style1 {
   position: relative;
+  margin-bottom: 0;
 }
 
 .rs-slider.style1 .slider-content {
@@ -6645,6 +6646,11 @@ body .modal-backdrop {
 /* ------------------------------------
     08. Services Section CSS
 ---------------------------------------*/
+.rs-services.style1 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 .rs-services.style1 .service-item {
   position: relative;
   overflow: hidden;

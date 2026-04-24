@@ -21,6 +21,14 @@ class ZKTecoIClockController extends BaseController
             $payload = (string) $request->input('data');
         }
 
+        // Log untuk debugging
+        \Log::info('ZKTeco cdata received', [
+            'serial_number' => $serialNumber,
+            'ip_address' => $request->ip(),
+            'payload_size' => strlen($payload),
+            'payload_preview' => substr($payload, 0, 100),
+        ]);
+
         $ingest->ingest($serialNumber, $payload, $request->ip());
 
         return response("OK");
@@ -30,10 +38,19 @@ class ZKTecoIClockController extends BaseController
     {
         $this->requireToken($request);
 
-        $device = $this->touchDevice($this->serialNumber($request), $request->ip());
+        $serialNumber = $this->serialNumber($request);
+        $device = $this->touchDevice($serialNumber, $request->ip());
         $commands = $queue->pullCommandsForDevice($device);
 
         $lines = array_merge($this->defaultOptionsLines($device->serial_number), $commands);
+
+        // Log untuk debugging
+        \Log::info('ZKTeco getrequest', [
+            'serial_number' => $serialNumber,
+            'device_id' => $device->id,
+            'ip_address' => $request->ip(),
+            'lines_count' => count($lines),
+        ]);
 
         return response(implode("\n", $lines), 200, [
             'Content-Type' => 'text/plain; charset=UTF-8',
@@ -66,6 +83,7 @@ class ZKTecoIClockController extends BaseController
     {
         $expected = (string) config('attendance.iclock_secret');
         if ($expected === '') {
+            \Log::warning('ZKTeco token validation skipped: no secret configured');
             return;
         }
 
@@ -75,7 +93,17 @@ class ZKTecoIClockController extends BaseController
             ?? $request->input('iclock_token')
             ?? '');
 
+        \Log::debug('ZKTeco token validation', [
+            'expected' => substr($expected, 0, 10) . '...',
+            'received' => substr($token, 0, 10) . '...',
+            'match' => hash_equals($expected, $token),
+        ]);
+
         if (!hash_equals($expected, $token)) {
+            \Log::warning('ZKTeco token mismatch', [
+                'ip' => request()->ip(),
+                'path' => request()->path(),
+            ]);
             abort(403);
         }
     }
