@@ -14,10 +14,38 @@ class CheckRole
      * Custom roles with these permissions can bypass role checks.
      */
     protected array $rolePermissionMap = [
-        'guru'     => ['guru.view', 'guru.read', 'siswa.view', 'siswa.read', 'jadwal.view', 'jadwal.read', 'attendance.view'],
-        'admin'    => ['users.view', 'users.create', 'pages.view', 'events.view', 'berita.view'],
-        'sarpras'  => ['sarpras.view', 'sarpras.read', 'sarpras.create'],
-        'osis'     => ['osis.view', 'osis.read', 'osis.create'],
+        'guru'    => [
+            'guru.view', 'guru.read', 'guru.create', 'guru.edit', 'guru.delete',
+            'siswa.view', 'siswa.read',
+            'jadwal.view', 'jadwal.read',
+            'attendance.view',
+            'kelulusan.view', 'lulus.view', 'lulus.read',
+            'surat.view',
+        ],
+        'admin'   => [
+            'users.view', 'users.create', 'users.edit', 'users.delete',
+            'pages.view', 'pages.create', 'pages.edit', 'pages.delete',
+            'events.view', 'events.create', 'events.edit', 'events.delete',
+            'berita.view', 'berita.create', 'berita.edit', 'berita.delete',
+            'osis.view', 'osis.read', 'osis.create', 'osis.edit', 'osis.delete',
+            'kelulusan.view', 'kelulusan.create', 'kelulusan.edit', 'kelulusan.delete',
+            'surat.view',
+            'settings.view', 'settings.manage',
+            'testimonials.view', 'testimonial-links.view',
+        ],
+        'sarpras' => [
+            'sarpras.view', 'sarpras.read', 'sarpras.create', 'sarpras.edit', 'sarpras.delete',
+            'surat.view',
+        ],
+        'osis'    => [
+            'osis.view', 'osis.read', 'osis.create', 'osis.edit', 'osis.delete',
+            'osis.vote', 'osis.results',
+        ],
+        'siswa'   => [
+            'osis.vote', 'osis.results',
+            'jadwal.read', 'jadwal.view',
+            'lulus.read', 'lulus.view',
+        ],
     ];
 
     public function handle(Request $request, Closure $next, string $role): Response

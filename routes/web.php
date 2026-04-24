@@ -345,47 +345,47 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
 
 // OSIS Management (Access: admin, superadmin, osis)
 Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('admin/osis')->name('admin.osis.')->group(function () {
-    Route::get('/', [OSISController::class, 'index'])->name('index');
+    Route::get('/', [OSISController::class, 'index'])->name('index')->middleware('permission:osis.view');
 
     // Calon Import/Export routes
-    Route::get('/calon/import', [OSISController::class, 'importCalon'])->name('calon.import');
-    Route::get('/calon/import/template', [OSISController::class, 'downloadCalonTemplate'])->name('calon.downloadTemplate');
-    Route::post('/calon/import', [OSISController::class, 'processCalonImport'])->name('calon.processImport')->middleware('throttle:10,1'); // Max 10 imports per minute
-    Route::get('/calon/export', [OSISController::class, 'exportCalon'])->name('calon.export');
+    Route::get('/calon/import', [OSISController::class, 'importCalon'])->name('calon.import')->middleware('permission:osis.create');
+    Route::get('/calon/import/template', [OSISController::class, 'downloadCalonTemplate'])->name('calon.downloadTemplate')->middleware('permission:osis.create');
+    Route::post('/calon/import', [OSISController::class, 'processCalonImport'])->name('calon.processImport')->middleware(['permission:osis.create', 'throttle:10,1']);
+    Route::get('/calon/export', [OSISController::class, 'exportCalon'])->name('calon.export')->middleware('permission:osis.view');
 
-    Route::get('/calon', [OSISController::class, 'calonIndex'])->name('calon.index');
-    Route::get('/calon/create', [OSISController::class, 'createCalon'])->name('calon.create');
-    Route::post('/calon', [OSISController::class, 'storeCalon'])->name('calon.store');
-    Route::get('/calon/{calon}', [OSISController::class, 'showCalon'])->name('calon.show');
-    Route::get('/calon/{calon}/edit', [OSISController::class, 'editCalon'])->name('calon.edit');
-    Route::put('/calon/{calon}', [OSISController::class, 'updateCalon'])->name('calon.update');
-    Route::delete('/calon/{calon}', [OSISController::class, 'destroyCalon'])->name('calon.destroy');
+    Route::get('/calon', [OSISController::class, 'calonIndex'])->name('calon.index')->middleware('permission:osis.view');
+    Route::get('/calon/create', [OSISController::class, 'createCalon'])->name('calon.create')->middleware('permission:osis.create');
+    Route::post('/calon', [OSISController::class, 'storeCalon'])->name('calon.store')->middleware('permission:osis.create');
+    Route::get('/calon/{calon}', [OSISController::class, 'showCalon'])->name('calon.show')->middleware('permission:osis.view');
+    Route::get('/calon/{calon}/edit', [OSISController::class, 'editCalon'])->name('calon.edit')->middleware('permission:osis.edit');
+    Route::put('/calon/{calon}', [OSISController::class, 'updateCalon'])->name('calon.update')->middleware('permission:osis.edit');
+    Route::delete('/calon/{calon}', [OSISController::class, 'destroyCalon'])->name('calon.destroy')->middleware('permission:osis.delete');
 
     // Pemilih Import/Export routes (must be before {pemilih} routes)
-    Route::get('/pemilih/import', [OSISController::class, 'importPemilih'])->name('pemilih.import');
-    Route::get('/pemilih/import/template', [OSISController::class, 'downloadPemilihTemplate'])->name('pemilih.downloadTemplate');
-    Route::post('/pemilih/import', [OSISController::class, 'processPemilihImport'])->name('pemilih.processImport')->middleware('throttle:10,1'); // Max 10 imports per minute
-    Route::get('/pemilih/export', [OSISController::class, 'exportPemilih'])->name('pemilih.export');
+    Route::get('/pemilih/import', [OSISController::class, 'importPemilih'])->name('pemilih.import')->middleware('permission:osis.create');
+    Route::get('/pemilih/import/template', [OSISController::class, 'downloadPemilihTemplate'])->name('pemilih.downloadTemplate')->middleware('permission:osis.create');
+    Route::post('/pemilih/import', [OSISController::class, 'processPemilihImport'])->name('pemilih.processImport')->middleware(['permission:osis.create', 'throttle:10,1']);
+    Route::get('/pemilih/export', [OSISController::class, 'exportPemilih'])->name('pemilih.export')->middleware('permission:osis.view');
 
-    Route::get('/pemilih', [OSISController::class, 'pemilihIndex'])->name('pemilih.index');
-    Route::get('/pemilih/create', [OSISController::class, 'createPemilih'])->name('pemilih.create');
-    Route::post('/pemilih', [OSISController::class, 'storePemilih'])->name('pemilih.store');
-    Route::post('/pemilih/generate-from-users', [OSISController::class, 'generatePemilihFromUsers'])->name('pemilih.generate-from-users');
+    Route::get('/pemilih', [OSISController::class, 'pemilihIndex'])->name('pemilih.index')->middleware('permission:osis.view');
+    Route::get('/pemilih/create', [OSISController::class, 'createPemilih'])->name('pemilih.create')->middleware('permission:osis.create');
+    Route::post('/pemilih', [OSISController::class, 'storePemilih'])->name('pemilih.store')->middleware('permission:osis.create');
+    Route::post('/pemilih/generate-from-users', [OSISController::class, 'generatePemilihFromUsers'])->name('pemilih.generate-from-users')->middleware('permission:osis.create');
 
     // Pemilih CRUD with model binding (must be after specific routes)
-    Route::get('/pemilih/{pemilih}', [OSISController::class, 'showPemilih'])->name('pemilih.show');
-    Route::get('/pemilih/{pemilih}/edit', [OSISController::class, 'editPemilih'])->name('pemilih.edit');
-    Route::put('/pemilih/{pemilih}', [OSISController::class, 'updatePemilih'])->name('pemilih.update');
-    Route::delete('/pemilih/{pemilih}', [OSISController::class, 'destroyPemilih'])->name('pemilih.destroy');
+    Route::get('/pemilih/{pemilih}', [OSISController::class, 'showPemilih'])->name('pemilih.show')->middleware('permission:osis.view');
+    Route::get('/pemilih/{pemilih}/edit', [OSISController::class, 'editPemilih'])->name('pemilih.edit')->middleware('permission:osis.edit');
+    Route::put('/pemilih/{pemilih}', [OSISController::class, 'updatePemilih'])->name('pemilih.update')->middleware('permission:osis.edit');
+    Route::delete('/pemilih/{pemilih}', [OSISController::class, 'destroyPemilih'])->name('pemilih.destroy')->middleware('permission:osis.delete');
 
     Route::get('/voting', [OSISController::class, 'voting'])->name('voting');
     Route::post('/vote', [OSISController::class, 'processVote'])->name('vote');
-    Route::get('/results', [OSISController::class, 'results'])->name('results');
-    Route::get('/results/export/pdf', [OSISController::class, 'exportVotingResultsPdf'])->name('results.export.pdf');
-    Route::get('/results/export/json', [OSISController::class, 'exportVotingResultsJson'])->name('results.export.json');
-    Route::get('/results/export/xml', [OSISController::class, 'exportVotingResultsXml'])->name('results.export.xml');
-    Route::get('/analytics', [OSISController::class, 'analytics'])->name('analytics');
-    Route::get('/teacher-view', [OSISController::class, 'teacherView'])->name('teacher-view');
+    Route::get('/results', [OSISController::class, 'results'])->name('results')->middleware('permission:osis.results');
+    Route::get('/results/export/pdf', [OSISController::class, 'exportVotingResultsPdf'])->name('results.export.pdf')->middleware('permission:osis.results');
+    Route::get('/results/export/json', [OSISController::class, 'exportVotingResultsJson'])->name('results.export.json')->middleware('permission:osis.results');
+    Route::get('/results/export/xml', [OSISController::class, 'exportVotingResultsXml'])->name('results.export.xml')->middleware('permission:osis.results');
+    Route::get('/analytics', [OSISController::class, 'analytics'])->name('analytics')->middleware('permission:osis.view');
+    Route::get('/teacher-view', [OSISController::class, 'teacherView'])->name('teacher-view')->middleware('permission:osis.view');
 });
 
 // OSIS Student Routes (Access: siswa) - Voting and Results
@@ -398,26 +398,26 @@ Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('admin/osis')->nam
 // E-Lulus Management (Access: admin, superadmin, guru)
 Route::middleware(['auth', 'verified', 'role:admin|superadmin|guru'])->prefix('admin/lulus')->name('admin.lulus.')->group(function () {
     // Import/Export routes (must be before resource routes)
-    Route::get('/import', [KelulusanController::class, 'import'])->name('import');
-    Route::get('/import/template', [KelulusanController::class, 'downloadTemplate'])->name('downloadTemplate');
-    Route::post('/import', [KelulusanController::class, 'processImport'])->name('processImport')->middleware('throttle:10,1'); // Max 10 imports per minute
-    Route::get('/export', [KelulusanController::class, 'export'])->name('export');
-    Route::get('/export/pdf', [KelulusanController::class, 'exportPdf'])->name('export.pdf');
-    Route::get('/export/json', [KelulusanController::class, 'exportJson'])->name('export.json');
-    Route::get('/export/xml', [KelulusanController::class, 'exportXml'])->name('export.xml');
+    Route::get('/import', [KelulusanController::class, 'import'])->name('import')->middleware('permission:kelulusan.import');
+    Route::get('/import/template', [KelulusanController::class, 'downloadTemplate'])->name('downloadTemplate')->middleware('permission:kelulusan.import');
+    Route::post('/import', [KelulusanController::class, 'processImport'])->name('processImport')->middleware(['permission:kelulusan.import', 'throttle:10,1']);
+    Route::get('/export', [KelulusanController::class, 'export'])->name('export')->middleware('permission:kelulusan.export');
+    Route::get('/export/pdf', [KelulusanController::class, 'exportPdf'])->name('export.pdf')->middleware('permission:kelulusan.export');
+    Route::get('/export/json', [KelulusanController::class, 'exportJson'])->name('export.json')->middleware('permission:kelulusan.export');
+    Route::get('/export/xml', [KelulusanController::class, 'exportXml'])->name('export.xml')->middleware('permission:kelulusan.export');
     Route::get('/check', [KelulusanController::class, 'checkStatus'])->name('check');
     Route::post('/check', [KelulusanController::class, 'processCheck'])->name('check.process');
 
     // CRUD routes
-    Route::get('/', [KelulusanController::class, 'index'])->name('index');
-    Route::get('/create', [KelulusanController::class, 'create'])->name('create');
-    Route::post('/', [KelulusanController::class, 'store'])->name('store');
-    Route::get('/{kelulusan}', [KelulusanController::class, 'show'])->name('show');
-    Route::get('/{kelulusan}/edit', [KelulusanController::class, 'edit'])->name('edit');
-    Route::put('/{kelulusan}', [KelulusanController::class, 'update'])->name('update');
-    Route::delete('/{kelulusan}', [KelulusanController::class, 'destroy'])->name('destroy');
-    Route::get('/{kelulusan}/certificate', [KelulusanController::class, 'generateCertificate'])->name('certificate');
-    Route::get('/{kelulusan}/certificate/download', [KelulusanController::class, 'downloadCertificate'])->name('certificate.download');
+    Route::get('/', [KelulusanController::class, 'index'])->name('index')->middleware('permission:kelulusan.view');
+    Route::get('/create', [KelulusanController::class, 'create'])->name('create')->middleware('permission:kelulusan.create');
+    Route::post('/', [KelulusanController::class, 'store'])->name('store')->middleware('permission:kelulusan.create');
+    Route::get('/{kelulusan}', [KelulusanController::class, 'show'])->name('show')->middleware('permission:kelulusan.view');
+    Route::get('/{kelulusan}/edit', [KelulusanController::class, 'edit'])->name('edit')->middleware('permission:kelulusan.edit');
+    Route::put('/{kelulusan}', [KelulusanController::class, 'update'])->name('update')->middleware('permission:kelulusan.edit');
+    Route::delete('/{kelulusan}', [KelulusanController::class, 'destroy'])->name('destroy')->middleware('permission:kelulusan.delete');
+    Route::get('/{kelulusan}/certificate', [KelulusanController::class, 'generateCertificate'])->name('certificate')->middleware('permission:kelulusan.certificate');
+    Route::get('/{kelulusan}/certificate/download', [KelulusanController::class, 'downloadCertificate'])->name('certificate.download')->middleware('permission:kelulusan.certificate');
 });
 
 // E-Lulus Student Routes (Access: siswa) - View only

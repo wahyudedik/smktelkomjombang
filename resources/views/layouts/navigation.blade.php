@@ -88,7 +88,7 @@
                     @php
                         $showEServices = Auth::check() && (
                             Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru', 'osis']) ||
-                            Auth::user()->canAny(['osis.view','osis.read','kelulusan.view','surat.view','lulus.view'])
+                            Auth::user()->canAny(['osis.view','osis.read','kelulusan.view','lulus.view','surat.view'])
                         );
                     @endphp
                     @if ($showEServices)
@@ -113,7 +113,10 @@
                                             <i class="fas fa-vote-yea mr-2"></i>E-OSIS Voting
                                         </a>
                                     @endif
-                                    @if (Auth::check() && Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru']))
+                                    @if (Auth::check() &&
+                                            (Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru']) ||
+                                                Auth::user()->can('kelulusan.view') ||
+                                                Auth::user()->can('lulus.view')))
                                         <a href="{{ route('admin.lulus.index') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-graduation-cap mr-2"></i>E-Lulus Graduation
@@ -130,7 +133,7 @@
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-inbox mr-2"></i>Surat Masuk
                                         </a>
-                                        @if (Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                        @if (Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('surat.manage'))
                                             <a href="{{ route('admin.letters.formats.index') }}"
                                                 class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                                 <i class="fas fa-file-contract mr-2"></i>Format Surat
@@ -681,7 +684,7 @@
                                         <i class="fas fa-vote-yea mr-2"></i>E-OSIS Voting
                                     </a>
                                 @endif
-                                @if (Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru']) || Auth::user()->can('kelulusan.view'))
+                                @if (Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru']) || Auth::user()->can('kelulusan.view') || Auth::user()->can('lulus.view'))
                                     <a href="{{ route('admin.lulus.index') }}" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-graduation-cap mr-2"></i>E-Lulus Graduation
                                     </a>
@@ -694,7 +697,7 @@
                                     <a href="{{ route('admin.letters.in.index') }}" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-inbox mr-2"></i>Surat Masuk
                                     </a>
-                                    @if (Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                    @if (Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('surat.manage'))
                                         <a href="{{ route('admin.letters.formats.index') }}" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                             <i class="fas fa-file-contract mr-2"></i>Format Surat
                                         </a>

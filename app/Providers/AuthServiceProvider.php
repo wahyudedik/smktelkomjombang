@@ -75,27 +75,38 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('manageUsers', function (User $user) {
-            return $user->hasRole('superadmin');
+            return $user->hasAnyRole(['superadmin', 'admin'])
+                || $user->canAny(['users.view', 'users.create', 'users.edit', 'users.delete']);
         });
 
         Gate::define('manageSarpras', function (User $user) {
-            return $user->hasRole('superadmin') || $user->can('sarpras.view');
+            return $user->hasAnyRole(['superadmin', 'admin', 'sarpras'])
+                || $user->canAny(['sarpras.view', 'sarpras.create', 'sarpras.edit', 'sarpras.delete']);
         });
 
         Gate::define('manageOSIS', function (User $user) {
-            return $user->hasRole('superadmin') || $user->can('osis.view');
+            return $user->hasAnyRole(['superadmin', 'admin', 'osis'])
+                || $user->canAny(['osis.view', 'osis.create', 'osis.edit', 'osis.delete']);
         });
 
         Gate::define('managePages', function (User $user) {
-            return $user->hasRole('superadmin') || $user->can('pages.view');
+            return $user->hasAnyRole(['superadmin', 'admin'])
+                || $user->canAny(['pages.view', 'pages.create', 'pages.edit', 'pages.delete']);
         });
 
         Gate::define('manageInstagram', function (User $user) {
-            return $user->hasRole('superadmin') || $user->can('instagram.view');
+            return $user->hasAnyRole(['superadmin', 'admin'])
+                || $user->canAny(['instagram.view', 'instagram.manage']);
         });
 
         Gate::define('manageSettings', function (User $user) {
-            return $user->hasRole('superadmin') || $user->can('settings.view');
+            return $user->hasAnyRole(['superadmin', 'admin'])
+                || $user->canAny(['settings.view', 'settings.manage']);
+        });
+
+        Gate::define('manageContent', function (User $user) {
+            return $user->hasAnyRole(['superadmin', 'admin'])
+                || $user->canAny(['events.view', 'berita.view', 'pages.view', 'instagram.view']);
         });
     }
 }
