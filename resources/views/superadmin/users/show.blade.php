@@ -81,51 +81,49 @@
                     </div>
                 </div>
 
-                <!-- Module Access -->
+                <!-- Role & Permissions -->
                 <div class="card mt-6">
                     <div class="card-header">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-semibold text-slate-900">Module Access</h3>
-                            <a href="{{ route('admin.superadmin.users.module-access', $user) }}"
-                                class="btn btn-primary btn-sm">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                                </svg>
-                                Manage Access
+                            <h3 class="text-lg font-semibold text-slate-900">Role & Permissions</h3>
+                            <a href="{{ route('admin.role-permissions.index') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-shield-alt mr-1"></i> Manage Roles
                             </a>
                         </div>
                     </div>
                     <div class="card-body">
-                        @if ($user->moduleAccess->count() > 0)
-                            <div class="space-y-3">
-                                @foreach ($user->moduleAccess as $access)
-                                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                        <div>
-                                            <p class="font-medium text-slate-900">{{ ucfirst($access->module_name) }}
-                                            </p>
-                                            <p class="text-sm text-slate-500">
-                                                @if ($access->can_access)
-                                                    Access: Yes |
-                                                    Create: {{ $access->can_create ? 'Yes' : 'No' }} |
-                                                    Read: {{ $access->can_read ? 'Yes' : 'No' }} |
-                                                    Update: {{ $access->can_update ? 'Yes' : 'No' }} |
-                                                    Delete: {{ $access->can_delete ? 'Yes' : 'No' }}
-                                                @else
-                                                    No access
-                                                @endif
-                                            </p>
-                                        </div>
-                                        <span
-                                            class="badge {{ $access->can_access ? 'badge-success' : 'badge-danger' }}">
-                                            {{ $access->can_access ? 'Active' : 'Inactive' }}
-                                        </span>
+                        <!-- Current Role -->
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-slate-700 mb-2">Current Role</p>
+                            @forelse($user->roles as $role)
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                    <i class="fas fa-user-shield mr-1"></i> {{ $role->display_name ?? ucfirst($role->name) }}
+                                </span>
+                            @empty
+                                <span class="text-sm text-slate-500 italic">No role assigned</span>
+                            @endforelse
+                        </div>
+                        <!-- Permissions grouped by module -->
+                        <div>
+                            <p class="text-sm font-medium text-slate-700 mb-2">Permissions via Role</p>
+                            @php
+                                $userPermissions = $user->getAllPermissions()->groupBy('module');
+                            @endphp
+                            @forelse($userPermissions as $module => $perms)
+                                <div class="mb-3">
+                                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">{{ ucfirst($module ?? 'other') }}</p>
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach($perms as $perm)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                                {{ $perm->action ?? $perm->name }}
+                                            </span>
+                                        @endforeach
                                     </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-slate-500">No module access configured</p>
-                        @endif
+                                </div>
+                            @empty
+                                <p class="text-sm text-slate-500 italic">No permissions assigned</p>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>
@@ -157,15 +155,6 @@
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                             <span class="font-medium text-slate-900">Edit User</span>
-                        </a>
-                        <a href="{{ route('admin.superadmin.users.module-access', $user) }}"
-                            class="flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
-                            <svg class="w-5 h-5 text-purple-600 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1721 9z" />
-                            </svg>
-                            <span class="font-medium text-slate-900">Manage Access</span>
                         </a>
                         @if (!$user->hasRole('superadmin'))
                             <form method="POST" action="{{ route('admin.superadmin.users.destroy', $user) }}"

@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="mb-6">
-                        <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('admin.role-permissions.index') }}" class="btn btn-secondary">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -105,7 +105,7 @@
                         </div>
 
                         <div class="flex justify-end space-x-3">
-                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('admin.role-permissions.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -180,7 +180,7 @@
 
                     if (result.data.success) {
                         showSuccess('Berhasil!', 'User assignments berhasil diupdate').then(() => {
-                            window.location.href = '{{ route('admin.roles.index') }}';
+                            window.location.href = '{{ route('admin.role-permissions.index') }}';
                         });
                     } else {
                         showError('Error updating user assignments: ' + (result.data.message ||

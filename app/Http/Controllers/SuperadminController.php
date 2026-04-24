@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
-use App\Models\ModuleAccess;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +50,7 @@ class SuperadminController extends Controller
      */
     public function users(Request $request)
     {
-        $query = User::query()->with('roles', 'moduleAccess');
+        $query = User::query()->with('roles');
 
         // Filter by role if provided (handle array input from parameter pollution)
         if ($request->filled('role')) {
@@ -99,7 +98,7 @@ class SuperadminController extends Controller
      */
     public function showUser(User $user)
     {
-        $user->load('roles', 'moduleAccess', 'auditLogs');
+        $user->load('roles', 'auditLogs');
         return view('superadmin.users.show', compact('user'));
     }
 
@@ -323,64 +322,6 @@ class SuperadminController extends Controller
 
         return redirect()->route('admin.superadmin.users')
             ->with('success', 'User deleted successfully.');
-    }
-
-    /**
-     * Manage user module access.
-     */
-    public function moduleAccess(User $user)
-    {
-        $modules = ['instagram', 'pages', 'guru', 'siswa', 'osis', 'lulus', 'sarpras', 'settings'];
-        $user->load('moduleAccess');
-
-        return view('superadmin.users.module-access', compact('user', 'modules'));
-    }
-
-    /**
-     * Update user module access.
-     */
-    public function updateModuleAccess(Request $request, User $user)
-    {
-        $request->validate([
-            'modules' => 'required|array',
-            'modules.*.module_name' => 'required|string',
-            'modules.*.can_access' => 'boolean',
-            'modules.*.can_create' => 'boolean',
-            'modules.*.can_read' => 'boolean',
-            'modules.*.can_update' => 'boolean',
-            'modules.*.can_delete' => 'boolean',
-        ]);
-
-        foreach ($request->modules as $moduleData) {
-            ModuleAccess::updateOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'module_name' => $moduleData['module_name'],
-                ],
-                [
-                    'can_access' => $moduleData['can_access'] ?? false,
-                    'can_create' => $moduleData['can_create'] ?? false,
-                    'can_read' => $moduleData['can_read'] ?? false,
-                    'can_update' => $moduleData['can_update'] ?? false,
-                    'can_delete' => $moduleData['can_delete'] ?? false,
-                ]
-            );
-        }
-
-        // Log the action
-        AuditLog::createLog(
-            'module_access_updated',
-            Auth::id(),
-            'User',
-            $user->id,
-            null,
-            $request->modules,
-            $request->ip(),
-            $request->userAgent()
-        );
-
-        return redirect()->route('admin.superadmin.users.module-access', $user)
-            ->with('success', 'Module access updated successfully.');
     }
 
     /**

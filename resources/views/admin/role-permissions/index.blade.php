@@ -271,13 +271,11 @@
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Role Name <span
                                 class="text-red-500">*</span></label>
-                        <select id="editRoleName" name="name" class="form-input w-full" required>
-                            <option value="">-- Pilih Role --</option>
-                            @foreach ($predefinedRoles as $roleKey => $roleLabel)
-                                <option value="{{ $roleKey }}">{{ $roleLabel }}</option>
-                            @endforeach
-                        </select>
-                        <p class="mt-1 text-xs text-gray-500">Pilih role dari daftar untuk memastikan penamaan seragam
+                        <input type="text" id="editRoleName" name="name" class="form-input w-full"
+                            required placeholder="Nama role (huruf kecil, tanpa spasi)"
+                            pattern="[a-z0-9-]+" title="Hanya huruf kecil, angka, dan tanda hubung. Tanpa spasi.">
+                        <p class="mt-1 text-xs text-gray-500" id="editRoleNameHelp">
+                            Nama role hanya boleh huruf kecil, angka, dan tanda hubung (contoh: staf-keuangan)
                         </p>
                         <p class="mt-1 text-xs text-yellow-600" id="editRoleWarning" style="display: none;">
                             <i class="fas fa-exclamation-triangle"></i> Role core tidak dapat diubah namanya
@@ -368,7 +366,9 @@
             document.getElementById('editRoleModal').classList.add('hidden');
             document.getElementById('editRoleForm').reset();
             document.getElementById('editRoleWarning').style.display = 'none';
-            document.getElementById('editRoleName').disabled = false;
+            const nameInput = document.getElementById('editRoleName');
+            nameInput.disabled = false;
+            nameInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
         }
 
         // Handle role name dropdown change
@@ -421,7 +421,21 @@
                 return;
             }
 
-            const permissions = Array.from(document.querySelectorAll('input[name="permissions[]"]:checked'))
+            // Normalize name client-side (same as server)
+            const normalizedName = roleName.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9-]/g, '');
+            if (!normalizedName) {
+                showError('Error!', 'Nama role tidak valid. Gunakan huruf, angka, atau tanda hubung.');
+                return;
+            }
+
+            // Check if role already exists (client-side check)
+            const existingRoles = @json($roles->pluck('name'));
+            if (existingRoles.map(r => r.toLowerCase()).includes(normalizedName)) {
+                showError('Role Sudah Ada!', `Role "<strong>${normalizedName}</strong>" sudah ada. Gunakan nama lain.`);
+                return;
+            }
+
+            const permissions = Array.from(document.querySelectorAll('#createRoleModal input[name="permissions[]"]:checked'))
                 .map(input => input.value);
 
             const submitBtn = this.querySelector('button[type="submit"]');
@@ -439,7 +453,7 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({
-                        name: roleName,
+                        name: normalizedName,
                         permissions: permissions
                     })
                 })
@@ -458,12 +472,10 @@
                 .then(result => {
                     if (!result.ok) {
                         if (result.status === 422) {
-                            const errors = result.data.errors || {};
-                            let errorMsg = 'Validation errors:<br>';
-                            for (const [field, fieldErrors] of Object.entries(errors)) {
-                                errorMsg +=
-                                    `<strong>${field}:</strong> ${Array.isArray(fieldErrors) ? fieldErrors.join(', ') : fieldErrors}<br>`;
-                            }
+                            // Show the main error message directly
+                            const errorMsg = result.data.message || 
+                                Object.values(result.data.errors || {}).flat().join('<br>') || 
+                                'Validasi gagal. Periksa kembali input Anda.';
                             showError('Error Validasi!', errorMsg);
                         } else if (result.status === 401 || result.status === 403) {
                             showError('Unauthorized!', 'Anda tidak memiliki izin untuk melakukan aksi ini.');
@@ -500,8 +512,8 @@
 
             const formData = new FormData(this);
             const roleId = formData.get('role_id');
-            const nameSelect = document.getElementById('editRoleName');
-            const isDisabled = nameSelect.disabled;
+            const nameInput = document.getElementById('editRoleName');
+            const isDisabled = nameInput.disabled;
             const permissions = Array.from(document.querySelectorAll(
                     '#editRoleModal input[name="permissions[]"]:checked'))
                 .map(input => input.value);
@@ -518,7 +530,7 @@
 
             // Only include name if it's not disabled (not a core role or name can be changed)
             if (!isDisabled) {
-                requestBody.name = formData.get('name');
+                requestBody.name = nameInput.value.trim();
             }
 
             fetch(`/admin/role-permissions/roles/${roleId}`, {
@@ -547,12 +559,9 @@
                 .then(result => {
                     if (!result.ok) {
                         if (result.status === 422) {
-                            const errors = result.data.errors || {};
-                            let errorMsg = 'Validation errors:<br>';
-                            for (const [field, fieldErrors] of Object.entries(errors)) {
-                                errorMsg +=
-                                    `<strong>${field}:</strong> ${Array.isArray(fieldErrors) ? fieldErrors.join(', ') : fieldErrors}<br>`;
-                            }
+                            const errorMsg = result.data.message || 
+                                Object.values(result.data.errors || {}).flat().join('<br>') || 
+                                'Validasi gagal. Periksa kembali input Anda.';
                             showError('Error Validasi!', errorMsg);
                         } else if (result.status === 401 || result.status === 403) {
                             showError('Unauthorized!', 'Anda tidak memiliki izin untuk melakukan aksi ini.');
@@ -634,14 +643,19 @@
             const coreRoles = @json(get_core_roles());
             const isCoreRole = coreRoles.map(r => r.toLowerCase()).includes(roleName.toLowerCase());
             const warningEl = document.getElementById('editRoleWarning');
-            const nameSelect = document.getElementById('editRoleName');
+            const nameInput = document.getElementById('editRoleName');
+
+            // Set the role name immediately (before fetch)
+            nameInput.value = roleName;
 
             if (isCoreRole) {
                 warningEl.style.display = 'block';
-                nameSelect.disabled = true;
+                nameInput.disabled = true;
+                nameInput.classList.add('bg-gray-100', 'cursor-not-allowed');
             } else {
                 warningEl.style.display = 'none';
-                nameSelect.disabled = false;
+                nameInput.disabled = false;
+                nameInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
             }
 
             // Get role permissions (this would need to be passed from backend)
@@ -680,10 +694,10 @@
                         // Fill edit modal
                         document.getElementById('editRoleId').value = roleId;
 
-                        // Set role name in dropdown (use from API if available, else from data attribute)
-                        const nameSelect = document.getElementById('editRoleName');
+                        // Set role name in input (use from API if available, else from data attribute)
+                        const nameInput = document.getElementById('editRoleName');
                         const apiRoleName = result.data.role_name || roleName;
-                        nameSelect.value = apiRoleName.toLowerCase();
+                        nameInput.value = apiRoleName.toLowerCase();
 
                         // Re-check if it's core role for disabled state
                         const coreRoles = @json(get_core_roles());
@@ -691,10 +705,12 @@
                         const isCoreRole = coreRoles.map(r => r.toLowerCase()).includes(finalRoleName);
                         if (isCoreRole) {
                             warningEl.style.display = 'block';
-                            nameSelect.disabled = true;
+                            nameInput.disabled = true;
+                            nameInput.classList.add('bg-gray-100', 'cursor-not-allowed');
                         } else {
                             warningEl.style.display = 'none';
-                            nameSelect.disabled = false;
+                            nameInput.disabled = false;
+                            nameInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
                         }
 
                         // Clear all checkboxes first

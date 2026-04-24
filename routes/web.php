@@ -219,10 +219,6 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('admin/supera
     Route::put('/users/{user}', [SuperadminController::class, 'updateUser'])->name('users.update');
     Route::delete('/users/{user}', [SuperadminController::class, 'destroyUser'])->name('users.destroy');
 
-    // Module Access Management (must be after other {user} routes)
-    Route::get('/users/{user}/module-access', [SuperadminController::class, 'moduleAccess'])->name('users.module-access');
-    Route::put('/users/{user}/module-access', [SuperadminController::class, 'updateModuleAccess'])->name('users.module-access.update');
-
     // Instagram Settings Management
     Route::get('/instagram-settings', [InstagramSettingController::class, 'index'])->name('instagram-settings');
     Route::post('/instagram-settings', [InstagramSettingController::class, 'store'])->name('instagram-settings.store');

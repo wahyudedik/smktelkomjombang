@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Helpers\RoleHelper;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class RolePermissionController extends Controller
 {
@@ -48,46 +49,60 @@ class RolePermissionController extends Controller
         // Authorization check
         Gate::authorize('manageRolesAndPermissions');
 
+        // Normalize role name: lowercase, no spaces, only alphanumeric and hyphens
+        $roleName = strtolower(str_replace(' ', '', $request->name ?? ''));
+        $roleName = preg_replace('/[^a-z0-9-]/', '', $roleName);
+
+        $request->merge(['name' => $roleName]);
+
+        // Validate with clear messages
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:roles,name|regex:/^[a-z0-9-]+$/',
+            'permissions' => 'nullable|array'
+        ], [
+            'name.required'  => 'Nama role wajib diisi.',
+            'name.unique'    => "Role '{$roleName}' sudah ada. Gunakan nama lain.",
+            'name.regex'     => 'Nama role hanya boleh huruf kecil, angka, dan tanda hubung (-). Tanpa spasi.',
+            'name.max'       => 'Nama role maksimal 255 karakter.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first('name'),
+                'errors'  => $validator->errors()->toArray(),
+            ], 422);
+        }
+
         try {
-            // Normalize role name: lowercase, no spaces, only alphanumeric and hyphens
-            $roleName = strtolower(str_replace(' ', '', $request->name));
-            $roleName = preg_replace('/[^a-z0-9-]/', '', $roleName);
-
-            $request->merge(['name' => $roleName]);
-
-            $request->validate([
-                'name' => 'required|string|max:255|unique:roles,name|regex:/^[a-z0-9-]+$/',
-                'permissions' => 'array'
-            ]);
-
             $role = Role::create([
-                'name' => $roleName,
-                'guard_name' => 'web'
+                'name'         => $roleName,
+                'display_name' => $request->display_name ?? ucfirst($roleName),
+                'guard_name'   => 'web',
             ]);
 
-            if ($request->has('permissions')) {
+            if ($request->filled('permissions')) {
                 $role->givePermissionTo($request->permissions);
             }
 
-            // Return JSON for AJAX requests
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Role created successfully',
-                    'data' => $role
+                    'message' => "Role '{$roleName}' berhasil dibuat.",
+                    'data'    => $role,
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Role created successfully.');
+            return redirect()->back()->with('success', "Role '{$roleName}' berhasil dibuat.");
         } catch (\Exception $e) {
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error creating role: ' . $e->getMessage()
-                ], 422);
+                    'message' => 'Gagal membuat role: ' . $e->getMessage(),
+                ], 500);
             }
 
-            return redirect()->back()->with('error', 'Error creating role: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat role: ' . $e->getMessage());
         }
     }
 

@@ -68,12 +68,29 @@ class PermissionController extends Controller
             'name' => 'required|string|max:255|unique:permissions',
             'display_name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
-            'module' => 'required|string|max:100',
-            'action' => 'required|string|max:100',
+            'module' => 'nullable|string|max:100',
+            'action' => 'nullable|string|max:100',
             'guard_name' => 'required|string|in:web,api',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id'
         ]);
+
+        // Extract module and action from permission name if not provided
+        $module = $request->module;
+        $action = $request->action;
+        
+        if (empty($module) || empty($action)) {
+            // Try to extract from permission name (format: module.action)
+            $parts = explode('.', $request->name);
+            if (count($parts) >= 2) {
+                $module = $module ?? $parts[0];
+                $action = $action ?? $parts[1];
+            } else {
+                // Use defaults if cannot extract
+                $module = $module ?? 'custom';
+                $action = $action ?? 'manage';
+            }
+        }
 
         // Create permission
         $permission = Permission::create([
@@ -81,8 +98,8 @@ class PermissionController extends Controller
             'guard_name' => $request->guard_name,
             'display_name' => $request->display_name,
             'description' => $request->description,
-            'module' => $request->module,
-            'action' => $request->action,
+            'module' => $module,
+            'action' => $action,
         ]);
 
         // Assign to roles if specified
@@ -127,19 +144,23 @@ class PermissionController extends Controller
         $request->validate([
             'display_name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
-            'module' => 'required|string|max:100',
-            'action' => 'required|string|max:100',
+            'module' => 'nullable|string|max:100',
+            'action' => 'nullable|string|max:100',
             'guard_name' => 'required|string|in:web,api',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id'
         ]);
 
+        // Use existing values if not provided
+        $module = $request->module ?? $permission->module ?? 'custom';
+        $action = $request->action ?? $permission->action ?? 'manage';
+
         // Update permission
         $permission->update([
             'display_name' => $request->display_name,
             'description' => $request->description,
-            'module' => $request->module,
-            'action' => $request->action,
+            'module' => $module,
+            'action' => $action,
             'guard_name' => $request->guard_name,
         ]);
 
@@ -178,7 +199,7 @@ class PermissionController extends Controller
     public function bulkCreate(Request $request)
     {
         $request->validate([
-            'module' => 'required|string|max:100',
+            'module' => 'nullable|string|max:100',
             'module_display_name' => 'required|string|max:255',
             'actions' => 'required|array|min:1',
             'actions.*' => 'string|max:100',
@@ -189,9 +210,12 @@ class PermissionController extends Controller
 
         $created = 0;
         $errors = [];
+        
+        // Use provided module or extract from display name
+        $module = $request->module ?? strtolower(str_replace(' ', '_', $request->module_display_name));
 
         foreach ($request->actions as $action) {
-            $permissionName = $request->module . '.' . $action;
+            $permissionName = $module . '.' . $action;
 
             // Check if permission already exists
             if (Permission::where('name', $permissionName)->exists()) {
@@ -204,7 +228,7 @@ class PermissionController extends Controller
                     'name' => $permissionName,
                     'display_name' => $request->module_display_name . ' - ' . ucfirst($action),
                     'description' => "Permission untuk {$action} pada module {$request->module_display_name}",
-                    'module' => $request->module,
+                    'module' => $module,
                     'action' => $action,
                     'guard_name' => $request->guard_name,
                 ]);

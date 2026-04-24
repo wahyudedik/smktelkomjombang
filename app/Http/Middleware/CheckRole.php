@@ -10,11 +10,16 @@ use Symfony\Component\HttpFoundation\Response;
 class CheckRole
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  $role
+     * Map route role requirements to equivalent permissions.
+     * Custom roles with these permissions can bypass role checks.
      */
+    protected array $rolePermissionMap = [
+        'guru'     => ['guru.view', 'guru.read', 'siswa.view', 'siswa.read', 'jadwal.view', 'jadwal.read', 'attendance.view'],
+        'admin'    => ['users.view', 'users.create', 'pages.view', 'events.view', 'berita.view'],
+        'sarpras'  => ['sarpras.view', 'sarpras.read', 'sarpras.create'],
+        'osis'     => ['osis.view', 'osis.read', 'osis.create'],
+    ];
+
     public function handle(Request $request, Closure $next, string $role): Response
     {
         if (!Auth::check()) {
@@ -30,21 +35,27 @@ class CheckRole
         }
 
         // Support multiple roles separated by |
-        $allowedRoles = explode('|', $role);
+        $allowedRoles = array_map('trim', explode('|', $role));
 
-        // Check Spatie roles only
-        $hasAccess = false;
+        // 1. Check if user has one of the required roles directly
         foreach ($allowedRoles as $allowedRole) {
-            if ($user->hasRole(trim($allowedRole))) {
-                $hasAccess = true;
-                break;
+            if ($user->hasRole($allowedRole)) {
+                return $next($request);
             }
         }
 
-        if (!$hasAccess) {
-            abort(403, 'Unauthorized access.');
+        // 2. Fallback: check if user has any permission associated with the required roles
+        // This allows custom roles (e.g. "media", "taianjing") to access routes
+        // if they have the relevant permissions assigned
+        foreach ($allowedRoles as $allowedRole) {
+            $mappedPermissions = $this->rolePermissionMap[$allowedRole] ?? [];
+            foreach ($mappedPermissions as $permission) {
+                if ($user->hasPermissionTo($permission)) {
+                    return $next($request);
+                }
+            }
         }
 
-        return $next($request);
+        abort(403, 'Unauthorized access.');
     }
 }

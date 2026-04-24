@@ -63,14 +63,6 @@ class User extends Authenticatable
 
 
     /**
-     * Get the module access for the user.
-     */
-    public function moduleAccess(): HasMany
-    {
-        return $this->hasMany(ModuleAccess::class);
-    }
-
-    /**
      * Get the audit logs for the user.
      */
     public function auditLogs(): HasMany
@@ -97,46 +89,6 @@ class User extends Authenticatable
         }
 
         return $this->hasPermissionTo($permission);
-    }
-
-    /**
-     * Check if user has module access.
-     */
-    public function hasModuleAccess(string $module): bool
-    {
-        // Superadmin bypass all module access
-        if ($this->hasRole('superadmin')) {
-            return true;
-        }
-
-        return $this->moduleAccess()
-            ->where('module_name', $module)
-            ->where('can_access', true)
-            ->exists();
-    }
-
-    /**
-     * Check if user can perform specific action on module.
-     */
-    public function canPerform(string $action, string $module): bool
-    {
-        // Superadmin bypass all actions
-        if ($this->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check Spatie permission first
-        $permission = "{$module}.{$action}";
-        if ($this->hasPermissionTo($permission)) {
-            return true;
-        }
-
-        // Fallback to module access system
-        return $this->moduleAccess()
-            ->where('module_name', $module)
-            ->where('can_access', true)
-            ->where("can_{$action}", true)
-            ->exists();
     }
 
     /**
@@ -177,21 +129,6 @@ class User extends Authenticatable
     public function isSarpras(): bool
     {
         return $this->hasRole('sarpras');
-    }
-
-    /**
-     * Get user's accessible modules.
-     */
-    public function getAccessibleModules(): array
-    {
-        if ($this->isSuperadmin()) {
-            return ['instagram', 'pages', 'guru', 'siswa', 'osis', 'lulus', 'sarpras', 'users'];
-        }
-
-        return $this->moduleAccess()
-            ->where('can_access', true)
-            ->pluck('module_name')
-            ->toArray();
     }
 
     /**

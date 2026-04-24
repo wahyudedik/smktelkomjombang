@@ -14,11 +14,8 @@ class RoleManagementController extends Controller
 {
     public function index()
     {
-        // Authorization check - double layer: route middleware + Gate
-        Gate::authorize('manageRolesAndPermissions');
-
-        $roles = Role::with('permissions')->withCount('users')->get();
-        return view('role-management.index', compact('roles'));
+        // Redirect to the unified role-permissions management page
+        return redirect()->route('admin.role-permissions.index');
     }
 
     public function create()
@@ -47,7 +44,7 @@ class RoleManagementController extends Controller
 
             $request->validate([
                 'name' => 'required|string|unique:roles,name|max:255|regex:/^[a-z0-9-]+$/',
-                'display_name' => 'required|string|max:255',
+                'display_name' => 'nullable|string|max:255',
                 'description' => 'nullable|string|max:1000',
                 'permissions' => 'array',
             ]);
@@ -72,7 +69,7 @@ class RoleManagementController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.roles.index')
+            return redirect()->route('admin.role-permissions.index')
                 ->with('success', 'Role created successfully');
         } catch (\Exception $e) {
             if ($request->expectsJson() || $request->ajax()) {
@@ -150,7 +147,7 @@ class RoleManagementController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.roles.index')
+            return redirect()->route('admin.role-permissions.index')
                 ->with('success', 'Role updated successfully');
         } catch (\Exception $e) {
             if ($request->expectsJson() || $request->ajax()) {
@@ -176,7 +173,7 @@ class RoleManagementController extends Controller
 
         $role->delete();
 
-        return redirect()->route('admin.roles.index')
+        return redirect()->route('admin.role-permissions.index')
             ->with('success', 'Role deleted successfully');
     }
 
@@ -254,7 +251,7 @@ class RoleManagementController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.roles.index')
+            return redirect()->route('admin.role-permissions.index')
                 ->with('success', 'Users assigned successfully');
         } catch (\Exception $e) {
             if ($request->expectsJson() || $request->ajax()) {
