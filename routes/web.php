@@ -55,8 +55,8 @@ Route::get('/welcome', function () {
 })->name('landing.welcome');
 
 // Public graduation check
-Route::get('/check-graduation', [KelulusanController::class, 'checkStatus'])->name('public.graduation.check');
-Route::post('/check-graduation', [KelulusanController::class, 'processCheck'])->name('public.graduation.check.process');
+Route::get('/check-graduation', [KelulusanController::class, 'publicCheckStatus'])->name('public.graduation.check');
+Route::post('/check-graduation', [KelulusanController::class, 'publicProcessCheck'])->name('public.graduation.check.process');
 
 // Public kegiatan page (Instagram feed integration)
 Route::get('/kegiatan', [InstagramController::class, 'index'])->name('public.kegiatan');
@@ -91,7 +91,7 @@ Route::get('/iclock/debug', function () {
         'user_agent' => request()->userAgent(),
         'query' => request()->query(),
     ]);
-    
+
     return response()->json([
         'status' => 'debug',
         'ip' => request()->ip(),
@@ -159,7 +159,7 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::delete('/devices/{device}', [AttendanceController::class, 'destroyDevice'])->name('devices.destroy');
     Route::get('/mapping', [AttendanceController::class, 'mapping'])->name('mapping.index');
     Route::post('/mapping', [AttendanceController::class, 'storeMapping'])->name('mapping.store');
-    
+
     // User Management (CRUD PIN mapping)
     Route::get('/users', [App\Http\Controllers\AttendanceUserController::class, 'index'])->name('users.index');
     Route::post('/users', [App\Http\Controllers\AttendanceUserController::class, 'store'])->name('users.store');
@@ -168,7 +168,7 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::delete('/users/{identity}', [App\Http\Controllers\AttendanceUserController::class, 'destroy'])->name('users.destroy');
     Route::get('/users/{identity}/sync-status', [App\Http\Controllers\AttendanceUserController::class, 'syncStatus'])->name('users.sync-status');
     Route::post('/users/sync-all', [App\Http\Controllers\AttendanceUserController::class, 'syncAll'])->name('users.sync-all');
-    
+
     // Biometric Enrollment (NEW)
     Route::get('/biometric', [App\Http\Controllers\BiometricEnrollmentController::class, 'index'])->name('biometric.index');
     Route::get('/biometric/{identity}/fingerprint', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollFingerprintForm'])->name('biometric.fingerprint.form');
@@ -178,14 +178,14 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::get('/biometric/{identity}/rfid', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollRFIDForm'])->name('biometric.rfid.form');
     Route::post('/biometric/{identity}/rfid', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollRFID'])->name('biometric.rfid.store');
     Route::post('/biometric/test-connection', [App\Http\Controllers\BiometricEnrollmentController::class, 'testConnection'])->name('biometric.test-connection');
-    
+
     // Export (NEW)
     Route::get('/export', [App\Http\Controllers\AttendanceExportController::class, 'index'])->name('export.index');
     Route::post('/export/daily', [App\Http\Controllers\AttendanceExportController::class, 'exportDaily'])->name('export.daily');
     Route::post('/export/period', [App\Http\Controllers\AttendanceExportController::class, 'exportPeriod'])->name('export.period');
     Route::post('/export/summary', [App\Http\Controllers\AttendanceExportController::class, 'exportSummary'])->name('export.summary');
     Route::post('/export/user/{identity}', [App\Http\Controllers\AttendanceExportController::class, 'exportUserDetail'])->name('export.user');
-    
+
     // Report (NEW)
     Route::get('/report', [App\Http\Controllers\AttendanceReportController::class, 'index'])->name('report.index');
     Route::get('/report/daily', [App\Http\Controllers\AttendanceReportController::class, 'daily'])->name('report.daily');

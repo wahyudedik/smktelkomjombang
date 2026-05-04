@@ -22,9 +22,11 @@
                         <ul class="topbar-right">
                             <li class="btn-part">
                                 @auth
-                                    <a class="apply-btn" href="{{ route('admin.dashboard') }}"> <i class="fa fa-tachometer-alt"> </i> Dashboard</a>
+                                    <a class="apply-btn" href="{{ route('admin.dashboard') }}"> <i
+                                            class="fa fa-tachometer-alt"> </i> Dashboard</a>
                                 @else
-                                    <a class="apply-btn" href="{{ route('login') }}"> <i class="fa fa-sign-in"> </i> Login System</a>
+                                    <a class="apply-btn" href="{{ route('login') }}"> <i class="fa fa-sign-in"> </i> Login
+                                        System</a>
                                 @endauth
                             </li>
                         </ul>
@@ -42,10 +44,12 @@
                         <div class="logo-cat-wrap">
                             <div class="logo-part pr-90">
                                 <a class="dark-logo" href="{{ route('landing') }}">
-                                    <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}" alt="Logo Dark" style="max-height: 35px;">
+                                    <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}" alt="Logo Dark"
+                                        style="max-height: 35px;">
                                 </a>
                                 <a class="light-logo" href="{{ route('landing') }}">
-                                    <img src="{{ asset('assets_telkom/assets/images/logo.png') }}" alt="Logo Light" style="max-height: 35px;">
+                                    <img src="{{ asset('assets_telkom/assets/images/logo.png') }}" alt="Logo Light"
+                                        style="max-height: 35px;">
                                 </a>
                             </div>
                             <div class="categories-btn">
@@ -96,7 +100,7 @@
                                                 <li><a href="#">E-Semester</a></li>
                                                 <li><a href="#">E-LMS</a></li>
                                                 <li><a href="#">E-Perpus</a></li>
-                                                <li><a href="#">E-Lulus</a></li>
+                                                <li><a href="{{ route('public.graduation.check') }}">E-Lulus</a></li>
                                             </ul>
                                         </li>
 
@@ -127,7 +131,8 @@
                 </div>
             </div>
             <div class="canvas-logo">
-                <a href="{{ route('landing') }}"><img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}" alt="Logo" style="max-height: 60px;"></a>
+                <a href="{{ route('landing') }}"><img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}"
+                        alt="Logo" style="max-height: 60px;"></a>
             </div>
         </nav>
         <!-- Canvas Menu end -->

@@ -98,7 +98,7 @@ class KelulusanController extends Controller
             'nisn' => 'required|string|unique:kelulusans,nisn',
             'nis' => 'nullable|string|unique:kelulusans,nis',
             'jurusan' => 'nullable|string|max:100',
-            'tahun_ajaran' => 'required|integer|min:2000|max:' . date('Y'),
+            'tahun_ajaran' => 'required|string|max:20',
             'status' => 'required|in:lulus,tidak_lulus,mengulang',
             'tempat_kuliah' => 'nullable|string|max:255',
             'tempat_kerja' => 'nullable|string|max:255',
@@ -176,7 +176,7 @@ class KelulusanController extends Controller
             'nisn' => 'required|string|unique:kelulusans,nisn,' . $kelulusan->id,
             'nis' => 'nullable|string|unique:kelulusans,nis,' . $kelulusan->id,
             'jurusan' => 'nullable|string|max:100',
-            'tahun_ajaran' => 'required|integer|min:2000|max:' . date('Y'),
+            'tahun_ajaran' => 'required|string|max:20',
             'status' => 'required|in:lulus,tidak_lulus,mengulang',
             'tempat_kuliah' => 'nullable|string|max:255',
             'tempat_kerja' => 'nullable|string|max:255',
@@ -473,7 +473,46 @@ class KelulusanController extends Controller
     }
 
     /**
-     * Check graduation status.
+     * Check graduation status — PUBLIC (landing page, no login required).
+     */
+    public function publicCheckStatus()
+    {
+        return view('public.elulus.check');
+    }
+
+    /**
+     * Process status check — PUBLIC.
+     */
+    public function publicProcessCheck(Request $request)
+    {
+        $request->validate([
+            'nisn' => 'required_without:nis|nullable|string',
+            'nis'  => 'required_without:nisn|nullable|string',
+        ]);
+
+        $query = Kelulusan::with('siswa');
+
+        if ($request->filled('nisn')) {
+            $query->where('nisn', trim($request->nisn));
+        } elseif ($request->filled('nis')) {
+            $query->where('nis', trim($request->nis));
+        }
+
+        $kelulusan = $query->first();
+
+        if (!$kelulusan) {
+            return redirect()->back()
+                ->with('error', 'Data tidak ditemukan. Silakan periksa NISN atau NIS yang dimasukkan.');
+        }
+
+        // Record the check attempt
+        $kelulusan->recordCheck($request->ip(), $request->userAgent());
+
+        return view('public.elulus.result', compact('kelulusan'));
+    }
+
+    /**
+     * Check graduation status — ADMIN (requires login).
      */
     public function checkStatus()
     {
@@ -481,7 +520,7 @@ class KelulusanController extends Controller
     }
 
     /**
-     * Process status check.
+     * Process status check — ADMIN.
      */
     public function processCheck(Request $request)
     {
@@ -538,14 +577,14 @@ class KelulusanController extends Controller
 
             // Set paper size and orientation - A4 Portrait (210mm x 297mm)
             $pdf->setPaper('A4', 'portrait');
-            
+
             // Enable remote images and set options for better image handling
             $pdf->setOption('enable-local-file-access', true);
             $pdf->setOption('isRemoteEnabled', true);
             $pdf->setOption('dpi', 150);
             $pdf->setOption('isHtml5ParserEnabled', true);
             $pdf->setOption('isPhpEnabled', true);
-            
+
             // Prevent page breaks
             $pdf->setOption('page-break-inside', 'avoid');
 

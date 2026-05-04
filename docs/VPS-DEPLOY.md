@@ -446,7 +446,7 @@ Device ZKTeco **TIDAK fleksibel** seperti REST API biasa. Dia hanya ngerti 3 end
 
 **Format request dari device:**
 ```
-GET /iclock/getrequest?SN=SERIAL_NUMBER&table=rtlog
+GET /iclock/getrequest?SN=SERIAL_NUMBER&table=rtlog 
 POST /iclock/cdata?SN=SERIAL_NUMBER&table=rtlog
 ```
 

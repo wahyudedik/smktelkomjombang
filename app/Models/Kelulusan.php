@@ -38,10 +38,11 @@ class Kelulusan extends Model
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'tanggal_lulus' => 'datetime',
+        'is_active'       => 'boolean',
+        'tanggal_lulus'   => 'datetime',
         'last_checked_at' => 'datetime',
-        'check_count' => 'integer',
+        'check_count'     => 'integer',
+        // tahun_ajaran is stored as string to support "YYYY/YYYY" format
     ];
 
     /**
@@ -275,24 +276,24 @@ class Kelulusan extends Model
     }
 
     /**
-     * Check if student is eligible for graduation check
+     * Check if student is eligible for graduation check.
+     * Data imported via Excel may not have siswa_id — if status is lulus, always eligible.
      */
     public function isEligibleForCheck(): bool
     {
-        // If already graduated, always eligible
+        // If already graduated, always eligible regardless of siswa relation
         if ($this->status === 'lulus') {
             return true;
         }
 
-        // Only students in grade 12 or graduated can check
+        // For non-lulus status: check if siswa is in grade 12
         if ($this->siswa) {
             $kelas = $this->siswa->kelas;
             return str_contains($kelas, 'XII');
         }
 
-        // If no siswa relation but has graduation data, consider eligible if status is lulus
-        // This handles cases where kelulusan data exists but siswa_id is not linked
-        return false;
+        // No siswa relation but has kelulusan record — allow check
+        return true;
     }
 
     /**
