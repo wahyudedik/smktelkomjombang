@@ -27,11 +27,17 @@
                                 <ul class="list-disc list-inside ml-4 space-y-1">
                                     <li><strong>nama</strong> - Nama lengkap siswa (wajib)</li>
                                     <li><strong>nisn</strong> - Nomor Induk Siswa Nasional (wajib)</li>
-                                    <li><strong>nis</strong> - Nomor Induk Siswa (opsional)</li>
+                                    <li><strong>nis</strong> - Nomor Induk Siswa, boleh format <code
+                                            class="bg-blue-100 px-1 rounded">4009/353.067</code> (opsional)</li>
                                     <li><strong>jurusan</strong> - Jurusan siswa (opsional)</li>
-                                    <li><strong>tahun_ajaran</strong> - Tahun ajaran (wajib)</li>
-                                    <li><strong>status</strong> - Status kelulusan: lulus, tidak_lulus, mengulang
-                                        (wajib)</li>
+                                    <li><strong>tahun_ajaran</strong> - Format <code
+                                            class="bg-blue-100 px-1 rounded">2025/2026</code> atau <code
+                                            class="bg-blue-100 px-1 rounded">2025</code> (wajib)</li>
+                                    <li><strong>status</strong> - Nilai: <code
+                                            class="bg-blue-100 px-1 rounded">lulus</code>, <code
+                                            class="bg-blue-100 px-1 rounded">tidak_lulus</code>, atau <code
+                                            class="bg-blue-100 px-1 rounded">mengulang</code> — huruf besar/kecil tidak
+                                        masalah (wajib)</li>
                                 </ul>
                             </div>
                             <div>
@@ -41,8 +47,16 @@
                                     <li>tempat_kerja, jabatan_kerja</li>
                                     <li>no_hp, no_wa, alamat</li>
                                     <li>prestasi, catatan</li>
-                                    <li>tanggal_lulus (format: YYYY-MM-DD)</li>
+                                    <li>tanggal_lulus (format: <code class="bg-blue-100 px-1 rounded">YYYY-MM-DD</code>,
+                                        contoh: <code class="bg-blue-100 px-1 rounded">2026-05-04</code>)</li>
                                 </ul>
+                            </div>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mt-2">
+                                <p class="text-yellow-800 text-sm">
+                                    <strong>⚠️ Catatan:</strong> Kolom yang tidak diisi bisa dikosongkan atau diisi
+                                    tanda <code class="bg-yellow-100 px-1 rounded">-</code> — keduanya akan dianggap
+                                    kosong. Data dengan NISN yang sudah ada di sistem akan dilewati otomatis.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -127,50 +141,77 @@
                     <div class="mt-8 bg-gray-50 rounded-lg p-6">
                         <h4 class="text-lg font-semibold text-gray-900 mb-4">Contoh Data</h4>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                <thead class="bg-gray-200">
                                     <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            nama</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            nisn</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            nis</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">nama
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">nisn
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">nis
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
                                             jurusan</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
                                             tahun_ajaran</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
                                             status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                                            tanggal_lulus</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ahmad Rizki</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1234567890</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024001</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">IPA</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">lulus</td>
+                                        <td class="px-4 py-3 text-gray-900">Ahmad Rizki Pratama</td>
+                                        <td class="px-4 py-3 text-gray-900">0075823566</td>
+                                        <td class="px-4 py-3 text-gray-900">4009/353.067</td>
+                                        <td class="px-4 py-3 text-gray-900">PRODUKSI FILM</td>
+                                        <td class="px-4 py-3 font-medium text-indigo-700">2025/2026</td>
+                                        <td class="px-4 py-3"><span
+                                                class="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-semibold">lulus</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-900">2026-05-04</td>
+                                    </tr>
+                                    <tr class="bg-gray-50">
+                                        <td class="px-4 py-3 text-gray-900">Siti Nurhaliza</td>
+                                        <td class="px-4 py-3 text-gray-900">0087654321</td>
+                                        <td class="px-4 py-3 text-gray-900">4010/354.067</td>
+                                        <td class="px-4 py-3 text-gray-900">DKV</td>
+                                        <td class="px-4 py-3 font-medium text-indigo-700">2025/2026</td>
+                                        <td class="px-4 py-3"><span
+                                                class="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-semibold">lulus</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-900">2026-05-04</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Siti Nurhaliza
+                                        <td class="px-4 py-3 text-gray-900">Budi Santoso</td>
+                                        <td class="px-4 py-3 text-gray-900">0071234567</td>
+                                        <td class="px-4 py-3 text-gray-500">-</td>
+                                        <td class="px-4 py-3 text-gray-900">TKJ</td>
+                                        <td class="px-4 py-3 font-medium text-indigo-700">2025/2026</td>
+                                        <td class="px-4 py-3"><span
+                                                class="bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-xs font-semibold">tidak_lulus</span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">0987654321</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024002</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">IPS</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">lulus</td>
+                                        <td class="px-4 py-3 text-gray-500">-</td>
+                                    </tr>
+                                    <tr class="bg-gray-50">
+                                        <td class="px-4 py-3 text-gray-900">Dewi Rahayu</td>
+                                        <td class="px-4 py-3 text-gray-900">0069876543</td>
+                                        <td class="px-4 py-3 text-gray-500">-</td>
+                                        <td class="px-4 py-3 text-gray-900">RPL</td>
+                                        <td class="px-4 py-3 font-medium text-indigo-700">2025/2026</td>
+                                        <td class="px-4 py-3"><span
+                                                class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-semibold">mengulang</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-500">-</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                        <p class="text-xs text-gray-500 mt-3">
+                            * Kolom lain (tempat_kuliah, tempat_kerja, no_hp, dll.) bisa dikosongkan atau diisi tanda
+                            <code>-</code>
+                        </p>
                     </div>
                 </div>
             </div>
