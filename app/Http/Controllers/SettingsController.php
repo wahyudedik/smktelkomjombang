@@ -160,6 +160,10 @@ class SettingsController extends Controller
             // Contact Map & Hours
             'contact_map_url' => 'nullable|string',
             'contact_operational_hours' => 'nullable|string|max:255',
+            // Contact Section Titles
+            'contact_section_subtitle' => 'nullable|string|max:255',
+            'contact_section_title' => 'nullable|string|max:255',
+            'contact_section_description' => 'nullable|string|max:500',
         ]);
 
         // Update site settings (you can create a settings table or use config)
@@ -245,6 +249,10 @@ class SettingsController extends Controller
             // Contact Map & Hours
             'contact_map_url' => $request->contact_map_url,
             'contact_operational_hours' => $request->contact_operational_hours,
+            // Contact Section Titles
+            'contact_section_subtitle' => $request->contact_section_subtitle,
+            'contact_section_title' => $request->contact_section_title,
+            'contact_section_description' => $request->contact_section_description,
         ];
 
         // Handle file uploads with old file deletion

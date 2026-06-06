@@ -906,6 +906,37 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Contact Section Titles -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Judul Section Kontak (Landing Page)</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="contact_section_subtitle"
+                                        class="block text-sm font-medium text-gray-600 mb-1">Subtitle (teks kecil di atas judul)</label>
+                                    <input type="text" id="contact_section_subtitle" name="contact_section_subtitle"
+                                        value="{{ cache('site_setting_contact_section_subtitle', 'Hubungi Kami') }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Hubungi Kami">
+                                </div>
+                                <div>
+                                    <label for="contact_section_title"
+                                        class="block text-sm font-medium text-gray-600 mb-1">Judul Utama (sebelum nama sekolah)</label>
+                                    <input type="text" id="contact_section_title" name="contact_section_title"
+                                        value="{{ cache('site_setting_contact_section_title', 'Kontak') }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Kontak">
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <label for="contact_section_description"
+                                    class="block text-sm font-medium text-gray-600 mb-1">Deskripsi Section</label>
+                                <input type="text" id="contact_section_description" name="contact_section_description"
+                                    value="{{ cache('site_setting_contact_section_description', 'Jangan ragu untuk menghubungi kami jika memiliki pertanyaan') }}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Jangan ragu untuk menghubungi kami jika memiliki pertanyaan">
+                            </div>
+                        </div>
                     </div>
                 </div>
 

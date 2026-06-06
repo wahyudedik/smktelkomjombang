@@ -248,6 +248,9 @@ class LandingController extends Controller
             'contact_email' => cache('site_setting_contact_email') ?? 'info@smktelekom.sch.id',
             'contact_phone' => cache('site_setting_contact_phone') ?? '(021) 123456',
             'contact_address' => cache('site_setting_contact_address') ?? '',
+            'contact_section_subtitle' => cache('site_setting_contact_section_subtitle') ?? 'Hubungi Kami',
+            'contact_section_title' => cache('site_setting_contact_section_title') ?? 'Kontak',
+            'contact_section_description' => cache('site_setting_contact_section_description') ?? 'Jangan ragu untuk menghubungi kami jika memiliki pertanyaan',
 
             // Social media
             'social_facebook' => cache('site_setting_social_facebook') ?? '',

@@ -22,7 +22,7 @@
                             <div class="content-part">
                                 <h4 class="title mb-0">{{ $event->title ?? 'Event' }}</h4>
                                 <div class="categorie">
-                                    <a href="#">{{ $event->category ?? 'Kegiatan' }}</a>
+                                    <span>{{ $event->category ?? 'Kegiatan' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                             <div class="content-part">
                                 <h4 class="title mb-0">Studi Kunjungan Ke Perusahaan dan Kampus</h4>
                                 <div class="categorie">
-                                    <a href="#">Kelas 2 Semua Jurusan</a>
+                                    <span>Kelas 2 Semua Jurusan</span>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +47,7 @@
                             <div class="content-part">
                                 <h4 class="title mb-0">Praktek Kerja Industri</h4>
                                 <div class="categorie">
-                                    <a href="#">Kelas 2</a>
+                                    <span>Kelas 2</span>
                                 </div>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                             <div class="content-part">
                                 <h4 class="title mb-0">Ujian Akhir Sekolah</h4>
                                 <div class="categorie">
-                                    <a href="#">Kelas 3</a>
+                                    <span>Kelas 3</span>
                                 </div>
                             </div>
                         </div>
