@@ -76,6 +76,15 @@ git pull origin "$GIT_BRANCH" || error "Gagal pull dari git"
 # Pastikan deploy.sh tetap executable setelah pull
 chmod +x "$APP_DIR/deploy.sh"
 
+# Buat direktori yang mungkin belum ada (aman jika sudah ada)
+mkdir -p "$APP_DIR/storage/logs"
+mkdir -p "$APP_DIR/storage/framework/cache/data"
+mkdir -p "$APP_DIR/storage/framework/sessions"
+mkdir -p "$APP_DIR/storage/framework/views"
+mkdir -p "$APP_DIR/storage/app/public"
+mkdir -p "$APP_DIR/public/uploads"
+mkdir -p "$APP_DIR/bootstrap/cache"
+
 # 3. Install/update dependencies PHP
 info "Menginstall dependencies PHP (production)..."
 $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
@@ -112,14 +121,28 @@ $PHP_BIN artisan queue:restart
 
 # 10. Set permission yang benar
 info "Mengatur permission..."
-chmod -R 775 storage bootstrap/cache
 
 # Deteksi user web server (www-data untuk Ubuntu/Debian, www untuk aaPanel/BT Panel)
 WEB_USER="www-data"
 if id "www" &>/dev/null; then
     WEB_USER="www"
 fi
-chown -R "$WEB_USER:$WEB_USER" storage bootstrap/cache 2>/dev/null || warn "Gagal chown. Pastikan permission sudah benar secara manual."
+
+# Set permission direktori writable
+chmod -R 775 "$APP_DIR/storage" 2>/dev/null || true
+chmod -R 775 "$APP_DIR/bootstrap/cache" 2>/dev/null || true
+chmod -R 775 "$APP_DIR/public/uploads" 2>/dev/null || true
+chmod 775 "$APP_DIR/public" 2>/dev/null || true
+
+# Set ownership ke web server user
+chown -R "$WEB_USER:$WEB_USER" "$APP_DIR/storage" 2>/dev/null || warn "Gagal chown storage. Coba: sudo chown -R $WEB_USER:$WEB_USER $APP_DIR/storage"
+chown -R "$WEB_USER:$WEB_USER" "$APP_DIR/bootstrap/cache" 2>/dev/null || warn "Gagal chown bootstrap/cache."
+chown -R "$WEB_USER:$WEB_USER" "$APP_DIR/public/uploads" 2>/dev/null || true
+
+# Set permission file spesifik
+find "$APP_DIR/storage" -type f -exec chmod 664 {} \; 2>/dev/null || true
+find "$APP_DIR/storage" -type d -exec chmod 775 {} \; 2>/dev/null || true
+chmod -R o-w "$APP_DIR/storage" 2>/dev/null || true
 
 # 11. Nonaktifkan Maintenance Mode
 info "Menonaktifkan maintenance mode..."
