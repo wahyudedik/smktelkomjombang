@@ -578,6 +578,12 @@ Route::get('/offline', function () {
 Route::get('/pages', [PageController::class, 'publicIndex'])->name('pages.public.index');
 Route::get('/page/{slug}', [PageController::class, 'publicShow'])->name('pages.public.show');
 
+// Seeder halaman statis (jalankan sekali)
+Route::get('/seed-static-pages', function () {
+    $controller = new \App\Http\Controllers\LandingController();
+    return $controller->createStaticPages();
+})->name('seed.static.pages');
+
 // Berita / News Public Routes
 Route::get('/berita', [\App\Http\Controllers\BeritaController::class, 'publicIndex'])->name('berita.public.index');
 Route::get('/berita/{berita:slug}', [\App\Http\Controllers\BeritaController::class, 'publicShow'])->name('berita.public.show');
@@ -678,6 +684,15 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin'
 
     // System Health Dashboard
     Route::get('/system/health', [App\Http\Controllers\SystemHealthController::class, 'index'])->name('system.health');
+
+    // Log Monitoring
+    Route::prefix('log-monitoring')->name('log-monitoring.')->group(function () {
+        Route::get('/', [App\Http\Controllers\LogMonitoringController::class, 'index'])->name('index');
+        Route::get('/{filename}', [App\Http\Controllers\LogMonitoringController::class, 'show'])->name('show')->where('filename', '[a-zA-Z0-9._-]+');
+        Route::get('/{filename}/download', [App\Http\Controllers\LogMonitoringController::class, 'download'])->name('download')->where('filename', '[a-zA-Z0-9._-]+');
+        Route::delete('/{filename}', [App\Http\Controllers\LogMonitoringController::class, 'destroy'])->name('delete')->where('filename', '[a-zA-Z0-9._-]+');
+        Route::delete('/{filename}/clear', [App\Http\Controllers\LogMonitoringController::class, 'clear'])->name('clear')->where('filename', '[a-zA-Z0-9._-]+');
+    });
 
     // Notification Center
     Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');

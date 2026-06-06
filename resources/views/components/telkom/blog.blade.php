@@ -36,52 +36,49 @@
             @empty
                 <div class="blog-item">
                     <div class="image-part">
-                        <img src="{{ asset('assets_telkom/assets/images/blog/style2/1.jpg') }}" alt="">
+                        <img src="{{ asset('assets_telkom/assets/images/blog/style2/1.jpg') }}" alt="Blog Default">
                     </div>
                     <div class="blog-content new-style">
                         <ul class="blog-meta">
-                            <li><i class="fa fa-user-o"></i> Admin</li>
-                            <li><i class="fa fa-calendar"></i>June 15, 2019</li>
+                            <li><i class="fa fa-user-o"></i> {{ $siteSettings['site_name'] ?? 'Admin' }}</li>
+                            <li><i class="fa fa-calendar"></i> {{ now()->format('M d, Y') }}</li>
                         </ul>
-                        <h3 class="title"><a href="blog-single.html">University While The Lovely Valley Team Work</a></h3>
-                        <div class="desc">the acquisition of knowledge, skills, values befs, and habits. Educational methods include teach ing, training, storytelling</div>
+                        <h3 class="title"><a href="{{ route('berita.public.index') }}">Belum ada berita terbaru</a></h3>
+                        <div class="desc">Berita dan artikel terbaru akan segera hadir. Silakan kunjungi kembali nanti untuk mendapatkan informasi terkini.</div>
                         <ul class="blog-bottom">
-                            <li class="cmnt-part"><a href="#">(12) Comments</a></li>
-                            <li class="btn-part"><a class="readon-arrow" href="#">Read More</a></li>
+                            <li class="btn-part"><a class="readon-arrow" href="{{ route('berita.public.index') }}">Lihat Berita</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="blog-item">
                     <div class="image-part">
-                        <img src="{{ asset('assets_telkom/assets/images/blog/style2/2.jpg') }}" alt="">
+                        <img src="{{ asset('assets_telkom/assets/images/blog/style2/2.jpg') }}" alt="Blog Default">
                     </div>
                     <div class="blog-content new-style">
                         <ul class="blog-meta">
-                            <li><i class="fa fa-user-o"></i> Admin</li>
-                            <li><i class="fa fa-calendar"></i>June 15, 2019</li>
+                            <li><i class="fa fa-user-o"></i> {{ $siteSettings['site_name'] ?? 'Admin' }}</li>
+                            <li><i class="fa fa-calendar"></i> {{ now()->format('M d, Y') }}</li>
                         </ul>
-                        <h3 class="title"><a href="blog-single.html">High School Program Starting Soon 2021</a></h3>
-                        <div class="desc">the acquisition of knowledge, skills, values befs, and habits. Educational methods include teach ing, training, storytelling</div>
+                        <h3 class="title"><a href="{{ route('berita.public.index') }}">Informasi Kegiatan Sekolah</a></h3>
+                        <div class="desc">Pantau terus kegiatan dan acara sekolah yang berlangsung di SMK Telekomunikasi Darul Ulum.</div>
                         <ul class="blog-bottom">
-                            <li class="cmnt-part"><a href="#">(12) Comments</a></li>
-                            <li class="btn-part"><a class="readon-arrow" href="#">Read More</a></li>
+                            <li class="btn-part"><a class="readon-arrow" href="{{ route('berita.public.index') }}">Lihat Berita</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="blog-item">
                     <div class="image-part">
-                        <img src="{{ asset('assets_telkom/assets/images/blog/style2/3.jpg') }}" alt="">
+                        <img src="{{ asset('assets_telkom/assets/images/blog/style2/3.jpg') }}" alt="Blog Default">
                     </div>
                     <div class="blog-content new-style">
                         <ul class="blog-meta">
-                            <li><i class="fa fa-user-o"></i> Admin</li>
-                            <li><i class="fa fa-calendar"></i>June 15, 2019</li>
+                            <li><i class="fa fa-user-o"></i> {{ $siteSettings['site_name'] ?? 'Admin' }}</li>
+                            <li><i class="fa fa-calendar"></i> {{ now()->format('M d, Y') }}</li>
                         </ul>
-                        <h3 class="title"><a href="blog-single.html">Modern School The Lovely Valley Team Work</a></h3>
-                        <div class="desc">the acquisition of knowledge, skills, values befs, and habits. Educational methods include teach ing, training, storytelling</div>
+                        <h3 class="title"><a href="{{ route('berita.public.index') }}">Prestasi & Pengumuman</a></h3>
+                        <div class="desc">Ikuti perkembangan terbaru mengenai prestasi siswa dan pengumuman penting dari sekolah.</div>
                         <ul class="blog-bottom">
-                            <li class="cmnt-part"><a href="#">(12) Comments</a></li>
-                            <li class="btn-part"><a class="readon-arrow" href="#">Read More</a></li>
+                            <li class="btn-part"><a class="readon-arrow" href="{{ route('berita.public.index') }}">Lihat Berita</a></li>
                         </ul>
                     </div>
                 </div>

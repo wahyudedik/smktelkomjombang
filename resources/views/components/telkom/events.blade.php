@@ -65,9 +65,6 @@
                         </div>
                     @endforelse
                 </div>
-                <div class="btn-part wow fadeInUp" data-wow-delay="600ms" data-wow-duration="2000ms">
-                    <a class="readon2" href="#">Detail Kegiatan</a>
-                </div>
             </div>
         </div>
     </div>

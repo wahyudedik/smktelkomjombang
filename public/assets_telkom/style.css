@@ -3,16 +3,16 @@
 @import url('https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900');
 @charset "utf-8";
 
-/** 
-* 
+/**
+*
 * -----------------------------------------------------------------------------
 *
 * Template : Educavo - Education HTML Template
 * Author : rs-theme
-* Author URI : http://www.rstheme.com/ 
+* Author URI : http://www.rstheme.com/
 *
 * -----------------------------------------------------------------------------
-* 
+*
 **/
 /* TABLE OF CONTENT
 ---------------------------------------------------------
@@ -18337,5 +18337,285 @@ body .modal-backdrop {
 
   100% {
     transform: scale(1.2);
+  }
+}
+
+/* ==========================================================================
+   CUSTOM RESPONSIVE STYLES - SMK Telekomunikasi Darul Ulum
+   ========================================================================== */
+
+/* --- Tablet (max-width: 991px) --- */
+@media only screen and (max-width: 991px) {
+  /* Header */
+  .full-width-header.header-style2 .rs-header .menu-area .logo-part.pr-90 {
+    padding-right: 15px;
+  }
+  .full-width-header.header-style2 .rs-header .menu-area .main-menu.pr-90 {
+    padding-right: 15px;
+  }
+  .categories-btn {
+    display: none;
+  }
+
+  /* Footer */
+  .rs-footer .footer-top .footer-widget {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .rs-footer .footer-top .footer-widget .widget-title {
+    margin-bottom: 15px;
+  }
+  .rs-footer .footer-top .footer-widget .site-map,
+  .rs-footer .footer-top .footer-widget .address-widget {
+    display: inline-block;
+    text-align: left;
+  }
+  .rs-footer .footer-bottom .footer-logo {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  .rs-footer .footer-bottom .copyright {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  .rs-footer .footer-bottom .footer-social {
+    justify-content: center;
+  }
+
+  /* Section spacing reduction */
+  .pt-94 {
+    padding-top: 60px;
+  }
+  .pb-100 {
+    padding-bottom: 60px;
+  }
+  .mb-60 {
+    margin-bottom: 40px;
+  }
+
+  /* Instagram grid - 2 columns on tablet */
+  .rs-instagram .row .col-lg-4 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  /* Contact form */
+  .contact-form-widget {
+    padding: 20px !important;
+  }
+}
+
+/* --- Mobile Large (max-width: 767px) --- */
+@media only screen and (max-width: 767px) {
+  /* Topbar - stack vertically on mobile */
+  .topbar-area .row .col-md-7,
+  .topbar-area .row .col-md-5 {
+    text-align: center !important;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .topbar-area {
+    padding: 8px 0;
+  }
+  .topbar-contact {
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+  .topbar-right {
+    justify-content: center;
+  }
+
+  /* Header menu area */
+  .full-width-header.header-style2 .rs-header .menu-area .logo-part.pr-90 {
+    padding-right: 10px;
+  }
+  .full-width-header.header-style2 .rs-header .menu-area .main-menu.pr-90 {
+    padding-right: 10px;
+  }
+
+  /* Mobile menu toggle - make it bigger and more visible */
+  .mobile-menu .rs-menu-toggle {
+    display: block;
+    font-size: 24px;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+
+  /* rs-menu on mobile - full width */
+  .rs-menu {
+    position: relative;
+    width: 100%;
+    z-index: 999;
+  }
+  .rs-menu ul.nav-menu {
+    flex-direction: column;
+    width: 100%;
+  }
+  .rs-menu ul.nav-menu li {
+    width: 100%;
+    text-align: left;
+    margin-right: 0;
+  }
+  .rs-menu ul.nav-menu li a {
+    padding: 10px 15px;
+    display: block;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .rs-menu ul.nav-menu ul.sub-menu {
+    position: relative;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+  .rs-menu ul.nav-menu ul.sub-menu li a {
+    padding-left: 30px;
+    font-size: 14px;
+  }
+
+  /* Footer - single column on mobile */
+  .rs-footer .footer-top .footer-widget {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .rs-footer .footer-top .footer-widget:last-child {
+    border-bottom: none;
+  }
+  .rs-footer .footer-bottom .footer-logo {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  .rs-footer .footer-bottom .copyright {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 13px;
+  }
+  .rs-footer .footer-bottom .footer-social {
+    justify-content: center;
+  }
+
+  /* Section spacing - reduce more on mobile */
+  .pt-94 {
+    padding-top: 40px;
+  }
+  .pb-100 {
+    padding-bottom: 40px;
+  }
+  .md-pt-64 {
+    padding-top: 40px;
+  }
+  .md-pb-70 {
+    padding-bottom: 40px;
+  }
+  .mb-60 {
+    margin-bottom: 30px;
+  }
+  .sec-title .title {
+    font-size: 26px;
+    line-height: 36px;
+  }
+
+  /* Instagram grid - 1 column on mobile */
+  .rs-instagram .row .col-lg-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+
+  /* Contact section mobile */
+  .rs-contact .contact-widget-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .rs-contact .contact-widget-item .icon-part {
+    margin-bottom: 10px;
+    margin-right: 0;
+  }
+  .contact-form-widget {
+    padding: 15px !important;
+  }
+  .contact-form-widget h4 {
+    font-size: 18px;
+  }
+
+  /* Contact map mobile */
+  .contact-map iframe {
+    height: 250px;
+  }
+
+  /* Quick contact buttons on mobile */
+  .rs-contact .readon2 {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+
+  /* Hero section mobile */
+  .rs-banner .banner-content .title {
+    font-size: 28px;
+    line-height: 38px;
+  }
+
+  /* Services section mobile */
+  .rs-services .services-item {
+    margin-bottom: 20px;
+  }
+
+  /* About section mobile */
+  .rs-about .sec-title .title {
+    font-size: 24px;
+  }
+
+  /* Instagram badge buttons mobile */
+  .rs-instagram .blog-item .image-part .position-absolute .btn {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 12px;
+  }
+}
+
+/* --- Mobile Small (max-width: 480px) --- */
+@media only screen and (max-width: 480px) {
+  .topbar-area {
+    display: none;
+  }
+
+  .sec-title .title {
+    font-size: 22px;
+    line-height: 32px;
+  }
+
+  .sec-title .sub-title {
+    font-size: 13px;
+  }
+
+  .sec-title p {
+    font-size: 14px;
+  }
+
+  .pt-94 {
+    padding-top: 30px;
+  }
+  .pb-100 {
+    padding-bottom: 30px;
+  }
+  .md-pt-64 {
+    padding-top: 30px;
+  }
+  .md-pb-70 {
+    padding-bottom: 30px;
+  }
+
+  /* Contact form buttons stacked */
+  .rs-contact .row .col-sm-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  /* Footer copyright */
+  .rs-footer .footer-bottom .copyright p {
+    font-size: 12px;
   }
 }

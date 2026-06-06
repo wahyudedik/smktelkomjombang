@@ -11,6 +11,9 @@
                         Assurance dan Maintenance</div>
                     <div class="btn-part">
                         <a class="readon2 mod">Profil Alumni</a>
+                        <a class="readon2" href="{{ route('testimonials.create') }}" style="margin-left: 10px;">
+                            <i class="fa fa-paper-plane"></i> Kirim Testimoni
+                        </a>
                     </div>
                 </div>
             </div>

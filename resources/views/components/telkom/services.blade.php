@@ -1,5 +1,5 @@
             <!-- Services Section Start -->
-            <div class="rs-services style1">
+            <div id="rs-services" class="rs-services style1">
                 <div class="row no-gutter">
                     <div class="col-lg-3 col-md-6">
                         <div class="service-item overly1">
@@ -18,7 +18,7 @@
                                 <h4 class="title"><a href="#">DESAIN KOMUNIKASI VISUAL</a></h4>
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="service-item overly3">
                             <img src="{{ asset('assets_telkom/assets/images/services/1.jpg') }}" alt="">

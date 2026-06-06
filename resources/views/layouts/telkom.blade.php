@@ -7,23 +7,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="{{ $metaDescription ?? cache('site_setting_site_description', 'SMK Telekomunikasi Darul Ulum Jombang') }}">
+        content="{{ $metaDescription ?? ($siteSettings['site_description'] ?? 'SMK Telekomunikasi Darul Ulum Jombang') }}">
     <meta name="keywords"
-        content="{{ $metaKeywords ?? cache('site_setting_site_keywords', 'SMK, Telekomunikasi, Jombang') }}">
+        content="{{ $metaKeywords ?? ($siteSettings['site_keywords'] ?? 'SMK, Telekomunikasi, Jombang') }}">
 
     <!-- title -->
-    <title>{{ $pageTitle ?? 'SMK Telekomunikasi Darul Ulum Jombang' }} - {{ config('app.name') }}</title>
+    <title>{{ $pageTitle ?? ($siteSettings['site_name'] ?? 'SMK Telekomunikasi Darul Ulum Jombang') }} - {{ config('app.name') }}</title>
 
     <!-- favicon -->
-    @if (cache('site_setting_favicon'))
-        <link rel="icon" type="image/x-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
+    @if (!empty($siteSettings['favicon']))
+        <link rel="icon" type="image/x-icon" href="{{ Storage::url($siteSettings['favicon']) }}">
     @else
         <link rel="icon" type="image/x-icon" href="{{ asset('assets_telkom/assets/images/fav.png') }}">
     @endif
 
     <!-- css -->
     <link rel="stylesheet" href="{{ asset('assets_telkom/assets/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets_telkom/assets/css/font-awesome.min.css') }}">
+    <!-- Font Awesome 6 (CDN) - replaces old FA4, supports fas, fab, far, fa prefixes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{{ asset('assets_telkom/assets/css/animate.css') }}">
     <link rel="stylesheet" href="{{ asset('assets_telkom/assets/css/owl.carousel.css') }}">
     <link rel="stylesheet" href="{{ asset('assets_telkom/assets/css/slick.css') }}">

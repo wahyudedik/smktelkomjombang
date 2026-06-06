@@ -486,6 +486,68 @@
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Jl. Contoh No. 123, Kota, Provinsi">{{ cache('site_setting_contact_address') }}</textarea>
                                 </div>
+                                <div>
+                                    <label for="contact_operational_hours"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Jam Operasional</label>
+                                    <input type="text" id="contact_operational_hours" name="contact_operational_hours"
+                                        value="{{ cache('site_setting_contact_operational_hours') }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Senin - Sabtu: 07.00 - 16.00 WIB">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="contact_map_url"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Google Maps Embed URL</label>
+                                    <textarea id="contact_map_url" name="contact_map_url" rows="3"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="https://www.google.com/maps/embed?pb=...">{{ cache('site_setting_contact_map_url') }}</textarea>
+                                    <p class="text-sm text-gray-500 mt-1">Buka Google Maps → Share → Embed a map → Copy URL</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA Section (Pendaftaran) -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">CTA Section (Pendaftaran Siswa Baru)</h2>
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="cta_title" class="block text-sm font-medium text-gray-700 mb-2">Judul CTA</label>
+                                <input type="text" id="cta_title" name="cta_title"
+                                    value="{{ cache('site_setting_cta_title') }}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Pendaftaran Siswa Baru 2026">
+                            </div>
+                            <div>
+                                <label for="cta_video_title" class="block text-sm font-medium text-gray-700 mb-2">Judul Video CTA</label>
+                                <input type="text" id="cta_video_title" name="cta_video_title"
+                                    value="{{ cache('site_setting_cta_video_title') }}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Profil SMK Telekomunikasi DU">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="cta_description" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi CTA</label>
+                            <textarea id="cta_description" name="cta_description" rows="4"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Tempat Pendaftaran&#10;1. Online mandiri (24 jam)...">{{ cache('site_setting_cta_description') }}</textarea>
+                            <p class="text-sm text-gray-500 mt-1">Gunakan enter untuk baris baru</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="cta_button_text" class="block text-sm font-medium text-gray-700 mb-2">Teks Tombol</label>
+                                <input type="text" id="cta_button_text" name="cta_button_text"
+                                    value="{{ cache('site_setting_cta_button_text') }}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="DAFTAR">
+                            </div>
+                            <div>
+                                <label for="cta_button_url" class="block text-sm font-medium text-gray-700 mb-2">URL Tombol</label>
+                                <input type="url" id="cta_button_url" name="cta_button_url"
+                                    value="{{ cache('site_setting_cta_button_url') }}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="https://psb.ponpesdarululum.id/">
                             </div>
                         </div>
                     </div>
@@ -581,6 +643,15 @@
                                 value="{{ cache('site_setting_program_section_title') }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="3 Program Peminatan">
+                        </div>
+                        <div>
+                            <label for="program_section_subtitle"
+                                class="block text-sm font-medium text-gray-700 mb-2">Subtitle Section Program
+                                (di atas judul)</label>
+                            <input type="text" id="program_section_subtitle" name="program_section_subtitle"
+                                value="{{ cache('site_setting_program_section_subtitle') }}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Kerjasama Industri">
                         </div>
                         <div>
                             <label for="program_ipa_title" class="block text-sm font-medium text-gray-700 mb-2">Judul
@@ -1092,7 +1163,7 @@
                 e.preventDefault();
                 const form = this;
                 const confirmMessage = form.getAttribute('data-confirm') || 'Apakah Anda yakin ingin mengembalikan semua setting ke default? Tindakan ini tidak dapat dibatalkan.';
-                
+
                 if (typeof showConfirm !== 'undefined') {
                     showConfirm('Konfirmasi Reset', confirmMessage, 'Ya, Reset', 'Batal').then((result) => {
                         if (result.isConfirmed) {

@@ -149,6 +149,17 @@ class SettingsController extends Controller
             // Gallery Section
             'gallery_title' => 'nullable|string|max:255',
             'gallery_subtitle' => 'nullable|string|max:255',
+            // CTA Section
+            'cta_title' => 'nullable|string|max:255',
+            'cta_description' => 'nullable|string',
+            'cta_button_text' => 'nullable|string|max:255',
+            'cta_button_url' => 'nullable|url',
+            'cta_video_title' => 'nullable|string|max:255',
+            // Program Subtitle
+            'program_section_subtitle' => 'nullable|string|max:255',
+            // Contact Map & Hours
+            'contact_map_url' => 'nullable|string',
+            'contact_operational_hours' => 'nullable|string|max:255',
         ]);
 
         // Update site settings (you can create a settings table or use config)
@@ -223,6 +234,17 @@ class SettingsController extends Controller
             // Gallery Section
             'gallery_title' => $request->gallery_title,
             'gallery_subtitle' => $request->gallery_subtitle,
+            // CTA Section
+            'cta_title' => $request->cta_title,
+            'cta_description' => $request->cta_description,
+            'cta_button_text' => $request->cta_button_text,
+            'cta_button_url' => $request->cta_button_url,
+            'cta_video_title' => $request->cta_video_title,
+            // Program Subtitle
+            'program_section_subtitle' => $request->program_section_subtitle,
+            // Contact Map & Hours
+            'contact_map_url' => $request->contact_map_url,
+            'contact_operational_hours' => $request->contact_operational_hours,
         ];
 
         // Handle file uploads with old file deletion

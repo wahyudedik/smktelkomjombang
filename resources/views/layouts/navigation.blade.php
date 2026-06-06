@@ -310,6 +310,12 @@
                                             <i class="fas fa-heartbeat mr-2"></i>{{ __('common.system_health') }}
                                         </a>
                                     @endcan
+                                    @if (Auth::check() && Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                        <a href="{{ route('admin.log-monitoring.index') }}"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                            <i class="fas fa-file-alt mr-2"></i>Log Monitoring
+                                        </a>
+                                    @endif
                                     @can('viewNotifications', App\Models\User::class)
                                         <a href="{{ route('admin.notifications') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
@@ -811,6 +817,11 @@
                                         <i class="fas fa-heartbeat mr-2"></i>{{ __('common.system_health') }}
                                     </a>
                                 @endcan
+                                @if (Auth::check() && Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                    <a href="{{ route('admin.log-monitoring.index') }}" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                        <i class="fas fa-file-alt mr-2"></i>Log Monitoring
+                                    </a>
+                                @endif
                                 @can('viewNotifications', App\Models\User::class)
                                     <a href="{{ route('admin.notifications') }}" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-bell mr-2"></i>{{ __('common.notification_center') }}
