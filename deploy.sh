@@ -21,7 +21,7 @@ if [ ! -x "$SCRIPT_PATH" ]; then
     echo "[FIX] deploy.sh tidak memiliki permission execute. Memperbaiki..."
     chmod +x "$SCRIPT_PATH"
     echo "[FIX] Permission diperbaiki. Menjalankan ulang..."
-    exec "$SCRIPT_PATH" "$@"
+    exec bash "$SCRIPT_PATH" "$@"
 fi
 
 # Pastikan git selalu simpan permission execute
