@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default Theme (telkom | maudu)
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the default theme for the landing page.
+    | Change this to switch between SMK Telkom and MA MAUDU themes.
+    |
+    */
+
+    'default_theme' => env('DEFAULT_THEME', 'telkom'),
+
 ];

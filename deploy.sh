@@ -8,7 +8,7 @@
 #
 # Script ini OTOMATIS memperbaiki permission sendiri.
 # Cukup jalankan dengan "bash deploy.sh" setiap ada update.
-# Permission execute akan diatur otomatis oleh script ini.
+# Permission execute akan diatur otomatis oleh script ini. 
 # =============================================================================
 
 set -e

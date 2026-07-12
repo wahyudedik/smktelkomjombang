@@ -37,7 +37,8 @@
         },
         "files": [
             "app/Helpers/helpers.php",
-            "app/Helpers/i18n.php"
+            "app/Helpers/i18n.php",
+            "app/Helpers/ThemeHelper.php"
         ]
     },
     "autoload-dev": {

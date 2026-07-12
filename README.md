@@ -99,7 +99,7 @@ Sistem manajemen absensi berbasis web yang terintegrasi dengan perangkat ZKTeco 
 ### Integrasi
 - **ZKTeco iClock API**: Integrasi dengan perangkat ZKTeco
 - **Laravel Sanctum**: API authentication
-- **Vite**: Modern asset bundler
+- **Vite**: Modern asset bundler 
 
 ---
 

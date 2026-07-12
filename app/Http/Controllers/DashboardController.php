@@ -25,76 +25,61 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Get comprehensive statistics for all users (with caching for performance)
-        $stats = cache()->remember('dashboard_stats_' . $user->id, 300, function () use ($user) {
-            // Cache for 5 minutes to reduce database load
-            return [
-                'total_users' => User::count(),
-                'total_roles' => Role::count(),
-                'total_permissions' => Permission::count(),
-                'total_siswa' => 0,
-                'total_guru' => 0,
-                'total_barang' => 0,
-                'total_pages' => 0,
-                'total_instagram_settings' => 0,
-                'recent_activities' => collect(),
-            ];
+        // Get comprehensive statistics (with caching for performance)
+        $stats = cache()->remember('dashboard_stats_' . $user->id, 300, function () {
+            return $this->fetchCounts();
         });
 
-        // Get recent activities (don't cache - needs to be fresh)
-        try {
-            $stats['recent_activities'] = AuditLog::with('user')
-                ->latest()
-                ->limit(10)
-                ->get();
-        } catch (\Exception $e) {
-            $stats['recent_activities'] = collect();
-        }
+        // Get recent activities (don't cache — needs to be fresh)
+        $stats['recent_activities'] = $this->safe(fn() => AuditLog::with('user')->latest()->limit(10)->get(), collect());
 
-        // Get statistics for all users with error handling (cached counts)
-        try {
-            $stats['total_siswa'] = cache()->remember('count_siswa', 300, fn() => Siswa::count());
-        } catch (\Exception $e) {
-            $stats['total_siswa'] = 0;
-        }
-
-        try {
-            $stats['total_guru'] = cache()->remember('count_guru', 300, fn() => Guru::count());
-        } catch (\Exception $e) {
-            $stats['total_guru'] = 0;
-        }
-
-        try {
-            $stats['total_barang'] = cache()->remember('count_barang', 300, fn() => Barang::count());
-        } catch (\Exception $e) {
-            $stats['total_barang'] = 0;
-        }
-
-        try {
-            $stats['total_pages'] = cache()->remember('count_pages', 300, fn() => Page::count());
-        } catch (\Exception $e) {
-            $stats['total_pages'] = 0;
-        }
-
-        try {
-            $stats['total_instagram_settings'] = cache()->remember('count_instagram_settings', 300, fn() => InstagramSetting::count());
-        } catch (\Exception $e) {
-            $stats['total_instagram_settings'] = 0;
-        }
-
-        // Calculate module usage based on actual data and activity
+        // Calculate module usage and user growth
         $moduleUsage = $this->calculateModuleUsage();
-
-        // Calculate user growth data (last 6 months)
         $userGrowth = $this->calculateUserGrowth();
 
-        // Always use the centralized admin dashboard
         return view('dashboards.admin', [
             'statistics' => $stats,
             'recentActivities' => $stats['recent_activities'],
             'moduleUsage' => $moduleUsage,
-            'userGrowth' => $userGrowth
+            'userGrowth' => $userGrowth,
         ]);
+    }
+
+    /**
+     * Fetch all model counts in a single try-catch block.
+     */
+    private function fetchCounts(): array
+    {
+        $models = [
+            'total_users' => User::class,
+            'total_roles' => Role::class,
+            'total_permissions' => Permission::class,
+            'total_siswa' => Siswa::class,
+            'total_guru' => Guru::class,
+            'total_barang' => Barang::class,
+            'total_pages' => Page::class,
+            'total_instagram_settings' => InstagramSetting::class,
+        ];
+
+        $counts = [];
+        foreach ($models as $key => $model) {
+            $counts[$key] = $this->safe(fn() => $model::count(), 0);
+        }
+        $counts['recent_activities'] = collect();
+
+        return $counts;
+    }
+
+    /**
+     * Execute a callback safely; return fallback on failure.
+     */
+    private function safe(callable $callback, mixed $fallback = null): mixed
+    {
+        try {
+            return $callback();
+        } catch (\Exception $e) {
+            return $fallback;
+        }
     }
 
     /**

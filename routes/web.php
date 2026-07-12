@@ -23,13 +23,20 @@ use App\Http\Controllers\SaranaReportController;
 use App\Http\Controllers\DataManagementController;
 use App\Http\Controllers\InstagramSettingController;
 use App\Http\Controllers\InstagramAnalyticsController;
+use App\Http\Controllers\ThemeSettingController;
 
 // ========================================
 // PUBLIC ROUTES (Landing Page & Public Features)
 // ========================================
 
-// Telkom Landing Page (Main landing page)
-Route::get('/', [\App\Http\Controllers\LandingController::class, 'telkom'])->name('landing');
+// Landing Page — Dynamic theme switching via DEFAULT_THEME env
+// DEFAULT_THEME=telkom → SMK Telekomunikasi
+// DEFAULT_THEME=maudu  → MA Unggulan Darul Ulum
+Route::get('/', [\App\Http\Controllers\LandingController::class, 'index'])->name('landing');
+
+// Direct theme routes (for testing or direct access)
+Route::get('/telkom', [\App\Http\Controllers\LandingController::class, 'telkom'])->name('landing.telkom');
+Route::get('/maudu', [\App\Http\Controllers\LandingController::class, 'maudu'])->name('landing.maudu');
 
 // Legacy Welcome Page (for reference)
 Route::get('/welcome', function () {
@@ -676,6 +683,14 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin'
     Route::get('/settings/seo', [SettingsController::class, 'seoSettings'])->name('settings.seo');
     Route::post('/settings/seo', [SettingsController::class, 'updateSeoSettings'])->name('settings.seo.update');
 
+    // Theme Settings Management Routes
+    Route::prefix('settings/themes')->name('themes.')->group(function () {
+        Route::get('/', [ThemeSettingController::class, 'index'])->name('index');
+        Route::get('/{theme}/edit', [ThemeSettingController::class, 'edit'])->name('edit');
+        Route::put('/{theme}', [ThemeSettingController::class, 'update'])->name('update');
+        Route::post('/{theme}/seed-defaults', [ThemeSettingController::class, 'seedDefaults'])->name('seed-defaults');
+        Route::post('/{theme}/reset-defaults', [ThemeSettingController::class, 'resetDefaults'])->name('reset-defaults');
+    });
 
     // Analytics Dashboard
     Route::get('/analytics', [App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics');

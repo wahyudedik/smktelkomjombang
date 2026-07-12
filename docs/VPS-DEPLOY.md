@@ -255,6 +255,9 @@ VAPID_SUBJECT=https://yourdomain.com
 ATTENDANCE_ICLOCK_SECRET=BUAT_TOKEN_RANDOM_MINIMAL_32_KARAKTER
 ATTENDANCE_REQUIRE_USER_IDENTITY=true
 ATTENDANCE_REQUIRE_USER_VERIFIED=false
+
+# Theme Switching (telkom | maudu)
+DEFAULT_THEME=telkom
 ```
 
 ---
@@ -814,7 +817,7 @@ apt update && apt upgrade -y
 - [ ] SSL certificate aktif
 - [ ] Repository di-clone ke /var/www/telkom
 - [ ] composer install & npm run build selesai
-- [ ] .env dikonfigurasi (DB, APP_URL, ATTENDANCE_SECRET)
+- [ ] .env dikonfigurasi (DB, APP_URL, ATTENDANCE_SECRET, DEFAULT_THEME)
 - [ ] php artisan migrate --force selesai
 - [ ] php artisan storage:link selesai
 - [ ] Permissions sudah benar (www-data)
