@@ -15,7 +15,7 @@ Project ini mengelola: landing page, data siswa/guru, absensi, OSIS voting, sarp
 ## 🛠 Tech Stack
 
 | Layer | Teknologi |
-|-------|-----------|
+|-------|-----------| 
 | Framework | Laravel 12 |
 | PHP | ≥ 8.2 |
 | Database | MySQL (`telkom_db`) |

@@ -20,7 +20,8 @@
 
 @push('scripts')
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ === 'undefined') return;
             $('.popup-youtube').magnificPopup({
                 type: 'iframe',
                 mainClass: 'mfp-fade',

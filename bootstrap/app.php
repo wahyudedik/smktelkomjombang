@@ -16,14 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\SetTimezone::class);
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 
+        // Semua middleware alias digabung dalam satu panggilan
+        // untuk menghindari overwrite (panggilan kedua menimpa yang pertama)
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'verified.email' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-        ]);
-
-        // Rate limiting aliases
-        $middleware->alias([
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         ]);
 

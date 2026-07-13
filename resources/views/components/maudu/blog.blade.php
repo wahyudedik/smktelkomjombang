@@ -36,12 +36,13 @@
                                 <span><i class="fas fa-folder"></i> {{ $blog->category ?? 'Berita' }}</span>
                             </div>
                             <h4 class="blog-title">
-                                <a href="{{ route('landing') }}">{{ Str::limit($blog->title, 60) }}</a>
+                                <a
+                                    href="{{ route('berita.public.show', $blog->slug) }}">{{ Str::limit($blog->title, 60) }}</a>
                             </h4>
                             <p class="blog-desc">{{ Str::limit($blog->excerpt ?? ($blog->content ?? ''), 120) }}</p>
                             <div class="blog-bottom">
-                                <a href="{{ route('landing') }}" class="read-more">Baca Selengkapnya <i
-                                        class="fas fa-arrow-right"></i></a>
+                                <a href="{{ route('berita.public.show', $blog->slug) }}" class="read-more">Baca
+                                    Selengkapnya <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -101,7 +102,8 @@
 
 @push('scripts')
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ === 'undefined') return;
             $('.blog-slider').owlCarousel({
                 loop: true,
                 margin: 30,

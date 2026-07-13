@@ -148,3 +148,17 @@ if (!function_exists('theme_asset')) {
         return asset("{$assetsPath}/{$path}");
     }
 }
+
+if (!function_exists('theme_view')) {
+    /**
+     * Return the correct view name based on the active theme.
+     *
+     * @param string $telkom  View name for Telkom theme
+     * @param string $maudu   View name for MAUDU theme
+     * @return string
+     */
+    function theme_view(string $telkom, string $maudu): string
+    {
+        return current_theme() === 'maudu' ? $maudu : $telkom;
+    }
+}

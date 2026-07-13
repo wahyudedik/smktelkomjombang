@@ -25,7 +25,7 @@ class BeritaController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('excerpt', 'like', '%' . $request->search . '%');
+                    ->orWhere('excerpt', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -34,9 +34,9 @@ class BeritaController extends Controller
         }
 
         $beritas = $query->orderBy('published_at', 'desc')
-                         ->orderBy('created_at', 'desc')
-                         ->paginate(15)
-                         ->withQueryString();
+            ->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->withQueryString();
 
         $statuses = ['draft', 'published', 'archived'];
 
@@ -163,7 +163,7 @@ class BeritaController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('excerpt', 'like', '%' . $request->search . '%');
+                    ->orWhere('excerpt', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -175,7 +175,7 @@ class BeritaController extends Controller
             ->orderBy('published_at', 'desc')
             ->first();
 
-        return view('berita.public.index', compact('beritas', 'featured'));
+        return view(theme_view('berita.public.index', 'berita.maudu.index'), compact('beritas', 'featured'));
     }
 
     public function publicShow(Page $berita)
@@ -189,7 +189,7 @@ class BeritaController extends Controller
             ->limit(3)
             ->get();
 
-        return view('berita.public.show', compact('berita', 'related'));
+        return view(theme_view('berita.public.show', 'berita.maudu.show'), compact('berita', 'related'));
     }
 
     // =========================================================

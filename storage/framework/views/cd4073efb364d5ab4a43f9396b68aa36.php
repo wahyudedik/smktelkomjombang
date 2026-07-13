@@ -64,12 +64,13 @@ unset($__defined_vars, $__key, $__value); ?>
                                 <span><i class="fas fa-folder"></i> <?php echo e($blog->category ?? 'Berita'); ?></span>
                             </div>
                             <h4 class="blog-title">
-                                <a href="<?php echo e(route('landing')); ?>"><?php echo e(Str::limit($blog->title, 60)); ?></a>
+                                <a
+                                    href="<?php echo e(route('berita.public.show', $blog->slug)); ?>"><?php echo e(Str::limit($blog->title, 60)); ?></a>
                             </h4>
                             <p class="blog-desc"><?php echo e(Str::limit($blog->excerpt ?? ($blog->content ?? ''), 120)); ?></p>
                             <div class="blog-bottom">
-                                <a href="<?php echo e(route('landing')); ?>" class="read-more">Baca Selengkapnya <i
-                                        class="fas fa-arrow-right"></i></a>
+                                <a href="<?php echo e(route('berita.public.show', $blog->slug)); ?>" class="read-more">Baca
+                                    Selengkapnya <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -129,7 +130,8 @@ unset($__defined_vars, $__key, $__value); ?>
 
 <?php $__env->startPush('scripts'); ?>
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ === 'undefined') return;
             $('.blog-slider').owlCarousel({
                 loop: true,
                 margin: 30,

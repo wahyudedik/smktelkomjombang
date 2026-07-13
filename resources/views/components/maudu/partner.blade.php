@@ -102,7 +102,8 @@
 
 @push('scripts')
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ === 'undefined') return;
             $('.partner-slider').owlCarousel({
                 loop: true,
                 margin: 30,

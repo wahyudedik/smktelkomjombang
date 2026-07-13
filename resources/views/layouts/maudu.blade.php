@@ -55,17 +55,19 @@
 
     <!-- Additional CSS -->
     <style>
-        /* Fix: prevent double scrollbar and overflow issues */
-        html,
-        body {
+        /* Fix: prevent double scrollbar on Windows
+           Root cause: style.css sets overflow-x:hidden on BOTH html AND body (line 141-148),
+           which creates two separate scroll contexts on Windows -> two scrollbar tracks.
+
+           Fix: Use overflow-x:clip on body instead of overflow:hidden.
+           "clip" clips overflow WITHOUT creating a scroll container (Chrome 90+, Firefox 81+, Safari 16+).
+           This ensures only html element is the scroll context -> single scrollbar. */
+        html {
             overflow-x: hidden !important;
         }
 
-        /* Hide scrollbar ganda dari owl-carousel atau elemen lain */
-        .owl-carousel .owl-stage,
-        .partner-wrapper,
-        .testimonial-slider {
-            overflow: hidden !important;
+        body {
+            overflow-x: clip !important;
         }
     </style>
     @stack('styles')
@@ -124,41 +126,42 @@
     <script src="{{ asset('assets_maudu/assets/js/wow.min.js') }}" defer></script>
     <script src="{{ asset('assets_maudu/assets/js/main.js') }}" defer></script>
 
-    <!-- Custom Scripts -->
+    <!-- Custom Scripts (deferred scripts above are guaranteed to run before DOMContentLoaded) -->
     <script>
-        // Initialize WOW.js for animations
-        new WOW().init();
-
-        // Update copyright year
-        const dateElements = document.querySelectorAll('#date, .current-year');
-        dateElements.forEach(el => {
-            el.innerHTML = new Date().getFullYear();
-        });
-
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (href !== '#' && href !== '!') {
-                    const target = document.querySelector(href);
-                    if (target) {
-                        e.preventDefault();
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update copyright year
+            var dateElements = document.querySelectorAll('#date, .current-year');
+            dateElements.forEach(function(el) {
+                el.innerHTML = new Date().getFullYear();
             });
-        });
 
-        // Search popup toggle
-        $(document).on('click', '.search-btn', function(e) {
-            e.preventDefault();
-            $('.search-popup').addClass('active');
-        });
-        $(document).on('click', '.close-search', function() {
-            $('.search-popup').removeClass('active');
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+                anchor.addEventListener('click', function(e) {
+                    var href = this.getAttribute('href');
+                    if (href !== '#' && href !== '!') {
+                        var target = document.querySelector(href);
+                        if (target) {
+                            e.preventDefault();
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Search popup toggle (jQuery available after DOMContentLoaded)
+            if (typeof $ !== 'undefined') {
+                $(document).on('click', '.search-btn', function(e) {
+                    e.preventDefault();
+                    $('.search-popup').addClass('active');
+                });
+                $(document).on('click', '.close-search', function() {
+                    $('.search-popup').removeClass('active');
+                });
+            }
         });
     </script>
 

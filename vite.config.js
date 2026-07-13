@@ -8,4 +8,9 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        // Force IPv4 agar compatible dengan CSP (IPv6 tidak didukung oleh CSP)
+        host: '127.0.0.1',
+        port: 5173,
+    },
 });

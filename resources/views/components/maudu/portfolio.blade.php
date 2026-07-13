@@ -48,7 +48,8 @@
 
 @push('scripts')
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ === 'undefined') return;
             $('.popup-image').magnificPopup({
                 type: 'image',
                 mainClass: 'mfp-fade',

@@ -16,8 +16,7 @@
                 <div class="events-list">
                     @if (count($events) > 0)
                         @foreach ($events->take(3) as $event)
-                            <div class="event-item mb-4 wow fadeInUp"
-                                data-wow-delay="{{ $loop->index * 0.15 . 's' }}">
+                            <div class="event-item mb-4 wow fadeInUp" data-wow-delay="{{ $loop->index * 0.15 . 's' }}">
                                 <div class="d-flex align-items-center">
                                     <div class="event-date me-4 text-center">
                                         <span class="date-month d-block bg-primary text-white rounded px-2 py-1 small">
@@ -29,7 +28,7 @@
                                     </div>
                                     <div class="event-content">
                                         <h5 class="event-title mb-1">
-                                            <a href="#">{{ $event->title }}</a>
+                                            <a href="{{ route('public.kegiatan') }}">{{ $event->title }}</a>
                                         </h5>
                                         <span class="event-category text-muted small">
                                             <i class="fas fa-tag me-1"></i>
@@ -72,7 +71,7 @@
                                     </div>
                                     <div class="event-content">
                                         <h5 class="event-title mb-1">
-                                            <a href="#">{{ $event['title'] }}</a>
+                                            <a href="{{ route('public.kegiatan') }}">{{ $event['title'] }}</a>
                                         </h5>
                                         <span class="event-category text-muted small">
                                             <i class="fas fa-tag me-1"></i>

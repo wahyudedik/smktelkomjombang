@@ -56,41 +56,61 @@
 
                 <div class="collapse navbar-collapse" id="main_nav">
                     <ul class="navbar-nav">
-                        @php
-                            $menuItems = theme_config('menu', []);
-                        @endphp
-
-                        @foreach ($menuItems as $item)
-                            @if (!empty($item['children']))
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="{{ $item['url'] }}"
-                                        data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                        {{ $item['label'] }}
-                                    </a>
-                                    <ul class="dropdown-menu fade-down">
-                                        @foreach ($item['children'] as $child)
-                                            <li>
-                                                <a class="dropdown-item" href="{{ $child['url'] }}">
-                                                    {{ $child['label'] }}
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                    </ul>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('landing') }}">Beranda</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside">
+                                Profil
+                            </a>
+                            <ul class="dropdown-menu fade-down">
+                                <li><a class="dropdown-item"
+                                        href="{{ route('pages.public.index', ['category' => 'profil']) }}">Tentang
+                                        Kami</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{{ route('pages.public.index', ['category' => 'visi-misi']) }}">Visi &
+                                        Misi</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{{ route('pages.public.index', ['category' => 'guru']) }}">Guru &
+                                        Staff</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('berita.public.index') }}">Berita</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('public.kegiatan') }}">Kegiatan</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside">
+                                Layanan
+                            </a>
+                            <ul class="dropdown-menu fade-down">
+                                <li><a class="dropdown-item" href="{{ route('public.graduation.check') }}">E-Lulus</a>
                                 </li>
-                            @else
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ $item['url'] }}">
-                                        {{ $item['label'] }}
-                                    </a>
+                                <li><a class="dropdown-item"
+                                        href="{{ route('pages.public.index', ['category' => 'akademik']) }}">Akademik</a>
                                 </li>
-                            @endif
-                        @endforeach
+                                <li><a class="dropdown-item" href="{{ route('pages.public.index') }}">Lainnya</a></li>
+                            </ul>
+                        </li>
                     </ul>
 
                     <div class="nav-right">
-                        <div class="nav-right-btn mt-2">
+                        <div class="nav-right-btn mt-2 d-flex align-items-center gap-2">
+                            @auth
+                                <a class="btn btn-outline-secondary btn-sm" href="{{ route('dashboard') }}">
+                                    <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                                </a>
+                            @else
+                                <a class="btn btn-outline-secondary btn-sm" href="{{ route('login') }}">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Login
+                                </a>
+                            @endauth
                             <a class="btn btn-primary" href="{{ theme_config('ppdb_url', '#') }}" target="_blank">
-                                INFORMASI PENDAFTARAN
+                                DAFTAR SEKARANG
                             </a>
                         </div>
                     </div>

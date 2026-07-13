@@ -73,6 +73,22 @@
                 }
             }
         }
+
+        // Dark mode toggle component (shared across all admin pages)
+        function darkModeToggle() {
+            return {
+                active: localStorage.getItem('darkMode') === 'true',
+                toggle() {
+                    this.active = !this.active;
+                    localStorage.setItem('darkMode', this.active);
+                    if (this.active) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                }
+            };
+        }
     </script>
     <div class="min-h-screen">
         @include('layouts.navigation')
@@ -98,21 +114,22 @@
     <script>
         // Initialize dark mode on page load
         document.addEventListener('DOMContentLoaded', function() {
-                    if (localStorage.getItem('darkMode') === 'true') {
-                        document.documentElement.classList.add('dark');
-                    }
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
+        });
+    </script>
 
-                    <
-                    script >
-                        document.addEventListener('DOMContentLoaded', function() {
-                            @if (session('success'))
-                                window.showSuccess('Berhasil', '{{ session('success') }}');
-                            @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                window.showSuccess && window.showSuccess('Berhasil', '{{ session('success') }}');
+            @endif
 
-                            @if (session('error'))
-                                window.showError('Gagal', '{{ session('error') }}');
-                            @endif
-                        });
+            @if (session('error'))
+                window.showError && window.showError('Gagal', '{{ session('error') }}');
+            @endif
+        });
     </script>
 </body>
 

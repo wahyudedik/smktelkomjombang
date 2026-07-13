@@ -41,10 +41,11 @@
                         <h3 class="footer-title">Tautan Cepat</h3>
                         <ul class="footer-list">
                             <li><a href="{{ route('landing') }}">Beranda</a></li>
-                            <li><a href="#">Profil</a></li>
-                            <li><a href="#">Akademik</a></li>
-                            <li><a href="#">Kegiatan</a></li>
-                            <li><a href="#">Berita</a></li>
+                            <li><a href="{{ route('pages.public.index', ['category' => 'profil']) }}">Profil</a></li>
+                            <li><a href="{{ route('pages.public.index', ['category' => 'akademik']) }}">Akademik</a>
+                            </li>
+                            <li><a href="{{ route('public.kegiatan') }}">Kegiatan</a></li>
+                            <li><a href="{{ route('berita.public.index') }}">Berita</a></li>
                         </ul>
                     </div>
                 </div>
@@ -54,11 +55,13 @@
                     <div class="footer-widget-box list">
                         <h3 class="footer-title">Layanan</h3>
                         <ul class="footer-list">
-                            <li><a href="#">E-Siswa & Alumni</a></li>
-                            <li><a href="#">E-Raport</a></li>
-                            <li><a href="#">E-OSIS</a></li>
-                            <li><a href="#">E-Lulus</a></li>
-                            <li><a href="#">E-Majalah</a></li>
+                            <li><a href="{{ route('pages.public.index', ['category' => 'siswa-alumni']) }}">E-Siswa &
+                                    Alumni</a></li>
+                            <li><a href="{{ route('pages.public.index', ['category' => 'raport']) }}">E-Raport</a></li>
+                            <li><a href="{{ route('pages.public.index', ['category' => 'osis']) }}">E-OSIS</a></li>
+                            <li><a href="{{ route('public.graduation.check') }}">E-Lulus</a></li>
+                            <li><a href="{{ route('pages.public.index', ['category' => 'majalah']) }}">E-Majalah</a>
+                            </li>
                         </ul>
                     </div>
                 </div>

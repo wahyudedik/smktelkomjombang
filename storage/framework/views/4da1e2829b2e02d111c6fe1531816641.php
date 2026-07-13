@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>"
-    dir="<?php echo e(function_exists('is_rtl') && is_rtl() ? 'rtl' : 'ltr'); ?>">
+    dir="<?php echo e(function_exists('is_rtl') && is_rtl() ? 'rtl' : 'ltr'); ?>" x-data="darkMode()"
+    :class="{ 'dark': $store.darkMode?.active }">
 
 <head>
     <meta charset="utf-8">
@@ -42,11 +43,53 @@
     <!-- Scripts -->
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
     <!-- Additional Styles -->
     <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 
-<body class="font-sans antialiased bg-slate-50">
+<body class="font-sans antialiased bg-slate-50 dark:bg-dark-900 transition-colors duration-300" x-data>
+
+    <!-- Dark Mode Store -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('darkMode', {
+                active: localStorage.getItem('darkMode') === 'true',
+                toggle() {
+                    this.active = !this.active;
+                    localStorage.setItem('darkMode', this.active);
+                }
+            });
+        });
+
+        function darkMode() {
+            return {
+                init() {
+                    if (localStorage.getItem('darkMode') === 'true') {
+                        document.documentElement.classList.add('dark');
+                    }
+                }
+            }
+        }
+
+        // Dark mode toggle component (shared across all admin pages)
+        function darkModeToggle() {
+            return {
+                active: localStorage.getItem('darkMode') === 'true',
+                toggle() {
+                    this.active = !this.active;
+                    localStorage.setItem('darkMode', this.active);
+                    if (this.active) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                }
+            };
+        }
+    </script>
     <div class="min-h-screen">
         <?php echo $__env->make('layouts.navigation', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
@@ -61,7 +104,7 @@
         <?php endif; ?>
 
         <!-- Page Content -->
-        <main class="pb-8">
+        <main class="pb-8 dark:text-dark-100">
             <?php echo e($slot); ?>
 
         </main>
@@ -71,13 +114,22 @@
     <?php echo $__env->yieldPushContent('scripts'); ?>
 
     <script>
+        // Initialize dark mode on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
+        });
+    </script>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             <?php if(session('success')): ?>
-                window.showSuccess('Berhasil', '<?php echo e(session('success')); ?>');
+                window.showSuccess && window.showSuccess('Berhasil', '<?php echo e(session('success')); ?>');
             <?php endif; ?>
 
             <?php if(session('error')): ?>
-                window.showError('Gagal', '<?php echo e(session('error')); ?>');
+                window.showError && window.showError('Gagal', '<?php echo e(session('error')); ?>');
             <?php endif; ?>
         });
     </script>

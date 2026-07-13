@@ -27,7 +27,7 @@ class InstagramController extends Controller
         // Get Instagram posts from service
         $posts = $this->instagramService->getCachedPosts();
 
-        return view('instagram.activities', compact('posts'));
+        return view(theme_view('instagram.activities', 'instagram.activities-maudu'), compact('posts'));
     }
 
     /**
@@ -56,7 +56,7 @@ class InstagramController extends Controller
 
     /**
      * Handle OAuth callback from Instagram Business Login
-     * 
+     *
      * Instagram Business Login Flow:
      * 1. User clicks authorization URL
      * 2. User authorizes app
@@ -290,13 +290,13 @@ class InstagramController extends Controller
 
     /**
      * Handle webhook notifications (POST request from Meta)
-     * 
+     *
      * Meta Webhooks Requirements:
      * 1. Respond with 200 OK within 20 seconds
      * 2. Validate X-Hub-Signature-256 header
      * 3. Handle deduplication (retries if failed)
      * 4. Process batch of up to 1000 updates
-     * 
+     *
      * Called when Instagram events happen (new post, comment, etc)
      */
     public function handleWebhook(Request $request)

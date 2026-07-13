@@ -759,209 +759,261 @@
     </div>
 
     @push('scripts')
-    <script>
-        // Alpine.js component: Dashboard Stats with live polling
-        function dashboardStats() {
-            return {
-                stats: {
-                    siswa: {{ $statistics['total_siswa'] ?? 0 }},
-                    guru: {{ $statistics['total_guru'] ?? 0 }},
-                    users: {{ $statistics['total_users'] ?? 0 }},
-                    barang: {{ $statistics['total_barang'] ?? 0 }},
-                    siswaTrend: null,
-                    guruTrend: null,
-                },
-                pollInterval: null,
-                init() {
-                    // Poll every 60 seconds for live stats
-                    this.pollInterval = setInterval(() => this.fetchStats(), 60000);
-                    this.$once('destroy', () => clearInterval(this.pollInterval));
-                },
-                async fetchStats() {
-                    try {
-                        const response = await fetch('{{ route("admin.dashboard.api.stats") }}', {
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            }
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            // Animate number changes
-                            this.animateNumber('siswa', this.stats.siswa, data.total_siswa);
-                            this.animateNumber('guru', this.stats.guru, data.total_guru);
-                            this.animateNumber('users', this.stats.users, data.total_users);
-                            this.animateNumber('barang', this.stats.barang, data.total_barang);
-                            if (data.siswa_trend !== undefined) this.stats.siswaTrend = data.siswa_trend;
-                            if (data.guru_trend !== undefined) this.stats.guruTrend = data.guru_trend;
-                        }
-                    } catch (e) {
-                        console.log('Stats poll error:', e);
-                    }
-                },
-                animateNumber(key, from, to) {
-                    if (from === to) return;
-                    const duration = 500;
-                    const start = performance.now();
-                    const step = (timestamp) => {
-                        const progress = Math.min((timestamp - start) / duration, 1);
-                        this.stats[key] = Math.round(from + (to - from) * progress);
-                        if (progress < 1) requestAnimationFrame(step);
-                    };
-                    requestAnimationFrame(step);
-                }
-            };
-        }
-
-        // Chart.js Initialization
-        function initCharts() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#94a3b8' : '#64748b';
-            const gridColor = isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.05)';
-
-            // User Growth Bar Chart
-            const growthCtx = document.getElementById('userGrowthChart');
-            if (growthCtx) {
-                new Chart(growthCtx.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: {!! json_encode(array_column($userGrowth['data'], 'month')) !!},
-                        datasets: [
-                            {
-                                label: 'Siswa',
-                                data: {!! json_encode(array_map(fn($d) => $d['siswa']['count'], $userGrowth['data'])) !!},
-                                backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                                borderColor: 'rgba(59, 130, 246, 1)',
-                                borderWidth: 1,
-                                borderRadius: 6,
-                                barPercentage: 0.6,
-                                categoryPercentage: 0.7,
-                            },
-                            {
-                                label: 'Guru',
-                                data: {!! json_encode(array_map(fn($d) => $d['guru']['count'], $userGrowth['data'])) !!},
-                                backgroundColor: 'rgba(34, 197, 94, 0.8)',
-                                borderColor: 'rgba(34, 197, 94, 1)',
-                                borderWidth: 1,
-                                borderRadius: 6,
-                                barPercentage: 0.6,
-                                categoryPercentage: 0.7,
-                            }
-                        ]
+        <script>
+            // Alpine.js component: Dashboard Stats with live polling
+            function dashboardStats() {
+                return {
+                    stats: {
+                        siswa: {{ $statistics['total_siswa'] ?? 0 }},
+                        guru: {{ $statistics['total_guru'] ?? 0 }},
+                        users: {{ $statistics['total_users'] ?? 0 }},
+                        barang: {{ $statistics['total_barang'] ?? 0 }},
+                        siswaTrend: null,
+                        guruTrend: null,
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 800, easing: 'easeOutQuart' },
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { color: textColor, usePointStyle: true, pointStyle: 'circle', padding: 20 }
-                            },
-                            tooltip: {
-                                backgroundColor: isDark ? '#1e293b' : '#0f172a',
-                                titleColor: '#f8fafc',
-                                bodyColor: '#e2e8f0',
-                                cornerRadius: 8,
-                                padding: 12,
+                    pollInterval: null,
+                    init() {
+                        // Poll every 60 seconds for live stats
+                        this.pollInterval = setInterval(() => this.fetchStats(), 60000);
+                        // Cleanup interval saat component di-destroy (Alpine.js v3 compatible)
+                        const cleanup = () => clearInterval(this.pollInterval);
+                        window.addEventListener('beforeunload', cleanup);
+                        this.$el.addEventListener('cleanup', cleanup);
+                    },
+                    async fetchStats() {
+                        try {
+                            const response = await fetch('{{ route('admin.dashboard.api.stats') }}', {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                }
+                            });
+                            if (response.ok) {
+                                const data = await response.json();
+                                // Animate number changes
+                                this.animateNumber('siswa', this.stats.siswa, data.total_siswa);
+                                this.animateNumber('guru', this.stats.guru, data.total_guru);
+                                this.animateNumber('users', this.stats.users, data.total_users);
+                                this.animateNumber('barang', this.stats.barang, data.total_barang);
+                                if (data.siswa_trend !== undefined) this.stats.siswaTrend = data.siswa_trend;
+                                if (data.guru_trend !== undefined) this.stats.guruTrend = data.guru_trend;
                             }
-                        },
-                        scales: {
-                            x: {
-                                grid: { display: false },
-                                ticks: { color: textColor, font: { size: 12 } }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: gridColor },
-                                ticks: { color: textColor, font: { size: 12 }, stepSize: 1 }
-                            }
+                        } catch (e) {
+                            console.log('Stats poll error:', e);
                         }
+                    },
+                    animateNumber(key, from, to) {
+                        if (from === to) return;
+                        const duration = 500;
+                        const start = performance.now();
+                        const step = (timestamp) => {
+                            const progress = Math.min((timestamp - start) / duration, 1);
+                            this.stats[key] = Math.round(from + (to - from) * progress);
+                            if (progress < 1) requestAnimationFrame(step);
+                        };
+                        requestAnimationFrame(step);
                     }
-                });
+                };
             }
 
-            // Module Usage Doughnut Chart
-            const moduleCtx = document.getElementById('moduleUsageChart');
-            if (moduleCtx) {
-                const colorMap = {
-                    blue: { bg: 'rgba(59, 130, 246, 0.8)', border: '#3b82f6' },
-                    green: { bg: 'rgba(34, 197, 94, 0.8)', border: '#22c55e' },
-                    purple: { bg: 'rgba(168, 85, 247, 0.8)', border: '#a855f7' },
-                    orange: { bg: 'rgba(249, 115, 22, 0.8)', border: '#f97316' },
-                    pink: { bg: 'rgba(236, 72, 153, 0.8)', border: '#ec4899' },
-                };
-                @php
-                    $moduleLabels = array_keys($moduleUsage);
-                    $moduleValues = array_column($moduleUsage, 'percentage');
-                    $moduleColors = array_map(fn($m) => $m['color'], $moduleUsage);
-                @endphp
-                new Chart(moduleCtx.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: {!! json_encode($moduleLabels) !!},
-                        datasets: [{
-                            data: {!! json_encode($moduleValues) !!},
-                            backgroundColor: {!! json_encode(array_map(fn($c) => match($c) {
-                                'blue' => 'rgba(59,130,246,0.8)',
-                                'green' => 'rgba(34,197,94,0.8)',
-                                'purple' => 'rgba(168,85,247,0.8)',
-                                'orange' => 'rgba(249,115,22,0.8)',
-                                'pink' => 'rgba(236,72,153,0.8)',
-                                default => 'rgba(148,163,184,0.5)',
-                            }, $moduleColors)) !!},
-                            borderColor: isDark ? '#0f172a' : '#ffffff',
-                            borderWidth: 3,
-                            hoverOffset: 8,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '65%',
-                        animation: { animateRotate: true, duration: 1000 },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: isDark ? '#1e293b' : '#0f172a',
-                                titleColor: '#f8fafc',
-                                bodyColor: '#e2e8f0',
-                                cornerRadius: 8,
-                                padding: 12,
-                                callbacks: {
-                                    label: function(ctx) {
-                                        return ctx.label + ': ' + ctx.parsed + '%';
+            // Chart.js Initialization
+            function initCharts() {
+                const isDark = document.documentElement.classList.contains('dark');
+                const textColor = isDark ? '#94a3b8' : '#64748b';
+                const gridColor = isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.05)';
+
+                // User Growth Bar Chart
+                const growthCtx = document.getElementById('userGrowthChart');
+                if (growthCtx) {
+                    new Chart(growthCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: {!! json_encode(array_column($userGrowth['data'], 'month')) !!},
+                            datasets: [{
+                                    label: 'Siswa',
+                                    data: {!! json_encode(array_map(fn($d) => $d['siswa']['count'], $userGrowth['data'])) !!},
+                                    backgroundColor: '#3b82f6',
+                                    borderColor: '#2563eb',
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                    barPercentage: 0.6,
+                                    categoryPercentage: 0.7,
+                                },
+                                {
+                                    label: 'Guru',
+                                    data: {!! json_encode(array_map(fn($d) => $d['guru']['count'], $userGrowth['data'])) !!},
+                                    backgroundColor: '#22c55e',
+                                    borderColor: '#16a34a',
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                    barPercentage: 0.6,
+                                    categoryPercentage: 0.7,
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: {
+                                duration: 800,
+                                easing: 'easeOutQuart'
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: textColor,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle',
+                                        padding: 20
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: isDark ? '#1e293b' : '#0f172a',
+                                    titleColor: '#f8fafc',
+                                    bodyColor: '#e2e8f0',
+                                    cornerRadius: 8,
+                                    padding: 12,
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: textColor,
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: gridColor
+                                    },
+                                    ticks: {
+                                        color: textColor,
+                                        font: {
+                                            size: 12
+                                        },
+                                        stepSize: 1
                                     }
                                 }
                             }
                         }
-                    }
-                });
-            }
-        }
+                    });
+                }
 
-        // Dark mode toggle for navigation
-        function darkModeToggle() {
-            return {
-                active: localStorage.getItem('darkMode') === 'true',
-                toggle() {
-                    this.active = !this.active;
-                    localStorage.setItem('darkMode', this.active);
-                    if (this.active) {
-                        document.documentElement.classList.add('dark');
-                    } else {
-                        document.documentElement.classList.remove('dark');
-                    }
-                    // Reload charts with new theme colors
+                // Module Usage Doughnut Chart
+                const moduleCtx = document.getElementById('moduleUsageChart');
+                if (moduleCtx) {
+                    const colorMap = {
+                        blue: {
+                            bg: 'rgba(59, 130, 246, 0.8)',
+                            border: '#3b82f6'
+                        },
+                        green: {
+                            bg: 'rgba(34, 197, 94, 0.8)',
+                            border: '#22c55e'
+                        },
+                        purple: {
+                            bg: 'rgba(168, 85, 247, 0.8)',
+                            border: '#a855f7'
+                        },
+                        orange: {
+                            bg: 'rgba(249, 115, 22, 0.8)',
+                            border: '#f97316'
+                        },
+                        pink: {
+                            bg: 'rgba(236, 72, 153, 0.8)',
+                            border: '#ec4899'
+                        },
+                    };
+                    @php
+                        $moduleLabels = array_keys($moduleUsage);
+                        $moduleValues = array_column($moduleUsage, 'percentage');
+                        $moduleColors = array_map(fn($m) => $m['color'], $moduleUsage);
+                    @endphp
+                    // Skip doughnut chart jika semua values 0 (Chart.js v4 bug)
+                    const moduleValues = {!! json_encode($moduleValues) !!};
+                    const hasModuleData = moduleValues.some(v => v > 0);
+
+                    if (hasModuleData) {
+                    new Chart(moduleCtx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: {!! json_encode($moduleLabels) !!},
+                            datasets: [{
+                                data: moduleValues,
+                                backgroundColor: {!! json_encode(
+                                    array_map(
+                                        fn($c) => match ($c) {
+                                            'blue' => '#3b82f6',
+                                            'green' => '#22c55e',
+                                            'purple' => '#a855f7',
+                                            'orange' => '#f97316',
+                                            'pink' => '#ec4899',
+                                            default => '#94a3b8',
+                                        },
+                                        $moduleColors,
+                                    ),
+                                ) !!},
+                                borderColor: '#ffffff',
+                                borderWidth: 2,
+                                hoverOffset: 8,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '65%',
+                            animation: {
+                                animateRotate: true,
+                                duration: 1000
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    backgroundColor: isDark ? '#1e293b' : '#0f172a',
+                                    titleColor: '#f8fafc',
+                                    bodyColor: '#e2e8f0',
+                                    cornerRadius: 8,
+                                    padding: 12,
+                                    callbacks: {
+                                        label: function(ctx) {
+                                            return ctx.label + ': ' + ctx.parsed + '%';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    } // end if (hasModuleData)
+                }
+            }
+
+            // darkModeToggle() didefinisikan di layouts/app.blade.php (shared)
+            // Override versi dashboard untuk reload charts setelah toggle dark mode
+            const _originalDarkModeToggle = darkModeToggle;
+            darkModeToggle = function() {
+                const base = _originalDarkModeToggle();
+                const originalToggle = base.toggle.bind(base);
+                base.toggle = function() {
+                    originalToggle();
                     setTimeout(() => {
-                        // Destroy old charts and re-init
-                        Chart.helpers.each(Chart.instances, (instance) => instance.destroy());
+                        if (typeof Chart !== 'undefined') {
+                            Object.values(Chart.instances || {}).forEach(instance => instance.destroy());
+                        }
                         initCharts();
                     }, 100);
-                }
+                };
+                return base;
             };
-        }
-    </script>
+        </script>
     @endpush
 </x-app-layout>

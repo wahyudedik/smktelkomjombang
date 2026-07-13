@@ -71,7 +71,8 @@
 
 <?php $__env->startPush('scripts'); ?>
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ === 'undefined') return;
             $('.video-play-btn-lg').magnificPopup({
                 type: 'iframe',
                 mainClass: 'mfp-fade',

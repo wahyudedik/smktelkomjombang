@@ -1,10 +1,12 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-slate-200 sticky top-0 z-50">
+<nav x-data="{ open: false }"
+    class="bg-white dark:bg-dark-800 border-b border-slate-200 dark:border-dark-700 sticky top-0 z-50 transition-colors">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- Logo & Brand -->
             <div class="flex items-center">
                 <a href="<?php echo e(route('admin.dashboard')); ?>" class="flex items-center space-x-2">
-                    <img src="<?php echo e(asset('assets_telkom/assets/images/logo-dark.png')); ?>" alt="Logo Telkom" style="max-height: 40px;">
+                    <img src="<?php echo e(asset('assets_telkom/assets/images/logo-dark.png')); ?>" alt="Logo Telkom"
+                        style="max-height: 40px;">
                 </a>
             </div>
 
@@ -12,17 +14,27 @@
             <div class="hidden md:flex items-center space-x-6">
                 <?php if(auth()->guard()->check()): ?>
                     <a href="<?php echo e(route('admin.dashboard')); ?>"
-                        class="text-sm font-medium <?php echo e(request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-slate-600 hover:text-slate-900'); ?> transition-colors">
+                        class="text-sm font-medium <?php echo e(request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-slate-600 hover:text-slate-900 dark:text-dark-300 dark:hover:text-white'); ?> transition-colors">
                         <?php echo e(__('common.dashboard')); ?>
 
                     </a>
 
                     <!-- Academic Management -->
                     <?php
-                        $showAcademic = Auth::check() && (
-                            Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin', 'sarpras']) ||
-                            Auth::user()->canAny(['guru.view','guru.read','siswa.view','siswa.read','jadwal.view','jadwal.read','attendance.view','sarpras.view','sarpras.read'])
-                        );
+                        $showAcademic =
+                            Auth::check() &&
+                            (Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin', 'sarpras']) ||
+                                Auth::user()->canAny([
+                                    'guru.view',
+                                    'guru.read',
+                                    'siswa.view',
+                                    'siswa.read',
+                                    'jadwal.view',
+                                    'jadwal.read',
+                                    'attendance.view',
+                                    'sarpras.view',
+                                    'sarpras.read',
+                                ]));
                     ?>
                     <?php if($showAcademic): ?>
                         <div class="relative group">
@@ -87,10 +99,16 @@
 
                     <!-- E-Services -->
                     <?php
-                        $showEServices = Auth::check() && (
-                            Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru', 'osis']) ||
-                            Auth::user()->canAny(['osis.view','osis.read','kelulusan.view','lulus.view','surat.view'])
-                        );
+                        $showEServices =
+                            Auth::check() &&
+                            (Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru', 'osis']) ||
+                                Auth::user()->canAny([
+                                    'osis.view',
+                                    'osis.read',
+                                    'kelulusan.view',
+                                    'lulus.view',
+                                    'surat.view',
+                                ]));
                     ?>
                     <?php if($showEServices): ?>
                         <div class="relative group">
@@ -191,10 +209,19 @@
 
                     <!-- Content Management -->
                     <?php
-                        $showContent = Auth::check() && (
-                            Auth::user()->hasAnyRole(['admin', 'superadmin']) ||
-                            Auth::user()->canAny(['pages.view','pages.create','events.view','events.create','berita.view','berita.create','instagram.view','instagram.manage'])
-                        );
+                        $showContent =
+                            Auth::check() &&
+                            (Auth::user()->hasAnyRole(['admin', 'superadmin']) ||
+                                Auth::user()->canAny([
+                                    'pages.view',
+                                    'pages.create',
+                                    'events.view',
+                                    'events.create',
+                                    'berita.view',
+                                    'berita.create',
+                                    'instagram.view',
+                                    'instagram.manage',
+                                ]));
                     ?>
                     <?php if($showContent): ?>
                         <div class="relative group">
@@ -209,7 +236,9 @@
                             <div
                                 class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                 <div class="py-2">
-                                    <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('settings.manage') || Auth::user()->can('settings.view')): ?>
+                                    <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin']) ||
+                                            Auth::user()->can('settings.manage') ||
+                                            Auth::user()->can('settings.view')): ?>
                                         <a href="<?php echo e(route('landing')); ?>"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-globe mr-2"></i>Landing Page
@@ -247,10 +276,20 @@
 
                     <!-- System Management (Superadmin & Admin) -->
                     <?php
-                        $showSystem = Auth::check() && (
-                            Auth::user()->hasAnyRole(['superadmin', 'admin']) ||
-                            Auth::user()->canAny(['users.view','users.create','roles.view','permissions.view','system.analytics','system.health','system.notifications','testimonials.view','testimonial-links.view'])
-                        );
+                        $showSystem =
+                            Auth::check() &&
+                            (Auth::user()->hasAnyRole(['superadmin', 'admin']) ||
+                                Auth::user()->canAny([
+                                    'users.view',
+                                    'users.create',
+                                    'roles.view',
+                                    'permissions.view',
+                                    'system.analytics',
+                                    'system.health',
+                                    'system.notifications',
+                                    'testimonials.view',
+                                    'testimonial-links.view',
+                                ]));
                     ?>
                     <?php if($showSystem): ?>
                         <div class="relative group">
@@ -356,7 +395,26 @@
 
             <!-- User Profile Dropdown -->
             <?php if(auth()->guard()->check()): ?>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <!-- Dark Mode Toggle -->
+                    <div x-data="darkModeToggle()">
+                        <button @click="toggle()" :title="active ? 'Mode Terang' : 'Mode Gelap'"
+                            class="p-2 text-slate-600 hover:text-slate-900 dark:text-dark-300 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-dark-700">
+                            <!-- Sun icon (shown in dark mode) -->
+                            <svg x-show="active" class="w-5 h-5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <!-- Moon icon (shown in light mode) -->
+                            <svg x-show="!active" class="w-5 h-5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            </svg>
+                        </button>
+                    </div>
+
                     <!-- Notifications Dropdown -->
                     <?php
                         $unreadNotifications = DB::table('notifications')
@@ -668,30 +726,44 @@
                     <!-- Academic Management -->
                     <?php if($showAcademic): ?>
                         <div class="px-3 py-2">
-                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Academic Management</div>
+                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Academic
+                                Management</div>
                             <div class="space-y-1 ml-2">
-                                <?php if(Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']) || Auth::user()->can('guru.view') || Auth::user()->can('guru.read')): ?>
-                                    <a href="<?php echo e(route('admin.guru.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php if(Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']) ||
+                                        Auth::user()->can('guru.view') ||
+                                        Auth::user()->can('guru.read')): ?>
+                                    <a href="<?php echo e(route('admin.guru.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-chalkboard-teacher mr-2"></i>Guru Management
                                     </a>
                                 <?php endif; ?>
-                                <?php if(Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']) || Auth::user()->can('siswa.view') || Auth::user()->can('siswa.read')): ?>
-                                    <a href="<?php echo e(route('admin.siswa.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php if(Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']) ||
+                                        Auth::user()->can('siswa.view') ||
+                                        Auth::user()->can('siswa.read')): ?>
+                                    <a href="<?php echo e(route('admin.siswa.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-user-graduate mr-2"></i>Siswa Management
                                     </a>
                                 <?php endif; ?>
-                                <?php if(Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']) || Auth::user()->can('jadwal.view') || Auth::user()->can('jadwal.read')): ?>
-                                    <a href="<?php echo e(route('admin.jadwal-pelajaran.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php if(Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']) ||
+                                        Auth::user()->can('jadwal.view') ||
+                                        Auth::user()->can('jadwal.read')): ?>
+                                    <a href="<?php echo e(route('admin.jadwal-pelajaran.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-calendar-alt mr-2"></i>Jadwal Pelajaran
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']) || Auth::user()->can('attendance.view')): ?>
-                                    <a href="<?php echo e(route('admin.absensi.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.absensi.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-user-check mr-2"></i>Absensi
                                     </a>
                                 <?php endif; ?>
-                                <?php if(Auth::user()->hasAnyRole(['sarpras', 'admin', 'superadmin']) || Auth::user()->can('sarpras.view') || Auth::user()->can('sarpras.read')): ?>
-                                    <a href="<?php echo e(route('admin.sarpras.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php if(Auth::user()->hasAnyRole(['sarpras', 'admin', 'superadmin']) ||
+                                        Auth::user()->can('sarpras.view') ||
+                                        Auth::user()->can('sarpras.read')): ?>
+                                    <a href="<?php echo e(route('admin.sarpras.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-building mr-2"></i>Sarpras Management
                                     </a>
                                 <?php endif; ?>
@@ -704,26 +776,35 @@
                         <div class="px-3 py-2">
                             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">E-Services</div>
                             <div class="space-y-1 ml-2">
-                                <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin', 'osis']) || Auth::user()->can('osis.view') || Auth::user()->can('osis.read')): ?>
-                                    <a href="<?php echo e(route('admin.osis.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin', 'osis']) ||
+                                        Auth::user()->can('osis.view') ||
+                                        Auth::user()->can('osis.read')): ?>
+                                    <a href="<?php echo e(route('admin.osis.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-vote-yea mr-2"></i>E-OSIS Voting
                                     </a>
                                 <?php endif; ?>
-                                <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru']) || Auth::user()->can('kelulusan.view') || Auth::user()->can('lulus.view')): ?>
-                                    <a href="<?php echo e(route('admin.lulus.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru']) ||
+                                        Auth::user()->can('kelulusan.view') ||
+                                        Auth::user()->can('lulus.view')): ?>
+                                    <a href="<?php echo e(route('admin.lulus.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-graduation-cap mr-2"></i>E-Lulus Graduation
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru', 'sarpras']) || Auth::user()->can('surat.view')): ?>
                                     <div class="border-t border-slate-100 my-1"></div>
-                                    <a href="<?php echo e(route('admin.letters.out.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.letters.out.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-paper-plane mr-2"></i>Surat Keluar
                                     </a>
-                                    <a href="<?php echo e(route('admin.letters.in.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.letters.in.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-inbox mr-2"></i>Surat Masuk
                                     </a>
                                     <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('surat.manage')): ?>
-                                        <a href="<?php echo e(route('admin.letters.formats.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                        <a href="<?php echo e(route('admin.letters.formats.index')); ?>"
+                                            class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                             <i class="fas fa-file-contract mr-2"></i>Format Surat
                                         </a>
                                     <?php endif; ?>
@@ -738,22 +819,26 @@
                             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Student</div>
                             <div class="space-y-1 ml-2">
                                 <?php if(Auth::user()->hasRole('siswa') || Auth::user()->can('osis.vote')): ?>
-                                    <a href="<?php echo e(route('admin.osis.voting')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.osis.voting')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-vote-yea mr-2"></i>OSIS Voting
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasRole('siswa') || Auth::user()->can('osis.results')): ?>
-                                    <a href="<?php echo e(route('admin.osis.results')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.osis.results')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-chart-bar mr-2"></i>Voting Results
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasRole('siswa') || Auth::user()->can('jadwal.read')): ?>
-                                    <a href="<?php echo e(route('admin.jadwal-pelajaran.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.jadwal-pelajaran.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-calendar-alt mr-2"></i>Jadwal Pelajaran
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasRole('siswa') || Auth::user()->can('lulus.read')): ?>
-                                    <a href="<?php echo e(route('admin.lulus.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.lulus.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-graduation-cap mr-2"></i>Kelulusan
                                     </a>
                                 <?php endif; ?>
@@ -764,30 +849,38 @@
                     <!-- Content Management -->
                     <?php if($showContent): ?>
                         <div class="px-3 py-2">
-                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Content Management</div>
+                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Content
+                                Management</div>
                             <div class="space-y-1 ml-2">
-                                <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('settings.manage') || Auth::user()->can('settings.view')): ?>
-                                    <a href="<?php echo e(route('landing')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin']) ||
+                                        Auth::user()->can('settings.manage') ||
+                                        Auth::user()->can('settings.view')): ?>
+                                    <a href="<?php echo e(route('landing')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-globe mr-2"></i>Landing Page
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('pages.view')): ?>
-                                    <a href="<?php echo e(route('admin.pages.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.pages.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-file-alt mr-2"></i>Page Management
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('events.view')): ?>
-                                    <a href="<?php echo e(route('admin.events.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.events.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-calendar-alt mr-2"></i>Events / Kegiatan
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasAnyRole(['admin', 'superadmin']) || Auth::user()->can('berita.view')): ?>
-                                    <a href="<?php echo e(route('admin.berita.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.berita.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-newspaper mr-2"></i>Berita / News
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasRole('superadmin')): ?>
-                                    <a href="<?php echo e(route('admin.superadmin.instagram-settings')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.superadmin.instagram-settings')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fab fa-instagram mr-2"></i><?php echo e(__('common.instagram_settings')); ?>
 
                                     </a>
@@ -799,70 +892,84 @@
                     <!-- System Management -->
                     <?php if($showSystem): ?>
                         <div class="px-3 py-2">
-                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">System Management</div>
+                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">System
+                                Management</div>
                             <div class="space-y-1 ml-2">
                                 <?php if(Auth::user()->hasAnyRole(['superadmin', 'admin'])): ?>
-                                    <a href="<?php echo e(route('admin.superadmin.users')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.superadmin.users')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-users-cog mr-2"></i>User Management
                                     </a>
-                                <?php elseif(Auth::user()->canAny(['users.view','users.create','users.edit','users.delete'])): ?>
-                                    <a href="<?php echo e(route('admin.user-management.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php elseif(Auth::user()->canAny(['users.view', 'users.create', 'users.edit', 'users.delete'])): ?>
+                                    <a href="<?php echo e(route('admin.user-management.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-users mr-2"></i>User Management
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasRole('superadmin')): ?>
-                                    <a href="<?php echo e(route('admin.role-permissions.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.role-permissions.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-shield-alt mr-2"></i>Role & Permissions
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasRole('superadmin')): ?>
                                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', App\Models\Permission::class)): ?>
-                                        <a href="<?php echo e(route('admin.permissions.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                        <a href="<?php echo e(route('admin.permissions.index')); ?>"
+                                            class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                             <i class="fas fa-key mr-2"></i>Permission Management
                                         </a>
                                     <?php endif; ?>
                                 <?php endif; ?>
                                 <?php if(Auth::user()->hasRole('superadmin')): ?>
-                                    <a href="<?php echo e(route('admin.audit-logs.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.audit-logs.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-history mr-2"></i>Audit Logs
                                     </a>
                                 <?php endif; ?>
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAnalytics', App\Models\User::class)): ?>
-                                    <a href="<?php echo e(route('admin.analytics')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.analytics')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-chart-line mr-2"></i><?php echo e(__('common.analytics_dashboard')); ?>
 
                                     </a>
                                 <?php endif; ?>
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewSystemHealth', App\Models\User::class)): ?>
-                                    <a href="<?php echo e(route('admin.system.health')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.system.health')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-heartbeat mr-2"></i><?php echo e(__('common.system_health')); ?>
 
                                     </a>
                                 <?php endif; ?>
                                 <?php if(Auth::check() && Auth::user()->hasAnyRole(['admin', 'superadmin'])): ?>
-                                    <a href="<?php echo e(route('admin.log-monitoring.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.log-monitoring.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-file-alt mr-2"></i>Log Monitoring
                                     </a>
                                 <?php endif; ?>
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewNotifications', App\Models\User::class)): ?>
-                                    <a href="<?php echo e(route('admin.notifications')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.notifications')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-bell mr-2"></i><?php echo e(__('common.notification_center')); ?>
 
                                     </a>
                                 <?php endif; ?>
-                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->any(['testimonials.view', 'testimonials.create', 'testimonials.edit', 'testimonials.delete'])): ?>
-                                    <a href="<?php echo e(route('admin.testimonials.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->any(['testimonials.view', 'testimonials.create', 'testimonials.edit',
+                                    'testimonials.delete'])): ?>
+                                    <a href="<?php echo e(route('admin.testimonials.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-comments mr-2"></i><?php echo e(__('common.manage_testimonials')); ?>
 
                                     </a>
                                 <?php endif; ?>
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('testimonial-links.view')): ?>
-                                    <a href="<?php echo e(route('admin.testimonial-links.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                    <a href="<?php echo e(route('admin.testimonial-links.index')); ?>"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-link mr-2"></i><?php echo e(__('common.testimonial_links')); ?>
 
                                     </a>
                                 <?php endif; ?>
-                                <a href="<?php echo e(route('admin.settings.index')); ?>" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                <a href="<?php echo e(route('admin.settings.index')); ?>"
+                                    class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                     <i class="fas fa-cog mr-2"></i><?php echo e(__('common.system_settings')); ?>
 
                                 </a>

@@ -57,44 +57,61 @@
 
                 <div class="collapse navbar-collapse" id="main_nav">
                     <ul class="navbar-nav">
-                        <?php
-                            $menuItems = theme_config('menu', []);
-                        ?>
-
-                        <?php $__currentLoopData = $menuItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php if(!empty($item['children'])): ?>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="<?php echo e($item['url']); ?>"
-                                        data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                        <?php echo e($item['label']); ?>
-
-                                    </a>
-                                    <ul class="dropdown-menu fade-down">
-                                        <?php $__currentLoopData = $item['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $child): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <li>
-                                                <a class="dropdown-item" href="<?php echo e($child['url']); ?>">
-                                                    <?php echo e($child['label']); ?>
-
-                                                </a>
-                                            </li>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </ul>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?php echo e(route('landing')); ?>">Beranda</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside">
+                                Profil
+                            </a>
+                            <ul class="dropdown-menu fade-down">
+                                <li><a class="dropdown-item"
+                                        href="<?php echo e(route('pages.public.index', ['category' => 'profil'])); ?>">Tentang
+                                        Kami</a></li>
+                                <li><a class="dropdown-item"
+                                        href="<?php echo e(route('pages.public.index', ['category' => 'visi-misi'])); ?>">Visi &
+                                        Misi</a></li>
+                                <li><a class="dropdown-item"
+                                        href="<?php echo e(route('pages.public.index', ['category' => 'guru'])); ?>">Guru &
+                                        Staff</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?php echo e(route('berita.public.index')); ?>">Berita</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?php echo e(route('public.kegiatan')); ?>">Kegiatan</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside">
+                                Layanan
+                            </a>
+                            <ul class="dropdown-menu fade-down">
+                                <li><a class="dropdown-item" href="<?php echo e(route('public.graduation.check')); ?>">E-Lulus</a>
                                 </li>
-                            <?php else: ?>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="<?php echo e($item['url']); ?>">
-                                        <?php echo e($item['label']); ?>
-
-                                    </a>
+                                <li><a class="dropdown-item"
+                                        href="<?php echo e(route('pages.public.index', ['category' => 'akademik'])); ?>">Akademik</a>
                                 </li>
-                            <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <li><a class="dropdown-item" href="<?php echo e(route('pages.public.index')); ?>">Lainnya</a></li>
+                            </ul>
+                        </li>
                     </ul>
 
                     <div class="nav-right">
-                        <div class="nav-right-btn mt-2">
+                        <div class="nav-right-btn mt-2 d-flex align-items-center gap-2">
+                            <?php if(auth()->guard()->check()): ?>
+                                <a class="btn btn-outline-secondary btn-sm" href="<?php echo e(route('dashboard')); ?>">
+                                    <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                                </a>
+                            <?php else: ?>
+                                <a class="btn btn-outline-secondary btn-sm" href="<?php echo e(route('login')); ?>">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Login
+                                </a>
+                            <?php endif; ?>
                             <a class="btn btn-primary" href="<?php echo e(theme_config('ppdb_url', '#')); ?>" target="_blank">
-                                INFORMASI PENDAFTARAN
+                                DAFTAR SEKARANG
                             </a>
                         </div>
                     </div>

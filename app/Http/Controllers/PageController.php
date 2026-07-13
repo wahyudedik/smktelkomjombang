@@ -472,7 +472,7 @@ class PageController extends Controller
             ->pluck('category')
             ->filter();
 
-        return view('pages.public.index-telkom', compact('pages', 'categories'));
+        return view(theme_view('pages.public.index-telkom', 'pages.public.index-maudu'), compact('pages', 'categories'));
     }
 
     /**
@@ -507,6 +507,6 @@ class PageController extends Controller
         // Increment views count (optional)
         // $page->increment('views_count');
 
-        return view('pages.public.show-telkom', compact('page'));
+        return view(theme_view('pages.public.show-telkom', 'pages.public.show-maudu'), compact('page'));
     }
 }

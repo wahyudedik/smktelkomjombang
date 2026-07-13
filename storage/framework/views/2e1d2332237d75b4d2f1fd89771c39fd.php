@@ -130,7 +130,8 @@ unset($__defined_vars, $__key, $__value); ?>
 
 <?php $__env->startPush('scripts'); ?>
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ === 'undefined') return;
             $('.partner-slider').owlCarousel({
                 loop: true,
                 margin: 30,

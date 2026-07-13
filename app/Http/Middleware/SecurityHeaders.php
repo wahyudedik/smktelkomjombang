@@ -54,11 +54,13 @@ class SecurityHeaders
 
         // Skip untuk文件下载 responses
         $contentType = $response->headers->get('Content-Type', '');
-        if (str_contains($contentType, 'application/pdf') ||
+        if (
+            str_contains($contentType, 'application/pdf') ||
             str_contains($contentType, 'application/zip') ||
             str_contains($contentType, 'application/vnd.') ||
             str_contains($contentType, 'image/') ||
-            str_contains($contentType, 'text/csv')) {
+            str_contains($contentType, 'text/csv')
+        ) {
             return false;
         }
 
@@ -90,20 +92,22 @@ class SecurityHeaders
 
         // Content-Security-Policy: Dasar CSP
         // Catatan: CSP yang terlalu ketat bisa memecah fitur yang ada.
-        // Mulai dengan mode report-only, lalu upgrade ke enforce setelah testing.
-        $cspDirectives = [
-            "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://fonts.bunny.net",
-            "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.bunny.net",
-            "img-src 'self' data: blob: https://cdnjs.cloudflare.com https://fonts.bunny.net",
-            "font-src 'self' https://cdnjs.cloudflare.com https://fonts.bunny.net",
-            "connect-src 'self' https://cdnjs.cloudflare.com",
-            "frame-ancestors 'none'",
-            "base-uri 'self'",
-            "form-action 'self'",
-        ];
+        // Di development, skip CSP karena Vite dev server membutuhkan akses yang luas.
+        if (!app()->environment('local', 'development')) {
+            $cspDirectives = [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
+                "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
+                "img-src 'self' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
+                "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
+                "connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
+                "frame-ancestors 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
+            ];
 
-        $response->headers->set('Content-Security-Policy', implode('; ', $cspDirectives));
+            $response->headers->set('Content-Security-Policy', implode('; ', $cspDirectives));
+        }
 
         // Strict-Transport-Security: HSTS (hanya untuk HTTPS)
         if ($this->isSecure()) {
