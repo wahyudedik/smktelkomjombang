@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Global middleware
         $middleware->append(\App\Http\Middleware\SetLocale::class);
         $middleware->append(\App\Http\Middleware\SetTimezone::class);
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
@@ -21,7 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified.email' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
 
-        // Exclude Instagram webhook from CSRF verification
+        // Rate limiting aliases
+        $middleware->alias([
+            'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        ]);
+
+        // Exclude Instagram webhook and iClock from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'instagram/webhook',
             'iclock/cdata',

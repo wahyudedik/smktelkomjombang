@@ -55,18 +55,27 @@
         </div>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6" x-data="dashboardStats()">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
                 @if (Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']))
                     <!-- Total Students -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div
+                        class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-slate-600">{{ __('common.total_siswa') }}</p>
-                                <p class="text-2xl font-bold text-slate-900">{{ $statistics['total_siswa'] ?? 0 }}</p>
-                                {{-- <p class="text-xs text-green-600 mt-1">+12% dari bulan lalu</p> --}}
+                                <p class="text-sm font-medium text-slate-600 dark:text-dark-300">
+                                    {{ __('common.total_siswa') }}</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white" x-text="stats.siswa">
+                                    {{ $statistics['total_siswa'] ?? 0 }}</p>
+                                <p class="text-xs mt-1"
+                                    :class="stats.siswaTrend >= 0 ? 'text-green-600' : 'text-red-600'"
+                                    x-show="stats.siswaTrend !== null">
+                                    <span
+                                        x-text="stats.siswaTrend >= 0 ? '+' + stats.siswaTrend : stats.siswaTrend"></span>%
+                                    dari bulan lalu
+                                </p>
                             </div>
                             <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
@@ -81,12 +90,21 @@
 
                 @if (Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']))
                     <!-- Total Teachers -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div
+                        class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-slate-600">{{ __('common.total_guru') }}</p>
-                                <p class="text-2xl font-bold text-slate-900">{{ $statistics['total_guru'] ?? 0 }}</p>
-                                {{-- <p class="text-xs text-green-600 mt-1">+5% dari bulan lalu</p> --}}
+                                <p class="text-sm font-medium text-slate-600 dark:text-dark-300">
+                                    {{ __('common.total_guru') }}</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white" x-text="stats.guru">
+                                    {{ $statistics['total_guru'] ?? 0 }}</p>
+                                <p class="text-xs mt-1"
+                                    :class="stats.guruTrend >= 0 ? 'text-green-600' : 'text-red-600'"
+                                    x-show="stats.guruTrend !== null">
+                                    <span
+                                        x-text="stats.guruTrend >= 0 ? '+' + stats.guruTrend : stats.guruTrend"></span>%
+                                    dari bulan lalu
+                                </p>
                             </div>
                             <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
@@ -101,12 +119,16 @@
 
                 @if (Auth::user()->hasAnyRole(['admin', 'superadmin']))
                     <!-- Active Users -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div
+                        class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-slate-600">{{ __('common.active_users') }}</p>
-                                <p class="text-2xl font-bold text-slate-900">{{ $statistics['total_users'] ?? 0 }}</p>
-                                {{-- <p class="text-xs text-blue-600 mt-1">Online sekarang</p> --}}
+                                <p class="text-sm font-medium text-slate-600 dark:text-dark-300">
+                                    {{ __('common.active_users') }}</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white" x-text="stats.users">
+                                    {{ $statistics['total_users'] ?? 0 }}</p>
+                                <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                    {{ __('common.active_users') }}</p>
                             </div>
                             <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
@@ -178,12 +200,16 @@
 
                 @if (Auth::user()->hasAnyRole(['sarpras', 'admin', 'superadmin']))
                     <!-- Total Assets -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div
+                        class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-slate-600">{{ __('common.total_assets') }}</p>
-                                <p class="text-2xl font-bold text-slate-900">{{ $statistics['total_barang'] ?? 0 }}</p>
-                                {{-- <p class="text-xs text-orange-600 mt-1">Sarana Prasarana</p> --}}
+                                <p class="text-sm font-medium text-slate-600 dark:text-dark-300">
+                                    {{ __('common.total_assets') }}</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white" x-text="stats.barang">
+                                    {{ $statistics['total_barang'] ?? 0 }}</p>
+                                <p class="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                                    {{ __('common.total_assets') }}</p>
                             </div>
                             <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor"
@@ -199,78 +225,47 @@
 
             <!-- Charts and Analytics Section -->
             @if (Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']))
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <!-- User Growth Chart -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-8" x-data x-init="$nextTick(() => initCharts())">
+                    <!-- User Growth Chart (Chart.js) -->
+                    <div
+                        class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
                         <div class="flex items-center justify-between mb-4">
                             <div>
-                                <h3 class="text-lg font-semibold text-slate-900">{{ __('common.user_growth') }}</h3>
-                                <p class="text-xs text-slate-500 mt-1">6 bulan terakhir - Total:
+                                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                                    {{ __('common.user_growth') }}</h3>
+                                <p class="text-xs text-slate-500 dark:text-dark-400 mt-1">6 bulan terakhir - Total:
                                     {{ $userGrowth['total_siswa'] }} siswa, {{ $userGrowth['total_guru'] }} guru</p>
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                <span class="text-xs text-slate-600">Siswa</span>
-                                <div class="w-3 h-3 bg-green-500 rounded-full ml-4"></div>
-                                <span class="text-xs text-slate-600">Guru</span>
-                            </div>
                         </div>
-                        <div class="h-64 flex items-end justify-between space-x-2">
-                            @foreach ($userGrowth['data'] as $monthData)
-                                <div class="flex flex-col items-center flex-1 group relative">
-                                    <!-- Tooltip -->
-                                    <div
-                                        class="absolute bottom-full mb-2 hidden group-hover:block bg-slate-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
-                                        <div>Siswa: {{ $monthData['siswa']['count'] }}</div>
-                                        <div>Guru: {{ $monthData['guru']['count'] }}</div>
-                                    </div>
-
-                                    <!-- Bars Container -->
-                                    <div class="flex space-x-1 h-full items-end">
-                                        <!-- Siswa Bar -->
-                                        <div class="w-6 bg-blue-500 rounded-t transition-all duration-500 hover:bg-blue-600"
-                                            style="height: {{ $monthData['siswa']['percentage'] > 0 ? $monthData['siswa']['percentage'] : 5 }}%"
-                                            title="Siswa: {{ $monthData['siswa']['count'] }}">
-                                        </div>
-                                        <!-- Guru Bar -->
-                                        <div class="w-6 bg-green-500 rounded-t transition-all duration-500 hover:bg-green-600"
-                                            style="height: {{ $monthData['guru']['percentage'] > 0 ? $monthData['guru']['percentage'] : 5 }}%"
-                                            title="Guru: {{ $monthData['guru']['count'] }}">
-                                        </div>
-                                    </div>
-
-                                    <!-- Month Label -->
-                                    <span class="text-xs text-slate-500 mt-2">{{ $monthData['month'] }}</span>
-                                </div>
-                            @endforeach
+                        <div class="relative" style="height: 280px;">
+                            <canvas id="userGrowthChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- Module Usage Chart -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 class="text-lg font-semibold text-slate-900 mb-4">{{ __('common.module_usage') }}</h3>
-                        <p class="text-xs text-slate-500 mb-4">Berdasarkan jumlah data (70%) & aktivitas 30 hari
-                            terakhir
-                            (30%)</p>
-                        <div class="space-y-4">
-                            @foreach ($moduleUsage as $moduleName => $module)
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <div class="w-3 h-3 bg-{{ $module['color'] }}-500 rounded-full mr-3"></div>
-                                        <span class="text-sm text-slate-600">{{ $moduleName }}</span>
-                                        <span class="text-xs text-slate-400 ml-2">({{ $module['data_count'] }}
-                                            data)</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <div class="w-24 bg-slate-200 rounded-full h-2 mr-3">
-                                            <div class="bg-{{ $module['color'] }}-500 h-2 rounded-full transition-all duration-500"
-                                                style="width: {{ $module['percentage'] }}%"></div>
+                    <!-- Module Usage Chart (Chart.js Doughnut) -->
+                    <div
+                        class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                            {{ __('common.module_usage') }}</h3>
+                        <p class="text-xs text-slate-500 dark:text-dark-400 mb-4">Berdasarkan jumlah data (70%) &
+                            aktivitas 30 hari terakhir (30%)</p>
+                        <div class="flex flex-col md:flex-row items-center gap-6">
+                            <div class="relative" style="width: 200px; height: 200px;">
+                                <canvas id="moduleUsageChart"></canvas>
+                            </div>
+                            <div class="flex-1 space-y-2 w-full">
+                                @foreach ($moduleUsage as $moduleName => $module)
+                                    <div class="flex items-center justify-between text-sm">
+                                        <div class="flex items-center">
+                                            <span
+                                                class="w-3 h-3 rounded-full mr-2 bg-{{ $module['color'] }}-500"></span>
+                                            <span class="text-slate-600 dark:text-dark-300">{{ $moduleName }}</span>
                                         </div>
                                         <span
-                                            class="text-sm font-medium text-slate-900">{{ $module['percentage'] }}%</span>
+                                            class="font-medium text-slate-900 dark:text-white">{{ $module['percentage'] }}%</span>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -278,15 +273,26 @@
 
             <!-- Quick Actions and Recent Activity -->
             @if (Auth::user()->hasAnyRole(['admin', 'superadmin']))
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                     <!-- Quick Actions -->
-                    <div class="lg:col-span-1">
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                            <h3 class="text-lg font-semibold text-slate-900 mb-4">{{ __('common.quick_actions') }}</h3>
-                            <div class="space-y-3">
+                    <div class="lg:col-span-1" x-data="{ expanded: true }">
+                        <div
+                            class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
+                            <div class="flex items-center justify-between mb-4 cursor-pointer"
+                                @click="expanded = !expanded">
+                                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                                    {{ __('common.quick_actions') }}</h3>
+                                <svg class="w-5 h-5 text-slate-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': !expanded }" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <div class="space-y-3" x-show="expanded" x-collapse>
                                 @if (Auth::user()->hasRole('superadmin') || Auth::user()->can('users.create'))
                                     <a href="{{ route('admin.superadmin.users.create') }}"
-                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
                                         <div
                                             class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
                                             <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor"
@@ -295,13 +301,14 @@
                                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>
                                         </div>
-                                        <span class="text-sm font-medium text-slate-900">{{ __('common.add_new_user') }}</span>
+                                        <span
+                                            class="text-sm font-medium text-slate-900 dark:text-white">{{ __('common.add_new_user') }}</span>
                                     </a>
                                 @endif
 
                                 @if (Auth::user()->hasRole('superadmin') || Auth::user()->can('guru.create'))
                                     <a href="{{ route('admin.guru.create') }}"
-                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
                                         <div
                                             class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
                                             <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
@@ -310,13 +317,14 @@
                                                     d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                             </svg>
                                         </div>
-                                        <span class="text-sm font-medium text-slate-900">{{ __('common.add_new_teacher') }}</span>
+                                        <span
+                                            class="text-sm font-medium text-slate-900 dark:text-white">{{ __('common.add_new_teacher') }}</span>
                                     </a>
                                 @endif
 
                                 @if (Auth::user()->hasRole('superadmin') || Auth::user()->can('siswa.create'))
                                     <a href="{{ route('admin.siswa.create') }}"
-                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
                                         <div
                                             class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
                                             <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor"
@@ -325,13 +333,14 @@
                                                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                                             </svg>
                                         </div>
-                                        <span class="text-sm font-medium text-slate-900">{{ __('common.add_new_student') }}</span>
+                                        <span
+                                            class="text-sm font-medium text-slate-900 dark:text-white">{{ __('common.add_new_student') }}</span>
                                     </a>
                                 @endif
 
                                 @if (Auth::user()->hasRole('superadmin') || Auth::user()->hasRole('sarpras') || Auth::user()->can('sarpras.create'))
                                     <a href="{{ route('admin.sarpras.barang.create') }}"
-                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
                                         <div
                                             class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
                                             <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor"
@@ -340,13 +349,14 @@
                                                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                             </svg>
                                         </div>
-                                        <span class="text-sm font-medium text-slate-900">{{ __('common.add_new_asset') }}</span>
+                                        <span
+                                            class="text-sm font-medium text-slate-900 dark:text-white">{{ __('common.add_new_asset') }}</span>
                                     </a>
                                 @endif
 
                                 @if (Auth::user()->hasRole('superadmin'))
                                     <a href="{{ route('admin.superadmin.instagram-settings') }}"
-                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
                                         <div
                                             class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center mr-3">
                                             <svg class="w-4 h-4 text-pink-600" fill="currentColor"
@@ -355,7 +365,8 @@
                                                     d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.718-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.807-.875-1.297-2.026-1.297-3.323s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323z" />
                                             </svg>
                                         </div>
-                                        <span class="text-sm font-medium text-slate-900">Kelola Instagram</span>
+                                        <span class="text-sm font-medium text-slate-900 dark:text-white">Kelola
+                                            Instagram</span>
                                     </a>
                                 @endif
                             </div>
@@ -363,13 +374,33 @@
                     </div>
 
                     <!-- Recent Activity -->
-                    <div class="lg:col-span-2">
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="lg:col-span-2" x-data="{ searchQuery: '', expanded: true }">
+                        <div
+                            class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
                             <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-lg font-semibold text-slate-900">{{ __('common.recent_activity') }}</h3>
-                                <span class="text-xs text-slate-500">Last 10 activities</span>
+                                <div class="flex items-center gap-3 cursor-pointer" @click="expanded = !expanded">
+                                    <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                                        {{ __('common.recent_activity') }}</h3>
+                                    <svg class="w-5 h-5 text-slate-400 transition-transform duration-200"
+                                        :class="{ 'rotate-180': !expanded }" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="relative" x-show="expanded">
+                                        <input type="text" x-model="searchQuery" placeholder="Cari aktivitas..."
+                                            class="w-40 sm:w-56 text-xs rounded-lg border-slate-300 dark:border-dark-600 dark:bg-dark-700 dark:text-white pl-8 pr-3 py-1.5 focus:ring-blue-500 focus:border-blue-500">
+                                        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="space-y-3">
+                            <div class="space-y-3" x-show="expanded" x-collapse>
                                 @forelse($recentActivities ?? [] as $activity)
                                     @if ($activity)
                                         @php
@@ -412,8 +443,8 @@
                                                 $icon = 'eye';
                                             }
                                         @endphp
-                                        <div
-                                            class="flex items-start space-x-3 py-2 hover:bg-slate-50 rounded-lg px-2 -mx-2 transition-colors">
+                                        <div x-show="searchQuery === '' || '{{ strtolower($activity->action ?? '') }}'.includes(searchQuery.toLowerCase()) || '{{ strtolower($activity->user->name ?? 'system') }}'.includes(searchQuery.toLowerCase()) || '{{ strtolower($activity->description ?? '') }}'.includes(searchQuery.toLowerCase())"
+                                            class="flex items-start space-x-3 py-2 hover:bg-slate-50 dark:hover:bg-dark-700 rounded-lg px-2 -mx-2 transition-colors">
                                             <div
                                                 class="w-8 h-8 {{ $iconBg }} rounded-full flex items-center justify-center flex-shrink-0">
                                                 @if ($icon == 'plus')
@@ -465,9 +496,10 @@
                                                 <div class="flex items-center gap-2 flex-wrap">
                                                     @if ($activity->user)
                                                         <span
-                                                            class="text-sm font-medium text-slate-900">{{ $activity->user->name }}</span>
+                                                            class="text-sm font-medium text-slate-900 dark:text-white">{{ $activity->user->name }}</span>
                                                     @else
-                                                        <span class="text-sm font-medium text-slate-900">System</span>
+                                                        <span
+                                                            class="text-sm font-medium text-slate-900 dark:text-white">System</span>
                                                     @endif
 
                                                     @if ($activity->action)
@@ -477,7 +509,7 @@
                                                         </span>
                                                     @endif
                                                 </div>
-                                                <p class="text-sm text-slate-600 mt-0.5">
+                                                <p class="text-sm text-slate-600 dark:text-dark-300 mt-0.5">
                                                     {{ $activity->description ?? 'User activity logged' }}
                                                 </p>
                                                 <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
@@ -499,7 +531,8 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
-                                        <h3 class="mt-2 text-sm font-medium text-slate-900">{{ __('common.no_recent_activity') }}</h3>
+                                        <h3 class="mt-2 text-sm font-medium text-slate-900">
+                                            {{ __('common.no_recent_activity') }}</h3>
                                         <p class="mt-1 text-sm text-slate-500">Activity will appear here as users
                                             interact
                                             with the system.</p>
@@ -606,7 +639,8 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium text-slate-900">{{ __('common.upcoming_exams') }}</p>
+                                    <p class="text-sm font-medium text-slate-900">{{ __('common.upcoming_exams') }}
+                                    </p>
                                     <p class="text-xs text-slate-500">UTS Semester 2</p>
                                 </div>
                             </div>
@@ -723,4 +757,211 @@
         @endif
     </div>
     </div>
+
+    @push('scripts')
+    <script>
+        // Alpine.js component: Dashboard Stats with live polling
+        function dashboardStats() {
+            return {
+                stats: {
+                    siswa: {{ $statistics['total_siswa'] ?? 0 }},
+                    guru: {{ $statistics['total_guru'] ?? 0 }},
+                    users: {{ $statistics['total_users'] ?? 0 }},
+                    barang: {{ $statistics['total_barang'] ?? 0 }},
+                    siswaTrend: null,
+                    guruTrend: null,
+                },
+                pollInterval: null,
+                init() {
+                    // Poll every 60 seconds for live stats
+                    this.pollInterval = setInterval(() => this.fetchStats(), 60000);
+                    this.$once('destroy', () => clearInterval(this.pollInterval));
+                },
+                async fetchStats() {
+                    try {
+                        const response = await fetch('{{ route("admin.dashboard.api.stats") }}', {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            }
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            // Animate number changes
+                            this.animateNumber('siswa', this.stats.siswa, data.total_siswa);
+                            this.animateNumber('guru', this.stats.guru, data.total_guru);
+                            this.animateNumber('users', this.stats.users, data.total_users);
+                            this.animateNumber('barang', this.stats.barang, data.total_barang);
+                            if (data.siswa_trend !== undefined) this.stats.siswaTrend = data.siswa_trend;
+                            if (data.guru_trend !== undefined) this.stats.guruTrend = data.guru_trend;
+                        }
+                    } catch (e) {
+                        console.log('Stats poll error:', e);
+                    }
+                },
+                animateNumber(key, from, to) {
+                    if (from === to) return;
+                    const duration = 500;
+                    const start = performance.now();
+                    const step = (timestamp) => {
+                        const progress = Math.min((timestamp - start) / duration, 1);
+                        this.stats[key] = Math.round(from + (to - from) * progress);
+                        if (progress < 1) requestAnimationFrame(step);
+                    };
+                    requestAnimationFrame(step);
+                }
+            };
+        }
+
+        // Chart.js Initialization
+        function initCharts() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.05)';
+
+            // User Growth Bar Chart
+            const growthCtx = document.getElementById('userGrowthChart');
+            if (growthCtx) {
+                new Chart(growthCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: {!! json_encode(array_column($userGrowth['data'], 'month')) !!},
+                        datasets: [
+                            {
+                                label: 'Siswa',
+                                data: {!! json_encode(array_map(fn($d) => $d['siswa']['count'], $userGrowth['data'])) !!},
+                                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderWidth: 1,
+                                borderRadius: 6,
+                                barPercentage: 0.6,
+                                categoryPercentage: 0.7,
+                            },
+                            {
+                                label: 'Guru',
+                                data: {!! json_encode(array_map(fn($d) => $d['guru']['count'], $userGrowth['data'])) !!},
+                                backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                                borderColor: 'rgba(34, 197, 94, 1)',
+                                borderWidth: 1,
+                                borderRadius: 6,
+                                barPercentage: 0.6,
+                                categoryPercentage: 0.7,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 800, easing: 'easeOutQuart' },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: textColor, usePointStyle: true, pointStyle: 'circle', padding: 20 }
+                            },
+                            tooltip: {
+                                backgroundColor: isDark ? '#1e293b' : '#0f172a',
+                                titleColor: '#f8fafc',
+                                bodyColor: '#e2e8f0',
+                                cornerRadius: 8,
+                                padding: 12,
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: textColor, font: { size: 12 } }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: gridColor },
+                                ticks: { color: textColor, font: { size: 12 }, stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Module Usage Doughnut Chart
+            const moduleCtx = document.getElementById('moduleUsageChart');
+            if (moduleCtx) {
+                const colorMap = {
+                    blue: { bg: 'rgba(59, 130, 246, 0.8)', border: '#3b82f6' },
+                    green: { bg: 'rgba(34, 197, 94, 0.8)', border: '#22c55e' },
+                    purple: { bg: 'rgba(168, 85, 247, 0.8)', border: '#a855f7' },
+                    orange: { bg: 'rgba(249, 115, 22, 0.8)', border: '#f97316' },
+                    pink: { bg: 'rgba(236, 72, 153, 0.8)', border: '#ec4899' },
+                };
+                @php
+                    $moduleLabels = array_keys($moduleUsage);
+                    $moduleValues = array_column($moduleUsage, 'percentage');
+                    $moduleColors = array_map(fn($m) => $m['color'], $moduleUsage);
+                @endphp
+                new Chart(moduleCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: {!! json_encode($moduleLabels) !!},
+                        datasets: [{
+                            data: {!! json_encode($moduleValues) !!},
+                            backgroundColor: {!! json_encode(array_map(fn($c) => match($c) {
+                                'blue' => 'rgba(59,130,246,0.8)',
+                                'green' => 'rgba(34,197,94,0.8)',
+                                'purple' => 'rgba(168,85,247,0.8)',
+                                'orange' => 'rgba(249,115,22,0.8)',
+                                'pink' => 'rgba(236,72,153,0.8)',
+                                default => 'rgba(148,163,184,0.5)',
+                            }, $moduleColors)) !!},
+                            borderColor: isDark ? '#0f172a' : '#ffffff',
+                            borderWidth: 3,
+                            hoverOffset: 8,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        animation: { animateRotate: true, duration: 1000 },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: isDark ? '#1e293b' : '#0f172a',
+                                titleColor: '#f8fafc',
+                                bodyColor: '#e2e8f0',
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ctx.label + ': ' + ctx.parsed + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Dark mode toggle for navigation
+        function darkModeToggle() {
+            return {
+                active: localStorage.getItem('darkMode') === 'true',
+                toggle() {
+                    this.active = !this.active;
+                    localStorage.setItem('darkMode', this.active);
+                    if (this.active) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                    // Reload charts with new theme colors
+                    setTimeout(() => {
+                        // Destroy old charts and re-init
+                        Chart.helpers.each(Chart.instances, (instance) => instance.destroy());
+                        initCharts();
+                    }, 100);
+                }
+            };
+        }
+    </script>
+    @endpush
 </x-app-layout>

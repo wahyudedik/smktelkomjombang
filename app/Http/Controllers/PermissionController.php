@@ -43,7 +43,8 @@ class PermissionController extends Controller
         $query->orderBy($sortBy, $sortDirection);
 
         $permissions = $query->paginate(20);
-        $roles = Role::all();
+        // Performance: cache roles since they rarely change
+        $roles = cache()->remember('all_roles', 3600, fn() => Role::all());
 
         return view('permissions.index', compact('permissions', 'roles'));
     }
@@ -78,7 +79,7 @@ class PermissionController extends Controller
         // Extract module and action from permission name if not provided
         $module = $request->module;
         $action = $request->action;
-        
+
         if (empty($module) || empty($action)) {
             // Try to extract from permission name (format: module.action)
             $parts = explode('.', $request->name);
@@ -108,6 +109,10 @@ class PermissionController extends Controller
             $permission->syncRoles($roles);
         }
 
+        // Performance: invalidate cached permissions
+        cache()->forget('all_roles');
+        cache()->forget('grouped_permissions');
+
         return redirect()->route('admin.permissions.index')
             ->with('success', 'Permission berhasil dibuat.');
     }
@@ -130,7 +135,8 @@ class PermissionController extends Controller
     {
         $modules = $this->getAvailableModules();
         $actions = $this->getAvailableActions();
-        $roles = Role::all();
+        // Performance: cache roles since they rarely change
+        $roles = cache()->remember('all_roles', 3600, fn() => Role::all());
         $permissionRoles = $permission->roles->pluck('id')->toArray();
 
         return view('permissions.edit', compact('permission', 'modules', 'actions', 'roles', 'permissionRoles'));
@@ -172,6 +178,10 @@ class PermissionController extends Controller
             $permission->syncRoles([]);
         }
 
+        // Performance: invalidate cached permissions
+        cache()->forget('all_roles');
+        cache()->forget('grouped_permissions');
+
         return redirect()->route('admin.permissions.index')
             ->with('success', 'Permission berhasil diperbarui.');
     }
@@ -188,6 +198,10 @@ class PermissionController extends Controller
         }
 
         $permission->delete();
+
+        // Performance: invalidate cached permissions
+        cache()->forget('all_roles');
+        cache()->forget('grouped_permissions');
 
         return redirect()->route('admin.permissions.index')
             ->with('success', 'Permission berhasil dihapus.');
@@ -210,7 +224,7 @@ class PermissionController extends Controller
 
         $created = 0;
         $errors = [];
-        
+
         // Use provided module or extract from display name
         $module = $request->module ?? strtolower(str_replace(' ', '_', $request->module_display_name));
 

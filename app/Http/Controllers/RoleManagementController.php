@@ -23,9 +23,11 @@ class RoleManagementController extends Controller
         // Authorization check
         Gate::authorize('manageRolesAndPermissions');
 
-        // Group permissions by module (extract from permission name: module.action)
-        $permissions = Permission::all()->groupBy(function ($permission) {
-            return explode('.', $permission->name)[0] ?? 'other';
+        // Performance: cache grouped permissions since they rarely change
+        $permissions = cache()->remember('grouped_permissions', 3600, function () {
+            return Permission::all()->groupBy(function ($permission) {
+                return explode('.', $permission->name)[0] ?? 'other';
+            });
         });
         return view('role-management.create', compact('permissions'));
     }
@@ -60,6 +62,10 @@ class RoleManagementController extends Controller
                 $role->syncPermissions($request->permissions);
             }
 
+            // Performance: invalidate cached roles and permissions
+            cache()->forget('all_roles');
+            cache()->forget('grouped_permissions');
+
             // Return JSON for AJAX requests
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
@@ -88,9 +94,11 @@ class RoleManagementController extends Controller
         // Authorization check
         Gate::authorize('manageRolesAndPermissions');
 
-        // Group permissions by module (extract from permission name: module.action)
-        $permissions = Permission::all()->groupBy(function ($permission) {
-            return explode('.', $permission->name)[0] ?? 'other';
+        // Performance: cache grouped permissions since they rarely change
+        $permissions = cache()->remember('grouped_permissions', 3600, function () {
+            return Permission::all()->groupBy(function ($permission) {
+                return explode('.', $permission->name)[0] ?? 'other';
+            });
         });
         $rolePermissions = $role->permissions->pluck('name')->toArray();
 
@@ -138,6 +146,10 @@ class RoleManagementController extends Controller
 
             $role->syncPermissions($request->permissions ?? []);
 
+            // Performance: invalidate cached roles and permissions
+            cache()->forget('all_roles');
+            cache()->forget('grouped_permissions');
+
             // Return JSON for AJAX requests
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
@@ -172,6 +184,10 @@ class RoleManagementController extends Controller
         }
 
         $role->delete();
+
+        // Performance: invalidate cached roles and permissions
+        cache()->forget('all_roles');
+        cache()->forget('grouped_permissions');
 
         return redirect()->route('admin.role-permissions.index')
             ->with('success', 'Role deleted successfully');

@@ -13,11 +13,16 @@ use App\Models\Page;
 use App\Models\InstagramSetting;
 use App\Models\Calon;
 use App\Models\Pemilih;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    /**
+     * Display the dashboard based on user role.
+     */
     /**
      * Display the dashboard based on user role.
      */
@@ -43,6 +48,49 @@ class DashboardController extends Controller
             'moduleUsage' => $moduleUsage,
             'userGrowth' => $userGrowth,
         ]);
+    }
+
+    /**
+     * API endpoint for live dashboard stats (polled by frontend).
+     */
+    public function stats(): JsonResponse
+    {
+        $siswaCount = $this->safe(fn() => Siswa::count(), 0);
+        $guruCount = $this->safe(fn() => Guru::count(), 0);
+        $userCount = $this->safe(fn() => User::count(), 0);
+        $barangCount = $this->safe(fn() => Barang::count(), 0);
+
+        // Calculate trends (current vs previous month)
+        $siswaTrend = $this->calculateTrend(Siswa::class);
+        $guruTrend = $this->calculateTrend(Guru::class);
+
+        return response()->json([
+            'total_siswa' => $siswaCount,
+            'total_guru' => $guruCount,
+            'total_users' => $userCount,
+            'total_barang' => $barangCount,
+            'siswa_trend' => $siswaTrend,
+            'guru_trend' => $guruTrend,
+        ]);
+    }
+
+    /**
+     * Calculate month-over-month trend percentage for a model.
+     */
+    private function calculateTrend(string $model): ?float
+    {
+        try {
+            $current = $model::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth])->count();
+            $previous = $model::whereBetween('created_at', [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth])->count();
+
+            if ($previous === 0) {
+                return $current > 0 ? 100.0 : 0.0;
+            }
+
+            return round((($current - $previous) / $previous) * 100, 1);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -99,39 +147,40 @@ class DashboardController extends Controller
             ];
         });
 
-        // Get activity counts for each module from audit logs (last 30 days)
-        $activityCounts = [
-            'users' => 0,
-            'guru' => 0,
-            'siswa' => 0,
-            'sarpras' => 0,
-            'osis' => 0,
-        ];
+        // Performance: count activities at database level instead of loading all into memory
+        $activityCounts = cache()->remember('module_activity_counts_30days', 1800, function () {
+            $counts = [
+                'users' => 0,
+                'guru' => 0,
+                'siswa' => 0,
+                'sarpras' => 0,
+                'osis' => 0,
+            ];
 
-        try {
-            // Cache recent activities for better performance
-            $recentActivities = cache()->remember('recent_activities_30days', 1800, function () {
-                return AuditLog::where('created_at', '>=', now()->subDays(30))->get();
-            });
+            try {
+                $actions = AuditLog::where('created_at', '>=', now()->subDays(30))
+                    ->pluck('action')
+                    ->map(fn($action) => strtolower($action ?? ''));
 
-            foreach ($recentActivities as $activity) {
-                $action = strtolower($activity->action ?? '');
-
-                if (str_contains($action, 'user')) {
-                    $activityCounts['users']++;
-                } elseif (str_contains($action, 'guru') || str_contains($action, 'teacher')) {
-                    $activityCounts['guru']++;
-                } elseif (str_contains($action, 'siswa') || str_contains($action, 'student')) {
-                    $activityCounts['siswa']++;
-                } elseif (str_contains($action, 'barang') || str_contains($action, 'sarpras') || str_contains($action, 'asset')) {
-                    $activityCounts['sarpras']++;
-                } elseif (str_contains($action, 'osis') || str_contains($action, 'calon') || str_contains($action, 'pemilih') || str_contains($action, 'voting')) {
-                    $activityCounts['osis']++;
+                foreach ($actions as $action) {
+                    if (str_contains($action, 'user')) {
+                        $counts['users']++;
+                    } elseif (str_contains($action, 'guru') || str_contains($action, 'teacher')) {
+                        $counts['guru']++;
+                    } elseif (str_contains($action, 'siswa') || str_contains($action, 'student')) {
+                        $counts['siswa']++;
+                    } elseif (str_contains($action, 'barang') || str_contains($action, 'sarpras') || str_contains($action, 'asset')) {
+                        $counts['sarpras']++;
+                    } elseif (str_contains($action, 'osis') || str_contains($action, 'calon') || str_contains($action, 'pemilih') || str_contains($action, 'voting')) {
+                        $counts['osis']++;
+                    }
                 }
+            } catch (\Exception $e) {
+                // If audit logs fail, use default counts
             }
-        } catch (\Exception $e) {
-            // If audit logs fail, use default activity counts
-        }
+
+            return $counts;
+        });
 
         // Calculate total for percentage calculation
         $totalData = array_sum($counts);

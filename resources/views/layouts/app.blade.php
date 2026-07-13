@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-    dir="{{ function_exists('is_rtl') && is_rtl() ? 'rtl' : 'ltr' }}">
+    dir="{{ function_exists('is_rtl') && is_rtl() ? 'rtl' : 'ltr' }}" x-data="darkMode()"
+    :class="{ 'dark': $store.darkMode?.active }">
 
 <head>
     <meta charset="utf-8">
@@ -42,11 +43,37 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
     <!-- Additional Styles -->
     @stack('styles')
 </head>
 
-<body class="font-sans antialiased bg-slate-50">
+<body class="font-sans antialiased bg-slate-50 dark:bg-dark-900 transition-colors duration-300" x-data>
+
+    <!-- Dark Mode Store -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('darkMode', {
+                active: localStorage.getItem('darkMode') === 'true',
+                toggle() {
+                    this.active = !this.active;
+                    localStorage.setItem('darkMode', this.active);
+                }
+            });
+        });
+
+        function darkMode() {
+            return {
+                init() {
+                    if (localStorage.getItem('darkMode') === 'true') {
+                        document.documentElement.classList.add('dark');
+                    }
+                }
+            }
+        }
+    </script>
     <div class="min-h-screen">
         @include('layouts.navigation')
 
@@ -60,7 +87,7 @@
         @endisset
 
         <!-- Page Content -->
-        <main class="pb-8">
+        <main class="pb-8 dark:text-dark-100">
             {{ $slot }}
         </main>
     </div>
@@ -69,15 +96,23 @@
     @stack('scripts')
 
     <script>
+        // Initialize dark mode on page load
         document.addEventListener('DOMContentLoaded', function() {
-            @if (session('success'))
-                window.showSuccess('Berhasil', '{{ session('success') }}');
-            @endif
+                    if (localStorage.getItem('darkMode') === 'true') {
+                        document.documentElement.classList.add('dark');
+                    }
 
-            @if (session('error'))
-                window.showError('Gagal', '{{ session('error') }}');
-            @endif
-        });
+                    <
+                    script >
+                        document.addEventListener('DOMContentLoaded', function() {
+                            @if (session('success'))
+                                window.showSuccess('Berhasil', '{{ session('success') }}');
+                            @endif
+
+                            @if (session('error'))
+                                window.showError('Gagal', '{{ session('error') }}');
+                            @endif
+                        });
     </script>
 </body>
 

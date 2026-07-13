@@ -1,10 +1,14 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
 import Swal from 'sweetalert2';
 
 window.Alpine = Alpine;
 window.Swal = Swal;
+
+// Register Alpine.js plugins
+Alpine.plugin(collapse);
 
 Alpine.start();
 
@@ -97,7 +101,7 @@ async function initializePushNotifications(registration) {
     // Check notification permission state BEFORE attempting subscription
     if ('Notification' in window) {
         const permission = Notification.permission;
-        
+
         if (permission === 'denied') {
             // Permission is blocked - user has previously denied and can't be reset programmatically
             console.log('Push notification permission is denied. User must reset permission in browser settings.');
@@ -357,8 +361,8 @@ window.requestNotificationPermission = async function () {
         return {
             success: permission === 'granted',
             permission: permission,
-            message: permission === 'granted' 
-                ? 'Push notifications enabled successfully' 
+            message: permission === 'granted'
+                ? 'Push notifications enabled successfully'
                 : 'Push notification permission denied'
         };
     } catch (error) {

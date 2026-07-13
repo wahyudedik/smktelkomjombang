@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AsyncJob;
 use App\Models\User;
 use App\Models\Siswa;
 use App\Models\Guru;
@@ -16,16 +17,18 @@ use App\Imports\BarangImport;
 use App\Imports\CalonImport;
 use App\Imports\PemilihImport;
 use App\Imports\KelulusanImport;
+use App\Jobs\ProcessExcelImportJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BulkImportController extends Controller
 {
     /**
-     * Display the bulk import dashboard
+     * Display the bulk import dashboard with recent async jobs.
      */
     public function index()
     {
@@ -40,11 +43,20 @@ class BulkImportController extends Controller
             'total_kelulusan' => Kelulusan::count(),
         ];
 
-        return view('admin.bulk-import.index', compact('stats'));
+        // Get recent async jobs for this user
+        $recentJobs = AsyncJob::where('user_id', Auth::id())
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get();
+
+        return view('admin.bulk-import.index', compact('stats', 'recentJobs'));
     }
 
     /**
-     * Process bulk import for multiple modules
+     * Process bulk import for multiple modules.
+     *
+     * Dispatches to queue for background processing. Returns immediately
+     * with a job ID that can be polled for status updates.
      */
     public function processBulkImport(Request $request)
     {
@@ -65,30 +77,52 @@ class BulkImportController extends Controller
             $module = $request->module;
             $file = $request->file('file');
 
-            Log::info("Bulk import started", [
+            // Store the uploaded file for queue processing
+            $filename = time() . '_' . Auth::id() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('imports', $filename, 'local');
+
+            Log::info("Bulk import queued", [
                 'module' => $module,
                 'filename' => $file->getClientOriginalName(),
                 'size' => $file->getSize(),
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ]);
 
-            $result = $this->importByModule($module, $file);
+            // Create async job record
+            $asyncJob = AsyncJob::create([
+                'user_id' => Auth::id(),
+                'type' => AsyncJob::TYPE_IMPORT,
+                'module' => $module,
+                'status' => AsyncJob::STATUS_PENDING,
+                'payload' => [
+                    'original_filename' => $file->getClientOriginalName(),
+                    'file_size' => $file->getSize(),
+                ],
+            ]);
+
+            // Dispatch to queue
+            ProcessExcelImportJob::dispatch($asyncJob->id, $module, storage_path('app/' . $filePath))
+                ->onQueue('imports');
 
             return response()->json([
                 'success' => true,
-                'message' => "Import completed successfully for {$module}",
-                'data' => $result
+                'message' => "Import {$module} sedang diproses di background.",
+                'data' => [
+                    'job_id' => $asyncJob->id,
+                    'status_url' => route('admin.async-jobs.status', $asyncJob->id),
+                    'status' => 'pending',
+                ],
             ]);
         } catch (\Exception $e) {
-            Log::error("Bulk import failed", [
+            Log::error("Bulk import dispatch failed", [
                 'module' => $request->module,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Import failed: ' . $e->getMessage()
+                'message' => 'Import gagal: ' . $e->getMessage(),
             ], 500);
         }
     }

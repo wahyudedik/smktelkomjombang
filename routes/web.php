@@ -63,7 +63,9 @@ Route::get('/welcome', function () {
 
 // Public graduation check
 Route::get('/check-graduation', [KelulusanController::class, 'publicCheckStatus'])->name('public.graduation.check');
-Route::post('/check-graduation', [KelulusanController::class, 'publicProcessCheck'])->name('public.graduation.check.process');
+Route::post('/check-graduation', [KelulusanController::class, 'publicProcessCheck'])
+    ->middleware('throttle:10,1') // Max 10 checks per minute
+    ->name('public.graduation.check.process');
 
 // Public kegiatan page (Instagram feed integration)
 Route::get('/kegiatan', [InstagramController::class, 'index'])->name('public.kegiatan');
@@ -125,6 +127,7 @@ Route::post('/timezone', [LocaleController::class, 'switchTimezone'])->name('tim
 // Single admin dashboard - redirects based on user role
 Route::get('/admin', [DashboardController::class, 'index'])->middleware(['auth', 'verified.email'])->name('admin.dashboard');
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified.email'])->name('admin.dashboard.redirect');
+Route::get('/admin/dashboard/stats', [DashboardController::class, 'stats'])->middleware(['auth', 'verified.email'])->name('admin.dashboard.api.stats');
 
 // Admin profile management
 Route::middleware('auth')->group(function () {
@@ -239,6 +242,16 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('admin/supera
         Route::get('/', [App\Http\Controllers\BulkImportController::class, 'index'])->name('index');
         Route::post('/process', [App\Http\Controllers\BulkImportController::class, 'processBulkImport'])->name('process');
         Route::get('/template/{module}', [App\Http\Controllers\BulkImportController::class, 'downloadTemplate'])->name('template');
+    });
+
+    // Async Job Management (background imports/exports)
+    Route::prefix('async-jobs')->name('async-jobs.')->group(function () {
+        Route::get('/', [App\Http\Controllers\AsyncJobController::class, 'index'])->name('index');
+        Route::get('/{job}/status', [App\Http\Controllers\AsyncJobController::class, 'status'])->name('status');
+        Route::get('/{job}/download', [App\Http\Controllers\AsyncJobController::class, 'download'])->name('download');
+        Route::post('/{job}/cancel', [App\Http\Controllers\AsyncJobController::class, 'cancel'])->name('cancel');
+        Route::post('/import/{module}', [App\Http\Controllers\AsyncJobController::class, 'dispatchImport'])->name('import');
+        Route::post('/export/{module}', [App\Http\Controllers\AsyncJobController::class, 'dispatchExport'])->name('export');
     });
 });
 
@@ -690,6 +703,24 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin'
         Route::put('/{theme}', [ThemeSettingController::class, 'update'])->name('update');
         Route::post('/{theme}/seed-defaults', [ThemeSettingController::class, 'seedDefaults'])->name('seed-defaults');
         Route::post('/{theme}/reset-defaults', [ThemeSettingController::class, 'resetDefaults'])->name('reset-defaults');
+
+        // P3-6.1: Theme Preview
+        Route::get('/{theme}/preview', [ThemeSettingController::class, 'preview'])->name('preview');
+
+        // P3-6.2: Theme Clone
+        Route::post('/{theme}/clone', [ThemeSettingController::class, 'cloneTheme'])->name('clone');
+
+        // P3-6.3: Import/Export
+        Route::get('/{theme}/export', [ThemeSettingController::class, 'exportTheme'])->name('export');
+        Route::get('/{theme}/import', [ThemeSettingController::class, 'importForm'])->name('import');
+        Route::post('/{theme}/import', [ThemeSettingController::class, 'importTheme'])->name('import-process');
+
+        // P3-6.4: Theme Comparison
+        Route::get('/compare', [ThemeSettingController::class, 'compare'])->name('compare');
+
+        // P3-6.5: Theme Analytics
+        Route::get('/analytics', [ThemeSettingController::class, 'analytics'])->name('analytics');
+        Route::get('/analytics/data', [ThemeSettingController::class, 'analyticsData'])->name('analytics-data');
     });
 
     // Analytics Dashboard
@@ -714,6 +745,12 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin'
     Route::post('/notifications/{id}/mark-read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'delete'])->name('notifications.delete');
+
+    // Notification Preferences & History
+    Route::get('/notifications/preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'index'])->name('notifications.preferences');
+    Route::put('/notifications/preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('notifications.preferences.update');
+    Route::post('/notifications/preferences/reset', [App\Http\Controllers\NotificationPreferenceController::class, 'reset'])->name('notifications.preferences.reset');
+    Route::get('/notifications/history', [App\Http\Controllers\NotificationPreferenceController::class, 'history'])->name('notifications.history');
 });
 
 // Push Notifications (Access: All authenticated users)
@@ -755,10 +792,14 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('admin/role-p
 
 // Testimonials (Public - No Login Required)
 Route::get('/testimonial', [App\Http\Controllers\TestimonialController::class, 'create'])->name('testimonials.create');
-Route::post('/testimonial', [App\Http\Controllers\TestimonialController::class, 'store'])->name('testimonials.store');
+Route::post('/testimonial', [App\Http\Controllers\TestimonialController::class, 'store'])
+    ->middleware('throttle:5,1') // Max 5 testimonials per minute
+    ->name('testimonials.store');
 
 // Testimonial Links (Public with Token)
 Route::get('/testimonial-link/{token}', [App\Http\Controllers\TestimonialLinkController::class, 'showPublic'])->name('testimonials.public');
-Route::post('/testimonial-link/{token}', [App\Http\Controllers\TestimonialLinkController::class, 'storePublic'])->name('testimonials.public.store');
+Route::post('/testimonial-link/{token}', [App\Http\Controllers\TestimonialLinkController::class, 'storePublic'])
+    ->middleware('throttle:5,1') // Max 5 testimonials per minute
+    ->name('testimonials.public.store');
 
 require __DIR__ . '/auth.php';

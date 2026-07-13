@@ -48,17 +48,14 @@ class SettingsController extends Controller
      */
     public function landingPage()
     {
-        $pages = Page::where('is_menu', true)->orderBy('menu_sort_order')->get();
-        $headerMenus = Page::where('is_menu', true)
-            ->where('menu_position', 'header')
-            ->whereNull('parent_id')
+        // Performance: single query with eager loading instead of 3 separate queries
+        $pages = Page::where('is_menu', true)
+            ->with('children')
             ->orderBy('menu_sort_order')
             ->get();
-        $footerMenus = Page::where('is_menu', true)
-            ->where('menu_position', 'footer')
-            ->whereNull('parent_id')
-            ->orderBy('menu_sort_order')
-            ->get();
+
+        $headerMenus = $pages->where('menu_position', 'header')->whereNull('parent_id');
+        $footerMenus = $pages->where('menu_position', 'footer')->whereNull('parent_id');
 
         return view('settings.landing-page', compact('pages', 'headerMenus', 'footerMenus'));
     }
@@ -426,7 +423,8 @@ class SettingsController extends Controller
      */
     public function seoSettings()
     {
-        $pages = Page::all();
+        // Performance: cache pages for SEO settings (rarely changes)
+        $pages = cache()->remember('all_pages_for_seo', 3600, fn() => Page::all());
         return view('settings.seo', compact('pages'));
     }
 

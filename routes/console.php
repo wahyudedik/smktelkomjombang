@@ -34,3 +34,17 @@ Schedule::command('attendance:sync')
     ->everyFiveMinutes()
     ->withoutOverlapping()
     ->runInBackground();
+
+// Clean up old async jobs and their files (daily at 03:00)
+// Removes jobs older than 7 days and their associated export files
+Schedule::call(function () {
+    $oldJobs = \App\Models\AsyncJob::where('created_at', '<', now()->subDays(7))->get();
+    foreach ($oldJobs as $job) {
+        if (isset($job->result['path'])) {
+            \Illuminate\Support\Facades\Storage::disk('local')->delete($job->result['path']);
+        }
+        $job->delete();
+    }
+})->name('cleanup-old-jobs')
+    ->dailyAt('03:00')
+    ->withoutOverlapping();

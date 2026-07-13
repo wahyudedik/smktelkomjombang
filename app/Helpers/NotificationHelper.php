@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Jobs\SendNotificationJob;
 use App\Models\User;
 use App\Services\WebPushService;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,9 @@ use Illuminate\Support\Str;
 class NotificationHelper
 {
     /**
-     * Send notification to user(s)
+     * Send notification to user(s) synchronously.
+     *
+     * For queue-based sending, use sendQueued() instead.
      */
     public static function send($users, string $title, string $message, string $type = 'info', array $metadata = [])
     {
@@ -60,6 +63,27 @@ class NotificationHelper
             // Log error but don't fail the notification
             Log::warning('Push notification failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Send notification to user(s) via queue (non-blocking).
+     *
+     * This dispatches a job that handles in-app, push, and optionally email notifications.
+     */
+    public static function sendQueued($users, string $title, string $message, string $type = 'info', array $metadata = [], bool $sendEmail = false, bool $sendPush = true): void
+    {
+        if ($users instanceof User) {
+            $users = [$users];
+        }
+
+        $userIds = collect($users)->pluck('id')->toArray();
+
+        if (empty($userIds)) {
+            return;
+        }
+
+        SendNotificationJob::dispatch($userIds, $title, $message, $type, $metadata, $sendEmail, $sendPush)
+            ->onQueue('notifications');
     }
 
     /**

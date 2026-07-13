@@ -8,6 +8,7 @@ use App\Models\Ruang;
 use App\Models\Maintenance;
 use App\Models\Sarana;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -28,49 +29,49 @@ class SarprasController extends Controller
      */
     public function index()
     {
-        $stats = [
-            'total_kategori' => KategoriSarpras::count(),
-            'total_barang' => Barang::count(),
-            'total_ruang' => Ruang::count(),
-            'total_maintenance' => Maintenance::count(),
-            'total_sarana' => Sarana::count(),
-            'barang_baik' => Barang::where('kondisi', 'baik')->count(),
-            'barang_rusak' => Barang::where('kondisi', 'rusak')->count(),
-            'ruang_aktif' => Ruang::where('status', 'aktif')->count(),
-            'maintenance_selesai' => Maintenance::where('status', 'selesai')->count(),
-            'total_sarana_nilai' => Sarana::with('barang')->get()->sum(function ($sarana) {
-                return $sarana->barang->sum(function ($barang) {
-                    return ($barang->harga_beli ?? 0) * ($barang->pivot->jumlah ?? 0);
-                });
-            }),
-        ];
+        // Performance: cache dashboard stats for 5 minutes to avoid repeated heavy queries
+        $stats = cache()->remember('sarpras_dashboard_stats', 300, function () {
+            $stats = [
+                'total_kategori' => KategoriSarpras::count(),
+                'total_barang' => Barang::count(),
+                'total_ruang' => Ruang::count(),
+                'total_maintenance' => Maintenance::count(),
+                'total_sarana' => Sarana::count(),
+                'barang_baik' => Barang::where('kondisi', 'baik')->count(),
+                'barang_rusak' => Barang::where('kondisi', 'rusak')->count(),
+                'ruang_aktif' => Ruang::where('status', 'aktif')->count(),
+                'maintenance_selesai' => Maintenance::where('status', 'selesai')->count(),
+                // Performance: use database query instead of loading all sarana into memory
+                'total_sarana_nilai' => \DB::table('sarana_barang')
+                    ->join('barang', 'barang.id', '=', 'sarana_barang.barang_id')
+                    ->selectRaw('COALESCE(SUM(barang.harga_beli * sarana_barang.jumlah), 0) as total')
+                    ->value('total'),
+            ];
 
-        // Get barang rusak yang perlu maintenance (belum ada maintenance aktif)
-        $barang_rusak_perlu_maintenance = Barang::where('kondisi', 'rusak')
-            ->whereDoesntHave('maintenance', function ($query) {
-                $query->whereIn('status', ['pending', 'dalam_proses']);
-            })
-            ->count();
+            // Get barang rusak yang perlu maintenance (belum ada maintenance aktif)
+            $stats['barang_rusak_perlu_maintenance'] = Barang::where('kondisi', 'rusak')
+                ->whereDoesntHave('maintenance', function ($query) {
+                    $query->whereIn('status', ['pending', 'dalam_proses']);
+                })
+                ->count();
 
-        // Get sarana yang perlu update (lebih dari 6 bulan tidak diupdate atau ada barang rusak)
-        $sarana_perlu_update = Sarana::where(function ($query) {
-            // Sarana yang lebih dari 6 bulan tidak diupdate
-            $query->where('updated_at', '<', Carbon::now()->subMonths(6))
-                ->orWhereHas('barang', function ($q) {
-                    // Atau sarana yang memiliki barang dengan kondisi rusak
-                    $q->where('sarana_barang.kondisi', 'rusak');
-                });
-        })->count();
+            // Get sarana yang perlu update (lebih dari 6 bulan tidak diupdate atau ada barang rusak)
+            $stats['sarana_perlu_update'] = Sarana::where(function ($query) {
+                $query->where('updated_at', '<', Carbon::now()->subMonths(6))
+                    ->orWhereHas('barang', function ($q) {
+                        $q->where('sarana_barang.kondisi', 'rusak');
+                    });
+            })->count();
 
-        // Get barang rusak di sarana yang perlu perhatian
-        $barang_rusak_di_sarana = \DB::table('sarana_barang')
-            ->where('kondisi', 'rusak')
-            ->count();
+            // Get barang rusak di sarana yang perlu perhatian
+            $stats['barang_rusak_di_sarana'] = \DB::table('sarana_barang')
+                ->where('kondisi', 'rusak')
+                ->count();
 
-        $stats['barang_rusak_perlu_maintenance'] = $barang_rusak_perlu_maintenance;
-        $stats['sarana_perlu_update'] = $sarana_perlu_update;
-        $stats['barang_rusak_di_sarana'] = $barang_rusak_di_sarana;
+            return $stats;
+        });
 
+        // Recent data doesn't need heavy caching (small result set, limit 5)
         $recent_maintenance = Maintenance::with(['user', 'barang', 'ruang'])
             ->latest()
             ->limit(5)
@@ -145,6 +146,7 @@ class SarprasController extends Controller
         $data['deskripsi'] = strip_tags($data['deskripsi'] ?? '');
 
         KategoriSarpras::create($data);
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.kategori.index')
             ->with('success', 'Kategori berhasil ditambahkan.');
@@ -179,6 +181,7 @@ class SarprasController extends Controller
         $data['deskripsi'] = strip_tags($data['deskripsi'] ?? '');
 
         $kategori->update($data);
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.kategori.index')
             ->with('success', 'Kategori berhasil diperbarui.');
@@ -324,6 +327,7 @@ class SarprasController extends Controller
         $data['is_active'] = $request->has('is_active') && $request->is_active == '1';
 
         Barang::create($data);
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.barang.index')
             ->with('success', 'Barang berhasil ditambahkan.');
@@ -394,6 +398,7 @@ class SarprasController extends Controller
         $data['is_active'] = $request->has('is_active') && $request->is_active == '1';
 
         $barang->update($data);
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.barang.index')
             ->with('success', 'Barang berhasil diperbarui.');
@@ -410,6 +415,7 @@ class SarprasController extends Controller
         }
 
         $barang->delete();
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.barang.index')
             ->with('success', 'Barang berhasil dihapus.');
@@ -517,6 +523,7 @@ class SarprasController extends Controller
         }
 
         Ruang::create($data);
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.ruang.index')
             ->with('success', 'Ruang berhasil ditambahkan.');
@@ -588,6 +595,7 @@ class SarprasController extends Controller
         }
 
         $ruang->update($data);
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.ruang.index')
             ->with('success', 'Ruang berhasil diperbarui.');
@@ -604,6 +612,7 @@ class SarprasController extends Controller
         }
 
         $ruang->delete();
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.ruang.index')
             ->with('success', 'Ruang berhasil dihapus.');
@@ -704,6 +713,7 @@ class SarprasController extends Controller
         }
 
         Maintenance::create($data);
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.maintenance.index')
             ->with('success', 'Maintenance berhasil ditambahkan.');
@@ -770,6 +780,7 @@ class SarprasController extends Controller
         }
 
         $maintenance->update($data);
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.maintenance.index')
             ->with('success', 'Maintenance berhasil diperbarui.');
@@ -789,6 +800,7 @@ class SarprasController extends Controller
         }
 
         $maintenance->delete();
+        cache()->forget('sarpras_dashboard_stats');
 
         return redirect()->route('admin.sarpras.maintenance.index')
             ->with('success', 'Maintenance berhasil dihapus.');

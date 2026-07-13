@@ -34,6 +34,7 @@ class User extends Authenticatable
         'currency',
         'timezone',
         'unit_code',
+        'notification_preferences',
     ];
 
     /**
@@ -58,6 +59,7 @@ class User extends Authenticatable
             'email_verification_sent_at' => 'datetime',
             'is_verified_by_admin' => 'boolean',
             'password' => 'hashed',
+            'notification_preferences' => 'array',
         ];
     }
 
@@ -76,6 +78,14 @@ class User extends Authenticatable
     public function pushSubscriptions(): HasMany
     {
         return $this->hasMany(PushSubscription::class);
+    }
+
+    /**
+     * Get the notification history for the user.
+     */
+    public function notificationHistory(): HasMany
+    {
+        return $this->hasMany(NotificationHistory::class);
     }
 
     /**
