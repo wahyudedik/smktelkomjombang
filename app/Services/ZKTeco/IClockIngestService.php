@@ -7,6 +7,7 @@ use App\Models\AttendanceIdentity;
 use App\Models\AttendanceLog;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class IClockIngestService
 {
@@ -17,6 +18,14 @@ class IClockIngestService
     public function ingest(string $serialNumber, string $payload, ?string $ipAddress = null): int
     {
         $events = $this->parser->parse($payload);
+
+        Log::info('IClockIngestService: parsed events', [
+            'serial_number' => $serialNumber,
+            'payload_size' => strlen($payload),
+            'events_count' => count($events),
+            'ip_address' => $ipAddress,
+        ]);
+
         if (count($events) === 0) {
             $this->touchDevice($serialNumber, $ipAddress);
             return 0;
@@ -39,10 +48,22 @@ class IClockIngestService
             $allowedPins = $allowedPinsQuery->pluck('device_pin')->all();
             $allowed = array_flip($allowedPins);
 
+            $beforeFilter = count($events);
             $events = array_values(array_filter($events, fn($e) => isset($allowed[$e['device_pin']])));
+
+            Log::info('IClockIngestService: user identity filter', [
+                'serial_number' => $serialNumber,
+                'before_filter' => $beforeFilter,
+                'after_filter' => count($events),
+                'allowed_pins' => $allowedPins,
+            ]);
         }
 
         if (count($events) === 0) {
+            Log::info('IClockIngestService: no events after filtering', [
+                'serial_number' => $serialNumber,
+                'ip_address' => $ipAddress,
+            ]);
             $this->touchDevice($serialNumber, $ipAddress);
             return 0;
         }
@@ -84,6 +105,12 @@ class IClockIngestService
                     $inserted++;
                 }
             }
+
+            Log::info('IClockIngestService: completed', [
+                'serial_number' => $serialNumber,
+                'total_events' => count($events),
+                'inserted' => $inserted,
+            ]);
 
             return $inserted;
         });
