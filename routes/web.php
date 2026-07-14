@@ -34,9 +34,20 @@ use App\Http\Controllers\ThemeSettingController;
 // DEFAULT_THEME=maudu  → MA Unggulan Darul Ulum
 Route::get('/', [\App\Http\Controllers\LandingController::class, 'index'])->name('landing');
 
-// Direct theme routes (for testing or direct access)
+// Direct theme routes (backward compatibility)
 Route::get('/telkom', [\App\Http\Controllers\LandingController::class, 'telkom'])->name('landing.telkom');
 Route::get('/maudu', [\App\Http\Controllers\LandingController::class, 'maudu'])->name('landing.maudu');
+
+// Dynamic theme route — accessible for any registered theme
+// e.g. /theme/maudu, /theme/telkom, or /new-theme-name
+Route::get('/theme/{theme}', function (string $theme) {
+    if (!in_array($theme, available_themes())) {
+        abort(404, 'Theme tidak ditemukan.');
+    }
+    config(['app.theme_override' => $theme]);
+    app()->bind('current_theme_override', fn() => $theme);
+    return app(\App\Http\Controllers\LandingController::class)->index();
+})->name('landing.theme');
 
 // Legacy Welcome Page (for reference)
 Route::get('/welcome', function () {

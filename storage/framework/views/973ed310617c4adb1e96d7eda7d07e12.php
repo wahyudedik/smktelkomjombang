@@ -15,11 +15,8 @@
     <title><?php echo e($pageTitle ?? ($siteSettings['site_name'] ?? theme_config('name'))); ?> - <?php echo e(config('app.name')); ?></title>
 
     <!-- favicon -->
-    <?php if(!empty($siteSettings['favicon'])): ?>
-        <link rel="icon" type="image/x-icon" href="<?php echo e(Storage::url($siteSettings['favicon'])); ?>">
-    <?php else: ?>
-        <link rel="icon" type="image/x-icon" href="<?php echo e(asset(theme_config('favicon'))); ?>">
-    <?php endif; ?>
+    <link rel="icon" type="image/x-icon"
+        href="<?php echo e(theme_image('favicon', theme_info('defaults.favicon', 'assets_maudu/assets/images/fav.png'))); ?>">
 
     <!-- Critical CSS (render-blocking) -->
     <link rel="stylesheet" href="<?php echo e(asset('assets_maudu/assets/css/bootstrap.min.css')); ?>">

@@ -11,11 +11,8 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="footer-widget-box about-us">
                         <a href="{{ route('landing') }}" class="footer-logo">
-                            @if (!empty($siteSettings['logo']))
-                                <img src="{{ Storage::url($siteSettings['logo']) }}" alt="{{ theme_config('name') }}">
-                            @else
-                                <img src="{{ asset(theme_config('logo_light')) }}" alt="{{ theme_config('name') }}">
-                            @endif
+                            <img src="{{ theme_image('logo_light', theme_info('defaults.logo_light', 'assets_maudu/assets/img/logo/logo-light.png')) }}"
+                                alt="{{ theme_config('name') }}">
                         </a>
                         <p class="mb-3">{{ theme_config('tagline', theme_config('name')) }}</p>
                         <ul class="footer-contact">

@@ -16,11 +16,8 @@
         {{ config('app.name') }}</title>
 
     <!-- favicon -->
-    @if (!empty($siteSettings['favicon']))
-        <link rel="icon" type="image/x-icon" href="{{ Storage::url($siteSettings['favicon']) }}">
-    @else
-        <link rel="icon" type="image/x-icon" href="{{ asset('assets_telkom/assets/images/fav.png') }}">
-    @endif
+    <link rel="icon" type="image/x-icon"
+        href="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_telkom/assets/images/fav.png')) }}">
 
     <!-- Critical CSS (render-blocking) -->
     <link rel="stylesheet" href="{{ asset('assets_telkom/assets/css/bootstrap.min.css') }}">

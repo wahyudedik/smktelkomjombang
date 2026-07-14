@@ -27,7 +27,7 @@ class InstagramController extends Controller
         // Get Instagram posts from service
         $posts = $this->instagramService->getCachedPosts();
 
-        return view(theme_view('instagram.activities', 'instagram.activities-maudu'), compact('posts'));
+        return view(theme_view('instagram.activities'), compact('posts'));
     }
 
     /**

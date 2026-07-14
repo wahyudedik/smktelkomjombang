@@ -37,11 +37,8 @@
             <div class="container position-relative">
                 {{-- Logo --}}
                 <a class="navbar-brand" href="{{ route('landing') }}">
-                    @if (!empty($siteSettings['logo']))
-                        <img src="{{ Storage::url($siteSettings['logo']) }}" alt="{{ theme_config('name') }}">
-                    @else
-                        <img src="{{ asset(theme_config('logo')) }}" alt="{{ theme_config('name') }}">
-                    @endif
+                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_maudu/assets/img/logo/logo.png')) }}"
+                        alt="{{ theme_config('name') }}">
                 </a>
 
                 <div class="mobile-menu-right">
@@ -59,43 +56,29 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('landing') }}">Beranda</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
-                                data-bs-auto-close="outside">
-                                Profil
-                            </a>
-                            <ul class="dropdown-menu fade-down">
-                                <li><a class="dropdown-item"
-                                        href="{{ route('pages.public.index', ['category' => 'profil']) }}">Tentang
-                                        Kami</a></li>
-                                <li><a class="dropdown-item"
-                                        href="{{ route('pages.public.index', ['category' => 'visi-misi']) }}">Visi &
-                                        Misi</a></li>
-                                <li><a class="dropdown-item"
-                                        href="{{ route('pages.public.index', ['category' => 'guru']) }}">Guru &
-                                        Staff</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('berita.public.index') }}">Berita</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('public.kegiatan') }}">Kegiatan</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
-                                data-bs-auto-close="outside">
-                                Layanan
-                            </a>
-                            <ul class="dropdown-menu fade-down">
-                                <li><a class="dropdown-item" href="{{ route('public.graduation.check') }}">E-Lulus</a>
+                        @foreach (theme_config('menu', []) as $item)
+                            @if (isset($item['children']) && count($item['children']) > 0)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle"
+                                        href="{{ resolve_theme_url($item['url'] ?? '#') }}" data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside">
+                                        {{ $item['label'] }}
+                                    </a>
+                                    <ul class="dropdown-menu fade-down">
+                                        @foreach ($item['children'] as $child)
+                                            <li><a class="dropdown-item"
+                                                    href="{{ resolve_theme_url($child['url'] ?? '#') }}">{{ $child['label'] }}</a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
                                 </li>
-                                <li><a class="dropdown-item"
-                                        href="{{ route('pages.public.index', ['category' => 'akademik']) }}">Akademik</a>
+                            @else
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ resolve_theme_url($item['url'] ?? '#') }}"
+                                        @if (($item['target'] ?? '') === '_blank') target="_blank" @endif>{{ $item['label'] }}</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ route('pages.public.index') }}">Lainnya</a></li>
-                            </ul>
-                        </li>
+                            @endif
+                        @endforeach
                     </ul>
 
                     <div class="nav-right">

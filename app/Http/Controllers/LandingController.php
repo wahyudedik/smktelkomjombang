@@ -18,33 +18,41 @@ class LandingController extends Controller
     /**
      * Main entry point — checks DEFAULT_THEME and returns appropriate view.
      *
-     * Environment variable DEFAULT_THEME can be:
-     *   - 'telkom' (default) → resources/views/telkom.blade.php
-     *   - 'maudu'            → resources/views/maudu.blade.php
+     * Convention: view name = theme name (telkom.blade.php, maudu.blade.php, etc.)
+     * Generic — no hardcoded theme names.
+     *
+     * @see plans/theme-system-refactoring.md — Fase 3
      */
     public function index()
     {
-        $theme = Config::get('app.default_theme', 'telkom');
+        $theme = current_theme();
 
-        $themeConfig = theme_config();
-        View::share('themeConfig', $themeConfig);
+        View::share('themeConfig', theme_config());
         View::share('currentTheme', $theme);
 
         $data = $this->buildData();
 
-        return view($theme === 'maudu' ? 'maudu' : 'telkom', $data);
+        // Convention: view name = theme name (telkom.blade.php, maudu.blade.php)
+        return view($theme, $data);
     }
 
     /**
-     * Display the telkom landing page (direct route)
+     * Display the telkom landing page (direct route).
+     *
+     * @deprecated Use GET / with DEFAULT_THEME=telkom, or GET /telkom
      */
     public function telkom()
     {
+        View::share('themeConfig', theme_config());
+        View::share('currentTheme', 'telkom');
+
         return view('telkom', $this->buildData());
     }
 
     /**
-     * Display the maudu landing page (direct route)
+     * Display the maudu landing page (direct route).
+     *
+     * @deprecated Use GET / with DEFAULT_THEME=maudu, or GET /maudu
      */
     public function maudu()
     {

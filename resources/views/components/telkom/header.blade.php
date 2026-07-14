@@ -8,17 +8,19 @@
                 <div class="row y-middle">
                     <div class="col-md-7">
                         <ul class="topbar-contact">
-                            @if(!empty($siteSettings['contact_email']))
-                            <li>
-                                <i class="flaticon-email"></i>
-                                <a href="mailto:{{ $siteSettings['contact_email'] }}">{{ $siteSettings['contact_email'] }}</a>
-                            </li>
+                            @if (!empty($siteSettings['contact_email']))
+                                <li>
+                                    <i class="flaticon-email"></i>
+                                    <a
+                                        href="mailto:{{ $siteSettings['contact_email'] }}">{{ $siteSettings['contact_email'] }}</a>
+                                </li>
                             @endif
-                            @if(!empty($siteSettings['contact_phone']))
-                            <li>
-                                <i class="flaticon-call"></i>
-                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $siteSettings['contact_phone']) }}">{{ $siteSettings['contact_phone'] }}</a>
-                            </li>
+                            @if (!empty($siteSettings['contact_phone']))
+                                <li>
+                                    <i class="flaticon-call"></i>
+                                    <a
+                                        href="tel:{{ preg_replace('/[^0-9+]/', '', $siteSettings['contact_phone']) }}">{{ $siteSettings['contact_phone'] }}</a>
+                                </li>
                             @endif
                         </ul>
                     </div>
@@ -48,22 +50,12 @@
                         <div class="logo-cat-wrap">
                             <div class="logo-part pr-90">
                                 <a class="dark-logo" href="{{ route('landing') }}">
-                                    @if(!empty($siteSettings['logo']))
-                                        <img src="{{ Storage::url($siteSettings['logo']) }}" alt="{{ $siteSettings['site_name'] ?? 'Logo' }}"
-                                            style="max-height: 35px;">
-                                    @else
-                                        <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}" alt="Logo Dark"
-                                            style="max-height: 35px;">
-                                    @endif
+                                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo/logo.png')) }}"
+                                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 35px;">
                                 </a>
                                 <a class="light-logo" href="{{ route('landing') }}">
-                                    @if(!empty($siteSettings['logo']))
-                                        <img src="{{ Storage::url($siteSettings['logo']) }}" alt="{{ $siteSettings['site_name'] ?? 'Logo' }}"
-                                            style="max-height: 35px;">
-                                    @else
-                                        <img src="{{ asset('assets_telkom/assets/images/logo.png') }}" alt="Logo Light"
-                                            style="max-height: 35px;">
-                                    @endif
+                                    <img src="{{ theme_image('logo_light', theme_info('defaults.logo_light', 'assets_telkom/assets/images/logo/logo-light.png')) }}"
+                                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 35px;">
                                 </a>
                             </div>
                             <div class="categories-btn">
@@ -89,46 +81,26 @@
                                 </div>
                                 <nav class="rs-menu">
                                     <ul class="nav-menu">
-                                        <li class="menu-item-has-children">
-                                            <a href="#rs-about">Profil</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="{{ route('pages.public.show', 'pp-darul-ulum') }}">Tentang SMK</a></li>
-                                                <li><a href="{{ route('pages.public.show', 'visi-misi-smk') }}">Visi & Misi</a></li>
-                                                <li><a href="{{ route('pages.public.show', 'struktur-smk') }}">Struktur Sekolah</a></li>
-                                            </ul>
-                                        </li>
-
-                                        <li class="menu-item-has-children">
-                                            <a href="#rs-services">Akademik</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="{{ route('pages.public.show', 'tenaga-pendidik') }}">Tenaga Pendidik</a></li>
-                                                <li><a href="{{ route('pages.public.show', 'staf-karyawan') }}">Staf & Karyawan</a></li>
-                                                <li><a href="#rs-services">Jurusan</a></li>
-                                            </ul>
-                                        </li>
-
-                                        <li class="menu-item-has-children">
-                                            <a href="#">Layanan</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="#">Rapor Digital</a></li>
-                                                <li><a href="#">E-Semester</a></li>
-                                                <li><a href="#">E-LMS</a></li>
-                                                <li><a href="#">E-Perpus</a></li>
-                                                <li><a href="{{ route('public.graduation.check') }}">E-Lulus</a></li>
-                                            </ul>
-                                        </li>
-
-                                        <li class="menu-item-has">
-                                            <a href="{{ route('berita.public.index') }}">Berita</a>
-                                        </li>
-
-                                        <li class="menu-item-has">
-                                            <a href="#rs-contact">Kontak</a>
-                                        </li>
-
-                                        <li class="menu-item-has">
-                                            <a href="{{ $siteSettings['cta_button_url'] ?? 'https://psb.ponpesdarululum.id/' }}" target="_blank">INFORMASI PPDB</a>
-                                        </li>
+                                        @foreach (theme_config('menu', []) as $item)
+                                            @if (isset($item['children']) && count($item['children']) > 0)
+                                                <li class="menu-item-has-children">
+                                                    <a
+                                                        href="{{ resolve_theme_url($item['url'] ?? '#') }}">{{ $item['label'] }}</a>
+                                                    <ul class="sub-menu">
+                                                        @foreach ($item['children'] as $child)
+                                                            <li><a
+                                                                    href="{{ resolve_theme_url($child['url'] ?? '#') }}">{{ $child['label'] }}</a>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
+                                            @else
+                                                <li class="menu-item-has">
+                                                    <a href="{{ resolve_theme_url($item['url'] ?? '#') }}"
+                                                        @if (($item['target'] ?? '') === '_blank') target="_blank" @endif>{{ $item['label'] }}</a>
+                                                </li>
+                                            @endif
+                                        @endforeach
                                     </ul>
                                 </nav>
                             </div>
@@ -150,13 +122,8 @@
             </div>
             <div class="canvas-logo">
                 <a href="{{ route('landing') }}">
-                    @if(!empty($siteSettings['logo']))
-                        <img src="{{ Storage::url($siteSettings['logo']) }}" alt="{{ $siteSettings['site_name'] ?? 'Logo' }}"
-                            style="max-height: 60px;">
-                    @else
-                        <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}" alt="Logo"
-                            style="max-height: 60px;">
-                    @endif
+                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo/logo.png')) }}"
+                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 60px;">
                 </a>
             </div>
         </nav>

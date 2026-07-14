@@ -14,18 +14,12 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Apple Touch Icons -->
-    @if (cache('site_setting_favicon'))
-        <link rel="apple-touch-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
-    @else
-        <link rel="apple-touch-icon" href="{{ asset('assets_telkom/assets/images/logo-dark.png') }}">
-    @endif
+    <link rel="apple-touch-icon"
+        href="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}">
 
     <!-- favicon -->
-    @if (cache('site_setting_favicon'))
-        <link rel="icon" type="image/x-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
-    @else
-        <link rel="icon" type="image/x-icon" href="{{ asset('assets_telkom/assets/images/fav.png') }}">
-    @endif 
+    <link rel="icon" type="image/x-icon"
+        href="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_telkom/assets/images/fav.png')) }}">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

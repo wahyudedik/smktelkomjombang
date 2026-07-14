@@ -205,6 +205,7 @@ class PageController extends Controller
     public function show(Page $page)
     {
         // Check if page is published or user has permission
+        /** @var (User&\Spatie\Permission\Traits\HasRoles)|null $user */
         $user = Auth::user();
         if (!$page->isPublished() && (!$user || !$user->hasRole('superadmin'))) {
             abort(403, 'Page not found or not published.');
@@ -472,7 +473,7 @@ class PageController extends Controller
             ->pluck('category')
             ->filter();
 
-        return view(theme_view('pages.public.index-telkom', 'pages.public.index-maudu'), compact('pages', 'categories'));
+        return view(theme_view('pages.public.index'), compact('pages', 'categories'));
     }
 
     /**
@@ -507,6 +508,6 @@ class PageController extends Controller
         // Increment views count (optional)
         // $page->increment('views_count');
 
-        return view(theme_view('pages.public.show-telkom', 'pages.public.show-maudu'), compact('page'));
+        return view(theme_view('pages.public.show'), compact('page'));
     }
 }

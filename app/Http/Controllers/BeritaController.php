@@ -175,7 +175,7 @@ class BeritaController extends Controller
             ->orderBy('published_at', 'desc')
             ->first();
 
-        return view(theme_view('berita.public.index', 'berita.maudu.index'), compact('beritas', 'featured'));
+        return view(theme_view('berita.public.index'), compact('beritas', 'featured'));
     }
 
     public function publicShow(Page $berita)
@@ -189,7 +189,7 @@ class BeritaController extends Controller
             ->limit(3)
             ->get();
 
-        return view(theme_view('berita.public.show', 'berita.maudu.show'), compact('berita', 'related'));
+        return view(theme_view('berita.public.show'), compact('berita', 'related'));
     }
 
     // =========================================================

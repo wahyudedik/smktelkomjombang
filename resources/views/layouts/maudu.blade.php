@@ -15,11 +15,8 @@
     <title>{{ $pageTitle ?? ($siteSettings['site_name'] ?? theme_config('name')) }} - {{ config('app.name') }}</title>
 
     <!-- favicon -->
-    @if (!empty($siteSettings['favicon']))
-        <link rel="icon" type="image/x-icon" href="{{ Storage::url($siteSettings['favicon']) }}">
-    @else
-        <link rel="icon" type="image/x-icon" href="{{ asset(theme_config('favicon')) }}">
-    @endif
+    <link rel="icon" type="image/x-icon"
+        href="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_maudu/assets/images/fav.png')) }}">
 
     <!-- Critical CSS (render-blocking) -->
     <link rel="stylesheet" href="{{ asset('assets_maudu/assets/css/bootstrap.min.css') }}">

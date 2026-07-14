@@ -93,4 +93,50 @@ return [
         'days' => 'Sabtu - Kamis',
         'hours' => '08:00 - 16:00 WIB',
     ],
+
+    // Menu Navigasi
+    'menu' => [
+        [
+            'label' => 'Profil',
+            'url' => '#rs-about',
+            'children' => [
+                ['label' => 'Tentang SMK', 'url' => 'route:pages.public.show,pp-darul-ulum'],
+                ['label' => 'Visi & Misi', 'url' => 'route:pages.public.show,visi-misi-smk'],
+                ['label' => 'Struktur Sekolah', 'url' => 'route:pages.public.show,struktur-smk'],
+            ],
+        ],
+        [
+            'label' => 'Akademik',
+            'url' => '#rs-services',
+            'children' => [
+                ['label' => 'Tenaga Pendidik', 'url' => 'route:pages.public.show,tenaga-pendidik'],
+                ['label' => 'Staf & Karyawan', 'url' => 'route:pages.public.show,staf-karyawan'],
+                ['label' => 'Jurusan', 'url' => '#rs-services'],
+            ],
+        ],
+        [
+            'label' => 'Layanan',
+            'url' => '#',
+            'children' => [
+                ['label' => 'Rapor Digital', 'url' => '#'],
+                ['label' => 'E-Semester', 'url' => '#'],
+                ['label' => 'E-LMS', 'url' => '#'],
+                ['label' => 'E-Perpus', 'url' => '#'],
+                ['label' => 'E-Lulus', 'url' => 'route:public.graduation.check'],
+            ],
+        ],
+        [
+            'label' => 'Berita',
+            'url' => 'route:berita.public.index',
+        ],
+        [
+            'label' => 'Kontak',
+            'url' => '#rs-contact',
+        ],
+        [
+            'label' => 'INFORMASI PPDB',
+            'url' => 'https://psb.ponpesdarululum.id/',
+            'target' => '_blank',
+        ],
+    ],
 ];

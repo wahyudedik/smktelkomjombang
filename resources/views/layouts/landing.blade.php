@@ -15,11 +15,8 @@
     <title>{{ $pageTitle ?? cache('site_setting_site_name', 'Halaman Sekolah') }} - {{ config('app.name') }}</title>
 
     <!-- favicon -->
-    @if (cache('site_setting_favicon'))
-        <link rel="icon" type="image/x-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
-    @else
-        <link rel="icon" type="image/x-icon" href="{{ asset('assets_telkom/assets/images/fav.png') }}">
-    @endif
+    <link rel="icon" type="image/x-icon"
+        href="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_telkom/assets/images/fav.png')) }}">
 
     <!-- css -->
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">

@@ -38,11 +38,8 @@
             <div class="container position-relative">
                 
                 <a class="navbar-brand" href="<?php echo e(route('landing')); ?>">
-                    <?php if(!empty($siteSettings['logo'])): ?>
-                        <img src="<?php echo e(Storage::url($siteSettings['logo'])); ?>" alt="<?php echo e(theme_config('name')); ?>">
-                    <?php else: ?>
-                        <img src="<?php echo e(asset(theme_config('logo'))); ?>" alt="<?php echo e(theme_config('name')); ?>">
-                    <?php endif; ?>
+                    <img src="<?php echo e(theme_image('logo', theme_info('defaults.logo', 'assets_maudu/assets/img/logo/logo.png'))); ?>"
+                        alt="<?php echo e(theme_config('name')); ?>">
                 </a>
 
                 <div class="mobile-menu-right">
@@ -60,43 +57,30 @@
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('landing')); ?>">Beranda</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
-                                data-bs-auto-close="outside">
-                                Profil
-                            </a>
-                            <ul class="dropdown-menu fade-down">
-                                <li><a class="dropdown-item"
-                                        href="<?php echo e(route('pages.public.index', ['category' => 'profil'])); ?>">Tentang
-                                        Kami</a></li>
-                                <li><a class="dropdown-item"
-                                        href="<?php echo e(route('pages.public.index', ['category' => 'visi-misi'])); ?>">Visi &
-                                        Misi</a></li>
-                                <li><a class="dropdown-item"
-                                        href="<?php echo e(route('pages.public.index', ['category' => 'guru'])); ?>">Guru &
-                                        Staff</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo e(route('berita.public.index')); ?>">Berita</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo e(route('public.kegiatan')); ?>">Kegiatan</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
-                                data-bs-auto-close="outside">
-                                Layanan
-                            </a>
-                            <ul class="dropdown-menu fade-down">
-                                <li><a class="dropdown-item" href="<?php echo e(route('public.graduation.check')); ?>">E-Lulus</a>
+                        <?php $__currentLoopData = theme_config('menu', []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php if(isset($item['children']) && count($item['children']) > 0): ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle"
+                                        href="<?php echo e(resolve_theme_url($item['url'] ?? '#')); ?>" data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside">
+                                        <?php echo e($item['label']); ?>
+
+                                    </a>
+                                    <ul class="dropdown-menu fade-down">
+                                        <?php $__currentLoopData = $item['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $child): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <li><a class="dropdown-item"
+                                                    href="<?php echo e(resolve_theme_url($child['url'] ?? '#')); ?>"><?php echo e($child['label']); ?></a>
+                                            </li>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </ul>
                                 </li>
-                                <li><a class="dropdown-item"
-                                        href="<?php echo e(route('pages.public.index', ['category' => 'akademik'])); ?>">Akademik</a>
+                            <?php else: ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo e(resolve_theme_url($item['url'] ?? '#')); ?>"
+                                        <?php if(($item['target'] ?? '') === '_blank'): ?> target="_blank" <?php endif; ?>><?php echo e($item['label']); ?></a>
                                 </li>
-                                <li><a class="dropdown-item" href="<?php echo e(route('pages.public.index')); ?>">Lainnya</a></li>
-                            </ul>
-                        </li>
+                            <?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
 
                     <div class="nav-right">

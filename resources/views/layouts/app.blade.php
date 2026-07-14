@@ -17,11 +17,8 @@
     <link rel="manifest" href="{{ asset('manifest.json') }}">
 
     <!-- Apple Touch Icons -->
-    @if (cache('site_setting_favicon'))
-        <link rel="apple-touch-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
-    @else
-        <link rel="apple-touch-icon" href="{{ asset('assets_telkom/assets/images/logo-dark.png') }}">
-    @endif
+    <link rel="apple-touch-icon"
+        href="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}">
 
     <!-- title -->
     <title>{{ $pageTitle ?? cache('site_setting_site_name', 'Halaman Sekolah') }} - {{ config('app.name') }}</title>
@@ -34,11 +31,8 @@
     <link rel="stylesheet" href="{{ asset('assets/css/all-fontawesome.min.css') }}">
 
     <!-- favicon -->
-    @if (cache('site_setting_favicon'))
-        <link rel="icon" type="image/x-icon" href="{{ Storage::url(cache('site_setting_favicon')) }}">
-    @else
-        <link rel="icon" type="image/x-icon" href="{{ asset('assets_telkom/assets/images/fav.png') }}">
-    @endif
+    <link rel="icon" type="image/x-icon"
+        href="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_telkom/assets/images/fav.png')) }}">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

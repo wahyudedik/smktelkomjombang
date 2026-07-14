@@ -76,6 +76,138 @@ Sistem manajemen absensi berbasis web yang terintegrasi dengan perangkat ZKTeco 
 - **Audit Logging**: Tracking semua aktivitas penting
 - **Rate Limiting**: Pembatasan request untuk mencegah abuse
 
+### 🎨 Multi-Theme System
+- **Convention-based Theming**: Tambah tema baru tanpa ubah controller/routes
+- **4-Tier Favicon/Logo Resolution**: Per-theme DB → Global setting → Registry default → Hardcoded
+- **Dynamic Menu Navigation**: Menu dari config, bukan hardcoded di view
+- **View Override Convention**: `{base}-{theme}.blade.php` untuk override per tema
+- **Theme Registry**: [`config/themes.php`](config/themes.php) — central definition semua tema
+
+---
+
+## 🎨 Menambah Tema Baru (Step-by-Step)
+
+> **Prinsip**: Menambah tema baru = buat 4 file + set 1 env variable. Tidak perlu mengubah controller, routes, atau ThemeHelper.
+
+### Step 1: Buat Config Tema
+
+```bash
+cp config/themes/telkom.php config/themes/smk_xyz.php
+```
+
+Edit `config/themes/smk_xyz.php` — sesuaikan name, contact, social media, jurusan, menu, dll:
+
+```php
+return [
+    'name'        => 'SMK XYZ',
+    'short_name'  => 'SMK XYZ',
+    'type'        => 'SMK',
+    'tagline'     => 'Sekolah Unggulan',
+    'address'     => 'Jl. Contoh No.1, Kota',
+    'phone'       => '0812-3456-7890',
+    'whatsapp'    => '6281234567890',
+    'email'       => 'info@smkxyz.sch.id',
+    'assets_path' => 'assets_smk_xyz',
+    'favicon'     => 'assets_smk_xyz/images/favicon.png',
+    'logo'        => 'assets_smk_xyz/images/logo.png',
+    'logo_light'  => 'assets_smk_xyz/images/logo-light.png',
+
+    // Menu Navigasi (URL pakai format 'route:name')
+    'menu' => [
+        ['label' => 'Berita', 'url' => 'route:berita.public.index'],
+        ['label' => 'E-Lulus', 'url' => 'route:public.graduation.check'],
+        // ... tambah menu lainnya
+    ],
+    // ... config lainnya
+];
+```
+
+### Step 2: Register di Theme Registry
+
+Buka [`config/themes.php`](config/themes.php), tambah entry:
+
+```php
+'smk_xyz' => [
+    'name'        => 'SMK XYZ',
+    'view'        => 'smk_xyz',
+    'layout'      => 'layouts.smk_xyz',
+    'assets_path' => 'assets_smk_xyz',
+    'colors'      => ['primary' => '#ff0000', 'secondary' => '#cc0000'],
+    'defaults'    => [
+        'favicon'    => 'assets_smk_xyz/images/favicon.png',
+        'logo'       => 'assets_smk_xyz/images/logo.png',
+        'logo_light' => 'assets_smk_xyz/images/logo-light.png',
+    ],
+],
+```
+
+### Step 3: Buat Layout & Landing Page
+
+```bash
+# Layout (copy dari telkom, lalu customize)
+cp resources/views/layouts/telkom.blade.php resources/views/layouts/smk_xyz.blade.php
+
+# Landing page
+# Buat resources/views/smk_xyz.blade.php
+```
+
+Layout harus include `theme_image()` untuk favicon:
+```html
+<link rel="icon" type="image/x-icon" href="{{ theme_image('favicon', theme_info('defaults.favicon')) }}">
+```
+
+### Step 4: Buat Header & Footer Components
+
+```bash
+mkdir -p resources/views/components/smk_xyz
+```
+
+Buat `header.blade.php` dengan menu dari `theme_config('menu')`:
+```html
+@foreach(theme_config('menu', []) as $item)
+    @if(isset($item['children']) && count($item['children']) > 0)
+        {{-- dropdown menu --}}
+    @else
+        <a href="{{ resolve_theme_url($item['url'] ?? '#') }}">{{ $item['label'] }}</a>
+    @endif
+@endforeach
+```
+
+Logo otomatis benar via `theme_image()`:
+```html
+<img src="{{ theme_image('logo', theme_info('defaults.logo')) }}" alt="{{ theme_config('name') }}">
+```
+
+### Step 5: Buat Assets
+
+```bash
+mkdir -p public/assets_smk_xyz/css public/assets_smk_xyz/js public/assets_smk_xyz/images
+# Copy CSS/JS dari tema lain, lalu customize
+# Upload favicon/logo via admin: Theme Settings → SMK XYZ
+```
+
+### Step 6: Set Environment & Clear Cache
+
+```env
+# .env
+DEFAULT_THEME=smk_xyz
+```
+
+```bash
+php artisan config:clear && php artisan view:clear && php artisan cache:clear
+```
+
+### Step 7: Test
+
+Buka browser dan test:
+- [ ] Landing page (`GET /`)
+- [ ] Berita, Pages, Kegiatan, E-Lulus
+- [ ] Header/footer navigation
+- [ ] Favicon di landing page, dashboard admin, halaman login
+- [ ] Responsive design
+
+> **Detail lengkap**: Lihat [`plans/theme-system-refactoring.md`](plans/theme-system-refactoring.md) atau [`AGENTS.md`](AGENTS.md)
+
 ---
 
 ## 🛠️ Teknologi yang Digunakan
@@ -113,6 +245,8 @@ Untuk setup dan deployment, lihat dokumentasi lengkap:
 - **[docs/absensi-zkteco-setup.md](docs/absensi-zkteco-setup.md)** - Dokumentasi teknis sistem
 - **[DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)** - Master guide lengkap
 - **[DOKUMENTASI-INDEX.md](DOKUMENTASI-INDEX.md)** - Index lengkap dokumentasi
+- **[plans/theme-system-refactoring.md](plans/theme-system-refactoring.md)** - Plan refactoring theme system + panduan menambah tema baru
+- **[AGENTS.md](AGENTS.md)** - AI context file (juga berguna untuk developer manusia)
 
 ---
 

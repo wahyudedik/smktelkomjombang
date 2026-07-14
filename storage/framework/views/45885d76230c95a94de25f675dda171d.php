@@ -11,11 +11,8 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="footer-widget-box about-us">
                         <a href="<?php echo e(route('landing')); ?>" class="footer-logo">
-                            <?php if(!empty($siteSettings['logo'])): ?>
-                                <img src="<?php echo e(Storage::url($siteSettings['logo'])); ?>" alt="<?php echo e(theme_config('name')); ?>">
-                            <?php else: ?>
-                                <img src="<?php echo e(asset(theme_config('logo_light'))); ?>" alt="<?php echo e(theme_config('name')); ?>">
-                            <?php endif; ?>
+                            <img src="<?php echo e(theme_image('logo_light', theme_info('defaults.logo_light', 'assets_maudu/assets/img/logo/logo-light.png'))); ?>"
+                                alt="<?php echo e(theme_config('name')); ?>">
                         </a>
                         <p class="mb-3"><?php echo e(theme_config('tagline', theme_config('name'))); ?></p>
                         <ul class="footer-contact">

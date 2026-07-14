@@ -514,7 +514,7 @@ class KelulusanController extends Controller
      */
     public function publicCheckStatus()
     {
-        return view(theme_view('public.elulus.check', 'public.elulus.check-maudu'));
+        return view(theme_view('public.elulus.check'));
     }
 
     /**
@@ -545,7 +545,7 @@ class KelulusanController extends Controller
         // Record the check attempt
         $kelulusan->recordCheck($request->ip(), $request->userAgent());
 
-        return view(theme_view('public.elulus.result', 'public.elulus.result-maudu'), compact('kelulusan'));
+        return view(theme_view('public.elulus.result'), compact('kelulusan'));
     }
 
     /**
@@ -631,7 +631,7 @@ class KelulusanController extends Controller
             // Return PDF download
             return $pdf->download($filename);
         } catch (\Exception $e) {
-            \Log::error('Certificate generation error: ' . $e->getMessage(), [
+            Log::error('Certificate generation error: ' . $e->getMessage(), [
                 'kelulusan_id' => $kelulusan->id,
                 'trace' => $e->getTraceAsString()
             ]);
