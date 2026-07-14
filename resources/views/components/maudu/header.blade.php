@@ -1,29 +1,42 @@
 <!-- Header -->
 <header class="header">
-    <div class="header-top">
+    <div class="header-top" style="color: #fff;">
         <div class="container">
             <div class="header-top-wrap">
                 <div class="header-top-left">
                     <div class="header-top-social">
-                        <span>Ikuti Kami:</span>
-                        <a href="{{ theme_config('facebook_url', '#') }}" target="_blank"><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a href="{{ theme_config('instagram_url', '#') }}" target="_blank"><i
-                                class="fab fa-instagram"></i></a>
-                        <a href="{{ theme_config('youtube_url', '#') }}" target="_blank"><i
-                                class="fab fa-youtube"></i></a>
+                        <span style="color: #fff;">Ikuti Kami:</span>
+                        <a href="{{ theme_config('facebook_url', '#') }}" target="_blank"><i class="fab fa-facebook-f"
+                                style="color: #fff;"></i></a>
+                        <a href="{{ theme_config('instagram_url', '#') }}" target="_blank"><i class="fab fa-instagram"
+                                style="color: #fff;"></i></a>
+                        <a href="{{ theme_config('youtube_url', '#') }}" target="_blank"><i class="fab fa-youtube"
+                                style="color: #fff;"></i></a>
+                        <a href="{{ theme_config('whatsapp_url', '#') }}" target="_blank"><i class="fab fa-whatsapp"
+                                style="color: #fff;"></i></a>
                     </div>
                 </div>
                 <div class="header-top-right">
                     <div class="header-top-contact">
-                        <ul>
-                            <li>
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ theme_config('address') }}
+                        <ul style="color: #fff;">
+                            <li style="color: #fff;">
+                                <a href="{{ theme_config('google_maps_url', '#') }}" target="_blank"
+                                    style="color: #fff;">
+                                    <i class="fas fa-location-dot" style="color: #fff;"></i>
+                                    {{ theme_config('address') }}
+                                </a>
                             </li>
-                            <li>
-                                <i class="fas fa-phone-alt"></i>
-                                <a href="tel:{{ theme_config('phone') }}">{{ theme_config('phone') }}</a>
+                            <li style="color: #fff;">
+                                <a href="mailto:{{ theme_config('email') }}" target="_blank" style="color: #fff;">
+                                    <i class="fas fa-envelope" style="color: #fff;"></i>
+                                    {{ theme_config('email') }}
+                                </a>
+                            </li>
+                            <li style="color: #fff;">
+                                <a href="tel:{{ theme_config('phone') }}" style="color: #fff;">
+                                    <i class="fas fa-phone-volume" style="color: #fff;"></i>
+                                    {{ theme_config('phone') }}
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -36,7 +49,7 @@
         <nav class="navbar navbar-expand-lg">
             <div class="container position-relative">
                 {{-- Logo --}}
-                <a class="navbar-brand" href="{{ route('landing') }}">
+                <a class="navbar-brand" href="{{ route('landing') }}" style="margin-right: 25px;">
                     <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_maudu/assets/img/logo/logo.png')) }}"
                         alt="{{ theme_config('name') }}">
                 </a>
@@ -51,11 +64,8 @@
                     </button>
                 </div>
 
-                <div class="collapse navbar-collapse" id="main_nav">
+                <div class="collapse navbar-collapse justify-content-between" id="main_nav">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('landing') }}">Beranda</a>
-                        </li>
                         @foreach (theme_config('menu', []) as $item)
                             @if (isset($item['children']) && count($item['children']) > 0)
                                 <li class="nav-item dropdown">
@@ -74,28 +84,30 @@
                                 </li>
                             @else
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ resolve_theme_url($item['url'] ?? '#') }}"
+                                    <a class="nav-link text-nowrap" href="{{ resolve_theme_url($item['url'] ?? '#') }}"
                                         @if (($item['target'] ?? '') === '_blank') target="_blank" @endif>{{ $item['label'] }}</a>
                                 </li>
                             @endif
                         @endforeach
                     </ul>
 
-                    <div class="nav-right">
-                        <div class="nav-right-btn mt-2 d-flex align-items-center gap-2">
-                            @auth
-                                <a class="btn btn-outline-secondary btn-sm" href="{{ route('dashboard') }}">
-                                    <i class="fas fa-tachometer-alt me-1"></i> Dashboard
-                                </a>
-                            @else
-                                <a class="btn btn-outline-secondary btn-sm" href="{{ route('login') }}">
-                                    <i class="fas fa-sign-in-alt me-1"></i> Login
-                                </a>
-                            @endauth
-                            <a class="btn btn-primary" href="{{ theme_config('ppdb_url', '#') }}" target="_blank">
-                                DAFTAR SEKARANG
+                    <div class="nav-right d-flex align-items-center gap-2 flex-shrink-0">
+                        @auth
+                            <a class="btn btn-outline-primary text-nowrap" href="{{ route('admin.dashboard') }}"
+                               style="border-color: #0d6efd; color: #0d6efd; background: #fff; padding: 8px 18px; font-size: 14px; font-weight: 600;">
+                                <i class="fas fa-tachometer-alt me-1"></i> Dashboard
                             </a>
-                        </div>
+                        @else
+                            <a class="btn btn-outline-primary text-nowrap" href="{{ route('login') }}"
+                               style="border-color: #0d6efd; color: #0d6efd; background: #fff; padding: 8px 18px; font-size: 14px; font-weight: 600;">
+                                <i class="fas fa-sign-in-alt me-1"></i> Login
+                            </a>
+                        @endauth
+                        <a class="btn btn-outline-primary text-nowrap"
+                            href="{{ theme_config('linktree_url', theme_config('ppdb_url', '#')) }}" target="_blank"
+                            style="border-color: #0d6efd; color: #0d6efd; background: #fff; padding: 8px 18px; font-size: 14px; font-weight: 600;">
+                            INFORMASI PENDAFTARAN
+                        </a>
                     </div>
                 </div>
             </div>

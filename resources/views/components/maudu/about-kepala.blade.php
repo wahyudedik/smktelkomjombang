@@ -19,12 +19,13 @@
             <div class="col-lg-6">
                 <div class="content-info wow fadeInUp" data-wow-delay=".25s">
                     <div class="site-heading mb-3">
-                        <span class="sub-title">Sambutan</span>
-                        <h2 class="title">Kepala {{ theme_config('type', 'Madrasah') }}</h2>
+                        <h4 class="site-title">
+                            Kepala {{ theme_config('type', 'Madrasah') }}
+                            @if (!empty($kepala['name']))
+                                <span>: {{ $kepala['name'] }}</span>
+                            @endif
+                        </h4>
                     </div>
-                    @if (!empty($kepala['name']))
-                        <h4 class="mb-3">{{ $kepala['name'] }}</h4>
-                    @endif
                     <p class="content-text">
                         {{ $kepala['description'] ?? 'Selamat datang di ' . theme_config('name') . '. Kami berkomitmen untuk memberikan pendidikan terbaik bagi putra-putri Anda dengan menggabungkan kurikulum nasional dan kepesantrenan.' }}
                     </p>

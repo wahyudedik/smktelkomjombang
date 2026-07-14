@@ -25,8 +25,8 @@
             <div class="col-lg-6">
                 <div class="about-right wow fadeInRight" data-wow-delay=".25s">
                     <div class="site-heading mb-3">
-                        <span class="sub-title">Tentang Kami</span>
-                        <h2 class="title">Gallery Kegiatan {{ theme_config('short_name', 'MAUDU') }} Rejoso</h2>
+                        <span class="sub-title">INFORMASI</span>
+                        <h2 class="title">Unggulan <span>{{ theme_config('short_name', 'MAUDU') }}</span> Rejoso</h2>
                     </div>
                     <div class="about-content">
                         <div class="row">

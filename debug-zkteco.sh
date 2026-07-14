@@ -23,7 +23,7 @@ echo ""
 
 # 4. Cek database
 echo "4️⃣ Checking database..."
-echo "   Attendance devices:"
+echo "   Attendance devices:" 
 php artisan tinker --execute="DB::table('attendance_devices')->get();"
 echo ""
 

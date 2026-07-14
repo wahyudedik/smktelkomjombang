@@ -4,12 +4,11 @@
         <div class="video-content" style="background-image: url('{{ asset('assets_maudu/assets/img/video/01.jpg') }}');">
             <div class="row align-items-center">
                 <div class="col-lg-12">
-                    <div class="video-wrapper text-center">
+                    <div class="video-wrapper">
                         <a href="{{ theme_config('video_url', 'https://www.youtube.com/watch?v=ckHzmP1evNU') }}"
-                            class="popup-youtube video-play-btn" title="Play Video">
+                            class="popup-youtube play-btn" title="Play Video">
                             <i class="fas fa-play"></i>
                         </a>
-                        <h3 class="video-title">Tentang Kami</h3>
                     </div>
                 </div>
             </div>

@@ -17,8 +17,11 @@ return [
     'phone' => '(0321) 868911',
     'phone_secondary' => '',
     'whatsapp' => '628113383722',
+    'whatsapp_url' => 'https://wa.me/628113383722',
+    'google_maps_url' => 'https://share.google/XB6eTt65kqQF9xYVR',
     'email' => 'adminmaudu@gmail.com',
     'ppdb_url' => 'https://psb.ponpesdarululum.id/',
+    'linktree_url' => 'https://linktr.ee/maudu',
 
     // Social Media
     'facebook' => 'OfficialMaudu',
