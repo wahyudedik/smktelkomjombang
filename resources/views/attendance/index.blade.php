@@ -10,6 +10,8 @@
                 <a href="{{ route('admin.absensi.logs') }}" class="btn btn-secondary">Logs</a>
                 <a href="{{ route('admin.absensi.devices.index') }}" class="btn btn-secondary">Devices</a>
                 <a href="{{ route('admin.absensi.mapping.index') }}" class="btn btn-secondary">Mapping</a>
+                <a href="{{ route('admin.absensi.export.index') }}" class="btn btn-primary">Export</a>
+                <a href="{{ route('admin.absensi.report.index') }}" class="btn btn-primary">Report</a>
             </div>
         </div>
     </x-slot>
@@ -153,4 +155,3 @@
         </div>
     </div>
 </x-app-layout>
-

@@ -19,6 +19,8 @@
                 <a href="<?php echo e(route('admin.absensi.logs')); ?>" class="btn btn-secondary">Logs</a>
                 <a href="<?php echo e(route('admin.absensi.devices.index')); ?>" class="btn btn-secondary">Devices</a>
                 <a href="<?php echo e(route('admin.absensi.mapping.index')); ?>" class="btn btn-secondary">Mapping</a>
+                <a href="<?php echo e(route('admin.absensi.export.index')); ?>" class="btn btn-primary">Export</a>
+                <a href="<?php echo e(route('admin.absensi.report.index')); ?>" class="btn btn-primary">Report</a>
             </div>
         </div>
      <?php $__env->endSlot(); ?>
@@ -173,5 +175,4 @@
 <?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
 <?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
 <?php endif; ?>
-
 <?php /**PATH E:\PROJEKU\telkom\resources\views/attendance/index.blade.php ENDPATH**/ ?>

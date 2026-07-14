@@ -207,6 +207,11 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::post('/export/summary', [App\Http\Controllers\AttendanceExportController::class, 'exportSummary'])->name('export.summary');
     Route::post('/export/user/{identity}', [App\Http\Controllers\AttendanceExportController::class, 'exportUserDetail'])->name('export.user');
 
+    // Export PDF
+    Route::post('/export/pdf/daily', [App\Http\Controllers\AttendanceExportController::class, 'exportDailyPdf'])->name('export.pdf.daily');
+    Route::post('/export/pdf/period', [App\Http\Controllers\AttendanceExportController::class, 'exportPeriodPdf'])->name('export.pdf.period');
+    Route::post('/export/pdf/summary', [App\Http\Controllers\AttendanceExportController::class, 'exportSummaryPdf'])->name('export.pdf.summary');
+
     // Report (NEW)
     Route::get('/report', [App\Http\Controllers\AttendanceReportController::class, 'index'])->name('report.index');
     Route::get('/report/daily', [App\Http\Controllers\AttendanceReportController::class, 'daily'])->name('report.daily');
