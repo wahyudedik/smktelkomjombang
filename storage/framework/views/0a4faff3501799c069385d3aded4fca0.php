@@ -11,7 +11,7 @@
                         </div>
                         <div class="choose-content-wrap">
                             <div class="row g-4">
-                                @php
+                                <?php
                                     $peminatan = theme_config('program_peminatan', [
                                         [
                                             'name' => 'IPA',
@@ -35,27 +35,27 @@
                                             'icon' => 'fas fa-book-quran',
                                         ],
                                     ]);
-                                @endphp
+                                ?>
 
-                                @foreach ($peminatan as $index => $item)
-                                    <div class="col-md-{{ $index == 2 ? '12' : '6' }}">
+                                <?php $__currentLoopData = $peminatan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="col-md-<?php echo e($index == 2 ? '12' : '6'); ?>">
                                         <div class="choose-item">
                                             <div class="choose-item-icon">
-                                                @if (!empty($item['icon_path']))
-                                                    <img src="{{ asset($item['icon_path']) }}" alt="">
-                                                @elseif (!empty($item['icon']))
-                                                    <i class="{{ $item['icon'] }}"></i>
-                                                @else
+                                                <?php if(!empty($item['icon_path'])): ?>
+                                                    <img src="<?php echo e(asset($item['icon_path'])); ?>" alt="">
+                                                <?php elseif(!empty($item['icon'])): ?>
+                                                    <i class="<?php echo e($item['icon']); ?>"></i>
+                                                <?php else: ?>
                                                     <i class="fas fa-star"></i>
-                                                @endif
+                                                <?php endif; ?>
                                             </div>
                                             <div class="choose-item-info">
-                                                <h4>{{ $item['full_name'] ?? $item['name'] }}</h4>
-                                                <p>{{ $item['desc'] }}</p>
+                                                <h4><?php echo e($item['full_name'] ?? $item['name']); ?></h4>
+                                                <p><?php echo e($item['desc']); ?></p>
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
             </div>
             <div class="col-lg-6">
                 <div class="choose-img wow fadeInRight" data-wow-delay=".25s">
-                    <img src="{{ asset('assets_maudu/assets/img/choose/01.jpg') }}" alt="Program Peminatan"
+                    <img src="<?php echo e(asset('assets_maudu/assets/img/choose/01.jpg')); ?>" alt="Program Peminatan"
                         class="img-fluid rounded">
                 </div>
             </div>
@@ -71,3 +71,4 @@
     </div>
 </div>
 <!-- Choose Area End -->
+<?php /**PATH E:\PROJEKU\telkom\resources\views/components/maudu/choose-area.blade.php ENDPATH**/ ?>

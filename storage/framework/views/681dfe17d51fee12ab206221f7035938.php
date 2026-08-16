@@ -1,5 +1,33 @@
 <!-- Testimonial Area -->
-@props(['testimonials' => []])
+<?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
+
+$__newAttributes = [];
+$__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames((['testimonials' => []]));
+
+foreach ($attributes->all() as $__key => $__value) {
+    if (in_array($__key, $__propNames)) {
+        $$__key = $$__key ?? $__value;
+    } else {
+        $__newAttributes[$__key] = $__value;
+    }
+}
+
+$attributes = new \Illuminate\View\ComponentAttributeBag($__newAttributes);
+
+unset($__propNames);
+unset($__newAttributes);
+
+foreach (array_filter((['testimonials' => []]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+}
+
+$__defined_vars = get_defined_vars();
+
+foreach ($attributes->all() as $__key => $__value) {
+    if (array_key_exists($__key, $__defined_vars)) unset($$__key);
+}
+
+unset($__defined_vars, $__key, $__value); ?>
 
 <div class="testimonial-area ts-bg pt-80 pb-80">
     <div class="container">
@@ -13,50 +41,50 @@
             </div>
         </div>
         <div class="testimonial-slider owl-carousel owl-theme">
-            @php
+            <?php
                 // Check if DB testimonials have meaningful content (non-empty testimonial text)
                 $hasValidTestimonials = $testimonials->isNotEmpty() && $testimonials->contains(function ($t) {
                     return !empty($t->testimonial) || !empty($t->content);
                 });
-            @endphp
-            @if ($hasValidTestimonials)
-                @foreach ($testimonials as $testimonial)
-                    @php
+            ?>
+            <?php if($hasValidTestimonials): ?>
+                <?php $__currentLoopData = $testimonials; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $testimonial): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $testimonialText = $testimonial->testimonial ?? $testimonial->content ?? '';
                         // Skip testimonials with empty content
                         if (empty(trim($testimonialText))) continue;
-                    @endphp
+                    ?>
                     <div class="testimonial-item">
                         <div class="testimonial-rate">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= ($testimonial->rating ?? 5))
+                            <?php for($i = 1; $i <= 5; $i++): ?>
+                                <?php if($i <= ($testimonial->rating ?? 5)): ?>
                                     <i class="fas fa-star"></i>
-                                @else
+                                <?php else: ?>
                                     <i class="far fa-star"></i>
-                                @endif
-                            @endfor
+                                <?php endif; ?>
+                            <?php endfor; ?>
                         </div>
                         <div class="testimonial-quote">
-                            <p>{{ $testimonialText }}</p>
+                            <p><?php echo e($testimonialText); ?></p>
                         </div>
                         <div class="testimonial-content">
                             <div class="testimonial-author-img">
-                                @if (!empty($testimonial->photo))
-                                    <img src="{{ Storage::url($testimonial->photo) }}" alt="{{ $testimonial->name }}">
-                                @else
-                                    <img src="{{ asset('assets_maudu/assets/img/testimonial/01.jpg') }}" alt="{{ $testimonial->name ?? 'Alumni' }}">
-                                @endif
+                                <?php if(!empty($testimonial->photo)): ?>
+                                    <img src="<?php echo e(Storage::url($testimonial->photo)); ?>" alt="<?php echo e($testimonial->name); ?>">
+                                <?php else: ?>
+                                    <img src="<?php echo e(asset('assets_maudu/assets/img/testimonial/01.jpg')); ?>" alt="<?php echo e($testimonial->name ?? 'Alumni'); ?>">
+                                <?php endif; ?>
                             </div>
                             <div class="testimonial-author-info">
-                                <h4>{{ $testimonial->name ?? 'Alumni' }}</h4>
-                                <p>{{ $testimonial->position ?? ($testimonial->occupation ?? 'Alumni ' . theme_config('short_name')) }}</p>
+                                <h4><?php echo e($testimonial->name ?? 'Alumni'); ?></h4>
+                                <p><?php echo e($testimonial->position ?? ($testimonial->occupation ?? 'Alumni ' . theme_config('short_name'))); ?></p>
                             </div>
                         </div>
                         <span class="testimonial-quote-icon"><i class="far fa-quote-right"></i></span>
                     </div>
-                @endforeach
-            @else
-                @php
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php else: ?>
+                <?php
                     $defaultTestimonials = [
                         [
                             'name' => 'Riza Azkia (2012)',
@@ -89,36 +117,36 @@
                             'photo' => 'assets_maudu/assets/img/testimonial/05.jpg',
                         ],
                     ];
-                @endphp
-                @foreach ($defaultTestimonials as $index => $item)
+                ?>
+                <?php $__currentLoopData = $defaultTestimonials; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="testimonial-item">
                         <div class="testimonial-rate">
-                            @for ($i = 1; $i <= 5; $i++)
+                            <?php for($i = 1; $i <= 5; $i++): ?>
                                 <i class="fas fa-star"></i>
-                            @endfor
+                            <?php endfor; ?>
                         </div>
                         <div class="testimonial-quote">
-                            <p>{{ $item['content'] }}</p>
+                            <p><?php echo e($item['content']); ?></p>
                         </div>
                         <div class="testimonial-content">
                             <div class="testimonial-author-img">
-                                <img src="{{ asset($item['photo']) }}" alt="{{ $item['name'] }}">
+                                <img src="<?php echo e(asset($item['photo'])); ?>" alt="<?php echo e($item['name']); ?>">
                             </div>
                             <div class="testimonial-author-info">
-                                <h4>{{ $item['name'] }}</h4>
-                                <p>{{ $item['position'] }}</p>
+                                <h4><?php echo e($item['name']); ?></h4>
+                                <p><?php echo e($item['position']); ?></p>
                             </div>
                         </div>
                         <span class="testimonial-quote-icon"><i class="far fa-quote-right"></i></span>
                     </div>
-                @endforeach
-            @endif
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 <!-- Testimonial Area End -->
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof $ === 'undefined') return;
@@ -144,4 +172,5 @@
             });
         });
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php /**PATH E:\PROJEKU\telkom\resources\views/components/maudu/testimonial.blade.php ENDPATH**/ ?>

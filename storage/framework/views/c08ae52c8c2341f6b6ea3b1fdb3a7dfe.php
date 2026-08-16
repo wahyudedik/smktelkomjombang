@@ -1,7 +1,7 @@
 <!-- Hero Section -->
 <div class="hero-section">
     <div class="hero-slider owl-carousel owl-theme">
-        @php
+        <?php
             $heroSlides = theme_config('hero_slides', []);
             $heroImages = theme_config('hero_images', []);
             $defaultImages = [
@@ -22,36 +22,40 @@
                 ['subtitle' => 'fadeInDown', 'title' => 'fadeInRight', 'desc' => 'fadeInLeft'],
                 ['subtitle' => 'fadeInDown', 'title' => 'fadeInRight', 'desc' => 'fadeInLeft'],
             ];
-        @endphp
+        ?>
 
-        @foreach ($slides as $index => $slide)
-            @php
+        <?php $__currentLoopData = $slides; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $slide): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
                 $image = $heroImages[$index] ?? ($defaultImages[$index] ?? $defaultImages[0]);
                 $anim = $animations[$index] ?? $animations[0];
                 $delay = 0.25;
-            @endphp
-            <div class="hero-single" style="background: url('{{ $image }}')">
+            ?>
+            <div class="hero-single" style="background: url('<?php echo e($image); ?>')">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-md-12 col-lg-7">
                             <div class="hero-content">
-                                <h6 class="hero-sub-title" data-animation="{{ $anim['subtitle'] }}" data-delay="{{ $delay }}s">
-                                    <i class="far fa-book-open-reader"></i>{{ $slide['subtitle'] ?? '' }}
+                                <h6 class="hero-sub-title" data-animation="<?php echo e($anim['subtitle']); ?>" data-delay="<?php echo e($delay); ?>s">
+                                    <i class="far fa-book-open-reader"></i><?php echo e($slide['subtitle'] ?? ''); ?>
+
                                 </h6>
-                                <h1 class="hero-title" data-animation="{{ $anim['title'] }}" data-delay="{{ $delay + 0.25 }}s">
-                                    {!! $slide['title'] ?? '' !!}
+                                <h1 class="hero-title" data-animation="<?php echo e($anim['title']); ?>" data-delay="<?php echo e($delay + 0.25); ?>s">
+                                    <?php echo $slide['title'] ?? ''; ?>
+
                                 </h1>
-                                @if(!empty($slide['description']))
-                                    <p data-animation="{{ $anim['desc'] }}" data-delay="{{ $delay + 0.50 }}s">
-                                        {{ $slide['description'] }}
+                                <?php if(!empty($slide['description'])): ?>
+                                    <p data-animation="<?php echo e($anim['desc']); ?>" data-delay="<?php echo e($delay + 0.50); ?>s">
+                                        <?php echo e($slide['description']); ?>
+
                                     </p>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 </div>
 <!-- Hero Section End -->
+<?php /**PATH E:\PROJEKU\telkom\resources\views/components/maudu/hero-slider.blade.php ENDPATH**/ ?>

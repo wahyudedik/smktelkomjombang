@@ -3,7 +3,7 @@
     <div class="col-xl-9 ms-auto">
         <div class="feature-wrapper">
             <div class="row g-4">
-                @php
+                <?php
                     $features = theme_config('features', [
                         [
                             'title' => 'E-LIBRARY',
@@ -24,30 +24,31 @@
                             'icon' => 'fas fa-pen-fancy',
                         ],
                     ]);
-                @endphp
+                ?>
 
-                @foreach ($features as $index => $feature)
+                <?php $__currentLoopData = $features; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $feature): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="col-md-6 col-lg-3">
                         <div class="feature-item">
-                            <span class="count">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                            <span class="count"><?php echo e(str_pad($index + 1, 2, '0', STR_PAD_LEFT)); ?></span>
                             <div class="feature-icon">
-                                @if (!empty($feature['icon_path']))
-                                    <img src="{{ asset($feature['icon_path']) }}" alt="">
-                                @elseif (!empty($feature['icon']))
-                                    <i class="{{ $feature['icon'] }}"></i>
-                                @else
+                                <?php if(!empty($feature['icon_path'])): ?>
+                                    <img src="<?php echo e(asset($feature['icon_path'])); ?>" alt="">
+                                <?php elseif(!empty($feature['icon'])): ?>
+                                    <i class="<?php echo e($feature['icon']); ?>"></i>
+                                <?php else: ?>
                                     <i class="fas fa-star"></i>
-                                @endif
+                                <?php endif; ?>
                             </div>
                             <div class="feature-content">
-                                <h4 class="feature-title">{{ $feature['title'] }}</h4>
-                                <p class="feature-text">{{ $feature['desc'] }}</p>
+                                <h4 class="feature-title"><?php echo e($feature['title']); ?></h4>
+                                <p class="feature-text"><?php echo e($feature['desc']); ?></p>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
     </div>
 </div>
 <!-- Feature Area End -->
+<?php /**PATH E:\PROJEKU\telkom\resources\views/components/maudu/feature-area.blade.php ENDPATH**/ ?>

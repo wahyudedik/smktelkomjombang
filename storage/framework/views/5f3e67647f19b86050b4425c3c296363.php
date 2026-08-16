@@ -7,17 +7,17 @@
                     <div class="about-img">
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <img class="img-1" src="{{ asset('assets_maudu/assets/img/about/01.jpg') }}" alt="Gallery">
+                                <img class="img-1" src="<?php echo e(asset('assets_maudu/assets/img/about/01.jpg')); ?>" alt="Gallery">
                                 <div class="about-experience mt-4">
                                     <div class="about-experience-icon">
-                                        <img src="{{ asset('assets_maudu/assets/img/icon/monitor.svg') }}" alt="">
+                                        <img src="<?php echo e(asset('assets_maudu/assets/img/icon/monitor.svg')); ?>" alt="">
                                     </div>
-                                    <b class="text-start">Gallery Kegiatan<br> {{ theme_config('short_name', 'MAUDU') }} Rejoso</b>
+                                    <b class="text-start">Gallery Kegiatan<br> <?php echo e(theme_config('short_name', 'MAUDU')); ?> Rejoso</b>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <img class="img-2" src="{{ asset('assets_maudu/assets/img/about/02.jpg') }}" alt="Gallery">
-                                <img class="img-3 mt-4" src="{{ asset('assets_maudu/assets/img/about/03.jpg') }}" alt="Gallery">
+                                <img class="img-2" src="<?php echo e(asset('assets_maudu/assets/img/about/02.jpg')); ?>" alt="Gallery">
+                                <img class="img-3 mt-4" src="<?php echo e(asset('assets_maudu/assets/img/about/03.jpg')); ?>" alt="Gallery">
                             </div>
                         </div>
                     </div>
@@ -28,12 +28,12 @@
                     <div class="site-heading mb-3">
                         <span class="site-title-tagline"><i class="far fa-book-open-reader"></i> INFORMASI</span>
                         <h2 class="site-title">
-                            Unggulan <span>{{ theme_config('short_name', 'MAUDU') }}</span> Rejoso
+                            Unggulan <span><?php echo e(theme_config('short_name', 'MAUDU')); ?></span> Rejoso
                         </h2>
                     </div>
                     <div class="about-content">
                         <div class="row">
-                            @php
+                            <?php
                                 $programs = theme_config('program_unggulan', [
                                     [
                                         'title' => 'KURIKULUM MADRASAH',
@@ -60,35 +60,35 @@
                                         'icon' => 'fas fa-hands-helping',
                                     ],
                                 ]);
-                            @endphp
+                            ?>
 
-                            @foreach ($programs as $index => $program)
-                                @if ($index % 2 == 0)
+                            <?php $__currentLoopData = $programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if($index % 2 == 0): ?>
                                     <div class="col-md-6">
-                                @endif
+                                <?php endif; ?>
                                 <div class="about-item">
                                     <div class="about-item-icon">
-                                        @if (!empty($program['icon_path']))
-                                            <img src="{{ asset($program['icon_path']) }}" alt="">
-                                        @elseif (!empty($program['icon']))
-                                            <i class="{{ $program['icon'] }}"></i>
-                                        @else
+                                        <?php if(!empty($program['icon_path'])): ?>
+                                            <img src="<?php echo e(asset($program['icon_path'])); ?>" alt="">
+                                        <?php elseif(!empty($program['icon'])): ?>
+                                            <i class="<?php echo e($program['icon']); ?>"></i>
+                                        <?php else: ?>
                                             <i class="fas fa-star"></i>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
                                     <div class="about-item-content">
-                                        <h5>{{ $program['title'] }}</h5>
-                                        <p>{{ $program['desc'] }}</p>
+                                        <h5><?php echo e($program['title']); ?></h5>
+                                        <p><?php echo e($program['desc']); ?></p>
                                     </div>
                                 </div>
-                                @if ($index % 2 == 1 || $index == count($programs) - 1)
+                                <?php if($index % 2 == 1 || $index == count($programs) - 1): ?>
                             </div>
-                            @endif
-                            @endforeach
+                            <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                     <div class="about-bottom">
-                        <a href="{{ theme_config('ppdb_url', '#') }}" target="_blank" class="theme-btn">
+                        <a href="<?php echo e(theme_config('ppdb_url', '#')); ?>" target="_blank" class="theme-btn">
                             PPDB ONLINE<i class="fas fa-arrow-right-long"></i>
                         </a>
                         <div class="about-phone">
@@ -96,8 +96,9 @@
                             <div class="number">
                                 <span>WA KAMI</span>
                                 <h6>
-                                    <a href="https://wa.me/{{ theme_config('whatsapp', '628113383722') }}" target="_blank">
-                                        {{ theme_config('phone') }}
+                                    <a href="https://wa.me/<?php echo e(theme_config('whatsapp', '628113383722')); ?>" target="_blank">
+                                        <?php echo e(theme_config('phone')); ?>
+
                                     </a>
                                 </h6>
                             </div>
@@ -109,3 +110,4 @@
     </div>
 </div>
 <!-- About Area End -->
+<?php /**PATH E:\PROJEKU\telkom\resources\views/components/maudu/about-area.blade.php ENDPATH**/ ?>

@@ -37,6 +37,8 @@ return [
     'assets_path' => 'assets_maudu',
     'favicon' => 'assets_maudu/assets/img/logo/favicon.png',
     'logo' => 'assets_maudu/assets/img/logo/logo.png',
+    'logo_icon' => 'assets_maudu/assets/img/logo/favicon.png',
+    'logo_text' => 'assets_maudu/assets/img/logo/logo nama.png',
     'logo_light' => 'assets_maudu/assets/img/logo/logo-light.png',
 
     // Hero Slider (paths only — resolve with asset() in views/helpers)
@@ -46,24 +48,46 @@ return [
         'assets_maudu/assets/img/slider/slider-3.jpg',
     ],
 
-    // Program Peminatan (khusus MA)
+    // Hero Slide Text (content per slide — from template default)
+    'hero_slides' => [
+        [
+            'subtitle' => 'Welcome To MAUDU Library',
+            'title' => 'Grand Opening <span>MAUDU</span> Library',
+            'description' => 'Acara Grandopening Dihadiri oleh Majelis Pimpinan Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang',
+        ],
+        [
+            'subtitle' => 'Studi Edukasi Sosial',
+            'title' => 'Gedung <span>DPRD</span> Kabupaten Jombang',
+            'description' => '',
+        ],
+        [
+            'subtitle' => 'Event KOMPASS',
+            'title' => 'Kompetisi Agama, <span>Sains,</span> dan Seni 2024',
+            'description' => '',
+        ],
+    ],
+
+    // Program Peminatan (khusus MA) — full descriptions from template
     'program_peminatan' => [
         [
             'name' => 'IPA',
-            'full_name' => 'Peminatan Ilmu Pengetahuan Alam',
-            'desc' => 'Program peminatan sains dan teknologi.',
+            'full_name' => 'PEMINATAN ILMU PENGETAHUAN ALAM (IPA)',
+            'desc' => 'Menyiapkan peserta didik yang handal dalam kajian ilmiah dan alamiah dengan berlandaskan kepada ayat-ayat qauliyah dan kauniyah.',
+            'icon_path' => 'assets_maudu/assets/img/icon/course.svg',
             'icon' => 'fas fa-flask',
         ],
         [
             'name' => 'IPS',
-            'full_name' => 'Peminatan Ilmu Pengetahuan Sosial',
-            'desc' => 'Program peminatan sosial dan humaniora.',
+            'full_name' => 'PEMINATAN ILMU PENGETAHUAN SOSIAL (IPS)',
+            'desc' => 'Menyiapkan peserta didik yang dapat menguasai ilmu-ilmu sosial secara terpadu antara keislaman dan pengetahuan sehingga menjadi insan yang sosialis-agamis.',
+            'icon_path' => 'assets_maudu/assets/img/icon/course.svg',
             'icon' => 'fas fa-globe',
         ],
         [
             'name' => 'Keagamaan',
-            'full_name' => 'Peminatan Keagamaan',
-            'desc' => 'Program peminatan keislaman dan tahfidz.',
+            'full_name' => 'PEMINATAN KEAGAMAAN',
+            'desc' => 'Menyiapkan peserta didik yang lebih mampu menguasai ilmu-ilmu agama dengan mengkaji sumber aslinya serta mengkolaborasikan dengan perkembangan IPTEK.',
+            'icon_path' => 'assets_maudu/assets/img/icon/course.svg',
             'icon' => 'fas fa-book-quran',
         ],
     ],
@@ -71,59 +95,67 @@ return [
     // Jurusan — alias to program_peminatan for cross-theme component compatibility.
     // Resolved automatically by ThemeHelper; do not duplicate data here.
 
-    // Fitur Unggulan MAUDU
+    // Fitur Unggulan MAUDU — descriptions from template
     'features' => [
         [
             'title' => 'E-LIBRARY',
-            'desc' => 'Perpustakaan digital berisi koleksi materi dalam format elektronik.',
+            'desc' => 'Perpustakaan digital berisi Koleksi materi dalam format elektronik',
+            'icon_path' => 'assets_maudu/assets/img/icon/library.svg',
             'icon' => 'fas fa-book-open',
         ],
         [
             'title' => 'SERTIFIKASI KOMPETENSI',
-            'desc' => 'Uji kompetensi yang sistematis dan objektif.',
+            'desc' => 'Uji kompetensi yang sistematis dan objektif',
+            'icon_path' => 'assets_maudu/assets/img/icon/teacher-2.svg',
             'icon' => 'fas fa-certificate',
         ],
         [
             'title' => 'KARYA LITERASI',
             'desc' => 'Penelitian di Bidang Keislaman, Sains, Teknologi, dan Sosial.',
+            'icon_path' => 'assets_maudu/assets/img/icon/course.svg',
             'icon' => 'fas fa-pen-fancy',
         ],
     ],
 
-    // Program Unggulan
+    // Program Unggulan — full descriptions from template
     'program_unggulan' => [
         [
             'title' => 'KURIKULUM MADRASAH',
-            'desc' => 'Kolaborasi kurikulum Kepesantrenan, Kemendikbud, Kemenag.',
+            'desc' => 'Kolaborasi antara kurikulum Kepesantrenan, Kemendikbud, Kemenag dan Kurikulum Muatan Lokal Madrasah',
+            'icon_path' => 'assets_maudu/assets/img/icon/information.svg',
             'icon' => 'fas fa-graduation-cap',
         ],
         [
             'title' => 'PROGRAM STUDI KE TIMUR TENGAH',
-            'desc' => 'Pembinaan Intensif dan Mediator Pemberangkatan.',
+            'desc' => 'Pembinaan Intensif dan Mediator Pemberangkatan',
+            'icon_path' => 'assets_maudu/assets/img/icon/global-education.svg',
             'icon' => 'fas fa-plane-departure',
         ],
         [
             'title' => 'KELAS TAHFIDZ, MUATAN LOKAL KITAB TURATS',
-            'desc' => 'Program Tahfidz serta Pembiasaan Siswa.',
+            'desc' => 'Kelas Tahfidz, Program Tahfidz serta Program Pembiasaan Siswa',
+            'icon_path' => 'assets_maudu/assets/img/icon/open-book.svg',
             'icon' => 'fas fa-book-quran',
         ],
         [
             'title' => 'PROGRAM KEMASYARAKATAN',
-            'desc' => 'Kafilah Sholat Jum\'at, TPQ, Bakti Sosial.',
+            'desc' => 'Kafilah Sholat Jum\'at, Sholat Tarawih, TPQ, Bakti Sosial dan Pengabdian Masyarakat',
+            'icon_path' => 'assets_maudu/assets/img/icon/location.svg',
             'icon' => 'fas fa-hands-helping',
         ],
     ],
 
     // Kepala Madrasah
     'kepala_sekolah' => [
-        'name' => '',
+        'name' => 'Khoiruddinul Qoyyum,S.S.,M.Pd',
         'photo' => '',
-        'description' => '',
+        'description' => 'Selamat datang di Website Resmi Madrasah Aliyah Unggulan Darul \'Ulum Rejoso. Dengan rahmat Allah SWT, website ini menjadi media informasi, silaturahmi, dan komunikasi bagi siswa, alumni, orang tua, serta masyarakat. Kami menyajikan profil madrasah, kegiatan, prestasi, dan berbagai layanan pendidikan.',
+        'description_2' => 'Semoga kehadiran website ini memberikan manfaat, mempererat kebersamaan, serta mendukung terwujudnya pendidikan yang unggul, berkarakter, dan berorientasi pada masa depan. Kritik dan saran sangat kami harapkan demi kemajuan bersama.',
     ],
 
     // Video
     'video_url' => 'https://www.youtube.com/watch?v=ckHzmP1evNU',
-    'video_thumbnail' => '',
+    'video_thumbnail' => 'assets_maudu/assets/img/video/01.jpg',
 
     // CTA
     'cta_title' => 'Pendaftaran Peserta Didik Baru',

@@ -16,7 +16,7 @@
 
     <!-- favicon -->
     <link rel="icon" type="image/x-icon"
-        href="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_maudu/assets/images/fav.png')) }}">
+        href="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_maudu/assets/img/logo/favicon.png')) }}">
 
     <!-- Critical CSS (render-blocking) -->
     <link rel="stylesheet" href="{{ asset('assets_maudu/assets/css/bootstrap.min.css') }}">
@@ -96,7 +96,7 @@
 
     <!-- Search Popup -->
     <div class="search-popup">
-        <button class="close-search"><i class="fas fa-times"></i></button>
+        <button class="close-search"><span class="far fa-times"></span></button>
         <form action="#">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="Cari...">
