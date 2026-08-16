@@ -126,7 +126,7 @@ fi
 case "$THEME" in
     telkom)
         APP_NAME="SMK Telekomunikasi Darul Ulum"
-        APP_URL="https://smktelkom.sch.id"
+        APP_URL="https://smktelekomunikasidu.sch.id"
         DB_NAME="telkom_db"
         ;;
     maudu)
