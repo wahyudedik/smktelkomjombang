@@ -27,19 +27,19 @@
                 <div class="row rs-counter couter-area mb-40">
                     <div class="col-md-4">
                         <div class="counter-item one">
-                            <h2 class="number">{{ $siteSettings['counter1_number'] ?? ($siswaCount > 0 ? $siswaCount . '+' : '400+') }}</h2>
+                            <h2 class="number rs-count kplus">{{ $siteSettings['counter1_number'] ?? ($siswaCount > 0 ? $siswaCount : '400') }}</h2>
                             <h4 class="title mb-0">{{ $siteSettings['counter1_label'] ?? 'Siswa' }}</h4>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="counter-item two">
-                            <h2 class="number">{{ $siteSettings['counter2_number'] ?? '4' }}</h2>
+                            <h2 class="number rs-count">{{ $siteSettings['counter2_number'] ?? '4' }}</h2>
                             <h4 class="title mb-0">{{ $siteSettings['counter2_label'] ?? 'Jurusan' }}</h4>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="counter-item three">
-                            <h2 class="number">{{ $siteSettings['counter3_number'] ?? ($kelulusanPercentage > 0 ? $kelulusanPercentage : '90') }}{{ $siteSettings['counter3_label'] == 'Lanjut Kuliah' ? '%' : '' }}</h2>
+                            <h2 class="number rs-count percent">{{ $siteSettings['counter3_number'] ?? ($kelulusanPercentage > 0 ? $kelulusanPercentage : '75') }}</h2>
                             <h4 class="title mb-0">{{ $siteSettings['counter3_label'] ?? 'Lanjut Kuliah' }}</h4>
                         </div>
                     </div>

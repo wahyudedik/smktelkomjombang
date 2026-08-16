@@ -1,3 +1,5 @@
+<!-- Section Gray bg Wrap start -->
+<div class="gray-bg">
 <!-- Blog Section Start -->
 <div id="rs-blog" class="rs-blog style2 pt-94 pb-100 md-pt-64 md-pb-70">
     <div class="container">
@@ -93,3 +95,6 @@
     </div>
 </div>
 <!-- Blog Section End -->
+
+</div>
+<!-- Section bg Wrap 2 End -->

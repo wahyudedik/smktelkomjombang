@@ -126,6 +126,43 @@
                         alt="{{ theme_info('name', 'Logo') }}" style="max-height: 60px;">
                 </a>
             </div>
+            <ul class="canvas-social">
+                @if (theme_config('facebook_url'))
+                    <li><a href="{{ theme_config('facebook_url') }}" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+                @endif
+                @if (theme_config('instagram_url'))
+                    <li><a href="{{ theme_config('instagram_url') }}" target="_blank" rel="noopener"><i class="fa fa-instagram"></i></a></li>
+                @endif
+                @if (theme_config('youtube_url'))
+                    <li><a href="{{ theme_config('youtube_url') }}" target="_blank" rel="noopener"><i class="fa fa-youtube"></i></a></li>
+                @endif
+            </ul>
+            <div class="address-widget">
+                <ul>
+                    @if (!empty($siteSettings['contact_address']) || true)
+                        <li>
+                            <i class="flaticon-location"></i>
+                            <div class="desc">{{ $siteSettings['contact_address'] ?? 'Ponpes Darul Ulum, Jl. Wahid Hasyim No.128, Kedunglosari, Kedungrejo, Kec. Bandar Kedungmulyo, Kabupaten Jombang, Jawa Timur' }}</div>
+                        </li>
+                    @endif
+                    @if (!empty($siteSettings['contact_phone']) || true)
+                        <li>
+                            <i class="flaticon-call"></i>
+                            <div class="desc">
+                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $siteSettings['contact_phone'] ?? '085649400339') }}">{{ $siteSettings['contact_phone'] ?? '085649400339' }}</a>
+                            </div>
+                        </li>
+                    @endif
+                    @if (!empty($siteSettings['contact_email']) || true)
+                        <li>
+                            <i class="flaticon-email"></i>
+                            <div class="desc">
+                                <a href="mailto:{{ $siteSettings['contact_email'] ?? 'smktelkomdujbg@gmail.com' }}">{{ $siteSettings['contact_email'] ?? 'smktelkomdujbg@gmail.com' }}</a>
+                            </div>
+                        </li>
+                    @endif
+                </ul>
+            </div>
         </nav>
         <!-- Canvas Menu end -->
     </header>

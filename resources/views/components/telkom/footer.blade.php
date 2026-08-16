@@ -15,15 +15,15 @@
                 <div class="col-lg-4 col-md-6 col-sm-6 footer-widget mb-4">
                     <h4 class="widget-title">Link Terkait</h4>
                     <ul class="site-map">
-                        <li><a href="{{ route('berita.public.index') }}">Berita Terbaru</a></li>
-                        <li><a href="{{ route('public.kegiatan') }}">Kegiatan Sekolah</a></li>
-                        <li><a href="{{ route('public.graduation.check') }}">Cek Kelulusan</a></li>
-                        <li><a href="{{ route('pages.public.index') }}">Semua Halaman</a></li>
+                        <li><a href="#">E-Rapor</a></li>
+                        <li><a href="#">E-Osis</a></li>
+                        <li><a href="#">E-Learning</a></li>
+                        <li><a href="#">E-Perpus</a></li>
                     </ul>
                 </div>
 
                 <div class="col-lg-4 col-md-6 col-sm-12 footer-widget mb-4">
-                    <h4 class="widget-title">Kontak</h4>
+                    <h4 class="widget-title">Address</h4>
                     <ul class="address-widget">
                         <li>
                             <i class="flaticon-location"></i>
@@ -61,7 +61,7 @@
                 <div class="col-lg-4 col-md-4 col-sm-12 mb-3 mb-md-0">
                     <div class="footer-logo text-center text-md-start">
                         <a href="{{ route('landing') }}">
-                            <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}"
+                            <img src="{{ theme_image('logo_light', theme_info('defaults.logo_light', 'assets_telkom/assets/images/logo.png')) }}"
                                 alt="{{ theme_info('name', 'Logo') }}" style="max-height: 50px;">
                         </a>
                     </div>

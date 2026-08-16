@@ -94,29 +94,64 @@
     <!-- Telkom Footer -->
     <x-telkom.footer />
 
-    <!-- scroll-top -->
-    <a href="#" id="scroll-top"><i class="fa fa-arrow-up"></i></a>
-    <!-- scroll-top end -->
+    <!-- start scrollUp  -->
+    <div id="scrollUp"><i class="fa fa-angle-up"></i></div>
+    <!-- End scrollUp  -->
 
-    <!-- Scripts (defer for non-blocking page rendering) -->
-    <script src="{{ asset('assets_telkom/assets/js/modernizr-2.8.3.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/jquery.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/bootstrap.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/rsmenu-main.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/jquery.nav.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/owl.carousel.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/slick.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/isotope.pkgd.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/imagesloaded.pkgd.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/wow.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/skill.bars.jquery.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/jquery.counterup.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/waypoints.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/jquery.mb.YTPlayer.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/jquery.magnific-popup.min.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/plugins.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/contact.form.js') }}" defer></script>
-    <script src="{{ asset('assets_telkom/assets/js/main.js') }}" defer></script>
+    <!-- Search Modal Start -->
+    <div class="modal fade search-modal" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+        <button type="button" class="close" data-bs-dismiss="modal">
+            <span class="flaticon-cross"></span>
+        </button>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="search-block clearfix">
+                    <form>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Search Here..." type="text">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Search Modal End -->
+
+    <!-- modernizr js -->
+    <script src="{{ asset('assets_telkom/assets/js/modernizr-2.8.3.min.js') }}"></script>
+    <!-- jquery latest version -->
+    <script src="{{ asset('assets_telkom/assets/js/jquery.min.js') }}"></script>
+    <!-- Bootstrap v5.0.2 js -->
+    <script src="{{ asset('assets_telkom/assets/js/bootstrap.min.js') }}"></script>
+    <!-- Menu js -->
+    <script src="{{ asset('assets_telkom/assets/js/rsmenu-main.js') }}"></script>
+    <!-- op nav js -->
+    <script src="{{ asset('assets_telkom/assets/js/jquery.nav.js') }}"></script>
+    <!-- owl.carousel js -->
+    <script src="{{ asset('assets_telkom/assets/js/owl.carousel.min.js') }}"></script>
+    <!-- Slick js -->
+    <script src="{{ asset('assets_telkom/assets/js/slick.min.js') }}"></script>
+    <!-- isotope.pkgd.min js -->
+    <script src="{{ asset('assets_telkom/assets/js/isotope.pkgd.min.js') }}"></script>
+    <!-- imagesloaded.pkgd.min js -->
+    <script src="{{ asset('assets_telkom/assets/js/imagesloaded.pkgd.min.js') }}"></script>
+    <!-- wow js -->
+    <script src="{{ asset('assets_telkom/assets/js/wow.min.js') }}"></script>
+    <!-- Skill bar js -->
+    <script src="{{ asset('assets_telkom/assets/js/skill.bars.jquery.js') }}"></script>
+    <script src="{{ asset('assets_telkom/assets/js/jquery.counterup.min.js') }}"></script>
+    <!-- counter top js -->
+    <script src="{{ asset('assets_telkom/assets/js/waypoints.min.js') }}"></script>
+    <!-- video js -->
+    <script src="{{ asset('assets_telkom/assets/js/jquery.mb.YTPlayer.min.js') }}"></script>
+    <!-- magnific popup js -->
+    <script src="{{ asset('assets_telkom/assets/js/jquery.magnific-popup.min.js') }}"></script>
+    <!-- plugins js -->
+    <script src="{{ asset('assets_telkom/assets/js/plugins.js') }}"></script>
+    <!-- contact form js -->
+    <script src="{{ asset('assets_telkom/assets/js/contact.form.js') }}"></script>
+    <!-- main js -->
+    <script src="{{ asset('assets_telkom/assets/js/main.js') }}"></script>
 
     <!-- Custom Scripts -->
     <script>

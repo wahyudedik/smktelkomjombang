@@ -18,8 +18,8 @@ class UserSeeder extends Seeder
         // Create Superadmin User (Only one superadmin)
         $superadmin = User::create([
             'name' => 'Super Administrator',
-            'email' => 'superadmin@sekolah.com',
-            'password' => Hash::make('password'), 
+            'email' => 'superadmin@sekolah.com', 
+            'password' => Hash::make('password'),
             'email_verified_at' => now(),
             'is_verified_by_admin' => true,
         ]);

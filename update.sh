@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # =============================================================================
-# Update Script - Laravel SMK Telekomunikasi
+# Update Script — Laravel SMK Telekomunikasi / MAUDU
 # =============================================================================
 # Gunakan script ini untuk update incrementally di VPS (production)
-# Usage: bash update.sh
+#
+# Usage:
+#   bash update.sh --theme telkom       # Update tema Telkom
+#   bash update.sh --theme maudu        # Update tema MAUDU
+#   bash update.sh                      # Auto-detect dari .env (fallback: telkom)
 #
 # Script ini untuk UPDATE yang sudah berjalan di production.
 # Gunakan deploy.sh untuk setup awal pertama kali.
@@ -30,6 +34,7 @@ git config core.fileMode true 2>/dev/null || true
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Fungsi helper
@@ -46,6 +51,40 @@ error() {
     exit 1
 }
 
+theme_info() {
+    echo -e "${CYAN}[THEME]${NC} $1"
+}
+
+# =============================================================================
+# Parsing Arguments
+# =============================================================================
+THEME=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --theme)
+            THEME="$2"
+            shift 2
+            ;;
+        --help|-h)
+            echo "Usage: bash update.sh [--theme telkom|maudu]"
+            echo ""
+            echo "Options:"
+            echo "  --theme <nama>    Update untuk tema tertentu (telkom atau maudu)"
+            echo "  --help, -h        Tampilkan bantuan"
+            echo ""
+            echo "Examples:"
+            echo "  bash update.sh --theme telkom"
+            echo "  bash update.sh --theme maudu"
+            echo "  bash update.sh"
+            exit 0
+            ;;
+        *)
+            error "Parameter tidak dikenal: $1. Gunakan --help untuk bantuan."
+            ;;
+    esac
+done
+
 # =============================================================================
 # Konfigurasi - Sesuaikan dengan VPS kamu
 # =============================================================================
@@ -59,17 +98,57 @@ GIT_BRANCH="main"
 export COMPOSER_ALLOW_SUPERUSER=1
 
 # =============================================================================
+# Auto-detect Theme dari .env jika tidak dispesifikasikan
+# =============================================================================
+cd "$APP_DIR" || error "Gagal masuk ke direktori aplikasi: $APP_DIR"
+
+if [ -z "$THEME" ]; then
+    if [ -f "$APP_DIR/.env" ]; then
+        THEME=$(grep DEFAULT_THEME "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'" | tr -d ' ')
+        if [ -n "$THEME" ]; then
+            info "Theme auto-detected dari .env: $THEME"
+        fi
+    fi
+    if [ -z "$THEME" ]; then
+        THEME="telkom"
+        warn "Theme tidak ditemukan di .env. Menggunakan default: $THEME"
+    fi
+fi
+
+# Validasi theme
+if [[ "$THEME" != "telkom" && "$THEME" != "maudu" ]]; then
+    error "Theme '$THEME' tidak valid. Pilihan: telkom atau maudu"
+fi
+
+# =============================================================================
+# Konfigurasi Theme-Specific
+# =============================================================================
+case "$THEME" in
+    telkom)
+        APP_NAME="SMK Telekomunikasi Darul Ulum"
+        APP_URL="https://smktelkom.sch.id"
+        DB_NAME="telkom_db"
+        ;;
+    maudu)
+        APP_NAME="Maudu Rejoso"
+        APP_URL="https://maudu-rejoso.sch.id"
+        DB_NAME="sekolah"
+        ;;
+esac
+
+# =============================================================================
 # Mulai Update
 # =============================================================================
 echo ""
 echo "============================================="
-echo "  🔄 Update Laravel SMK Telekomunikasi"
+echo -e "  🔄 Update Laravel — ${CYAN}$THEME${NC}"
 echo "============================================="
 echo ""
-
-cd "$APP_DIR" || error "Gagal masuk ke direktori aplikasi: $APP_DIR"
-info "Direktori: $APP_DIR"
-info "Branch: $GIT_BRANCH"
+theme_info "Nama Aplikasi : $APP_NAME"
+theme_info "Domain         : $APP_URL"
+theme_info "Database       : $DB_NAME"
+theme_info "Direktori      : $APP_DIR"
+theme_info "Branch         : $GIT_BRANCH"
 echo ""
 
 # 1. Aktifkan Maintenance Mode
@@ -80,16 +159,16 @@ $PHP_BIN artisan down --refresh=15 --retry=60 || true
 info "Membuat backup database..."
 BACKUP_DIR="$APP_DIR/storage/backups"
 mkdir -p "$BACKUP_DIR"
-BACKUP_FILE="$BACKUP_DIR/db_backup_$(date +%Y%m%d_%H%M%S).sql"
+BACKUP_FILE="$BACKUP_DIR/db_backup_${THEME}_$(date +%Y%m%d_%H%M%S).sql"
 if command -v mysqldump &>/dev/null; then
-    DB_NAME=$(grep DB_DATABASE "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
+    DB_NAME_CHECK=$(grep DB_DATABASE "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
     DB_USER=$(grep DB_USERNAME "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
     DB_PASS=$(grep DB_PASSWORD "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
-    if [ -n "$DB_NAME" ]; then
+    if [ -n "$DB_NAME_CHECK" ]; then
         if [ -n "$DB_PASS" ]; then
-            mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null || warn "Gagal backup database. Melanjutkan..."
+            mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_NAME_CHECK" > "$BACKUP_FILE" 2>/dev/null || warn "Gagal backup database. Melanjutkan..."
         else
-            mysqldump -u "$DB_USER" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null || warn "Gagal backup database. Melanjutkan..."
+            mysqldump -u "$DB_USER" "$DB_NAME_CHECK" > "$BACKUP_FILE" 2>/dev/null || warn "Gagal backup database. Melanjutkan..."
         fi
         if [ -f "$BACKUP_FILE" ]; then
             info "Backup database tersimpan: $BACKUP_FILE"
@@ -102,7 +181,7 @@ fi
 # 3. Reset local changes & pull perubahan terbaru dari Git
 info "Mereset perubahan lokal..."
 git checkout -- .
-git clean -fd -e public/.user.ini -e public/.well-known -e .env -e .env.production
+git clean -fd -e public/.user.ini -e public/.well-known -e .env -e .env.production -e .env.production.maudu -e .env.production.telkom
 
 info "Pulling perubahan terbaru dari git..."
 git pull origin "$GIT_BRANCH" || error "Gagal pull dari git"
@@ -145,7 +224,7 @@ $PHP_BIN artisan migrate --force
 info "Sync permissions Spatie..."
 $PHP_BIN artisan db:seed --class=RolePermissionSeeder 2>/dev/null || true
 
-# 8. Clear cache lama
+# 8. Clear cache lama (individual commands — hindari optimize:clear mbstring error)
 info "Membersihkan cache lama..."
 $PHP_BIN artisan cache:clear
 $PHP_BIN artisan config:clear
@@ -222,16 +301,20 @@ $PHP_BIN artisan up
 # =============================================================================
 echo ""
 echo "============================================="
-echo -e "  ${GREEN}✅ Update selesai!${NC}"
+echo -e "  ${GREEN}✅ Update $THEME selesai!${NC}"
 echo "============================================="
 echo ""
+theme_info "Website    : $APP_URL"
+theme_info "Theme      : $THEME"
+theme_info "Database   : $DB_NAME"
+echo ""
 info "Jangan lupa cek:"
-echo "  - Website bisa diakses"
+echo "  - Website bisa diakses: $APP_URL"
 echo "  - Queue worker berjalan (supervisord)"
 echo "  - Log error: storage/logs/laravel.log"
 echo "  - Backup database: storage/backups/"
 echo ""
 info "Rollback jika ada masalah:"
-echo "  - Database: mysql -u user -p telkom_db < storage/backups/db_backup_YYYYMMDD_HHMMSS.sql"
+echo "  - Database: mysql -u user -p $DB_NAME < storage/backups/db_backup_${THEME}_YYYYMMDD_HHMMSS.sql"
 echo "  - Code: git checkout <previous-commit>"
 echo ""
