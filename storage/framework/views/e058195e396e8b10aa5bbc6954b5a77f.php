@@ -11,9 +11,12 @@
                         Assurance dan Maintenance</div>
                     <div class="btn-part">
                         <a class="readon2 mod">Profil Alumni</a>
+                        <?php if(!empty($siteSettings['show_testimonial_form'])): ?>
                         <a class="readon2" href="<?php echo e(route('testimonials.create')); ?>" style="margin-left: 10px;">
-                            <i class="fa fa-paper-plane"></i> Kirim Testimoni
+                            <i class="fa fa-paper-plane"></i> <?php echo e($siteSettings['testimonial_form_text'] ?? 'Kirim Testimoni'); ?>
+
                         </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

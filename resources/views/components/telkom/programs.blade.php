@@ -4,8 +4,8 @@
         <div class="row y-middle">
             <div class="col-lg-4 col-md-6 mb-30">
                 <div class="sec-title wow fadeInUp" data-wow-delay="300ms" data-wow-duration="2000ms">
-                    <div class="sub-title primary">{{ $siteSettings['program_section_subtitle'] ?? 'Kerjasama Industri' }}</div>
-                    <h2 class="title mb-0">{{ $siteSettings['program_section_title'] ?? 'Kurikulum dan Pengajar' }}</h2>
+                    <div class="sub-title primary">{{ $siteSettings['program_section_subtitle'] ?: 'Kerjasama Industri' }}</div>
+                    <h2 class="title mb-0">{{ $siteSettings['program_section_title'] ?: 'Kurikulum dan Pengajar' }}</h2>
                 </div>
             </div>
             @forelse($partners as $partner)

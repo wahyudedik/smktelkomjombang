@@ -84,14 +84,32 @@
                         </ul>
                     </div>
                 </div>
+                <div class="blog-item">
+                    <div class="image-part">
+                        <img src="{{ asset('assets_telkom/assets/images/blog/style2/2.jpg') }}" alt="Blog Default">
+                    </div>
+                    <div class="blog-content new-style">
+                        <ul class="blog-meta">
+                            <li><i class="fa fa-user-o"></i> {{ $siteSettings['site_name'] ?? 'Admin' }}</li>
+                            <li><i class="fa fa-calendar"></i> {{ now()->format('M d, Y') }}</li>
+                        </ul>
+                        <h3 class="title"><a href="{{ route('berita.public.index') }}">Pengumuman & Informasi Sekolah</a></h3>
+                        <div class="desc">Pantau terus pengumuman dan informasi penting dari SMK Telekomunikasi Darul Ulum Jombang.</div>
+                        <ul class="blog-bottom">
+                            <li class="btn-part"><a class="readon-arrow" href="{{ route('berita.public.index') }}">Read More</a></li>
+                        </ul>
+                    </div>
+                </div>
             @endforelse
         </div>
-        <!-- View All Button -->
+        <!-- View All Button — configurable via backend -->
+        @if(!empty($siteSettings['show_view_all_news']))
         <div class="text-center mt-50">
             <a class="readon2" href="{{ route('berita.public.index') }}">
-                Lihat Semua Berita &nbsp;<i class="fa fa-arrow-right"></i>
+                {{ $siteSettings['view_all_news_text'] ?? 'Lihat Semua Berita' }} &nbsp;<i class="fa fa-arrow-right"></i>
             </a>
         </div>
+        @endif
     </div>
 </div>
 <!-- Blog Section End -->

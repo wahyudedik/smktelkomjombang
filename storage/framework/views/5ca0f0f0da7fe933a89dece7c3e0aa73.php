@@ -6,8 +6,8 @@
                 <div class="col-lg-4 col-md-12 col-sm-12 footer-widget md-mb-50">
                     <h4 class="widget-title">Jurusan</h4>
                     <ul class="site-map">
-                        <?php $__currentLoopData = theme_config('jurusan', []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $j): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <li><a href="#rs-services"><?php echo e(strtoupper($j['name'] ?? '')); ?></a></li>
+                        <?php $__currentLoopData = array_reverse(theme_config('jurusan', [])); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $j): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><a href="#rs-services"><?php echo e(strtoupper($j['full_name'] ?? $j['name'] ?? '')); ?></a></li>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
@@ -67,18 +67,11 @@
                 </div>
                 <div class="col-lg-4 text-end md-text-start">
                     <ul class="footer-social">
-                        <?php if(theme_config('facebook_url')): ?>
-                            <li><a href="<?php echo e(theme_config('facebook_url')); ?>" target="_blank" rel="noopener" title="Facebook"><i class="fa fa-facebook"></i></a></li>
-                        <?php endif; ?>
-                        <?php if(theme_config('instagram_url')): ?>
-                            <li><a href="<?php echo e(theme_config('instagram_url')); ?>" target="_blank" rel="noopener" title="Instagram"><i class="fa fa-instagram"></i></a></li>
-                        <?php endif; ?>
-                        <?php if(theme_config('youtube_url')): ?>
-                            <li><a href="<?php echo e(theme_config('youtube_url')); ?>" target="_blank" rel="noopener" title="YouTube"><i class="fa fa-youtube"></i></a></li>
-                        <?php endif; ?>
-                        <?php if(theme_config('whatsapp')): ?>
-                            <li><a href="https://wa.me/<?php echo e(theme_config('whatsapp')); ?>" target="_blank" rel="noopener" title="WhatsApp"><i class="fa fa-whatsapp"></i></a></li>
-                        <?php endif; ?>
+                        <li><a href="<?php echo e(theme_config('facebook_url') ?: '#'); ?>" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="<?php echo e(theme_config('twitter_url') ?: '#'); ?>" target="_blank" rel="noopener" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="<?php echo e(theme_config('instagram_url') ?: '#'); ?>" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+                        <li><a href="<?php echo e(theme_config('google_plus_url') ?: '#'); ?>" target="_blank" rel="noopener" title="Google+"><i class="fab fa-google-plus-g"></i></a></li>
+                        <li><a href="<?php echo e(theme_config('pinterest_url') ?: '#'); ?>" target="_blank" rel="noopener" title="Pinterest"><i class="fab fa-pinterest-p"></i></a></li>
                     </ul>
                 </div>
             </div>

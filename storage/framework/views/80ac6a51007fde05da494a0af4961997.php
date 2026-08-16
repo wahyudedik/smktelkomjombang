@@ -46,12 +46,12 @@ unset($__defined_vars, $__key, $__value); ?>
                     <?php endif; ?>
 
                     <div class="sec-title mb-40 wow fadeInUp" data-wow-delay="300ms" data-wow-duration="2000ms">
-                        <div class="sub-title primary"><?php echo e($siteSettings['headmaster_name'] ?? 'NUR LAILA,S.Pd'); ?></div>
-                        <h6 class="title mb-21 white-color">KEPALA SEKOLAH <br><?php echo e(strtoupper($siteSettings['site_name'] ?? 'SMK TELEKOMUNIKASI DARUL ULUM JOMBANG')); ?></h6>
-                        <div class="desc big white-color"><?php echo $siteSettings['headmaster_description'] ?? 'Selamat datang di website resmi <b>SMK Telekomunikasi Darul Ulum Jombang.</b> Website ini menjadi sarana informasi bagi siswa, orang tua, alumni, dan masyarakat untuk mengetahui berbagai kegiatan serta perkembangan sekolah.'; ?></div>
+                        <div class="sub-title primary"><?php echo e($siteSettings['headmaster_name'] ?: 'NUR LAILA,S.Pd'); ?></div>
+                        <h6 class="title mb-21 white-color">KEPALA SEKOLAH <br><?php echo e(strtoupper($siteSettings['headmaster_school_name'] ?? 'SMK TELEKOMUNIKASI DARUL ULUM JOMBANG')); ?></h6>
+                        <div class="desc big white-color"><?php echo $siteSettings['headmaster_description'] ?: 'Selamat datang di website resmi <b>SMK Telekomunikasi Darul Ulum Jombang.</b> Website ini menjadi sarana informasi bagi siswa, orang tua, alumni, dan masyarakat untuk mengetahui berbagai kegiatan serta perkembangan sekolah.'; ?></div>
                     </div>
                     <div class="btn-part wow fadeInUp" data-wow-delay="400ms" data-wow-duration="2000ms">
-                        <a class="readon2" href="#rs-about"><?php echo e($siteSettings['about_button_text'] ?? 'Detail'); ?></a>
+                        <a class="readon2" href="<?php echo e($siteSettings['about_button_url'] ?? '#'); ?>"><?php echo e($siteSettings['about_button_text'] ?: 'Detail'); ?></a>
                     </div>
                 </div>
             </div>

@@ -221,16 +221,25 @@ class LandingController extends Controller
             'hero_subtitle' => theme_config('hero_subtitle') ?? '',
             'hero_images' => theme_config('hero_images') ?? ($themeData['hero_images'] ?? []),
 
-            // Hero slides — theme-aware defaults
-            'hero_slide1_subtitle' => theme_config('hero_slide1_subtitle') ?? ($themeData['hero_slides'][0]['subtitle'] ?? 'Slide 1'),
-            'hero_slide1_title' => theme_config('hero_slide1_title') ?? ($themeData['hero_slides'][0]['title'] ?? ''),
-            'hero_slide1_description' => theme_config('hero_slide1_description') ?? ($themeData['hero_slides'][0]['description'] ?? ''),
-            'hero_slide2_subtitle' => theme_config('hero_slide2_subtitle') ?? ($themeData['hero_slides'][1]['subtitle'] ?? 'Slide 2'),
-            'hero_slide2_title' => theme_config('hero_slide2_title') ?? ($themeData['hero_slides'][1]['title'] ?? ''),
-            'hero_slide2_description' => theme_config('hero_slide2_description') ?? ($themeData['hero_slides'][1]['description'] ?? ''),
-            'hero_slide3_subtitle' => theme_config('hero_slide3_subtitle') ?? ($themeData['hero_slides'][2]['subtitle'] ?? 'Slide 3'),
-            'hero_slide3_title' => theme_config('hero_slide3_title') ?? ($themeData['hero_slides'][2]['title'] ?? ''),
-            'hero_slide3_description' => theme_config('hero_slide3_description') ?? ($themeData['hero_slides'][2]['description'] ?? ''),
+            // Hero slides — theme-aware defaults (fallback ke data template telkom.html)
+            'hero_slide1_subtitle' => theme_config('hero_slide1_subtitle') ?: ($themeData['hero_slides'][0]['subtitle'] ?? 'Penerimaan Siswa Baru 2026'),
+            'hero_slide1_title' => theme_config('hero_slide1_title') ?: ($themeData['hero_slides'][0]['title'] ?? 'SMK Telekomunikasi<br>Darul Ulum Jombang'),
+            'hero_slide1_description' => theme_config('hero_slide1_description') ?: ($themeData['hero_slides'][0]['description'] ?? 'Berhardware Teknologi, Bersoftware Religi'),
+            'hero_slide1_button_text' => theme_config('hero_slide1_button_text') ?: ($themeData['hero_slides'][0]['button_text'] ?? 'DAFTAR PPDB'),
+            'hero_slide1_button_url' => theme_config('hero_slide1_button_url') ?: ($themeData['hero_slides'][0]['button_url'] ?? 'https://psb.ponpesdarululum.id/'),
+            'hero_slide1_button_target' => theme_config('hero_slide1_button_target') ?: ($themeData['hero_slides'][0]['button_target'] ?? '_blank'),
+            'hero_slide2_subtitle' => theme_config('hero_slide2_subtitle') ?: ($themeData['hero_slides'][1]['subtitle'] ?? 'Program Keahlian Unggulan'),
+            'hero_slide2_title' => theme_config('hero_slide2_title') ?: ($themeData['hero_slides'][1]['title'] ?? 'Siap Kerja &<br>Berkompeten'),
+            'hero_slide2_description' => theme_config('hero_slide2_description') ?: ($themeData['hero_slides'][1]['description'] ?? 'Produksi Film | DKV | TKJ | RPL'),
+            'hero_slide2_button_text' => theme_config('hero_slide2_button_text') ?: ($themeData['hero_slides'][1]['button_text'] ?? 'JELAJAHI JURUSAN'),
+            'hero_slide2_button_url' => theme_config('hero_slide2_button_url') ?: ($themeData['hero_slides'][1]['button_url'] ?? '#rs-services'),
+            'hero_slide2_button_target' => theme_config('hero_slide2_button_target') ?: ($themeData['hero_slides'][1]['button_target'] ?? ''),
+            'hero_slide3_subtitle' => theme_config('hero_slide3_subtitle') ?: ($themeData['hero_slides'][2]['subtitle'] ?? ''),
+            'hero_slide3_title' => theme_config('hero_slide3_title') ?: ($themeData['hero_slides'][2]['title'] ?? ''),
+            'hero_slide3_description' => theme_config('hero_slide3_description') ?: ($themeData['hero_slides'][2]['description'] ?? ''),
+            'hero_slide3_button_text' => theme_config('hero_slide3_button_text') ?: ($themeData['hero_slides'][2]['button_text'] ?? ''),
+            'hero_slide3_button_url' => theme_config('hero_slide3_button_url') ?: ($themeData['hero_slides'][2]['button_url'] ?? ''),
+            'hero_slide3_button_target' => theme_config('hero_slide3_button_target') ?: ($themeData['hero_slides'][2]['button_target'] ?? ''),
 
             // Features — theme-aware defaults
             'feature1_title' => theme_config('feature1_title') ?? ($themeData['features'][0]['title'] ?? ''),
@@ -255,25 +264,27 @@ class LandingController extends Controller
             'about_feature_3_description' => theme_config('about_feature_3_description') ?? '',
             'about_feature_4_title' => theme_config('about_feature_4_title') ?? '',
             'about_feature_4_description' => theme_config('about_feature_4_description') ?? '',
-            'about_button_text' => theme_config('about_button_text') ?? 'Detail',
-            'about_contact_text' => theme_config('about_contact_text') ?? 'Hubungi Kami',
-            'about_contact_phone' => theme_config('about_contact_phone') ?? '',
+            'about_button_text' => theme_config('about_button_text') ?: 'Detail',
+            'about_button_url' => theme_config('about_button_url') ?: '#',
+            'about_contact_text' => theme_config('about_contact_text') ?: 'Hubungi Kami',
+            'about_contact_phone' => theme_config('about_contact_phone') ?: '',
 
-            // Headmaster — theme-aware defaults
-            'headmaster_name' => theme_config('headmaster_name') ?? ($themeData['kepala_sekolah']['name'] ?? ''),
-            'headmaster_description' => theme_config('headmaster_description') ?? ($themeData['kepala_sekolah']['description'] ?? ''),
-            'headmaster_vision' => theme_config('headmaster_vision') ?? ($themeData['kepala_sekolah']['description_2'] ?? ''),
-            'headmaster_photo' => theme_config('headmaster_photo') ?? ($themeData['kepala_sekolah']['photo'] ?? null),
+            // Headmaster — theme-aware defaults (?: agar empty string jg fallback)
+            'headmaster_name' => theme_config('headmaster_name') ?: ($themeData['kepala_sekolah']['name'] ?? 'NUR LAILA,S.Pd'),
+            'headmaster_school_name' => theme_config('headmaster_school_name') ?: 'SMK TELEKOMUNIKASI DARUL ULUM JOMBANG',
+            'headmaster_description' => theme_config('headmaster_description') ?: ($themeData['kepala_sekolah']['description'] ?? 'Selamat datang di website resmi <b>SMK Telekomunikasi Darul Ulum Jombang.</b> Website ini menjadi sarana informasi bagi siswa, orang tua, alumni, dan masyarakat untuk mengetahui berbagai kegiatan serta perkembangan sekolah.'),
+            'headmaster_vision' => theme_config('headmaster_vision') ?: ($themeData['kepala_sekolah']['description_2'] ?? ''),
+            'headmaster_photo' => theme_config('headmaster_photo') ?: ($themeData['kepala_sekolah']['photo'] ?? null),
 
             // Campus life headmaster — theme-aware defaults
-            'campus_life_headmaster_name' => theme_config('campus_life_headmaster_name') ?? ($themeData['kepala_sekolah']['name'] ?? ''),
-            'campus_life_headmaster_description' => theme_config('campus_life_headmaster_description') ?? ($themeData['kepala_sekolah']['description'] ?? ''),
-            'campus_life_headmaster_vision' => theme_config('campus_life_headmaster_vision') ?? ($themeData['kepala_sekolah']['description_2'] ?? ''),
-            'campus_life_headmaster_photo' => theme_config('campus_life_headmaster_photo') ?? ($themeData['kepala_sekolah']['photo'] ?? null),
+            'campus_life_headmaster_name' => theme_config('campus_life_headmaster_name') ?: ($themeData['kepala_sekolah']['name'] ?? 'NUR LAILA,S.Pd'),
+            'campus_life_headmaster_description' => theme_config('campus_life_headmaster_description') ?: ($themeData['kepala_sekolah']['description'] ?? 'Selamat datang di website resmi <b>SMK Telekomunikasi Darul Ulum Jombang.</b> Website ini menjadi sarana informasi bagi siswa, orang tua, alumni, dan masyarakat untuk mengetahui berbagai kegiatan serta perkembangan sekolah.'),
+            'campus_life_headmaster_vision' => theme_config('campus_life_headmaster_vision') ?: ($themeData['kepala_sekolah']['description_2'] ?? ''),
+            'campus_life_headmaster_photo' => theme_config('campus_life_headmaster_photo') ?: ($themeData['kepala_sekolah']['photo'] ?? null),
 
-            // Programs
-            'program_section_title' => theme_config('program_section_title') ?? 'Program Unggulan',
-            'program_section_subtitle' => theme_config('program_section_subtitle') ?? '',
+            // Programs — default sesuai template telkom.html
+            'program_section_title' => theme_config('program_section_title') ?: 'Kurikulum dan Pengajar',
+            'program_section_subtitle' => theme_config('program_section_subtitle') ?: 'Kerjasama Industri',
             'program_ipa_title' => theme_config('program_ipa_title') ?? ($themeData['program_peminatan'][0]['full_name'] ?? 'Program IPA'),
             'program_ipa_description' => theme_config('program_ipa_description') ?? ($themeData['program_peminatan'][0]['desc'] ?? ''),
             'program_ips_title' => theme_config('program_ips_title') ?? ($themeData['program_peminatan'][1]['full_name'] ?? 'Program IPS'),
@@ -282,13 +293,13 @@ class LandingController extends Controller
             'program_religion_description' => theme_config('program_religion_description') ?? ($themeData['program_peminatan'][2]['desc'] ?? ''),
             'program_section_image' => theme_config('program_section_image') ?? null,
 
-            // Counters — theme-aware defaults
-            'counter1_number' => theme_config('counter1_number') ?? '24',
-            'counter1_label' => theme_config('counter1_label') ?? 'Mata Pelajaran',
-            'counter2_number' => theme_config('counter2_number') ?? '800',
-            'counter2_label' => theme_config('counter2_label') ?? 'Peserta Didik',
-            'counter3_number' => theme_config('counter3_number') ?? '98',
-            'counter3_label' => theme_config('counter3_label') ?? 'Tenaga Pendidik',
+            // Counters — default sesuai template telkom.html
+            'counter1_number' => theme_config('counter1_number') ?: '500',
+            'counter1_label' => theme_config('counter1_label') ?: 'Siswa',
+            'counter2_number' => theme_config('counter2_number') ?: '4',
+            'counter2_label' => theme_config('counter2_label') ?: 'Jurusan',
+            'counter3_number' => theme_config('counter3_number') ?: '75',
+            'counter3_label' => theme_config('counter3_label') ?: 'Lanjut Kuliah',
 
             // Gallery
             'gallery_title' => theme_config('gallery_title') ?? 'Galeri',
@@ -312,19 +323,30 @@ class LandingController extends Controller
             'video_url' => theme_config('video_url') ?? ($themeData['video_url'] ?? ''),
             'video_thumbnail' => theme_config('video_thumbnail') ?? ($themeData['video_thumbnail'] ?? null),
 
-            // CTA Section — theme-aware defaults
-            'cta_title' => theme_config('cta_title') ?? ($themeData['cta_title'] ?? 'Pendaftaran Siswa Baru ' . date('Y')),
-            'cta_description' => theme_config('cta_description') ?? ($themeData['cta_description'] ?? ''),
-            'cta_button_text' => theme_config('cta_button_text') ?? ($themeData['cta_button_text'] ?? 'DAFTAR'),
-            'cta_button_url' => theme_config('cta_button_url') ?? ($themeData['cta_button_url'] ?? '#'),
-            'cta_video_title' => theme_config('cta_video_title') ?? '',
+            // CTA Section — theme-aware defaults (?: agar empty string jg fallback)
+            'cta_title' => theme_config('cta_title') ?: ($themeData['cta_title'] ?? 'Pendaftaran Siswa Baru ' . date('Y')),
+            'cta_description' => theme_config('cta_description') ?: ($themeData['cta_description'] ?? "Tempat Pendaftaran\n1. Online mandiri (24 jam) dengan alamat web psb.ponpesdarululum.id\n2. Kantor Pusat Pondok Pesantren Darul 'Ulum Jombang\n3. Buka Hari Sabtu - Kamis pukul 08:00 - 16:00 WIB\n4. Hari Jum'at & hari libur nasional pendaftaran kantor pusat libur"),
+            'cta_button_text' => theme_config('cta_button_text') ?: ($themeData['cta_button_text'] ?? 'DAFTAR'),
+            'cta_button_url' => theme_config('cta_button_url') ?: ($themeData['cta_button_url'] ?? 'https://psb.ponpesdarululum.id/'),
+            'cta_video_title' => theme_config('cta_video_title') ?: 'Profil SMK Telekomunikasi DU',
 
             // Contact Map & Hours — theme-aware defaults
             'contact_map_url' => theme_config('contact_map_url') ?? ($themeData['google_maps_url'] ?? ''),
             'contact_operational_hours' => theme_config('contact_operational_hours') ?? (($themeData['working_hours']['days'] ?? 'Senin - Sabtu') . ': ' . ($themeData['working_hours']['hours'] ?? '07.00 - 16.00 WIB')),
 
-            // Footer — theme-aware defaults
-            'footer_text' => theme_config('footer_text') ?? '© ' . date('Y') . ' ' . ($themeData['name'] ?? config('app.name')) . '. All rights reserved.',
+            // Footer — theme-aware defaults (match template: "© 2026 All Rights Reserved. Developed By Kritis.TV")
+            'footer_text' => theme_config('footer_text') ?: '© ' . date('Y') . ' All Rights Reserved. Developed By <a href="https://www.tiktok.com/@kritis.tv" target="_blank">Kritis.TV</a>',
+
+            // Events — configurable detail link
+            'events_detail_url' => theme_config('events_detail_url') ?? '#',
+
+            // Testimonials — configurable form button
+            'show_testimonial_form' => theme_config('show_testimonial_form') ?? false,
+            'testimonial_form_text' => theme_config('testimonial_form_text') ?? 'Kirim Testimoni',
+
+            // Blog — configurable view all button
+            'show_view_all_news' => theme_config('show_view_all_news') ?? false,
+            'view_all_news_text' => theme_config('view_all_news_text') ?? 'Lihat Semua Berita',
         ];
     }
 

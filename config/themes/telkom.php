@@ -13,7 +13,7 @@ return [
     'type' => 'SMK',
 
     // Contact Info
-    'address' => 'Ponpes Darul Ulum, Jl. Wahid Hasyim No.128, Jombang',
+    'address' => 'Ponpes Darul Ulum Jombang',
     'phone' => '085649400339',
     'phone_secondary' => '(0321)868188',
     'whatsapp' => '6285649400339',
@@ -29,6 +29,10 @@ return [
     'youtube_url' => 'https://www.youtube.com/@smktelkomdarululum',
     'tiktok' => '',
     'tiktok_url' => '',
+    'twitter' => '',
+    'twitter_url' => '',
+    'google_plus_url' => '',
+    'pinterest_url' => '',
 
     // Assets
     'assets_path' => 'assets_telkom',
@@ -43,11 +47,31 @@ return [
         'assets_telkom/assets/images/slider/h2-3.jpg',
     ],
 
+    // Hero Slides — default text sesuai template telkom.html
+    'hero_slides' => [
+        [
+            'subtitle'    => 'Penerimaan Siswa Baru 2026',
+            'title'       => 'SMK Telekomunikasi<br>Darul Ulum Jombang',
+            'description' => 'Berhardware Teknologi, Bersoftware Religi',
+            'button_text' => 'DAFTAR PPDB',
+            'button_url'  => 'https://psb.ponpesdarululum.id/',
+            'button_target' => '_blank',
+        ],
+        [
+            'subtitle'    => 'Program Keahlian Unggulan',
+            'title'       => 'Siap Kerja &<br>Berkompeten',
+            'description' => 'Produksi Film | DKV | TKJ | RPL',
+            'button_text' => 'JELAJAHI JURUSAN',
+            'button_url'  => '#rs-services',
+            'button_target' => '',
+        ],
+    ],
+
     // Jurusan
     'jurusan' => [
         [
             'name' => 'TKJ',
-            'full_name' => 'Teknik Komputer & Jaringan',
+            'full_name' => 'Teknik Komputer dan Jaringan',
             'desc' => 'Mempelajari jaringan komputer, administrasi server, dan keamanan siber.',
             'icon' => 'fas fa-network-wired',
         ],
@@ -71,22 +95,22 @@ return [
         ],
     ],
 
-    // Kepala Sekolah
+    // Kepala Sekolah — default sesuai template telkom.html
     'kepala_sekolah' => [
-        'name' => '',
+        'name' => 'NUR LAILA,S.Pd',
         'photo' => '',
-        'description' => '',
+        'description' => 'Selamat datang di website resmi <b>SMK Telekomunikasi Darul Ulum Jombang.</b> Website ini menjadi sarana informasi bagi siswa, orang tua, alumni, dan masyarakat untuk mengetahui berbagai kegiatan serta perkembangan sekolah.',
     ],
 
     // Video
     'video_url' => 'https://www.youtube.com/watch?v=F5bnwy0lRZI',
     'video_thumbnail' => '',
 
-    // CTA
+    // CTA — default sesuai template telkom.html
     'cta_title' => 'Pendaftaran Siswa Baru',
-    'cta_description' => 'Buka Hari Sabtu - Kamis pukul 08:00 - 16:00 WIB',
+    'cta_description' => "Tempat Pendaftaran\n1. Online mandiri (24 jam) dengan alamat web psb.ponpesdarululum.id\n2. Kantor Pusat Pondok Pesantren Darul 'Ulum Jombang\n3. Buka Hari Sabtu - Kamis pukul 08:00 - 16:00 WIB\n4. Hari Jum'at & hari libur nasional pendaftaran kantor pusat libur",
     'cta_button_url' => 'https://psb.ponpesdarululum.id/',
-    'cta_button_text' => 'Daftar Sekarang',
+    'cta_button_text' => 'DAFTAR',
 
     // Working Hours
     'working_hours' => [

@@ -11,9 +11,11 @@
                         Assurance dan Maintenance</div>
                     <div class="btn-part">
                         <a class="readon2 mod">Profil Alumni</a>
+                        @if(!empty($siteSettings['show_testimonial_form']))
                         <a class="readon2" href="{{ route('testimonials.create') }}" style="margin-left: 10px;">
-                            <i class="fa fa-paper-plane"></i> Kirim Testimoni
+                            <i class="fa fa-paper-plane"></i> {{ $siteSettings['testimonial_form_text'] ?? 'Kirim Testimoni' }}
                         </a>
+                        @endif
                     </div>
                 </div>
             </div>

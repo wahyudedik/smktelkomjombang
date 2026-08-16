@@ -65,7 +65,7 @@
                         </div>
                     <?php endif; ?>
                     <div class="btn-part mt-55 md-mt-25 wow fadeInUp" data-wow-delay="600ms" data-wow-duration="2000ms">
-                        <a href="<?php echo e(route('public.kegiatan')); ?>">Detail Kegiatan</a>
+                        <a href="<?php echo e($siteSettings['events_detail_url'] ?? '#'); ?>">Detail Kegiatan</a>
                     </div>
                 </div>
             </div>
