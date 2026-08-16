@@ -287,6 +287,17 @@ chmod -R 775 "$APP_DIR/bootstrap/cache" 2>/dev/null || true
 chmod -R 775 "$APP_DIR/public/uploads" 2>/dev/null || true
 chmod 775 "$APP_DIR/public" 2>/dev/null || true
 
+# Fix permission static assets (assets_telkom, assets_maudu, dll)
+# File: 644 (readable), Direktori: 755 (traversable) — hindari 403 Forbidden
+info "Memperbaiki permission static assets..."
+for ASSETS_DIR in "$APP_DIR"/public/assets_*/; do
+    if [ -d "$ASSETS_DIR" ]; then
+        find "$ASSETS_DIR" -type d -exec chmod 755 {} \; 2>/dev/null || true
+        find "$ASSETS_DIR" -type f -exec chmod 644 {} \; 2>/dev/null || true
+        info "  ✓ $(basename "$ASSETS_DIR") — permission diperbaiki"
+    fi
+done
+
 # Set ownership ke web server user
 chown -R "$WEB_USER:$WEB_USER" "$APP_DIR/storage" 2>/dev/null || warn "Gagal chown storage. Coba: sudo chown -R $WEB_USER:$WEB_USER $APP_DIR/storage"
 chown -R "$WEB_USER:$WEB_USER" "$APP_DIR/bootstrap/cache" 2>/dev/null || warn "Gagal chown bootstrap/cache."
