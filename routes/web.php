@@ -219,6 +219,23 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::get('/report/monthly', [App\Http\Controllers\AttendanceReportController::class, 'monthly'])->name('report.monthly');
     Route::get('/report/user/{identity}', [App\Http\Controllers\AttendanceReportController::class, 'userDetail'])->name('report.user');
     Route::get('/report/latecomers', [App\Http\Controllers\AttendanceReportController::class, 'latecomers'])->name('report.latecomers');
+
+    // Izin/Sakit/Alpha (rate limited: max 10 per minute)
+    Route::resource('excuses', App\Http\Controllers\AttendanceExcuseController::class)
+        ->except(['show', 'edit', 'update', 'destroy']);
+    Route::get('/excuses/{excuse}', [App\Http\Controllers\AttendanceExcuseController::class, 'show'])->name('excuses.show');
+    Route::get('/excuses/{excuse}/edit', [App\Http\Controllers\AttendanceExcuseController::class, 'edit'])->name('excuses.edit');
+    Route::put('/excuses/{excuse}', [App\Http\Controllers\AttendanceExcuseController::class, 'update'])->name('excuses.update');
+    Route::delete('/excuses/{excuse}', [App\Http\Controllers\AttendanceExcuseController::class, 'destroy'])->name('excuses.destroy');
+    Route::post('/excuses', [App\Http\Controllers\AttendanceExcuseController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('excuses.store');
+    Route::post('/excuses/{excuse}/approve', [App\Http\Controllers\AttendanceExcuseController::class, 'approve'])
+        ->middleware('throttle:20,1')
+        ->name('excuses.approve');
+    Route::post('/excuses/{excuse}/reject', [App\Http\Controllers\AttendanceExcuseController::class, 'reject'])
+        ->middleware('throttle:20,1')
+        ->name('excuses.reject');
 });
 
 // ========================================

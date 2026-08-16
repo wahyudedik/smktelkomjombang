@@ -218,6 +218,8 @@ QUEUE_CONNECTION=database
 | Testimonial | `TestimonialController` | Testimoni |
 | Pages | `PageController` | CMS pages (CRUD + versioning) |
 | Attendance | `AttendanceController` | Absensi (ZKTeco iClock) |
+| Attendance Excuse | `AttendanceExcuseController` | Izin/sakit/alpha (CRUD + approve/reject) |
+| Attendance Report | `AttendanceReportController` | Report absensi (daily, weekly, monthly, latecomers, user-detail) |
 | Settings | `SettingsController` | Pengaturan umum + SEO |
 | Theme Settings | `ThemeSettingController` | Pengaturan tema per theme |
 | Notifications | `NotificationController` | Push notifications |
@@ -248,6 +250,16 @@ php -l app/Http/Controllers/LandingController.php
 # Database migration
 php artisan migrate
 php artisan db:seed
+
+# Attendance commands
+php artisan attendance:mark-alpha              # Tandai alpha otomatis (default: hari ini)
+php artisan attendance:mark-alpha --date=2026-08-15  # Tandai alpha untuk tanggal tertentu
+php artisan attendance:notify --summary        # Kirim rekap harian ke admin
+php artisan attendance:notify --late           # Kirim notifikasi keterlambatan
+php artisan attendance:notify --excuse         # Kirim notifikasi izin pending
+
+# Scheduler (tambahkan di crontab production)
+# * * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 ---
@@ -537,6 +549,11 @@ php artisan serve
 7. **Assets per tema**: `public/assets_telkom/`, `public/assets_maudu/`, `public/assets_{theme}/` — jangan campur aduk
 8. **Menu URL format**: Gunakan `route:name` syntax di config (e.g., `'route:berita.public.index'`), bukan `route()` langsung
 9. **View naming**: Pattern `{base}-{theme}.blade.php` untuk override per tema
+10. **Content Sanitization** — Selalu gunakan `ContentSanitizer` untuk sanitize HTML content CMS sebelum disimpan (mencegah XSS)
+11. **Rate Limiting** — Routes sensitif (login, import, excuses) sudah dilindungi throttle middleware
+12. **Security Headers** — Middleware `SecurityHeaders` otomatis menambahkan CSP, X-Frame-Options, HSTS, dll
+13. **Attendance Config** — Semua config absensi di `config/attendance.php`, override via env vars `ATTENDANCE_*`
+14. **Attendance Scheduler** — `attendance:mark-alpha` berjalan jam 23:00, `attendance:notify --summary` jam 16:00
 
 ---
 
@@ -544,5 +561,7 @@ php artisan serve
 
 - [`plans/theme-system-refactoring.md`](plans/theme-system-refactoring.md) — Plan lengkap refactoring theme system + panduan menambah tema
 - [`plans/theme-switching-maudu.md`](plans/theme-switching-maudu.md) — Dokumentasi detail sistem theme switching (sebelum refactor)
+- [`plans/attendance-features-plan.md`](plans/attendance-features-plan.md) — Plan lengkap fitur absensi (excuse, notification, report, config)
+- [`plans/maudu-public-features-complete.md`](plans/maudu-public-features-complete.md) — Plan lengkap fitur publik tema MAUDU
 - [`README.md`](README.md) — Readme project
 - [`.kiro/hooks/laravel-expert.kiro.hook`](.kiro/hooks/laravel-expert.kiro.hook) — Laravel best practices hook

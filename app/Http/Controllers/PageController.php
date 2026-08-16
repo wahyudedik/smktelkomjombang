@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use App\Models\PageVersion;
 use App\Models\User;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -126,6 +127,12 @@ class PageController extends Controller
         $data['user_id'] = Auth::id();
         // Ensure slug is always generated correctly (remove any spaces, special chars)
         $data['slug'] = Str::slug($request->title);
+
+        // Sanitize HTML content to prevent XSS attacks
+        if (!empty($data['content'])) {
+            $sanitizer = new ContentSanitizer();
+            $data['content'] = $sanitizer->sanitize($data['content']);
+        }
 
         // ✅ Fix: Ensure is_featured has a default value
         $data['is_featured'] = $request->boolean('is_featured', false);
@@ -281,6 +288,12 @@ class PageController extends Controller
         $data = $request->all();
         // Ensure slug is always generated correctly (remove any spaces, special chars)
         $data['slug'] = Str::slug($request->title);
+
+        // Sanitize HTML content to prevent XSS attacks
+        if (!empty($data['content'])) {
+            $sanitizer = new ContentSanitizer();
+            $data['content'] = $sanitizer->sanitize($data['content']);
+        }
 
         // Handle featured image upload
         if ($request->hasFile('featured_image')) {

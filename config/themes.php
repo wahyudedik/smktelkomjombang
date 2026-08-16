@@ -49,8 +49,8 @@ return [
             ],
             'defaults'    => [
                 'favicon'    => 'assets_telkom/assets/images/fav.png',
-                'logo'       => 'assets_telkom/assets/images/logo/logo.png',
-                'logo_light' => 'assets_telkom/assets/images/logo/logo-light.png',
+                'logo'       => 'assets_telkom/assets/images/logo-dark.png',   // Dark logo for light header (default state)
+                'logo_light' => 'assets_telkom/assets/images/logo.png',        // Light/white logo for dark header (sticky state)
             ],
         ],
 

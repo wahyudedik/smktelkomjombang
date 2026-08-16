@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # =============================================================================
-# Deploy Script - Laravel TELKOM
+# Update Script - Laravel SMK Telekomunikasi
 # =============================================================================
-# Gunakan script ini untuk deploy update di VPS
-# Usage: bash deploy.sh
+# Gunakan script ini untuk update incrementally di VPS (production)
+# Usage: bash update.sh
 #
-# Script ini OTOMATIS memperbaiki permission sendiri.
-# Cukup jalankan dengan "bash deploy.sh" setiap ada update.
-# Permission execute akan diatur otomatis oleh script ini.
+# Script ini untuk UPDATE yang sudah berjalan di production.
+# Gunakan deploy.sh untuk setup awal pertama kali.
 # =============================================================================
 
 set -e
@@ -18,7 +17,7 @@ set -e
 # =============================================================================
 SCRIPT_PATH="$(realpath "$0")"
 if [ ! -x "$SCRIPT_PATH" ]; then
-    echo "[FIX] deploy.sh tidak memiliki permission execute. Memperbaiki..."
+    echo "[FIX] update.sh tidak memiliki permission execute. Memperbaiki..."
     chmod +x "$SCRIPT_PATH"
     echo "[FIX] Permission diperbaiki. Menjalankan ulang..."
     exec bash "$SCRIPT_PATH" "$@"
@@ -60,11 +59,11 @@ GIT_BRANCH="main"
 export COMPOSER_ALLOW_SUPERUSER=1
 
 # =============================================================================
-# Mulai Deploy
+# Mulai Update
 # =============================================================================
 echo ""
 echo "============================================="
-echo "  🚀 Deploy Laravel LMS"
+echo "  🔄 Update Laravel SMK Telekomunikasi"
 echo "============================================="
 echo ""
 
@@ -77,16 +76,40 @@ echo ""
 info "Mengaktifkan maintenance mode..."
 $PHP_BIN artisan down --refresh=15 --retry=60 || true
 
-# 2. Reset local changes & pull perubahan terbaru dari Git
+# 2. Backup database (opsional, tapi direkomendasikan)
+info "Membuat backup database..."
+BACKUP_DIR="$APP_DIR/storage/backups"
+mkdir -p "$BACKUP_DIR"
+BACKUP_FILE="$BACKUP_DIR/db_backup_$(date +%Y%m%d_%H%M%S).sql"
+if command -v mysqldump &>/dev/null; then
+    DB_NAME=$(grep DB_DATABASE "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
+    DB_USER=$(grep DB_USERNAME "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
+    DB_PASS=$(grep DB_PASSWORD "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
+    if [ -n "$DB_NAME" ]; then
+        if [ -n "$DB_PASS" ]; then
+            mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null || warn "Gagal backup database. Melanjutkan..."
+        else
+            mysqldump -u "$DB_USER" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null || warn "Gagal backup database. Melanjutkan..."
+        fi
+        if [ -f "$BACKUP_FILE" ]; then
+            info "Backup database tersimpan: $BACKUP_FILE"
+        fi
+    fi
+else
+    warn "mysqldump tidak ditemukan. Backup database dilewati."
+fi
+
+# 3. Reset local changes & pull perubahan terbaru dari Git
 info "Mereset perubahan lokal..."
 git checkout -- .
-git clean -fd -e public/.user.ini -e public/.well-known
+git clean -fd -e public/.user.ini -e public/.well-known -e .env -e .env.production
 
 info "Pulling perubahan terbaru dari git..."
 git pull origin "$GIT_BRANCH" || error "Gagal pull dari git"
 
-# Pastikan deploy.sh tetap executable setelah pull
-chmod +x "$APP_DIR/deploy.sh"
+# Pastikan script tetap executable setelah pull
+chmod +x "$APP_DIR/deploy.sh" 2>/dev/null || true
+chmod +x "$APP_DIR/update.sh" 2>/dev/null || true
 
 # Buat direktori yang mungkin belum ada (aman jika sudah ada)
 mkdir -p "$APP_DIR/storage/logs"
@@ -94,44 +117,66 @@ mkdir -p "$APP_DIR/storage/framework/cache/data"
 mkdir -p "$APP_DIR/storage/framework/sessions"
 mkdir -p "$APP_DIR/storage/framework/views"
 mkdir -p "$APP_DIR/storage/app/public"
+mkdir -p "$APP_DIR/storage/app/private"
 mkdir -p "$APP_DIR/public/uploads"
 mkdir -p "$APP_DIR/bootstrap/cache"
+mkdir -p "$APP_DIR/storage/backups"
 
-# 3. Install/update dependencies PHP
+# 4. Install/update dependencies PHP
 info "Menginstall dependencies PHP (production)..."
 $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
 
-# 4. Install/update dependencies Node.js & build assets
-info "Menginstall dependencies Node.js..."
-$NPM_BIN ci
+# 5. Install/update dependencies Node.js & build assets
+if [ -f "package.json" ]; then
+    info "Menginstall dependencies Node.js..."
+    $NPM_BIN ci
 
-info "Building assets (Vite)..."
-$NPM_BIN run build
+    info "Building assets (Vite)..."
+    $NPM_BIN run build
+else
+    warn "package.json tidak ditemukan. Build assets dilewati."
+fi
 
-# 5. Jalankan migrasi database
+# 6. Jalankan migrasi database
 info "Menjalankan migrasi database..."
 $PHP_BIN artisan migrate --force
 
-# 6. Optimasi Laravel
+# 7. Seed permissions Spatie (jika ada perubahan)
+info "Sync permissions Spatie..."
+$PHP_BIN artisan db:seed --class=RolePermissionSeeder 2>/dev/null || true
+
+# 8. Clear cache lama
+info "Membersihkan cache lama..."
+$PHP_BIN artisan cache:clear
+$PHP_BIN artisan config:clear
+$PHP_BIN artisan view:clear
+$PHP_BIN artisan event:clear
+
+# 9. Optimasi Laravel
 info "Mengoptimasi aplikasi..."
 $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
 $PHP_BIN artisan view:cache
 $PHP_BIN artisan event:cache
+$PHP_BIN artisan icons:cache 2>/dev/null || true
 
-# 7. Clear cache lama
-info "Membersihkan cache lama..."
-$PHP_BIN artisan cache:clear
-
-# 8. Link storage (jika belum)
+# 10. Link storage (jika belum)
 info "Memastikan storage link..."
 $PHP_BIN artisan storage:link 2>/dev/null || true
 
-# 9. Restart queue worker
+# 11. Seed static pages (jika ada perubahan theme)
+info "Seed static pages..."
+$PHP_BIN artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()" 2>/dev/null || warn "Static page generator dilewati."
+
+# 12. Restart queue worker
 info "Merestart queue worker..."
 $PHP_BIN artisan queue:restart
 
-# 10. Set permission yang benar
+# 13. Restart scheduler (jika menggunakan supervisor)
+info "Merestart scheduler..."
+$PHP_BIN artisan schedule:work --stop-when-empty 2>/dev/null || true
+
+# 14. Set permission yang benar
 info "Mengatur permission..."
 
 # Deteksi user web server (www-data untuk Ubuntu/Debian, www untuk aaPanel/BT Panel)
@@ -156,7 +201,19 @@ find "$APP_DIR/storage" -type f -exec chmod 664 {} \; 2>/dev/null || true
 find "$APP_DIR/storage" -type d -exec chmod 775 {} \; 2>/dev/null || true
 chmod -R o-w "$APP_DIR/storage" 2>/dev/null || true
 
-# 11. Nonaktifkan Maintenance Mode
+# 15. Cleanup backup lama (simpan 7 hari terakhir)
+info "Membersihkan backup lama..."
+find "$BACKUP_DIR" -name "db_backup_*.sql" -mtime +7 -delete 2>/dev/null || true
+
+# 16. Cleanup old logs (simpan 30 hari terakhir)
+info "Membersihkan log lama..."
+find "$APP_DIR/storage/logs" -name "*.log" -mtime +30 -delete 2>/dev/null || true
+
+# 17. Cleanup old views cache
+info "Membersihkan view cache lama..."
+find "$APP_DIR/storage/framework/views" -name "*.php" -mtime +7 -delete 2>/dev/null || true
+
+# 18. Nonaktifkan Maintenance Mode
 info "Menonaktifkan maintenance mode..."
 $PHP_BIN artisan up
 
@@ -165,12 +222,16 @@ $PHP_BIN artisan up
 # =============================================================================
 echo ""
 echo "============================================="
-echo -e "  ${GREEN}✅ Deploy selesai!${NC}"
+echo -e "  ${GREEN}✅ Update selesai!${NC}"
 echo "============================================="
 echo ""
 info "Jangan lupa cek:"
 echo "  - Website bisa diakses"
 echo "  - Queue worker berjalan (supervisord)"
-echo "  - Scheduler berjalan: crontab -e → * * * * * cd $APP_DIR && php artisan schedule:run >> /dev/null 2>&1"
 echo "  - Log error: storage/logs/laravel.log"
+echo "  - Backup database: storage/backups/"
+echo ""
+info "Rollback jika ada masalah:"
+echo "  - Database: mysql -u user -p telkom_db < storage/backups/db_backup_YYYYMMDD_HHMMSS.sql"
+echo "  - Code: git checkout <previous-commit>"
 echo ""

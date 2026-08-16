@@ -35,6 +35,27 @@ Schedule::command('attendance:sync')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Mark alpha for users who didn't show up (daily at 23:00)
+// This checks if each active identity has an attendance record for today.
+// If not, it checks for approved excuses. If neither, marks as 'alpha'.
+Schedule::command('attendance:mark-alpha')
+    ->dailyAt('23:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+
+// Send attendance notifications (daily summary at 16:00)
+Schedule::command('attendance:notify --summary')
+    ->dailyAt(config('attendance.notify.daily_summary_time', '16:00'))
+    ->withoutOverlapping()
+    ->runInBackground();
+
+// Send pending excuse notifications (every hour during work hours)
+Schedule::command('attendance:notify --excuse')
+    ->hourly()
+    ->between('08:00', '17:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Clean up old async jobs and their files (daily at 03:00)
 // Removes jobs older than 7 days and their associated export files
 Schedule::call(function () {

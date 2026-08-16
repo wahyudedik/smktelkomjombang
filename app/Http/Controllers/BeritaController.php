@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Page;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -59,6 +60,10 @@ class BeritaController extends Controller
             'is_featured'    => 'boolean',
         ]);
 
+        // Sanitize HTML content to prevent XSS attacks
+        $sanitizer = new ContentSanitizer();
+        $validated['content'] = $sanitizer->sanitize($validated['content']);
+
         $data = [
             'title'       => $validated['title'],
             'slug'        => $this->uniqueSlug($validated['title']),
@@ -106,6 +111,10 @@ class BeritaController extends Controller
             'status'         => 'required|in:draft,published,archived',
             'is_featured'    => 'boolean',
         ]);
+
+        // Sanitize HTML content to prevent XSS attacks
+        $sanitizer = new ContentSanitizer();
+        $validated['content'] = $sanitizer->sanitize($validated['content']);
 
         $data = [
             'title'       => $validated['title'],

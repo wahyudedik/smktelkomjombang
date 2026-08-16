@@ -8,32 +8,32 @@
                 <div class="row y-middle">
                     <div class="col-md-7">
                         <ul class="topbar-contact">
-                            @if (!empty($siteSettings['contact_email']))
+                            <?php if(!empty($siteSettings['contact_email'])): ?>
                                 <li>
                                     <i class="flaticon-email"></i>
                                     <a
-                                        href="mailto:{{ $siteSettings['contact_email'] }}">{{ $siteSettings['contact_email'] }}</a>
+                                        href="mailto:<?php echo e($siteSettings['contact_email']); ?>"><?php echo e($siteSettings['contact_email']); ?></a>
                                 </li>
-                            @endif
-                            @if (!empty($siteSettings['contact_phone']))
+                            <?php endif; ?>
+                            <?php if(!empty($siteSettings['contact_phone'])): ?>
                                 <li>
                                     <i class="flaticon-call"></i>
                                     <a
-                                        href="tel:{{ preg_replace('/[^0-9+]/', '', $siteSettings['contact_phone']) }}">{{ $siteSettings['contact_phone'] }}</a>
+                                        href="tel:<?php echo e(preg_replace('/[^0-9+]/', '', $siteSettings['contact_phone'])); ?>"><?php echo e($siteSettings['contact_phone']); ?></a>
                                 </li>
-                            @endif
+                            <?php endif; ?>
                         </ul>
                     </div>
                     <div class="col-md-5 text-end">
                         <ul class="topbar-right">
                             <li class="btn-part">
-                                @auth
-                                    <a class="apply-btn" href="{{ route('admin.dashboard') }}"> <i
+                                <?php if(auth()->guard()->check()): ?>
+                                    <a class="apply-btn" href="<?php echo e(route('admin.dashboard')); ?>"> <i
                                             class="fa fa-tachometer-alt"> </i> Dashboard</a>
-                                @else
-                                    <a class="apply-btn" href="{{ route('login') }}"> <i class="fa fa-sign-in"> </i> Login
+                                <?php else: ?>
+                                    <a class="apply-btn" href="<?php echo e(route('login')); ?>"> <i class="fa fa-sign-in"> </i> Login
                                         System</a>
-                                @endauth
+                                <?php endif; ?>
                             </li>
                         </ul>
                     </div>
@@ -49,13 +49,13 @@
                     <div class="col-lg-5">
                         <div class="logo-cat-wrap">
                             <div class="logo-part pr-90">
-                                <a class="dark-logo" href="{{ route('landing') }}">
-                                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}"
-                                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 35px;">
+                                <a class="dark-logo" href="<?php echo e(route('landing')); ?>">
+                                    <img src="<?php echo e(theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png'))); ?>"
+                                        alt="<?php echo e(theme_info('name', 'Logo')); ?>" style="max-height: 35px;">
                                 </a>
-                                <a class="light-logo" href="{{ route('landing') }}">
-                                    <img src="{{ theme_image('logo_light', theme_info('defaults.logo_light', 'assets_telkom/assets/images/logo.png')) }}"
-                                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 35px;">
+                                <a class="light-logo" href="<?php echo e(route('landing')); ?>">
+                                    <img src="<?php echo e(theme_image('logo_light', theme_info('defaults.logo_light', 'assets_telkom/assets/images/logo.png'))); ?>"
+                                        alt="<?php echo e(theme_info('name', 'Logo')); ?>" style="max-height: 35px;">
                                 </a>
                             </div>
                             <div class="categories-btn">
@@ -81,26 +81,26 @@
                                 </div>
                                 <nav class="rs-menu">
                                     <ul class="nav-menu">
-                                        @foreach (theme_config('menu', []) as $item)
-                                            @if (isset($item['children']) && count($item['children']) > 0)
+                                        <?php $__currentLoopData = theme_config('menu', []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if(isset($item['children']) && count($item['children']) > 0): ?>
                                                 <li class="menu-item-has-children">
                                                     <a
-                                                        href="{{ resolve_theme_url($item['url'] ?? '#') }}">{{ $item['label'] }}</a>
+                                                        href="<?php echo e(resolve_theme_url($item['url'] ?? '#')); ?>"><?php echo e($item['label']); ?></a>
                                                     <ul class="sub-menu">
-                                                        @foreach ($item['children'] as $child)
+                                                        <?php $__currentLoopData = $item['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $child): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                             <li><a
-                                                                    href="{{ resolve_theme_url($child['url'] ?? '#') }}">{{ $child['label'] }}</a>
+                                                                    href="<?php echo e(resolve_theme_url($child['url'] ?? '#')); ?>"><?php echo e($child['label']); ?></a>
                                                             </li>
-                                                        @endforeach
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </ul>
                                                 </li>
-                                            @else
+                                            <?php else: ?>
                                                 <li class="menu-item-has">
-                                                    <a href="{{ resolve_theme_url($item['url'] ?? '#') }}"
-                                                        @if (($item['target'] ?? '') === '_blank') target="_blank" @endif>{{ $item['label'] }}</a>
+                                                    <a href="<?php echo e(resolve_theme_url($item['url'] ?? '#')); ?>"
+                                                        <?php if(($item['target'] ?? '') === '_blank'): ?> target="_blank" <?php endif; ?>><?php echo e($item['label']); ?></a>
                                                 </li>
-                                            @endif
-                                        @endforeach
+                                            <?php endif; ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </ul>
                                 </nav>
                             </div>
@@ -121,9 +121,9 @@
                 </div>
             </div>
             <div class="canvas-logo">
-                <a href="{{ route('landing') }}">
-                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}"
-                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 60px;">
+                <a href="<?php echo e(route('landing')); ?>">
+                    <img src="<?php echo e(theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png'))); ?>"
+                        alt="<?php echo e(theme_info('name', 'Logo')); ?>" style="max-height: 60px;">
                 </a>
             </div>
         </nav>
@@ -132,3 +132,4 @@
     <!--Header End-->
 </div>
 <!--Full width header End-->
+<?php /**PATH E:\PROJEKU\telkom\resources\views/components/telkom/header.blade.php ENDPATH**/ ?>
