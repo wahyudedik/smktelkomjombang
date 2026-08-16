@@ -244,11 +244,15 @@ $PHP_BIN artisan migrate --force
 info "Sync permissions Spatie..."
 $PHP_BIN artisan db:seed --class=RolePermissionSeeder 2>/dev/null || true
 
-# 9. Seed static pages
+# 9. Seed theme settings (safe — tidak overwrites data existing)
+info "Seed theme settings..."
+$PHP_BIN artisan db:seed --class=ThemeSettingsSeeder 2>/dev/null || warn "ThemeSettingsSeeder dilewati."
+
+# 10. Seed static pages
 info "Seed static pages..."
 $PHP_BIN artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()" 2>/dev/null || warn "Static page generator dilewati."
 
-# 10. Optimasi Laravel
+# 11. Optimasi Laravel
 info "Mengoptimasi aplikasi..."
 $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
@@ -256,23 +260,23 @@ $PHP_BIN artisan view:cache
 $PHP_BIN artisan event:cache
 $PHP_BIN artisan icons:cache 2>/dev/null || true
 
-# 11. Clear cache data (bukan config/route/view)
+# 12. Clear cache data (bukan config/route/view)
 info "Membersihkan data cache..."
 $PHP_BIN artisan cache:clear
 
-# 12. Link storage (jika belum)
+# 13. Link storage (jika belum)
 info "Memastikan storage link..."
 $PHP_BIN artisan storage:link 2>/dev/null || true
 
-# 13. Restart queue worker
+# 14. Restart queue worker
 info "Merestart queue worker..."
 $PHP_BIN artisan queue:restart
 
-# 14. Restart scheduler (jika menggunakan supervisor)
+# 15. Restart scheduler (jika menggunakan supervisor)
 info "Merestart scheduler..."
 $PHP_BIN artisan schedule:work --stop-when-empty 2>/dev/null || true
 
-# 15. Set permission yang benar
+# 16. Set permission yang benar
 info "Mengatur permission..."
 
 # Deteksi user web server (www-data untuk Ubuntu/Debian, www untuk aaPanel/BT Panel)
@@ -308,7 +312,7 @@ find "$APP_DIR/storage" -type f -exec chmod 664 {} \; 2>/dev/null || true
 find "$APP_DIR/storage" -type d -exec chmod 775 {} \; 2>/dev/null || true
 chmod -R o-w "$APP_DIR/storage" 2>/dev/null || true
 
-# 16. Nonaktifkan Maintenance Mode
+# 17. Nonaktifkan Maintenance Mode
 info "Menonaktifkan maintenance mode..."
 $PHP_BIN artisan up
 

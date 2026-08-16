@@ -73,6 +73,16 @@
 - [x] Theme settings admin (database-backed)
 - [x] Theme preview, clone, import/export, comparison, analytics
 
+### Tahap 5b: Theme System Audit & Fix (Selesai — 2026-08-16)
+- [x] Fix cache keys di LandingController → generic `landing_{theme}_*` prefix
+- [x] Fix logo inconsistency di `config/themes/telkom.php` (logo-dark.png vs logo.png)
+- [x] Tambah `ThemeSettingsSeeder` ke `deploy.sh` & `update.sh`
+- [x] Tambah permission granular `themes.view` / `themes.edit` ke routes & RolePermissionSeeder
+- [x] Refactor `ThemeSetting::getRegisteredThemes()` → reads from `config('themes.available')`
+- [x] Fix header canvas menu logo → `theme_image()` (bukan hardcoded `asset()`)
+- [x] Fix footer & header "Link Terkait" → render dari `theme_config('related_links')`
+- [x] Update FEATURES.md & ROADMAP.md
+
 ---
 
 ## 🔄 Fitur yang Sedang Dikerjakan

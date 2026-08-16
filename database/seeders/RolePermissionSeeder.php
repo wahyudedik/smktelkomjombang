@@ -69,6 +69,10 @@ class RolePermissionSeeder extends Seeder
             'sarpras.read',
             'sarpras.update',
             'sarpras.delete',
+
+            // Themes Module
+            'themes.view',
+            'themes.edit',
         ];
 
         foreach ($permissions as $permission) {

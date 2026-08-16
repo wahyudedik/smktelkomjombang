@@ -243,19 +243,23 @@ $PHP_BIN artisan icon:cache 2>/dev/null || true
 info "Memastikan storage link..."
 $PHP_BIN artisan storage:link 2>/dev/null || true
 
-# 11. Seed static pages (jika ada perubahan theme)
+# 11. Seed theme settings (safe — tidak overwrites data existing)
+info "Seed theme settings..."
+$PHP_BIN artisan db:seed --class=ThemeSettingsSeeder 2>/dev/null || warn "ThemeSettingsSeeder dilewati."
+
+# 12. Seed static pages (jika ada perubahan theme)
 info "Seed static pages..."
 $PHP_BIN artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()" 2>/dev/null || warn "Static page generator dilewati."
 
-# 12. Restart queue worker
+# 13. Restart queue worker
 info "Merestart queue worker..."
 $PHP_BIN artisan queue:restart
 
-# 13. Restart scheduler (jika menggunakan supervisor)
+# 14. Restart scheduler (jika menggunakan supervisor)
 info "Merestart scheduler..."
 $PHP_BIN artisan schedule:run 2>/dev/null || true
 
-# 14. Set permission yang benar
+# 15. Set permission yang benar
 info "Mengatur permission..."
 
 # Deteksi user web server (www-data untuk Ubuntu/Debian, www untuk aaPanel/BT Panel)
@@ -291,19 +295,19 @@ find "$APP_DIR/storage" -type f -exec chmod 664 {} \; 2>/dev/null || true
 find "$APP_DIR/storage" -type d -exec chmod 775 {} \; 2>/dev/null || true
 chmod -R o-w "$APP_DIR/storage" 2>/dev/null || true
 
-# 15. Cleanup backup lama (simpan 7 hari terakhir)
+# 16. Cleanup backup lama (simpan 7 hari terakhir)
 info "Membersihkan backup lama..."
 find "$BACKUP_DIR" -name "db_backup_*.sql" -mtime +7 -delete 2>/dev/null || true
 
-# 16. Cleanup old logs (simpan 30 hari terakhir)
+# 17. Cleanup old logs (simpan 30 hari terakhir)
 info "Membersihkan log lama..."
 find "$APP_DIR/storage/logs" -name "*.log" -mtime +30 -delete 2>/dev/null || true
 
-# 17. Cleanup old views cache
+# 18. Cleanup old views cache
 info "Membersihkan view cache lama..."
 find "$APP_DIR/storage/framework/views" -name "*.php" -mtime +7 -delete 2>/dev/null || true
 
-# 18. Nonaktifkan Maintenance Mode
+# 19. Nonaktifkan Maintenance Mode
 info "Menonaktifkan maintenance mode..."
 $PHP_BIN artisan up
 

@@ -214,16 +214,17 @@ class ThemeSetting extends Model
      */
     public static function getRegisteredThemes(): array
     {
-        return [
-            'telkom' => [
-                'name' => config('themes.telkom.name', 'SMK Telekomunikasi Darul Ulum'),
-                'short_name' => 'Telkom',
-            ],
-            'maudu' => [
-                'name' => config('themes.maudu.name', 'MA Unggulan Darul Ulum Rejoso'),
-                'short_name' => 'MAUDU',
-            ],
-        ];
+        $themes = [];
+        $available = config('themes.available', []);
+
+        foreach ($available as $key => $config) {
+            $themes[$key] = [
+                'name' => $config['name'] ?? $key,
+                'short_name' => $config['short_name'] ?? strtoupper($key),
+            ];
+        }
+
+        return $themes;
     }
 
     /**

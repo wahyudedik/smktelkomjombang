@@ -731,29 +731,29 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin'
 
     // Theme Settings Management Routes
     Route::prefix('settings/themes')->name('themes.')->group(function () {
-        Route::get('/', [ThemeSettingController::class, 'index'])->name('index');
-        Route::get('/{theme}/edit', [ThemeSettingController::class, 'edit'])->name('edit');
-        Route::put('/{theme}', [ThemeSettingController::class, 'update'])->name('update');
-        Route::post('/{theme}/seed-defaults', [ThemeSettingController::class, 'seedDefaults'])->name('seed-defaults');
-        Route::post('/{theme}/reset-defaults', [ThemeSettingController::class, 'resetDefaults'])->name('reset-defaults');
+        Route::get('/', [ThemeSettingController::class, 'index'])->name('index')->middleware('permission:themes.view');
+        Route::get('/{theme}/edit', [ThemeSettingController::class, 'edit'])->name('edit')->middleware('permission:themes.edit');
+        Route::put('/{theme}', [ThemeSettingController::class, 'update'])->name('update')->middleware('permission:themes.edit');
+        Route::post('/{theme}/seed-defaults', [ThemeSettingController::class, 'seedDefaults'])->name('seed-defaults')->middleware('permission:themes.edit');
+        Route::post('/{theme}/reset-defaults', [ThemeSettingController::class, 'resetDefaults'])->name('reset-defaults')->middleware('permission:themes.edit');
 
         // P3-6.1: Theme Preview
-        Route::get('/{theme}/preview', [ThemeSettingController::class, 'preview'])->name('preview');
+        Route::get('/{theme}/preview', [ThemeSettingController::class, 'preview'])->name('preview')->middleware('permission:themes.view');
 
         // P3-6.2: Theme Clone
-        Route::post('/{theme}/clone', [ThemeSettingController::class, 'cloneTheme'])->name('clone');
+        Route::post('/{theme}/clone', [ThemeSettingController::class, 'cloneTheme'])->name('clone')->middleware('permission:themes.edit');
 
         // P3-6.3: Import/Export
-        Route::get('/{theme}/export', [ThemeSettingController::class, 'exportTheme'])->name('export');
-        Route::get('/{theme}/import', [ThemeSettingController::class, 'importForm'])->name('import');
-        Route::post('/{theme}/import', [ThemeSettingController::class, 'importTheme'])->name('import-process');
+        Route::get('/{theme}/export', [ThemeSettingController::class, 'exportTheme'])->name('export')->middleware('permission:themes.view');
+        Route::get('/{theme}/import', [ThemeSettingController::class, 'importForm'])->name('import')->middleware('permission:themes.view');
+        Route::post('/{theme}/import', [ThemeSettingController::class, 'importTheme'])->name('import-process')->middleware('permission:themes.edit');
 
         // P3-6.4: Theme Comparison
-        Route::get('/compare', [ThemeSettingController::class, 'compare'])->name('compare');
+        Route::get('/compare', [ThemeSettingController::class, 'compare'])->name('compare')->middleware('permission:themes.view');
 
         // P3-6.5: Theme Analytics
-        Route::get('/analytics', [ThemeSettingController::class, 'analytics'])->name('analytics');
-        Route::get('/analytics/data', [ThemeSettingController::class, 'analyticsData'])->name('analytics-data');
+        Route::get('/analytics', [ThemeSettingController::class, 'analytics'])->name('analytics')->middleware('permission:themes.view');
+        Route::get('/analytics/data', [ThemeSettingController::class, 'analyticsData'])->name('analytics-data')->middleware('permission:themes.view');
     });
 
     // Analytics Dashboard

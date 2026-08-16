@@ -37,8 +37,8 @@ return [
     // Assets
     'assets_path' => 'assets_telkom',
     'favicon' => 'assets_telkom/assets/images/fav.png',
-    'logo' => 'assets_telkom/assets/images/logo.png',            // Dark text logo for light header (default state)
-    'logo_light' => 'assets_telkom/assets/images/logo.png',      // Same logo for footer
+    'logo' => 'assets_telkom/assets/images/logo-dark.png',       // Dark text logo for light header (default state)
+    'logo_light' => 'assets_telkom/assets/images/logo.png',      // Light/white logo for dark header (sticky state)
 
     // Hero Slider (paths only — resolve with asset() in views/helpers)
     'hero_images' => [
@@ -115,6 +115,15 @@ return [
     'working_hours' => [
         'days' => 'Sabtu - Kamis',
         'hours' => '08:00 - 16:00 WIB',
+    ],
+
+    // Link Terkait (used in header dropdown & footer)
+    'related_links' => [
+        ['label' => 'E-Rapor', 'url' => '#'],
+        ['label' => 'E-Osis', 'url' => '#'],
+        ['label' => 'E-Learning', 'url' => '#'],
+        ['label' => 'E-Perpus', 'url' => '#'],
+        ['label' => 'E-Administrasi', 'url' => '#'],
     ],
 
     // Menu Navigasi (matches telkom.html template exactly)

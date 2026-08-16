@@ -14,10 +14,9 @@
                 <div class="col-lg-4 col-md-12 col-sm-12 footer-widget md-mb-50">
                     <h4 class="widget-title">Link Terkait</h4>
                     <ul class="site-map">
-                        <li><a href="#">E-Rapor</a></li>
-                        <li><a href="#">E-Osis</a></li>
-                        <li><a href="#">E-Learning</a></li>
-                        <li><a href="#">E-Perpus</a></li>
+                        @foreach(theme_config('related_links', []) as $link)
+                            <li><a href="{{ resolve_theme_url($link['url'] ?? '#') }}">{{ $link['label'] ?? '' }}</a></li>
+                        @endforeach
                     </ul>
                 </div>
 

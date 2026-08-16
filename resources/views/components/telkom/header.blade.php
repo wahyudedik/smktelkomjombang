@@ -60,10 +60,9 @@
                                 <button type="button" class="cat-btn"><i class="fa fa-th"></i>Link Terkait</button>
                                 <div class="cat-menu-inner">
                                     <ul id="cat-menu">
-                                        <li><a href="#">E-Rapor</a></li>
-                                        <li><a href="#">E-Learning</a></li>
-                                        <li><a href="#">E-Perpus</a></li>
-                                        <li><a href="#">E-Administrasi</a></li>
+                                        @foreach(theme_config('related_links', []) as $link)
+                                            <li><a href="{{ resolve_theme_url($link['url'] ?? '#') }}">{{ $link['label'] ?? '' }}</a></li>
+                                        @endforeach
                                     </ul>
                                 </div>
                             </div>
@@ -120,7 +119,7 @@
             </div>
             <div class="canvas-logo">
                 <a href="{{ route('landing') }}">
-                    <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}"
+                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}"
                         alt="{{ theme_info('name', 'Logo') }}">
                 </a>
             </div>

@@ -285,7 +285,13 @@
 | Theme config files | ✅ | `config/themes/{theme}.php` |
 | Database theme settings | ✅ | Admin-editable overrides |
 | Route override | ✅ | `/theme/{theme}` dynamic route |
-| Theme-aware controllers | ⚠️ | Telkom ✅, MAUDU ⚠️ (partial) |
+| Theme-aware controllers | ✅ | Generic via `current_theme()` + `theme_view()` |
+| Theme-aware cache keys | ✅ | `landing_{theme}_*` prefix (per-theme cache isolation) |
+| Theme permission granularity | ✅ | `themes.view` / `themes.edit` (Spatie) |
+| Related links from config | ✅ | Header dropdown + footer render dari `theme_config('related_links')` |
+| Canvas menu logo theme-aware | ✅ | Menggunakan `theme_image()` bukan hardcoded `asset()` |
+| Deployment seeder | ✅ | `ThemeSettingsSeeder` otomatis di `deploy.sh` & `update.sh` |
+| Dynamic registered themes | ✅ | `ThemeSetting::getRegisteredThemes()` reads from `config('themes.available')` |
 
 ---
 

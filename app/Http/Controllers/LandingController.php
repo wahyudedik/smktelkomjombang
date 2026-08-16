@@ -87,7 +87,8 @@ class LandingController extends Controller
      */
     private function getSiswaCount()
     {
-        return Cache::remember('telkom_siswa_count', 86400, function () {
+        $theme = current_theme();
+        return Cache::remember("landing_{$theme}_siswa_count", 86400, function () {
             return Siswa::where('status', 'aktif')->count();
         });
     }
@@ -97,7 +98,8 @@ class LandingController extends Controller
      */
     private function getKelulusanPercentage()
     {
-        return Cache::remember('telkom_kelulusan_percentage', 86400, function () {
+        $theme = current_theme();
+        return Cache::remember("landing_{$theme}_kelulusan_percentage", 86400, function () {
             $total = Kelulusan::count();
             if ($total === 0) return 0;
             // Count graduates who continued to higher education (have tempat_kuliah filled)
@@ -114,7 +116,8 @@ class LandingController extends Controller
      */
     private function getTestimonials()
     {
-        return Cache::remember('telkom_testimonials', 86400, function () {
+        $theme = current_theme();
+        return Cache::remember("landing_{$theme}_testimonials", 86400, function () {
             $testimonials = Testimonial::where('is_approved', true)
                 ->orderBy('created_at', 'desc')
                 ->limit(4)
@@ -134,7 +137,8 @@ class LandingController extends Controller
      */
     private function getBlogs()
     {
-        return Cache::remember('telkom_blogs', 86400, function () {
+        $theme = current_theme();
+        return Cache::remember("landing_{$theme}_blogs", 86400, function () {
             return Page::where('status', 'published')
                 ->where('category', 'berita')
                 ->where('published_at', '<=', now())
@@ -150,7 +154,8 @@ class LandingController extends Controller
      */
     private function getPartners()
     {
-        return Cache::remember('telkom_partners', 86400, function () {
+        $theme = current_theme();
+        return Cache::remember("landing_{$theme}_partners", 86400, function () {
             return Partner::where('is_active', true)
                 ->orderBy('sort_order')
                 ->get();
@@ -162,7 +167,8 @@ class LandingController extends Controller
      */
     private function getEvents()
     {
-        return Cache::remember('telkom_events', 43200, function () {
+        $theme = current_theme();
+        return Cache::remember("landing_{$theme}_events", 43200, function () {
             if (class_exists('App\Models\Events')) {
                 // Show active events: upcoming first, then recent past events as fallback
                 $events = \App\Models\Events::where('status', 'active')
