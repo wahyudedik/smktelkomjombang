@@ -237,7 +237,7 @@ $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
 $PHP_BIN artisan view:cache
 $PHP_BIN artisan event:cache
-$PHP_BIN artisan icons:cache 2>/dev/null || true
+$PHP_BIN artisan icon:cache 2>/dev/null || true
 
 # 10. Link storage (jika belum)
 info "Memastikan storage link..."
@@ -253,7 +253,7 @@ $PHP_BIN artisan queue:restart
 
 # 13. Restart scheduler (jika menggunakan supervisor)
 info "Merestart scheduler..."
-$PHP_BIN artisan schedule:work --stop-when-empty 2>/dev/null || true
+$PHP_BIN artisan schedule:run 2>/dev/null || true
 
 # 14. Set permission yang benar
 info "Mengatur permission..."

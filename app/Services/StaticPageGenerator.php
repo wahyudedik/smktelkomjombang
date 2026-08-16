@@ -23,14 +23,18 @@ class StaticPageGenerator
             $pageData['user_id'] = $adminUserId;
             $pageData['published_at'] = now();
 
-            $existing = Page::where('slug', $pageData['slug'])->first();
+            $slug = $pageData['slug'];
+            unset($pageData['slug']); // Hapus slug dari data untuk updateOrCreate
 
-            if ($existing) {
-                $existing->update($pageData);
-                $updated++;
-            } else {
-                Page::create($pageData);
+            $result = Page::updateOrCreate(
+                ['slug' => $slug],
+                $pageData
+            );
+
+            if ($result->wasRecentlyCreated) {
                 $created++;
+            } else {
+                $updated++;
             }
         }
 
