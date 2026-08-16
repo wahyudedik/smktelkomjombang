@@ -25,12 +25,6 @@
     <!-- Testimonials Section -->
     <x-telkom.testimonials :testimonials="$testimonials" />
 
-    <!-- Instagram Feed Section -->
-    <x-telkom.instagram :instagramPosts="$instagramPosts" />
-
     <!-- Blog Section -->
     <x-telkom.blog :blogs="$blogs" />
-
-    <!-- Contact Section -->
-    <x-telkom.contact />
 @endsection

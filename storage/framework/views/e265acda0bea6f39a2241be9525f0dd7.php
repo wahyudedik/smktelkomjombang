@@ -76,6 +76,181 @@
 
     <!-- Additional CSS -->
     <?php echo $__env->yieldPushContent('styles'); ?>
+
+    <!-- Inline Override for Navbar & Sub-Menu (from original template) -->
+    <style>
+        /* Direct Inline Override for Navbar & Sub-Menu */
+        html body .full-width-header.header-style2 .rs-header .menu-area,
+        html body .menu-area.menu-sticky {
+            background-color: #21a7d0 !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+            padding: 4px 0 !important;
+        }
+        html body .logo-cat-wrap {
+            display: flex !important;
+            align-items: center !important;
+            gap: 18px !important;
+            flex-wrap: nowrap !important;
+        }
+        html body .brand-logo-wrap {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            text-decoration: none !important;
+        }
+        /* Logo badge & text size */
+        html body .brand-logo-wrap .logo-badge {
+            height: 60px !important;
+            width: 60px !important;
+            max-height: 60px !important;
+            object-fit: contain !important;
+            flex-shrink: 0 !important;
+        }
+        html body .brand-logo-wrap .logo-text {
+            height: 44px !important;
+            max-height: 44px !important;
+            width: auto !important;
+            object-fit: contain !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* TOP LEVEL NAV MENU ITEMS - CLEAN, FLEX-NOWRAP SINGLE ROW, ALWAYS SOLID WHITE (#ffffff) TEXT */
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu,
+        html body .rs-menu ul.nav-menu {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            white-space: nowrap !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            gap: 2px !important;
+        }
+
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li,
+        html body .rs-menu ul.nav-menu > li {
+            background: transparent !important;
+            background-color: transparent !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            flex-shrink: 0 !important;
+            float: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            white-space: nowrap !important;
+        }
+
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a *,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li:hover > a,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li:hover > a *,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li.hover > a,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li.hover > a *,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a:hover,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a:hover *,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li.active-menu > a,
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li.current-menu-item > a {
+            color: #ffffff !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            letter-spacing: 0.3px;
+            white-space: nowrap !important;
+            padding: 20px 10px !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+        }
+
+        /* HIDE ALL EXTRA JS ARROWS & CLOSE BUTTONS & PSEUDO ELEMENTS COMPLETELY */
+        html body span.rs-menu-parent,
+        html body .rs-menu-parent,
+        html body .rs-menu-parent *,
+        html body div.sub-menu-close,
+        html body .sub-menu-close,
+        html body .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a:after,
+        html body .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a:before,
+        html body .rs-menu ul.nav-menu > li > a:after,
+        html body .rs-menu ul.nav-menu > li > a:before,
+        html body .rs-menu ul.sub-menu:before,
+        html body .rs-menu ul.sub-menu:after {
+            display: none !important;
+            content: "" !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
+        /* SINGLE CLEAN SUB-MENU DROPDOWN WITH BORDER RADIUS & PERFECT CLIPPING */
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.sub-menu,
+        html body .full-width-header .rs-header .menu-area .main-menu .rs-menu ul.sub-menu,
+        html body .rs-menu ul.sub-menu {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.16) !important;
+            border-radius: 8px !important;
+            padding: 6px 0 !important;
+            border: 1px solid #e2e8f0 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            overflow: hidden !important;
+        }
+
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.sub-menu li,
+        html body .rs-menu ul.sub-menu li {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Normal sub-menu item state: DARK BLACK TEXT (#111111) ON WHITE BACKGROUND */
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.sub-menu li a,
+        html body .full-width-header .rs-header .menu-area .main-menu .rs-menu ul.sub-menu li a,
+        html body .rs-menu ul.sub-menu li a,
+        html body .sub-menu li a {
+            color: #111111 !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            line-height: 20px !important;
+            padding: 12px 24px !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            text-shadow: none !important;
+            display: block !important;
+            text-align: left !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            text-transform: capitalize !important;
+            transition: all 0.2s ease !important;
+        }
+
+        /* Hover sub-menu item state: SOLID BLACK TEXT (#000000) WITH LIGHT GRAY ROW BACKGROUND (#F2F2F2) */
+        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.sub-menu li a:hover,
+        html body .full-width-header .rs-header .menu-area .main-menu .rs-menu ul.sub-menu li a:hover,
+        html body .rs-menu ul.sub-menu li a:hover,
+        html body .sub-menu li a:hover,
+        html body .sub-menu li:hover > a {
+            color: #000000 !important;
+            background: #f2f2f2 !important;
+            background-color: #f2f2f2 !important;
+            padding-left: 28px !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            font-weight: 700 !important;
+            text-shadow: none !important;
+        }
+    </style>
 </head>
 
 <body class="home-style2">

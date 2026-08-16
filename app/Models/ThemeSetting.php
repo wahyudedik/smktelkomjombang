@@ -252,7 +252,7 @@ class ThemeSetting extends Model
     private static function getDefaultGroupMap(): array
     {
         return [
-            // General
+            // ═══ General ═══
             'name' => 'general',
             'short_name' => 'general',
             'tagline' => 'general',
@@ -270,7 +270,17 @@ class ThemeSetting extends Model
             'logo' => 'general',
             'logo_light' => 'general',
 
-            // Social Media
+            // ═══ Landing Page: Site Info ═══
+            'site_name' => 'general',
+            'site_description' => 'general',
+            'site_keywords' => 'general',
+            'footer_text' => 'general',
+
+            // ═══ Landing Page: Gallery ═══
+            'gallery_title' => 'general',
+            'gallery_subtitle' => 'general',
+
+            // ═══ Social Media ═══
             'facebook' => 'social',
             'instagram' => 'social',
             'youtube' => 'social',
@@ -280,25 +290,94 @@ class ThemeSetting extends Model
             'youtube_url' => 'social',
             'tiktok_url' => 'social',
 
-            // Hero
+            // ═══ Landing Page: Social (admin) ═══
+            'social_facebook' => 'social',
+            'social_instagram' => 'social',
+            'social_youtube' => 'social',
+            'social_whatsapp' => 'social',
+
+            // ═══ Hero ═══
             'hero_images' => 'hero',
 
-            // Features
+            // ═══ Landing Page: Hero Slides ═══
+            'hero_title' => 'hero',
+            'hero_subtitle' => 'hero',
+            'hero_slide1_subtitle' => 'hero',
+            'hero_slide1_title' => 'hero',
+            'hero_slide1_description' => 'hero',
+            'hero_slide2_subtitle' => 'hero',
+            'hero_slide2_title' => 'hero',
+            'hero_slide2_description' => 'hero',
+            'hero_slide3_subtitle' => 'hero',
+            'hero_slide3_title' => 'hero',
+            'hero_slide3_description' => 'hero',
+
+            // ═══ Features ═══
             'features' => 'features',
 
-            // Programs
+            // ═══ Landing Page: Feature Cards ═══
+            'feature1_title' => 'features',
+            'feature1_description' => 'features',
+            'feature2_title' => 'features',
+            'feature2_description' => 'features',
+            'feature3_title' => 'features',
+            'feature3_description' => 'features',
+
+            // ═══ Programs ═══
             'program_peminatan' => 'programs',
             'program_unggulan' => 'programs',
             'jurusan' => 'programs',
 
-            // About / Kepala Sekolah
+            // ═══ Landing Page: Programs ═══
+            'program_section_title' => 'programs',
+            'program_section_subtitle' => 'programs',
+            'program_ipa_title' => 'programs',
+            'program_ipa_description' => 'programs',
+            'program_ips_title' => 'programs',
+            'program_ips_description' => 'programs',
+            'program_religion_title' => 'programs',
+            'program_religion_description' => 'programs',
+            'program_section_image' => 'programs',
+
+            // ═══ About / Kepala Sekolah ═══
             'kepala_sekolah' => 'about',
 
-            // Video
+            // ═══ Landing Page: About Section ═══
+            'about_section_title' => 'about',
+            'about_section_subtitle' => 'about',
+            'about_section_description' => 'about',
+            'about_image_1' => 'about',
+            'about_image_2' => 'about',
+            'about_image_3' => 'about',
+            'about_feature_1_title' => 'about',
+            'about_feature_1_description' => 'about',
+            'about_feature_2_title' => 'about',
+            'about_feature_2_description' => 'about',
+            'about_feature_3_title' => 'about',
+            'about_feature_3_description' => 'about',
+            'about_feature_4_title' => 'about',
+            'about_feature_4_description' => 'about',
+            'about_button_text' => 'about',
+            'about_contact_text' => 'about',
+            'about_contact_phone' => 'about',
+
+            // ═══ Landing Page: Headmaster ═══
+            'headmaster_name' => 'about',
+            'headmaster_description' => 'about',
+            'headmaster_vision' => 'about',
+            'headmaster_photo' => 'about',
+
+            // ═══ Landing Page: Campus Life Headmaster ═══
+            'campus_life_headmaster_name' => 'about',
+            'campus_life_headmaster_description' => 'about',
+            'campus_life_headmaster_vision' => 'about',
+            'campus_life_headmaster_photo' => 'about',
+
+            // ═══ Video ═══
             'video_url' => 'video',
             'video_thumbnail' => 'video',
 
-            // Counter
+            // ═══ Counter ═══
             'counter1_number' => 'counter',
             'counter1_label' => 'counter',
             'counter2_number' => 'counter',
@@ -306,16 +385,25 @@ class ThemeSetting extends Model
             'counter3_number' => 'counter',
             'counter3_label' => 'counter',
 
-            // CTA
+            // ═══ CTA ═══
             'cta_title' => 'cta',
             'cta_description' => 'cta',
             'cta_button_url' => 'cta',
             'cta_button_text' => 'cta',
+            'cta_video_title' => 'cta',
 
-            // Working Hours
+            // ═══ Contact ═══
             'working_hours' => 'contact',
+            'contact_email' => 'contact',
+            'contact_phone' => 'contact',
+            'contact_address' => 'contact',
+            'contact_section_subtitle' => 'contact',
+            'contact_section_title' => 'contact',
+            'contact_section_description' => 'contact',
+            'contact_map_url' => 'contact',
+            'contact_operational_hours' => 'contact',
 
-            // Menu
+            // ═══ Menu ═══
             'menu' => 'menu',
         ];
     }

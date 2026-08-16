@@ -53,13 +53,13 @@
                         </div>
                         <div class="events-short wow fadeInUp" data-wow-delay="500ms" data-wow-duration="2000ms">
                             <div class="date-part bgc3">
-                                <span class="month">Juli</span>
-                                <div class="date">15</div>
+                                <span class="month">..</span>
+                                <div class="date">..</div>
                             </div>
                             <div class="content-part">
-                                <h4 class="title mb-0">Ujian Akhir Sekolah</h4>
+                                <h4 class="title mb-0">Ujian Akhir Semester</h4>
                                 <div class="categorie">
-                                    <span>Kelas 3</span>
+                                    <span>Semua Jurusan</span>
                                 </div>
                             </div>
                         </div>

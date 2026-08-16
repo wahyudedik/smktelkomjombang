@@ -175,28 +175,6 @@
 <?php unset($__componentOriginal5a2de31ac60438e90474c083b84ec48e); ?>
 <?php endif; ?>
 
-    <!-- Instagram Feed Section -->
-    <?php if (isset($component)) { $__componentOriginal44b7d1f1c1e773d23007f9cf86d35414 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal44b7d1f1c1e773d23007f9cf86d35414 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.telkom.instagram','data' => ['instagramPosts' => $instagramPosts]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('telkom.instagram'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['instagramPosts' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($instagramPosts)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal44b7d1f1c1e773d23007f9cf86d35414)): ?>
-<?php $attributes = $__attributesOriginal44b7d1f1c1e773d23007f9cf86d35414; ?>
-<?php unset($__attributesOriginal44b7d1f1c1e773d23007f9cf86d35414); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal44b7d1f1c1e773d23007f9cf86d35414)): ?>
-<?php $component = $__componentOriginal44b7d1f1c1e773d23007f9cf86d35414; ?>
-<?php unset($__componentOriginal44b7d1f1c1e773d23007f9cf86d35414); ?>
-<?php endif; ?>
-
     <!-- Blog Section -->
     <?php if (isset($component)) { $__componentOriginalf3450caae6f24b5675c2cd35530a4cdd = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalf3450caae6f24b5675c2cd35530a4cdd = $attributes; } ?>
@@ -217,28 +195,6 @@
 <?php if (isset($__componentOriginalf3450caae6f24b5675c2cd35530a4cdd)): ?>
 <?php $component = $__componentOriginalf3450caae6f24b5675c2cd35530a4cdd; ?>
 <?php unset($__componentOriginalf3450caae6f24b5675c2cd35530a4cdd); ?>
-<?php endif; ?>
-
-    <!-- Contact Section -->
-    <?php if (isset($component)) { $__componentOriginal4592c8694e89aa548e34652999c567a6 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal4592c8694e89aa548e34652999c567a6 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.telkom.contact','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('telkom.contact'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal4592c8694e89aa548e34652999c567a6)): ?>
-<?php $attributes = $__attributesOriginal4592c8694e89aa548e34652999c567a6; ?>
-<?php unset($__attributesOriginal4592c8694e89aa548e34652999c567a6); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal4592c8694e89aa548e34652999c567a6)): ?>
-<?php $component = $__componentOriginal4592c8694e89aa548e34652999c567a6; ?>
-<?php unset($__componentOriginal4592c8694e89aa548e34652999c567a6); ?>
 <?php endif; ?>
 <?php $__env->stopSection(); ?>
 

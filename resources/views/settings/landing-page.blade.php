@@ -8,6 +8,40 @@
                 <p class="text-gray-600 mt-2">{{ __('common.manage_landing_page_settings_description') }}</p>
             </div>
 
+            {{-- Per-Theme Settings Badge --}}
+            @php $activeTheme = current_theme(); @endphp
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full">
+                            🎨 {{ strtoupper($activeTheme) }}
+                        </span>
+                        <span class="text-sm text-blue-800">Tema Aktif</span>
+                    </div>
+                    @if (isset($availableThemes) && count($availableThemes) > 1)
+                        <span class="text-gray-400">|</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-600">Switch ke:</span>
+                            @foreach ($availableThemes as $themeSlug => $themeName)
+                                @if ($themeSlug !== $activeTheme)
+                                    <a href="{{ route('admin.settings.landing-page') . '?theme=' . $themeSlug }}"
+                                       class="px-3 py-1 text-sm rounded-full border border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition {{ $themeSlug === $activeTheme ? 'bg-blue-100 border-blue-500' : '' }}">
+                                        {{ $themeName }}
+                                    </a>
+                                @else
+                                    <span class="px-3 py-1 text-sm rounded-full bg-green-100 border border-green-500 text-green-700 font-medium">
+                                        ✓ {{ $themeName }}
+                                    </span>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+                <a href="{{ url('/' . $activeTheme) }}" target="_blank"
+                   class="text-sm text-blue-600 hover:text-blue-800 underline">
+                    Preview Landing Page ↗
+                </a>
+            </div>
             @if (session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
                     {{ session('success') }}
@@ -43,7 +77,7 @@
                             <label for="site_name" class="block text-sm font-medium text-gray-700 mb-2">Site Name
                                 *</label>
                             <input type="text" id="site_name" name="site_name"
-                                value="{{ cache('site_setting_site_name', 'MAUDU REJOSO') }}"
+                                value="{{ $settings['site_name'] ?? 'MAUDU REJOSO' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required>
                         </div>
@@ -51,14 +85,14 @@
                             <label for="site_description" class="block text-sm font-medium text-gray-700 mb-2">Site
                                 Description</label>
                             <textarea id="site_description" name="site_description" rows="3"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{ cache('site_setting_site_description') }}</textarea>
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{ $settings['site_description'] ?? '' }}</textarea>
                         </div>
                         <div class="md:col-span-2">
                             <label for="site_keywords" class="block text-sm font-medium text-gray-700 mb-2">Keywords
                                 (comma
                                 separated)</label>
                             <input type="text" id="site_keywords" name="site_keywords"
-                                value="{{ cache('site_setting_site_keywords') }}"
+                                value="{{ $settings['site_keywords'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="sekolah, pendidikan, madrasah">
                         </div>
@@ -73,10 +107,10 @@
                             <label for="logo" class="block text-sm font-medium text-gray-700 mb-2">Logo</label>
                             <input type="file" id="logo" name="logo" accept="image/*"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @if (cache('site_setting_logo'))
+                            @if (!empty($settings['logo']))
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-600">Current logo:</p>
-                                    <img src="{{ Storage::url(cache('site_setting_logo')) }}" alt="Current Logo"
+                                    <img src="{{ Storage::url($settings['logo']) }}" alt="Current Logo"
                                         class="h-16 w-auto mt-1">
                                 </div>
                             @endif
@@ -85,10 +119,10 @@
                             <label for="favicon" class="block text-sm font-medium text-gray-700 mb-2">Favicon</label>
                             <input type="file" id="favicon" name="favicon" accept="image/*"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @if (cache('site_setting_favicon'))
+                            @if (!empty($settings['favicon']))
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-600">Current favicon:</p>
-                                    <img src="{{ Storage::url(cache('site_setting_favicon')) }}" alt="Current Favicon"
+                                    <img src="{{ Storage::url($settings['favicon']) }}" alt="Current Favicon"
                                         class="h-8 w-8 mt-1">
                                 </div>
                             @endif
@@ -104,7 +138,7 @@
                             <label for="hero_title" class="block text-sm font-medium text-gray-700 mb-2">Hero
                                 Title</label>
                             <input type="text" id="hero_title" name="hero_title"
-                                value="{{ cache('site_setting_hero_title') }}"
+                                value="{{ $settings['hero_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Selamat Datang di MAUDU REJOSO">
                         </div>
@@ -113,7 +147,7 @@
                                 Subtitle</label>
                             <textarea id="hero_subtitle" name="hero_subtitle" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Membangun generasi yang berakhlak mulia dan berprestasi">{{ cache('site_setting_hero_subtitle') }}</textarea>
+                                placeholder="Membangun generasi yang berakhlak mulia dan berprestasi">{{ $settings['hero_subtitle'] ?? '' }}</textarea>
                         </div>
 
                         <!-- Hero Slide 1 Settings -->
@@ -124,7 +158,7 @@
                                     <label for="hero_slide1_subtitle"
                                         class="block text-sm font-medium text-gray-700 mb-2">Slide 1 Subtitle</label>
                                     <input type="text" id="hero_slide1_subtitle" name="hero_slide1_subtitle"
-                                        value="{{ cache('site_setting_hero_slide1_subtitle', 'Welcome To MAUDU Library') }}"
+                                        value="{{ $settings['hero_slide1_subtitle'] ?? 'Welcome To MAUDU Library' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Welcome To MAUDU Library">
                                 </div>
@@ -132,7 +166,7 @@
                                     <label for="hero_slide1_title"
                                         class="block text-sm font-medium text-gray-700 mb-2">Slide 1 Title</label>
                                     <input type="text" id="hero_slide1_title" name="hero_slide1_title"
-                                        value="{{ cache('site_setting_hero_slide1_title', 'Grand Opening MAUDU Library') }}"
+                                        value="{{ $settings['hero_slide1_title'] ?? 'Grand Opening MAUDU Library' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Grand Opening MAUDU Library">
                                 </div>
@@ -142,7 +176,7 @@
                                         Description</label>
                                     <textarea id="hero_slide1_description" name="hero_slide1_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Acara Grandopening Dihadiri oleh Majelis Pimpinan Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang">{{ cache('site_setting_hero_slide1_description', 'Acara Grandopening Dihadiri oleh Majelis Pimpinan Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang') }}</textarea>
+                                        placeholder="Acara Grandopening Dihadiri oleh Majelis Pimpinan Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang">{{ $settings['hero_slide1_description'] ?? 'Acara Grandopening Dihadiri oleh Majelis Pimpinan Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -155,7 +189,7 @@
                                     <label for="hero_slide2_subtitle"
                                         class="block text-sm font-medium text-gray-700 mb-2">Slide 2 Subtitle</label>
                                     <input type="text" id="hero_slide2_subtitle" name="hero_slide2_subtitle"
-                                        value="{{ cache('site_setting_hero_slide2_subtitle', 'Studi Edukasi Sosial') }}"
+                                        value="{{ $settings['hero_slide2_subtitle'] ?? 'Studi Edukasi Sosial' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Studi Edukasi Sosial">
                                 </div>
@@ -163,7 +197,7 @@
                                     <label for="hero_slide2_title"
                                         class="block text-sm font-medium text-gray-700 mb-2">Slide 2 Title</label>
                                     <input type="text" id="hero_slide2_title" name="hero_slide2_title"
-                                        value="{{ cache('site_setting_hero_slide2_title', 'Gedung DPRD Kabupaten Jombang') }}"
+                                        value="{{ $settings['hero_slide2_title'] ?? 'Gedung DPRD Kabupaten Jombang' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Gedung DPRD Kabupaten Jombang">
                                 </div>
@@ -173,7 +207,7 @@
                                         Description</label>
                                     <textarea id="hero_slide2_description" name="hero_slide2_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Deskripsi untuk slide 2">{{ cache('site_setting_hero_slide2_description') }}</textarea>
+                                        placeholder="Deskripsi untuk slide 2">{{ $settings['hero_slide2_description'] ?? '' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -186,7 +220,7 @@
                                     <label for="hero_slide3_subtitle"
                                         class="block text-sm font-medium text-gray-700 mb-2">Slide 3 Subtitle</label>
                                     <input type="text" id="hero_slide3_subtitle" name="hero_slide3_subtitle"
-                                        value="{{ cache('site_setting_hero_slide3_subtitle', 'Event KOMPASS') }}"
+                                        value="{{ $settings['hero_slide3_subtitle'] ?? 'Event KOMPASS' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Event KOMPASS">
                                 </div>
@@ -194,7 +228,7 @@
                                     <label for="hero_slide3_title"
                                         class="block text-sm font-medium text-gray-700 mb-2">Slide 3 Title</label>
                                     <input type="text" id="hero_slide3_title" name="hero_slide3_title"
-                                        value="{{ cache('site_setting_hero_slide3_title', 'Kompetisi Agama, Sains, dan Seni 2024') }}"
+                                        value="{{ $settings['hero_slide3_title'] ?? 'Kompetisi Agama, Sains, dan Seni 2024' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Kompetisi Agama, Sains, dan Seni 2024">
                                 </div>
@@ -204,7 +238,7 @@
                                         Description</label>
                                     <textarea id="hero_slide3_description" name="hero_slide3_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Deskripsi untuk slide 3">{{ cache('site_setting_hero_slide3_description') }}</textarea>
+                                        placeholder="Deskripsi untuk slide 3">{{ $settings['hero_slide3_description'] ?? '' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -217,7 +251,7 @@
                                 gambar)</p>
 
                             @php
-                                $heroImages = cache('site_setting_hero_images');
+                                $heroImages = $settings['hero_images'] ?? '';
                                 if ($heroImages) {
                                     $heroImages = json_decode($heroImages, true);
                                 }
@@ -257,7 +291,7 @@
                                     <label for="feature1_title"
                                         class="block text-sm font-medium text-gray-700 mb-2">Feature 1 Title</label>
                                     <input type="text" id="feature1_title" name="feature1_title"
-                                        value="{{ cache('site_setting_feature1_title', 'E-LIBRARY') }}"
+                                        value="{{ $settings['feature1_title'] ?? 'E-LIBRARY' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="E-LIBRARY">
                                 </div>
@@ -267,7 +301,7 @@
                                         Description</label>
                                     <textarea id="feature1_description" name="feature1_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Perpustakaan digital berisi Koleksi materi dalam format elektronik">{{ cache('site_setting_feature1_description', 'Perpustakaan digital berisi Koleksi materi dalam format elektronik') }}</textarea>
+                                        placeholder="Perpustakaan digital berisi Koleksi materi dalam format elektronik">{{ $settings['feature1_description'] ?? 'Perpustakaan digital berisi Koleksi materi dalam format elektronik' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -280,7 +314,7 @@
                                     <label for="feature2_title"
                                         class="block text-sm font-medium text-gray-700 mb-2">Feature 2 Title</label>
                                     <input type="text" id="feature2_title" name="feature2_title"
-                                        value="{{ cache('site_setting_feature2_title', 'SERTIFIKASI KOMPETENSI') }}"
+                                        value="{{ $settings['feature2_title'] ?? 'SERTIFIKASI KOMPETENSI' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="SERTIFIKASI KOMPETENSI">
                                 </div>
@@ -290,7 +324,7 @@
                                         Description</label>
                                     <textarea id="feature2_description" name="feature2_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Uji kompetensi yang sistematis dan objektif">{{ cache('site_setting_feature2_description', 'Uji kompetensi yang sistematis dan objektif') }}</textarea>
+                                        placeholder="Uji kompetensi yang sistematis dan objektif">{{ $settings['feature2_description'] ?? 'Uji kompetensi yang sistematis dan objektif' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -303,7 +337,7 @@
                                     <label for="feature3_title"
                                         class="block text-sm font-medium text-gray-700 mb-2">Feature 3 Title</label>
                                     <input type="text" id="feature3_title" name="feature3_title"
-                                        value="{{ cache('site_setting_feature3_title', 'KARYA LITERASI') }}"
+                                        value="{{ $settings['feature3_title'] ?? 'KARYA LITERASI' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="KARYA LITERASI">
                                 </div>
@@ -313,7 +347,7 @@
                                         Description</label>
                                     <textarea id="feature3_description" name="feature3_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Penelitian di Bidang Keislaman, Sains, Teknologi, dan Sosial.">{{ cache('site_setting_feature3_description', 'Penelitian di Bidang Keislaman, Sains, Teknologi, dan Sosial.') }}</textarea>
+                                        placeholder="Penelitian di Bidang Keislaman, Sains, Teknologi, dan Sosial.">{{ $settings['feature3_description'] ?? 'Penelitian di Bidang Keislaman, Sains, Teknologi, dan Sosial.' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -332,7 +366,7 @@
                                     <label for="counter1_number"
                                         class="block text-sm font-medium text-gray-700 mb-2">Counter 1 Number</label>
                                     <input type="number" id="counter1_number" name="counter1_number"
-                                        value="{{ cache('site_setting_counter1_number', '24') }}"
+                                        value="{{ $settings['counter1_number'] ?? '24' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="24">
                                 </div>
@@ -340,7 +374,7 @@
                                     <label for="counter1_label"
                                         class="block text-sm font-medium text-gray-700 mb-2">Counter 1 Label</label>
                                     <input type="text" id="counter1_label" name="counter1_label"
-                                        value="{{ cache('site_setting_counter1_label', 'Mata Pelajaran') }}"
+                                        value="{{ $settings['counter1_label'] ?? 'Mata Pelajaran' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Mata Pelajaran">
                                 </div>
@@ -355,7 +389,7 @@
                                     <label for="counter2_number"
                                         class="block text-sm font-medium text-gray-700 mb-2">Counter 2 Number</label>
                                     <input type="number" id="counter2_number" name="counter2_number"
-                                        value="{{ cache('site_setting_counter2_number', '800') }}"
+                                        value="{{ $settings['counter2_number'] ?? '800' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="800">
                                 </div>
@@ -363,7 +397,7 @@
                                     <label for="counter2_label"
                                         class="block text-sm font-medium text-gray-700 mb-2">Counter 2 Label</label>
                                     <input type="text" id="counter2_label" name="counter2_label"
-                                        value="{{ cache('site_setting_counter2_label', '+ Peserta Didik') }}"
+                                        value="{{ $settings['counter2_label'] ?? '+ Peserta Didik' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="+ Peserta Didik">
                                 </div>
@@ -378,7 +412,7 @@
                                     <label for="counter3_number"
                                         class="block text-sm font-medium text-gray-700 mb-2">Counter 3 Number</label>
                                     <input type="number" id="counter3_number" name="counter3_number"
-                                        value="{{ cache('site_setting_counter3_number', '98') }}"
+                                        value="{{ $settings['counter3_number'] ?? '98' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="98">
                                 </div>
@@ -386,7 +420,7 @@
                                     <label for="counter3_label"
                                         class="block text-sm font-medium text-gray-700 mb-2">Counter 3 Label</label>
                                     <input type="text" id="counter3_label" name="counter3_label"
-                                        value="{{ cache('site_setting_counter3_label', '+ Tenaga Pendidik & KEPENDIDIKAN') }}"
+                                        value="{{ $settings['counter3_label'] ?? '+ Tenaga Pendidik & KEPENDIDIKAN' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="+ Tenaga Pendidik & KEPENDIDIKAN">
                                 </div>
@@ -403,7 +437,7 @@
                             <label for="gallery_title" class="block text-sm font-medium text-gray-700 mb-2">Gallery
                                 Title</label>
                             <input type="text" id="gallery_title" name="gallery_title"
-                                value="{{ cache('site_setting_gallery_title', 'Kegiatan Madrasah') }}"
+                                value="{{ $settings['gallery_title'] ?? 'Kegiatan Madrasah' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Kegiatan Madrasah">
                         </div>
@@ -411,7 +445,7 @@
                             <label for="gallery_subtitle" class="block text-sm font-medium text-gray-700 mb-2">Gallery
                                 Subtitle</label>
                             <input type="text" id="gallery_subtitle" name="gallery_subtitle"
-                                value="{{ cache('site_setting_gallery_subtitle', 'Ket// programmer : ambil data dari dari IG') }}"
+                                value="{{ $settings['gallery_subtitle'] ?? 'Ket// programmer : ambil data dari dari IG' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Ket// programmer : ambil data dari dari IG">
                         </div>
@@ -430,7 +464,7 @@
                                     <label for="social_facebook"
                                         class="block text-sm font-medium text-gray-700 mb-2">Facebook URL</label>
                                     <input type="url" id="social_facebook" name="social_facebook"
-                                        value="{{ cache('site_setting_social_facebook') }}"
+                                        value="{{ $settings['social_facebook'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="https://facebook.com/sekolah">
                                 </div>
@@ -438,7 +472,7 @@
                                     <label for="social_instagram"
                                         class="block text-sm font-medium text-gray-700 mb-2">Instagram URL</label>
                                     <input type="url" id="social_instagram" name="social_instagram"
-                                        value="{{ cache('site_setting_social_instagram') }}"
+                                        value="{{ $settings['social_instagram'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="https://instagram.com/sekolah">
                                 </div>
@@ -446,7 +480,7 @@
                                     <label for="social_youtube"
                                         class="block text-sm font-medium text-gray-700 mb-2">YouTube URL</label>
                                     <input type="url" id="social_youtube" name="social_youtube"
-                                        value="{{ cache('site_setting_social_youtube') }}"
+                                        value="{{ $settings['social_youtube'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="https://youtube.com/sekolah">
                                 </div>
@@ -454,7 +488,7 @@
                                     <label for="social_whatsapp"
                                         class="block text-sm font-medium text-gray-700 mb-2">WhatsApp URL</label>
                                     <input type="url" id="social_whatsapp" name="social_whatsapp"
-                                        value="{{ cache('site_setting_social_whatsapp') }}"
+                                        value="{{ $settings['social_whatsapp'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="https://wa.me/628123456789">
                                 </div>
@@ -469,14 +503,14 @@
                                     <label for="contact_email"
                                         class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                                     <input type="email" id="contact_email" name="contact_email"
-                                        value="{{ cache('site_setting_contact_email') }}"
+                                        value="{{ $settings['contact_email'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <div>
                                     <label for="contact_phone"
                                         class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                                     <input type="text" id="contact_phone" name="contact_phone"
-                                        value="{{ cache('site_setting_contact_phone') }}"
+                                        value="{{ $settings['contact_phone'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <div class="md:col-span-2">
@@ -484,13 +518,13 @@
                                         class="block text-sm font-medium text-gray-700 mb-2">Address</label>
                                     <textarea id="contact_address" name="contact_address" rows="3"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Jl. Contoh No. 123, Kota, Provinsi">{{ cache('site_setting_contact_address') }}</textarea>
+                                        placeholder="Jl. Contoh No. 123, Kota, Provinsi">{{ $settings['contact_address'] ?? '' }}</textarea>
                                 </div>
                                 <div>
                                     <label for="contact_operational_hours"
                                         class="block text-sm font-medium text-gray-700 mb-2">Jam Operasional</label>
                                     <input type="text" id="contact_operational_hours" name="contact_operational_hours"
-                                        value="{{ cache('site_setting_contact_operational_hours') }}"
+                                        value="{{ $settings['contact_operational_hours'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Senin - Sabtu: 07.00 - 16.00 WIB">
                                 </div>
@@ -499,7 +533,7 @@
                                         class="block text-sm font-medium text-gray-700 mb-2">Google Maps Embed URL</label>
                                     <textarea id="contact_map_url" name="contact_map_url" rows="3"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="https://www.google.com/maps/embed?pb=...">{{ cache('site_setting_contact_map_url') }}</textarea>
+                                        placeholder="https://www.google.com/maps/embed?pb=...">{{ $settings['contact_map_url'] ?? '' }}</textarea>
                                     <p class="text-sm text-gray-500 mt-1">Buka Google Maps → Share → Embed a map → Copy URL</p>
                                 </div>
                             </div>
@@ -515,14 +549,14 @@
                             <div>
                                 <label for="cta_title" class="block text-sm font-medium text-gray-700 mb-2">Judul CTA</label>
                                 <input type="text" id="cta_title" name="cta_title"
-                                    value="{{ cache('site_setting_cta_title') }}"
+                                    value="{{ $settings['cta_title'] ?? '' }}"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Pendaftaran Siswa Baru 2026">
                             </div>
                             <div>
                                 <label for="cta_video_title" class="block text-sm font-medium text-gray-700 mb-2">Judul Video CTA</label>
                                 <input type="text" id="cta_video_title" name="cta_video_title"
-                                    value="{{ cache('site_setting_cta_video_title') }}"
+                                    value="{{ $settings['cta_video_title'] ?? '' }}"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Profil SMK Telekomunikasi DU">
                             </div>
@@ -531,21 +565,21 @@
                             <label for="cta_description" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi CTA</label>
                             <textarea id="cta_description" name="cta_description" rows="4"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Tempat Pendaftaran&#10;1. Online mandiri (24 jam)...">{{ cache('site_setting_cta_description') }}</textarea>
+                                placeholder="Tempat Pendaftaran&#10;1. Online mandiri (24 jam)...">{{ $settings['cta_description'] ?? '' }}</textarea>
                             <p class="text-sm text-gray-500 mt-1">Gunakan enter untuk baris baru</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="cta_button_text" class="block text-sm font-medium text-gray-700 mb-2">Teks Tombol</label>
                                 <input type="text" id="cta_button_text" name="cta_button_text"
-                                    value="{{ cache('site_setting_cta_button_text') }}"
+                                    value="{{ $settings['cta_button_text'] ?? '' }}"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="DAFTAR">
                             </div>
                             <div>
                                 <label for="cta_button_url" class="block text-sm font-medium text-gray-700 mb-2">URL Tombol</label>
                                 <input type="url" id="cta_button_url" name="cta_button_url"
-                                    value="{{ cache('site_setting_cta_button_url') }}"
+                                    value="{{ $settings['cta_button_url'] ?? '' }}"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="https://psb.ponpesdarululum.id/">
                             </div>
@@ -561,7 +595,7 @@
                             <label for="video_url" class="block text-sm font-medium text-gray-700 mb-2">Video URL
                                 (YouTube)</label>
                             <input type="url" id="video_url" name="video_url"
-                                value="{{ cache('site_setting_video_url') }}"
+                                value="{{ $settings['video_url'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="https://www.youtube.com/watch?v=example">
                             <p class="text-sm text-gray-500 mt-1">Masukkan URL YouTube video yang akan ditampilkan di
@@ -575,10 +609,10 @@
                             <p class="text-sm text-gray-500 mt-1">Upload thumbnail custom untuk video (jika tidak
                                 diisi, akan menggunakan thumbnail YouTube)</p>
 
-                            @if (cache('site_setting_video_thumbnail'))
+                            @if (!empty($settings['video_thumbnail']))
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-600">Current thumbnail:</p>
-                                    <img src="{{ Storage::url(cache('site_setting_video_thumbnail')) }}"
+                                    <img src="{{ Storage::url($settings['video_thumbnail']) }}"
                                         alt="Current Video Thumbnail" class="h-24 w-auto mt-1 rounded">
                                 </div>
                             @endif
@@ -594,7 +628,7 @@
                             <label for="headmaster_name" class="block text-sm font-medium text-gray-700 mb-2">Nama
                                 Kepala Sekolah</label>
                             <input type="text" id="headmaster_name" name="headmaster_name"
-                                value="{{ cache('site_setting_headmaster_name') }}"
+                                value="{{ $settings['headmaster_name'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Khoiruddinul Qoyyum, S.S., M.Pd">
                         </div>
@@ -603,14 +637,14 @@
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Kepala Sekolah</label>
                             <textarea id="headmaster_description" name="headmaster_description" rows="4"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Sebagai kepala madrasah yang berpengalaman, kami berkomitmen untuk memberikan pendidikan terbaik...">{{ cache('site_setting_headmaster_description') }}</textarea>
+                                placeholder="Sebagai kepala madrasah yang berpengalaman, kami berkomitmen untuk memberikan pendidikan terbaik...">{{ $settings['headmaster_description'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="headmaster_vision" class="block text-sm font-medium text-gray-700 mb-2">Visi
                                 Kepala Sekolah</label>
                             <textarea id="headmaster_vision" name="headmaster_vision" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Visi kami adalah menciptakan generasi yang unggul dalam akademik...">{{ cache('site_setting_headmaster_vision') }}</textarea>
+                                placeholder="Visi kami adalah menciptakan generasi yang unggul dalam akademik...">{{ $settings['headmaster_vision'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="headmaster_photo" class="block text-sm font-medium text-gray-700 mb-2">Foto
@@ -620,10 +654,10 @@
                             <p class="text-sm text-gray-500 mt-1">Upload foto kepala sekolah (format: JPG, PNG,
                                 maksimal 2MB)</p>
 
-                            @if (cache('site_setting_headmaster_photo'))
+                            @if (!empty($settings['headmaster_photo']))
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-600">Current photo:</p>
-                                    <img src="{{ Storage::url(cache('site_setting_headmaster_photo')) }}"
+                                    <img src="{{ Storage::url($settings['headmaster_photo']) }}"
                                         alt="Current Headmaster Photo" class="h-24 w-auto mt-1 rounded">
                                 </div>
                             @endif
@@ -640,7 +674,7 @@
                                 class="block text-sm font-medium text-gray-700 mb-2">Judul Section Program
                                 Peminatan</label>
                             <input type="text" id="program_section_title" name="program_section_title"
-                                value="{{ cache('site_setting_program_section_title') }}"
+                                value="{{ $settings['program_section_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="3 Program Peminatan">
                         </div>
@@ -649,7 +683,7 @@
                                 class="block text-sm font-medium text-gray-700 mb-2">Subtitle Section Program
                                 (di atas judul)</label>
                             <input type="text" id="program_section_subtitle" name="program_section_subtitle"
-                                value="{{ cache('site_setting_program_section_subtitle') }}"
+                                value="{{ $settings['program_section_subtitle'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Kerjasama Industri">
                         </div>
@@ -657,7 +691,7 @@
                             <label for="program_ipa_title" class="block text-sm font-medium text-gray-700 mb-2">Judul
                                 Program IPA</label>
                             <input type="text" id="program_ipa_title" name="program_ipa_title"
-                                value="{{ cache('site_setting_program_ipa_title') }}"
+                                value="{{ $settings['program_ipa_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="PEMINATAN ILMU PENGETAHUAN ALAM (IPA)">
                         </div>
@@ -666,13 +700,13 @@
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Program IPA</label>
                             <textarea id="program_ipa_description" name="program_ipa_description" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Menyiapkan peserta didik yang handal dalam kajian ilmiah dan alamiah...">{{ cache('site_setting_program_ipa_description') }}</textarea>
+                                placeholder="Menyiapkan peserta didik yang handal dalam kajian ilmiah dan alamiah...">{{ $settings['program_ipa_description'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="program_ips_title" class="block text-sm font-medium text-gray-700 mb-2">Judul
                                 Program IPS</label>
                             <input type="text" id="program_ips_title" name="program_ips_title"
-                                value="{{ cache('site_setting_program_ips_title') }}"
+                                value="{{ $settings['program_ips_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="PEMINATAN ILMU PENGETAHUAN SOSIAL (IPS)">
                         </div>
@@ -681,13 +715,13 @@
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Program IPS</label>
                             <textarea id="program_ips_description" name="program_ips_description" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Menyiapkan peserta didik yang dapat menguasai ilmu-ilmu sosial...">{{ cache('site_setting_program_ips_description') }}</textarea>
+                                placeholder="Menyiapkan peserta didik yang dapat menguasai ilmu-ilmu sosial...">{{ $settings['program_ips_description'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="program_religion_title"
                                 class="block text-sm font-medium text-gray-700 mb-2">Judul Program Keagamaan</label>
                             <input type="text" id="program_religion_title" name="program_religion_title"
-                                value="{{ cache('site_setting_program_religion_title') }}"
+                                value="{{ $settings['program_religion_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="PEMINATAN KEAGAMAAN">
                         </div>
@@ -697,7 +731,7 @@
                                 Keagamaan</label>
                             <textarea id="program_religion_description" name="program_religion_description" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Menyiapkan peserta didik yang lebih mampu menguasai ilmu-ilmu agama...">{{ cache('site_setting_program_religion_description') }}</textarea>
+                                placeholder="Menyiapkan peserta didik yang lebih mampu menguasai ilmu-ilmu agama...">{{ $settings['program_religion_description'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="program_section_image"
@@ -706,10 +740,10 @@
                             <input type="file" id="program_section_image" name="program_section_image"
                                 accept="image/*"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @if (cache('site_setting_program_section_image'))
+                            @if (!empty($settings['program_section_image']))
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-600 mb-1">Gambar saat ini:</p>
-                                    <img src="{{ Storage::url(cache('site_setting_program_section_image')) }}"
+                                    <img src="{{ Storage::url($settings['program_section_image']) }}"
                                         alt="Current Program Section Image" class="h-24 w-auto rounded">
                                 </div>
                             @endif
@@ -725,7 +759,7 @@
                             <label for="about_section_title"
                                 class="block text-sm font-medium text-gray-700 mb-2">Judul Section About</label>
                             <input type="text" id="about_section_title" name="about_section_title"
-                                value="{{ cache('site_setting_about_section_title', 'Portal Digital Pendidikan Terintegrasi') }}"
+                                value="{{ $settings['about_section_title'] ?? 'Portal Digital Pendidikan Terintegrasi' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Portal Digital Pendidikan Terintegrasi">
                         </div>
@@ -734,7 +768,7 @@
                             <label for="about_section_subtitle"
                                 class="block text-sm font-medium text-gray-700 mb-2">Subtitle About</label>
                             <input type="text" id="about_section_subtitle" name="about_section_subtitle"
-                                value="{{ cache('site_setting_about_section_subtitle', 'TENTANG KAMI') }}"
+                                value="{{ $settings['about_section_subtitle'] ?? 'TENTANG KAMI' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="TENTANG KAMI">
                         </div>
@@ -744,7 +778,7 @@
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi About</label>
                             <textarea id="about_section_description" name="about_section_description" rows="4"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Website sekolah yang mengintegrasikan semua layanan pendidikan dalam satu platform digital yang modern dan efisien. Memudahkan akses informasi dan layanan untuk seluruh civitas akademika.">{{ cache('site_setting_about_section_description', 'Website sekolah yang mengintegrasikan semua layanan pendidikan dalam satu platform digital yang modern dan efisien. Memudahkan akses informasi dan layanan untuk seluruh civitas akademika.') }}</textarea>
+                                placeholder="Website sekolah yang mengintegrasikan semua layanan pendidikan dalam satu platform digital yang modern dan efisien. Memudahkan akses informasi dan layanan untuk seluruh civitas akademika.">{{ $settings['about_section_description'] ?? 'Website sekolah yang mengintegrasikan semua layanan pendidikan dalam satu platform digital yang modern dan efisien. Memudahkan akses informasi dan layanan untuk seluruh civitas akademika.' }}</textarea>
                         </div>
 
                         <!-- About Images -->
@@ -757,9 +791,9 @@
                                         Atas)</label>
                                     <input type="file" id="about_image_1" name="about_image_1" accept="image/*"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    @if (cache('site_setting_about_image_1'))
+                                    @if (!empty($settings['about_image_1']))
                                         <div class="mt-2">
-                                            <img src="{{ Storage::url(cache('site_setting_about_image_1')) }}"
+                                            <img src="{{ Storage::url($settings['about_image_1']) }}"
                                                 alt="About Image 1" class="h-16 w-auto rounded">
                                         </div>
                                     @endif
@@ -770,9 +804,9 @@
                                         Atas)</label>
                                     <input type="file" id="about_image_2" name="about_image_2" accept="image/*"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    @if (cache('site_setting_about_image_2'))
+                                    @if (!empty($settings['about_image_2']))
                                         <div class="mt-2">
-                                            <img src="{{ Storage::url(cache('site_setting_about_image_2')) }}"
+                                            <img src="{{ Storage::url($settings['about_image_2']) }}"
                                                 alt="About Image 2" class="h-16 w-auto rounded">
                                         </div>
                                     @endif
@@ -783,9 +817,9 @@
                                         Bawah)</label>
                                     <input type="file" id="about_image_3" name="about_image_3" accept="image/*"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    @if (cache('site_setting_about_image_3'))
+                                    @if (!empty($settings['about_image_3']))
                                         <div class="mt-2">
-                                            <img src="{{ Storage::url(cache('site_setting_about_image_3')) }}"
+                                            <img src="{{ Storage::url($settings['about_image_3']) }}"
                                                 alt="About Image 3" class="h-16 w-auto rounded">
                                         </div>
                                     @endif
@@ -804,7 +838,7 @@
                                             class="block text-sm font-medium text-gray-600 mb-1">Fitur 1 -
                                             Judul</label>
                                         <input type="text" id="about_feature_1_title" name="about_feature_1_title"
-                                            value="{{ cache('site_setting_about_feature_1_title', 'SISTEM E-OSIS') }}"
+                                            value="{{ $settings['about_feature_1_title'] ?? 'SISTEM E-OSIS' }}"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             placeholder="SISTEM E-OSIS">
                                     </div>
@@ -814,14 +848,14 @@
                                             Deskripsi</label>
                                         <textarea id="about_feature_1_description" name="about_feature_1_description" rows="2"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Pemilihan OSIS digital dengan monitoring real-time dan sistem voting yang aman">{{ cache('site_setting_about_feature_1_description', 'Pemilihan OSIS digital dengan monitoring real-time dan sistem voting yang aman') }}</textarea>
+                                            placeholder="Pemilihan OSIS digital dengan monitoring real-time dan sistem voting yang aman">{{ $settings['about_feature_1_description'] ?? 'Pemilihan OSIS digital dengan monitoring real-time dan sistem voting yang aman' }}</textarea>
                                     </div>
                                     <div>
                                         <label for="about_feature_2_title"
                                             class="block text-sm font-medium text-gray-600 mb-1">Fitur 2 -
                                             Judul</label>
                                         <input type="text" id="about_feature_2_title" name="about_feature_2_title"
-                                            value="{{ cache('site_setting_about_feature_2_title', 'SISTEM E-LULUS') }}"
+                                            value="{{ $settings['about_feature_2_title'] ?? 'SISTEM E-LULUS' }}"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             placeholder="SISTEM E-LULUS">
                                     </div>
@@ -831,7 +865,7 @@
                                             Deskripsi</label>
                                         <textarea id="about_feature_2_description" name="about_feature_2_description" rows="2"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Pengumuman kelulusan dengan verifikasi NISN/NIS yang akurat dan real-time">{{ cache('site_setting_about_feature_2_description', 'Pengumuman kelulusan dengan verifikasi NISN/NIS yang akurat dan real-time') }}</textarea>
+                                            placeholder="Pengumuman kelulusan dengan verifikasi NISN/NIS yang akurat dan real-time">{{ $settings['about_feature_2_description'] ?? 'Pengumuman kelulusan dengan verifikasi NISN/NIS yang akurat dan real-time' }}</textarea>
                                     </div>
                                 </div>
                                 <div class="space-y-4">
@@ -840,7 +874,7 @@
                                             class="block text-sm font-medium text-gray-600 mb-1">Fitur 3 -
                                             Judul</label>
                                         <input type="text" id="about_feature_3_title" name="about_feature_3_title"
-                                            value="{{ cache('site_setting_about_feature_3_title', 'MANAJEMEN SARPRAS') }}"
+                                            value="{{ $settings['about_feature_3_title'] ?? 'MANAJEMEN SARPRAS' }}"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             placeholder="MANAJEMEN SARPRAS">
                                     </div>
@@ -850,14 +884,14 @@
                                             Deskripsi</label>
                                         <textarea id="about_feature_3_description" name="about_feature_3_description" rows="2"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Sistem inventaris sarana dan prasarana sekolah dengan barcode tracking">{{ cache('site_setting_about_feature_3_description', 'Sistem inventaris sarana dan prasarana sekolah dengan barcode tracking') }}</textarea>
+                                            placeholder="Sistem inventaris sarana dan prasarana sekolah dengan barcode tracking">{{ $settings['about_feature_3_description'] ?? 'Sistem inventaris sarana dan prasarana sekolah dengan barcode tracking' }}</textarea>
                                     </div>
                                     <div>
                                         <label for="about_feature_4_title"
                                             class="block text-sm font-medium text-gray-600 mb-1">Fitur 4 -
                                             Judul</label>
                                         <input type="text" id="about_feature_4_title" name="about_feature_4_title"
-                                            value="{{ cache('site_setting_about_feature_4_title', 'INTEGRASI INSTAGRAM') }}"
+                                            value="{{ $settings['about_feature_4_title'] ?? 'INTEGRASI INSTAGRAM' }}"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             placeholder="INTEGRASI INSTAGRAM">
                                     </div>
@@ -867,7 +901,7 @@
                                             Deskripsi</label>
                                         <textarea id="about_feature_4_description" name="about_feature_4_description" rows="2"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Sinkronisasi otomatis dengan Instagram sekolah untuk galeri kegiatan terbaru">{{ cache('site_setting_about_feature_4_description', 'Sinkronisasi otomatis dengan Instagram sekolah untuk galeri kegiatan terbaru') }}</textarea>
+                                            placeholder="Sinkronisasi otomatis dengan Instagram sekolah untuk galeri kegiatan terbaru">{{ $settings['about_feature_4_description'] ?? 'Sinkronisasi otomatis dengan Instagram sekolah untuk galeri kegiatan terbaru' }}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -878,7 +912,7 @@
                             <label for="about_button_text" class="block text-sm font-medium text-gray-700 mb-2">Teks
                                 Button About</label>
                             <input type="text" id="about_button_text" name="about_button_text"
-                                value="{{ cache('site_setting_about_button_text', 'JELAJAHI FITUR') }}"
+                                value="{{ $settings['about_button_text'] ?? 'JELAJAHI FITUR' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="JELAJAHI FITUR">
                         </div>
@@ -892,7 +926,7 @@
                                         class="block text-sm font-medium text-gray-600 mb-1">Teks "Hubungi
                                         Kami"</label>
                                     <input type="text" id="about_contact_text" name="about_contact_text"
-                                        value="{{ cache('site_setting_about_contact_text', 'HUBUNGI KAMI') }}"
+                                        value="{{ $settings['about_contact_text'] ?? 'HUBUNGI KAMI' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="HUBUNGI KAMI">
                                 </div>
@@ -900,7 +934,7 @@
                                     <label for="about_contact_phone"
                                         class="block text-sm font-medium text-gray-600 mb-1">Nomor Telepon</label>
                                     <input type="text" id="about_contact_phone" name="about_contact_phone"
-                                        value="{{ cache('site_setting_about_contact_phone', '+62 123 456 789') }}"
+                                        value="{{ $settings['about_contact_phone'] ?? '+62 123 456 789' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="+62 123 456 789">
                                 </div>
@@ -915,7 +949,7 @@
                                     <label for="contact_section_subtitle"
                                         class="block text-sm font-medium text-gray-600 mb-1">Subtitle (teks kecil di atas judul)</label>
                                     <input type="text" id="contact_section_subtitle" name="contact_section_subtitle"
-                                        value="{{ cache('site_setting_contact_section_subtitle', 'Hubungi Kami') }}"
+                                        value="{{ $settings['contact_section_subtitle'] ?? 'Hubungi Kami' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Hubungi Kami">
                                 </div>
@@ -923,7 +957,7 @@
                                     <label for="contact_section_title"
                                         class="block text-sm font-medium text-gray-600 mb-1">Judul Utama (sebelum nama sekolah)</label>
                                     <input type="text" id="contact_section_title" name="contact_section_title"
-                                        value="{{ cache('site_setting_contact_section_title', 'Kontak') }}"
+                                        value="{{ $settings['contact_section_title'] ?? 'Kontak' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Kontak">
                                 </div>
@@ -932,7 +966,7 @@
                                 <label for="contact_section_description"
                                     class="block text-sm font-medium text-gray-600 mb-1">Deskripsi Section</label>
                                 <input type="text" id="contact_section_description" name="contact_section_description"
-                                    value="{{ cache('site_setting_contact_section_description', 'Jangan ragu untuk menghubungi kami jika memiliki pertanyaan') }}"
+                                    value="{{ $settings['contact_section_description'] ?? 'Jangan ragu untuk menghubungi kami jika memiliki pertanyaan' }}"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Jangan ragu untuk menghubungi kami jika memiliki pertanyaan">
                             </div>
@@ -949,7 +983,7 @@
                             <label for="campus_life_headmaster_name" class="block text-sm font-medium text-gray-700 mb-2">Nama
                                 Kepala Madrasah (Campus Life)</label>
                             <input type="text" id="campus_life_headmaster_name" name="campus_life_headmaster_name"
-                                value="{{ cache('site_setting_campus_life_headmaster_name') }}"
+                                value="{{ $settings['campus_life_headmaster_name'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Kosongkan untuk menggunakan data dari Informasi Kepala Sekolah">
                         </div>
@@ -959,7 +993,7 @@
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Kepala Madrasah (Campus Life)</label>
                             <textarea id="campus_life_headmaster_description" name="campus_life_headmaster_description" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Kosongkan untuk menggunakan data dari Informasi Kepala Sekolah">{{ cache('site_setting_campus_life_headmaster_description') }}</textarea>
+                                placeholder="Kosongkan untuk menggunakan data dari Informasi Kepala Sekolah">{{ $settings['campus_life_headmaster_description'] ?? '' }}</textarea>
                         </div>
 
                         <div>
@@ -967,7 +1001,7 @@
                                 Kepala Madrasah (Campus Life)</label>
                             <textarea id="campus_life_headmaster_vision" name="campus_life_headmaster_vision" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Kosongkan untuk menggunakan data dari Informasi Kepala Sekolah">{{ cache('site_setting_campus_life_headmaster_vision') }}</textarea>
+                                placeholder="Kosongkan untuk menggunakan data dari Informasi Kepala Sekolah">{{ $settings['campus_life_headmaster_vision'] ?? '' }}</textarea>
                         </div>
 
                         <div>
@@ -976,9 +1010,9 @@
                             <input type="file" id="campus_life_headmaster_photo" name="campus_life_headmaster_photo" accept="image/*"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <p class="text-sm text-gray-500 mt-1">Kosongkan untuk menggunakan foto dari Informasi Kepala Sekolah</p>
-                            @if (cache('site_setting_campus_life_headmaster_photo'))
+                            @if (!empty($settings['campus_life_headmaster_photo']))
                                 <div class="mt-2">
-                                    <img src="{{ Storage::url(cache('site_setting_campus_life_headmaster_photo')) }}"
+                                    <img src="{{ Storage::url($settings['campus_life_headmaster_photo']) }}"
                                         alt="Foto Kepala Madrasah (Campus Life)" class="h-32 w-auto rounded-lg border">
                                     <p class="text-sm text-gray-500 mt-1">Foto saat ini (Campus Life)</p>
                                 </div>
@@ -997,7 +1031,7 @@
                             Text</label>
                         <textarea id="footer_text" name="footer_text" rows="3"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="© 2024 MAUDU REJOSO. All rights reserved.">{{ cache('site_setting_footer_text') }}</textarea>
+                            placeholder="© 2024 MAUDU REJOSO. All rights reserved.">{{ $settings['footer_text'] ?? '' }}</textarea>
                     </div>
                 </div>
 

@@ -46,16 +46,14 @@
         <div class="menu-area menu-sticky">
             <div class="container">
                 <div class="row y-middle">
-                    <div class="col-lg-5">
+                    <div class="col-lg-4 col-md-5 col-12">
                         <div class="logo-cat-wrap">
-                            <div class="logo-part pr-90">
-                                <a class="dark-logo" href="<?php echo e(route('landing')); ?>">
-                                    <img src="<?php echo e(theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png'))); ?>"
-                                        alt="<?php echo e(theme_info('name', 'Logo')); ?>" style="max-height: 35px;">
-                                </a>
-                                <a class="light-logo" href="<?php echo e(route('landing')); ?>">
-                                    <img src="<?php echo e(theme_image('logo_light', theme_info('defaults.logo_light', 'assets_telkom/assets/images/logo.png'))); ?>"
-                                        alt="<?php echo e(theme_info('name', 'Logo')); ?>" style="max-height: 35px;">
+                            <div class="logo-part">
+                                <a href="<?php echo e(route('landing')); ?>" class="brand-logo-wrap">
+                                    <img src="<?php echo e(theme_image('favicon', theme_info('defaults.favicon', 'assets_telkom/assets/images/fav.png'))); ?>"
+                                        alt="<?php echo e(theme_info('name', 'Logo')); ?>" class="logo-badge">
+                                    <img src="<?php echo e(theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo.png'))); ?>"
+                                        alt="<?php echo e(theme_info('name', 'SMK Telekomunikasi Darul Ulum Jombang')); ?>" class="logo-text">
                                 </a>
                             </div>
                             <div class="categories-btn">
@@ -71,9 +69,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-7 text-center">
+                    <div class="col-lg-8 col-md-7 col-12 text-end">
                         <div class="rs-menu-area">
-                            <div class="main-menu pr-90">
+                            <div class="main-menu pr-0">
                                 <div class="mobile-menu">
                                     <a class="rs-menu-toggle">
                                         <i class="fa fa-bars"></i>
@@ -85,7 +83,7 @@
                                             <?php if(isset($item['children']) && count($item['children']) > 0): ?>
                                                 <li class="menu-item-has-children">
                                                     <a
-                                                        href="<?php echo e(resolve_theme_url($item['url'] ?? '#')); ?>"><?php echo e($item['label']); ?></a>
+                                                        href="<?php echo e(resolve_theme_url($item['url'] ?? '#')); ?>"><?php echo e($item['label']); ?> +</a>
                                                     <ul class="sub-menu">
                                                         <?php $__currentLoopData = $item['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $child): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                             <li><a
@@ -122,8 +120,8 @@
             </div>
             <div class="canvas-logo">
                 <a href="<?php echo e(route('landing')); ?>">
-                    <img src="<?php echo e(theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png'))); ?>"
-                        alt="<?php echo e(theme_info('name', 'Logo')); ?>" style="max-height: 60px;">
+                    <img src="<?php echo e(asset('assets_telkom/assets/images/logo-dark.png')); ?>"
+                        alt="<?php echo e(theme_info('name', 'Logo')); ?>">
                 </a>
             </div>
             <ul class="canvas-social">

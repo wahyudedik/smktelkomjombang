@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Page;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\ThemeSetting;
 
 class SettingsController extends Controller
 {
@@ -46,8 +47,16 @@ class SettingsController extends Controller
     /**
      * Display landing page settings
      */
-    public function landingPage()
+    public function landingPage(Request $request)
     {
+        // Support theme switching via query parameter
+        $availableThemes = ThemeSetting::getRegisteredThemes();
+        if ($request->has('theme') && array_key_exists($request->theme, $availableThemes)) {
+            session(['admin_theme_override' => $request->theme]);
+        }
+
+        $theme = current_theme();
+
         // Performance: single query with eager loading instead of 3 separate queries
         $pages = Page::where('is_menu', true)
             ->with('children')
@@ -57,7 +66,13 @@ class SettingsController extends Controller
         $headerMenus = $pages->where('menu_position', 'header')->whereNull('parent_id');
         $footerMenus = $pages->where('menu_position', 'footer')->whereNull('parent_id');
 
-        return view('settings.landing-page', compact('pages', 'headerMenus', 'footerMenus'));
+        // ⭐ Load settings per active theme from theme_config()
+        $settings = theme_config() ?: [];
+
+        return view('settings.landing-page', compact(
+            'pages', 'headerMenus', 'footerMenus',
+            'settings', 'availableThemes'
+        ));
     }
 
     /**
@@ -65,6 +80,8 @@ class SettingsController extends Controller
      */
     public function updateLandingPage(Request $request)
     {
+        $theme = current_theme(); // ⭐ Per-theme settings
+
         $request->validate([
             'site_name' => 'required|string|max:255',
             'site_description' => 'nullable|string',
@@ -380,37 +397,31 @@ class SettingsController extends Controller
         }
 
         try {
-            // Save settings to cache with long TTL to prevent expiration
-            // Note: Due to duplicate form fields, we prioritize non-empty values
+            // ⭐ Save to theme_settings table (per-theme, not global cache)
+            // Filter out null and empty values, trim strings
+            $cleanedSettings = [];
             foreach ($settings as $key => $value) {
                 if ($value !== null) {
-                    // Special handling for JSON strings (like hero_images)
-                    if ($key === 'hero_images' && is_string($value)) {
-                        // Don't trim JSON strings, save as-is
-                        cache()->put("site_setting_{$key}", $value, now()->addYear());
-                    } elseif (is_string($value)) {
-                        $trimmedValue = trim($value);
-                        // Only save non-empty strings to prevent overwriting with empty values
-                        if ($trimmedValue !== '') {
-                            // Store with very long TTL (1 year) to ensure persistence
-                            cache()->put("site_setting_{$key}", $trimmedValue, now()->addYear());
+                    if (is_string($value)) {
+                        $trimmed = trim($value);
+                        if ($trimmed !== '') {
+                            $cleanedSettings[$key] = $trimmed;
                         }
-                        // If empty string, don't overwrite existing cache - keep existing value
-                    } elseif (is_numeric($value)) {
-                        // For numeric values (integers, floats), save directly
-                        cache()->put("site_setting_{$key}", $value, now()->addYear());
                     } else {
-                        // For other values (arrays, objects, etc.), save directly
-                        cache()->put("site_setting_{$key}", $value, now()->addYear());
+                        $cleanedSettings[$key] = $value;
                     }
                 }
             }
 
-            // Clear view cache to ensure changes are reflected immediately
-            // Note: We don't clear the full cache as it would remove the settings we just saved
+            if (!empty($cleanedSettings)) {
+                ThemeSetting::saveThemeConfig($theme, $cleanedSettings);
+            }
+
+            // Clear theme cache so changes are reflected immediately
+            ThemeSetting::clearCache($theme);
             Artisan::call('view:clear');
 
-            return redirect()->back()->with('success', 'Landing page settings updated successfully!');
+            return redirect()->back()->with('success', "Landing page settings untuk tema [{$theme}] berhasil diupdate!");
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withInput()
@@ -466,41 +477,52 @@ class SettingsController extends Controller
      */
     public function resetLandingPage()
     {
-        // Clear all site settings from cache
-        $settings = [
-            'site_name',
-            'site_description',
-            'site_keywords',
-            'logo',
-            'favicon',
-            'hero_title',
-            'hero_subtitle',
-            'hero_images',
-            'footer_text',
-            'contact_email',
-            'contact_phone',
-            'contact_address',
-            'social_facebook',
-            'social_instagram',
-            'social_youtube',
-            'social_whatsapp',
-            'video_url',
-            'video_thumbnail',
-            'headmaster_name',
-            'headmaster_description',
-            'headmaster_vision',
-            'headmaster_photo',
-            // Campus Life Section
-            'campus_life_headmaster_name',
-            'campus_life_headmaster_description',
-            'campus_life_headmaster_vision',
-            'campus_life_headmaster_photo'
+        $theme = current_theme();
+
+        // ⭐ Delete landing page settings for this theme only (from theme_settings table)
+        $landingPageKeys = [
+            'site_name', 'site_description', 'site_keywords', 'footer_text',
+            'logo', 'favicon',
+            'hero_title', 'hero_subtitle', 'hero_images',
+            'hero_slide1_subtitle', 'hero_slide1_title', 'hero_slide1_description',
+            'hero_slide2_subtitle', 'hero_slide2_title', 'hero_slide2_description',
+            'hero_slide3_subtitle', 'hero_slide3_title', 'hero_slide3_description',
+            'feature1_title', 'feature1_description',
+            'feature2_title', 'feature2_description',
+            'feature3_title', 'feature3_description',
+            'about_section_title', 'about_section_subtitle', 'about_section_description',
+            'about_image_1', 'about_image_2', 'about_image_3',
+            'about_feature_1_title', 'about_feature_1_description',
+            'about_feature_2_title', 'about_feature_2_description',
+            'about_feature_3_title', 'about_feature_3_description',
+            'about_feature_4_title', 'about_feature_4_description',
+            'about_button_text', 'about_contact_text', 'about_contact_phone',
+            'headmaster_name', 'headmaster_description', 'headmaster_vision', 'headmaster_photo',
+            'campus_life_headmaster_name', 'campus_life_headmaster_description',
+            'campus_life_headmaster_vision', 'campus_life_headmaster_photo',
+            'program_section_title', 'program_section_subtitle',
+            'program_ipa_title', 'program_ipa_description',
+            'program_ips_title', 'program_ips_description',
+            'program_religion_title', 'program_religion_description',
+            'program_section_image',
+            'counter1_number', 'counter1_label',
+            'counter2_number', 'counter2_label',
+            'counter3_number', 'counter3_label',
+            'gallery_title', 'gallery_subtitle',
+            'cta_title', 'cta_description', 'cta_button_text', 'cta_button_url', 'cta_video_title',
+            'contact_email', 'contact_phone', 'contact_address',
+            'contact_section_subtitle', 'contact_section_title', 'contact_section_description',
+            'contact_map_url', 'contact_operational_hours',
+            'social_facebook', 'social_instagram', 'social_youtube', 'social_whatsapp',
+            'video_url', 'video_thumbnail',
         ];
 
-        foreach ($settings as $setting) {
-            cache()->forget("site_setting_{$setting}");
+        foreach ($landingPageKeys as $key) {
+            ThemeSetting::where('theme', $theme)->where('key', $key)->delete();
         }
 
-        return redirect()->back()->with('success', 'Landing page settings have been reset to default values!');
+        ThemeSetting::clearCache($theme);
+
+        return redirect()->back()->with('success', "Settings tema [{$theme}] berhasil direset ke default!");
     }
 }

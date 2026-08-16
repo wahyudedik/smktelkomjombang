@@ -46,16 +46,14 @@
         <div class="menu-area menu-sticky">
             <div class="container">
                 <div class="row y-middle">
-                    <div class="col-lg-5">
+                    <div class="col-lg-4 col-md-5 col-12">
                         <div class="logo-cat-wrap">
-                            <div class="logo-part pr-90">
-                                <a class="dark-logo" href="{{ route('landing') }}">
-                                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}"
-                                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 35px;">
-                                </a>
-                                <a class="light-logo" href="{{ route('landing') }}">
-                                    <img src="{{ theme_image('logo_light', theme_info('defaults.logo_light', 'assets_telkom/assets/images/logo.png')) }}"
-                                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 35px;">
+                            <div class="logo-part">
+                                <a href="{{ route('landing') }}" class="brand-logo-wrap">
+                                    <img src="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_telkom/assets/images/fav.png')) }}"
+                                        alt="{{ theme_info('name', 'Logo') }}" class="logo-badge">
+                                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo.png')) }}"
+                                        alt="{{ theme_info('name', 'SMK Telekomunikasi Darul Ulum Jombang') }}" class="logo-text">
                                 </a>
                             </div>
                             <div class="categories-btn">
@@ -71,9 +69,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-7 text-center">
+                    <div class="col-lg-8 col-md-7 col-12 text-end">
                         <div class="rs-menu-area">
-                            <div class="main-menu pr-90">
+                            <div class="main-menu pr-0">
                                 <div class="mobile-menu">
                                     <a class="rs-menu-toggle">
                                         <i class="fa fa-bars"></i>
@@ -85,7 +83,7 @@
                                             @if (isset($item['children']) && count($item['children']) > 0)
                                                 <li class="menu-item-has-children">
                                                     <a
-                                                        href="{{ resolve_theme_url($item['url'] ?? '#') }}">{{ $item['label'] }}</a>
+                                                        href="{{ resolve_theme_url($item['url'] ?? '#') }}">{{ $item['label'] }} +</a>
                                                     <ul class="sub-menu">
                                                         @foreach ($item['children'] as $child)
                                                             <li><a
@@ -122,8 +120,8 @@
             </div>
             <div class="canvas-logo">
                 <a href="{{ route('landing') }}">
-                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}"
-                        alt="{{ theme_info('name', 'Logo') }}" style="max-height: 60px;">
+                    <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}"
+                        alt="{{ theme_info('name', 'Logo') }}">
                 </a>
             </div>
             <ul class="canvas-social">

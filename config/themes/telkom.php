@@ -14,8 +14,8 @@ return [
 
     // Contact Info
     'address' => 'Ponpes Darul Ulum, Jl. Wahid Hasyim No.128, Jombang',
-    'phone' => '0856-4940-0339',
-    'phone_secondary' => '(0321) 8681-888',
+    'phone' => '085649400339',
+    'phone_secondary' => '(0321)868188',
     'whatsapp' => '6285649400339',
     'email' => 'smktelkomdujbg@gmail.com',
     'ppdb_url' => 'https://psb.ponpesdarululum.id/',
@@ -33,13 +33,13 @@ return [
     // Assets
     'assets_path' => 'assets_telkom',
     'favicon' => 'assets_telkom/assets/images/fav.png',
-    'logo' => 'assets_telkom/assets/images/logo-dark.png',       // Dark logo for light header (default state)
-    'logo_light' => 'assets_telkom/assets/images/logo.png',      // Light/white logo for dark header (sticky state)
+    'logo' => 'assets_telkom/assets/images/logo.png',            // Dark text logo for light header (default state)
+    'logo_light' => 'assets_telkom/assets/images/logo.png',      // Same logo for footer
 
     // Hero Slider (paths only — resolve with asset() in views/helpers)
     'hero_images' => [
-        'assets_telkom/assets/images/slider/h2-1.jpg',
-        'assets_telkom/assets/images/slider/h2-2.jpg',
+        'assets_telkom/assets/images/slider/h2-2.jpg',   // Slide 1 (matches template)
+        'assets_telkom/assets/images/slider/h2-1.jpg',   // Slide 2 (matches template)
         'assets_telkom/assets/images/slider/h2-3.jpg',
     ],
 
@@ -94,20 +94,20 @@ return [
         'hours' => '08:00 - 16:00 WIB',
     ],
 
-    // Menu Navigasi
+    // Menu Navigasi (matches telkom.html template exactly)
     'menu' => [
         [
             'label' => 'Profil',
-            'url' => '#rs-about',
+            'url' => '#',
             'children' => [
-                ['label' => 'Tentang SMK', 'url' => 'route:pages.public.show,pp-darul-ulum'],
-                ['label' => 'Visi & Misi', 'url' => 'route:pages.public.show,visi-misi-smk'],
-                ['label' => 'Struktur Sekolah', 'url' => 'route:pages.public.show,struktur-smk'],
+                ['label' => 'PP. Darul Ulum', 'url' => 'route:pages.public.show,pp-darul-ulum'],
+                ['label' => 'Visi Misi SMK', 'url' => 'route:pages.public.show,visi-misi-smk'],
+                ['label' => 'Struktur SMK', 'url' => 'route:pages.public.show,struktur-smk'],
             ],
         ],
         [
             'label' => 'Akademik',
-            'url' => '#rs-services',
+            'url' => '#',
             'children' => [
                 ['label' => 'Tenaga Pendidik', 'url' => 'route:pages.public.show,tenaga-pendidik'],
                 ['label' => 'Staf & Karyawan', 'url' => 'route:pages.public.show,staf-karyawan'],
@@ -124,10 +124,6 @@ return [
                 ['label' => 'E-Perpus', 'url' => '#'],
                 ['label' => 'E-Lulus', 'url' => 'route:public.graduation.check'],
             ],
-        ],
-        [
-            'label' => 'Berita',
-            'url' => 'route:berita.public.index',
         ],
         [
             'label' => 'Kontak',
