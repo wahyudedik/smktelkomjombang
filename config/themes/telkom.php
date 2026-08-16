@@ -44,7 +44,6 @@ return [
     'hero_images' => [
         'assets_telkom/assets/images/slider/h2-2.jpg',   // Slide 1 (matches template)
         'assets_telkom/assets/images/slider/h2-1.jpg',   // Slide 2 (matches template)
-        'assets_telkom/assets/images/slider/h2-3.jpg',
     ],
 
     // Hero Slides — default text sesuai template telkom.html
