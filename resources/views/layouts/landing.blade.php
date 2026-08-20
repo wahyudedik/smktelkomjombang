@@ -19,12 +19,9 @@
         href="{{ theme_image('favicon', theme_info('defaults.favicon', 'assets_telkom/assets/images/fav.png')) }}">
 
     <!-- css -->
-    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/all-fontawesome.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/animate.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/magnific-popup.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/owl.carousel.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -67,18 +64,8 @@
     <!-- scroll-top end -->
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}"></script>
-    <script src="{{ asset('assets/js/modernizr.min.js') }}"></script>
-    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/js/imagesloaded.pkgd.min.js') }}"></script>
-    <script src="{{ asset('assets/js/jquery.magnific-popup.min.js') }}"></script>
-    <script src="{{ asset('assets/js/isotope.pkgd.min.js') }}"></script>
-    <script src="{{ asset('assets/js/jquery.appear.min.js') }}"></script>
-    <script src="{{ asset('assets/js/jquery.easing.min.js') }}"></script>
-    <script src="{{ asset('assets/js/owl.carousel.min.js') }}"></script>
-    <script src="{{ asset('assets/js/counter-up.js') }}"></script>
-    <script src="{{ asset('assets/js/wow.min.js') }}"></script>
-    <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom Scripts -->
     <script>

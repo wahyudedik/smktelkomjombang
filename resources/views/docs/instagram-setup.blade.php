@@ -2,7 +2,7 @@
 
 @section('content')
     <!-- breadcrumb -->
-    <div class="site-breadcrumb" style="background: url({{ asset('assets/img/breadcrumb/01.jpg') }})">
+    <div class="site-breadcrumb" style="background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);">
         <div class="container">
             <h2 class="breadcrumb-title">Panduan Setup Instagram API</h2>
             <ul class="breadcrumb-menu">
