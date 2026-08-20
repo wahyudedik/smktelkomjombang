@@ -5,7 +5,7 @@
                 <div class="p-6 text-gray-900">
                     <!-- Header -->
                     <div class="mb-8">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">Theme Settings</h1>
                                 <p class="text-gray-600 mt-2">Kelola pengaturan visual dan konten untuk setiap tema
@@ -106,7 +106,7 @@
                                 class="border rounded-lg overflow-hidden {{ $isActive ? 'border-green-400 ring-2 ring-green-200' : 'border-gray-200' }}">
                                 <!-- Card Header -->
                                 <div class="p-6 {{ $isActive ? 'bg-green-50' : 'bg-gray-50' }}">
-                                    <div class="flex items-center justify-between">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
                                                 @if ($isActive)
@@ -154,7 +154,7 @@
 
                                 <!-- Card Body -->
                                 <div class="p-6 border-t">
-                                    <div class="flex items-center justify-between mb-4">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                                         <div class="text-sm text-gray-600">
                                             <span class="font-semibold text-gray-900">{{ $settingsCount }}</span>
                                             pengaturan tersimpan di database

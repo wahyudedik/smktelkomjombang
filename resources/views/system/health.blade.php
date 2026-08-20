@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">System Health</h1>
                 <p class="text-slate-600 mt-1">Monitor system status and performance metrics</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.system.health') }}" class="btn btn-primary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -27,7 +27,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Overall Status -->
         <div class="bg-white rounded-xl border border-slate-200 p-6 mb-8">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900">System Status</h2>
                     <p class="text-slate-600 mt-1">Last checked: {{ $health['timestamp'] }}</p>
@@ -82,7 +82,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             @foreach ($health['checks'] as $checkName => $checkData)
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                         <h3 class="text-lg font-semibold text-slate-900 capitalize">
                             {{ str_replace('_', ' ', $checkName) }}</h3>
                         @if ($checkData['status'] === 'healthy')

@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Detail Sarana</h1>
                 <p class="text-slate-600 mt-1">{{ $sarana->kode_inventaris }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.sarpras.sarana.edit', $sarana) }}" class="btn btn-secondary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -37,7 +37,7 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- Sarana Info -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between mb-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <h3 class="text-lg font-semibold text-slate-900">Informasi Sarana</h3>
                         <span class="font-mono text-sm font-semibold text-blue-600">
                             {{ $sarana->kode_inventaris }}
@@ -251,7 +251,7 @@
                                                             <div class="flex items-start space-x-2 text-xs">
                                                                 <span class="font-medium text-slate-600 capitalize">{{ str_replace('_', ' ', $field) }}:</span>
                                                                 <div class="flex-1">
-                                                                    <div class="flex items-center space-x-2">
+                                                                    <div class="flex flex-wrap items-center gap-2">
                                                                         <span class="text-red-600 line-through">{{ $values['old'] ?? '-' }}</span>
                                                                         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -355,22 +355,22 @@
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
                     <h3 class="text-lg font-semibold text-slate-900 mb-4">Statistik</h3>
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Total Barang</span>
                             <span class="text-sm font-semibold text-slate-900">{{ $sarana->barang->count() }}</span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Total Jumlah</span>
                             <span class="text-sm font-semibold text-slate-900">{{ $sarana->total_jumlah }}</span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Dibuat</span>
                             <span class="text-sm text-slate-900">{{ $sarana->created_at->format('d M Y') }}</span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Diperbarui</span>
                             <span class="text-sm text-slate-900">{{ $sarana->updated_at->format('d M Y') }}</span>
                         </div>

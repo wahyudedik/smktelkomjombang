@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Letter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Routing\Controller as BaseController;
 

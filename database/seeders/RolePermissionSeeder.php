@@ -73,6 +73,26 @@ class RolePermissionSeeder extends Seeder
             // Themes Module
             'themes.view',
             'themes.edit',
+
+            // Surat Management (ghost permission fix)
+            'surat.view',
+            'surat.create',
+            'surat.edit',
+            'surat.delete',
+            'surat.manage',
+
+            // Notification Center (ghost permission fix)
+            'notification.view',
+            'notification.manage',
+
+            // Theme Management singular form (ghost permission fix)
+            'theme.view',
+            'theme.manage',
+
+            // Settings (ghost permission fix)
+            'settings.view',
+            'settings.manage',
+            'settings.landing-page',
         ];
 
         foreach ($permissions as $permission) {

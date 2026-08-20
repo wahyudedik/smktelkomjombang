@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Advanced Analytics Dashboard</h1>
                 <p class="text-slate-600 mt-1">Comprehensive system analytics and insights</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <!-- Date Range Filter -->
-                <form method="GET" action="{{ route('admin.analytics') }}" class="flex items-center space-x-2">
+                <form method="GET" action="{{ route('admin.analytics') }}" class="flex flex-wrap items-center gap-2">
                     <input type="date" name="start_date" value="{{ $analytics['date_range']['start'] }}"
                         class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <span class="text-slate-500">to</span>
@@ -271,7 +271,7 @@
         <!-- Key Metrics Overview -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-slate-600">Total Users</p>
                         <p class="text-3xl font-bold text-slate-900 mt-2">
@@ -297,7 +297,7 @@
             </div>
 
             <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-slate-600">Active Users</p>
                         <p class="text-3xl font-bold text-slate-900 mt-2">
@@ -314,7 +314,7 @@
             </div>
 
             <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-slate-600">Total Actions</p>
                         <p class="text-3xl font-bold text-slate-900 mt-2">
@@ -331,7 +331,7 @@
             </div>
 
             <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-slate-600">System Health</p>
                         <p class="text-3xl font-bold text-green-600 mt-2">
@@ -365,7 +365,7 @@
                     User Activity Insights
                 </h3>
                 <div class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="p-3 bg-slate-50 rounded-lg">
                             <p class="text-xs text-slate-500">Last 24 Hours</p>
                             <p class="text-xl font-bold text-slate-900">
@@ -392,8 +392,8 @@
                         <h4 class="text-sm font-medium text-slate-700 mb-3">User Distribution by Role</h4>
                         <div class="space-y-2">
                             @foreach ($analytics['user_activity']['user_distribution'] as $role => $count)
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-2">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         <div class="w-3 h-3 rounded-full bg-blue-500"></div>
                                         <span class="text-sm text-slate-700 capitalize">{{ $role }}</span>
                                     </div>
@@ -529,7 +529,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <!-- User Invitation Trend Chart -->
             <div class="bg-white rounded-xl border border-slate-200 p-6">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <h3 class="text-lg font-semibold text-slate-900">User Invitation Trend</h3>
                     <select @change="updateChart('userInvitations')"
                         class="text-sm border border-slate-300 rounded px-2 py-1">
@@ -545,7 +545,7 @@
 
             <!-- Module Usage Trend Chart -->
             <div class="bg-white rounded-xl border border-slate-200 p-6">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <h3 class="text-lg font-semibold text-slate-900">Module Activity Trend</h3>
                     <select @change="updateChart('moduleUsage')"
                         class="text-sm border border-slate-300 rounded px-2 py-1">

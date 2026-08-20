@@ -8,6 +8,13 @@
         ['label' => 'E-Lulus', 'url' => route('public.graduation.check')],
     ]" />
 
+    <style>
+        @media (max-width: 575.98px) {
+            .elulus-card {
+                padding: 24px 20px !important;
+            }
+        }
+    </style>
     {{-- Main Section --}}
     <div class="rs-contact style1 pt-94 pb-100 md-pt-64 md-pb-70">
         <div class="container">
@@ -38,7 +45,7 @@
                     @endif
 
                     {{-- Card Form --}}
-                    <div class="contact-wrap"
+                    <div class="contact-wrap elulus-card"
                         style="background: #fff; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.10); padding: 48px 44px;">
 
                         {{-- Info Box --}}

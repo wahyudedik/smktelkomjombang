@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Sarpras Dashboard</h1>
                 <p class="text-slate-600 mt-1">Manage school facilities and infrastructure</p>
@@ -105,7 +105,7 @@
             <!-- Total Sarana -->
             <div class="card {{ $stats['sarana_perlu_update'] > 0 ? 'border-l-4 border-yellow-500' : '' }}">
                 <div class="card-body">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
                                 <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center relative">
@@ -349,7 +349,7 @@
                     <h3 class="text-lg font-semibold text-slate-900">Quick Actions</h3>
                 </div>
                 <div class="card-body">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <a href="{{ route('admin.sarpras.kategori.index') }}" class="btn btn-primary">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -401,7 +401,7 @@
             <!-- Recent Maintenance -->
             <div class="card">
                 <div class="card-header">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <h3 class="text-lg font-semibold text-slate-900">Recent Maintenance</h3>
                         <a href="{{ route('admin.sarpras.maintenance.index') }}" 
                             class="text-sm text-blue-600 hover:text-blue-700 font-medium">
@@ -479,7 +479,7 @@
             <!-- Recent Sarana -->
             <div class="card">
                 <div class="card-header">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <h3 class="text-lg font-semibold text-slate-900">Recent Sarana</h3>
                         <a href="{{ route('admin.sarpras.sarana.index') }}" 
                             class="text-sm text-blue-600 hover:text-blue-700 font-medium">
@@ -524,7 +524,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         <span class="text-xs text-slate-500">
                                             {{ $sarana->sumber_dana ?? '-' }}
                                         </span>

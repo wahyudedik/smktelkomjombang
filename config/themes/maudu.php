@@ -175,38 +175,38 @@ return [
             'label' => 'PROFIL',
             'url' => '#',
             'children' => [
-                ['label' => 'Yayasan', 'url' => '#'],
-                ['label' => 'MAUDU', 'url' => '#'],
-                ['label' => 'Prestasi Siswa', 'url' => '#'],
-                ['label' => 'Gallery', 'url' => '#'],
+                ['label' => 'Yayasan', 'url' => 'route:pages.public.show,tentang-yayasan'],
+                ['label' => 'MAUDU', 'url' => 'route:pages.public.show,tentang-madrasah'],
+                ['label' => 'Prestasi Siswa', 'url' => '#'], // TODO: Add route when feature is implemented
+                ['label' => 'Gallery', 'url' => '#'], // TODO: Add route when feature is implemented
             ],
         ],
         [
             'label' => 'AKADEMIK',
             'url' => '#',
             'children' => [
-                ['label' => 'Tenaga Pendidik', 'url' => '#'],
-                ['label' => 'Jurusan', 'url' => '#'],
-                ['label' => 'Kalender Akademik', 'url' => '#'],
-                ['label' => 'Studi Ekskursi', 'url' => '#'],
-                ['label' => 'Studi Kampus', 'url' => '#'],
-                ['label' => 'Ekstrakurikuler', 'url' => '#'],
+                ['label' => 'Tenaga Pendidik', 'url' => 'route:pages.public.index'],
+                ['label' => 'Jurusan', 'url' => '#'], // TODO: Add route when feature is implemented
+                ['label' => 'Kalender Akademik', 'url' => '#'], // TODO: Add route when feature is implemented
+                ['label' => 'Studi Ekskursi', 'url' => '#'], // TODO: Add route when feature is implemented
+                ['label' => 'Studi Kampus', 'url' => '#'], // TODO: Add route when feature is implemented
+                ['label' => 'Ekstrakurikuler', 'url' => '#'], // TODO: Add route when feature is implemented
             ],
         ],
         [
             'label' => 'LAYANAN PESERTA DIDIK',
             'url' => '#',
             'children' => [
-                ['label' => 'E-Siswa & Alumni', 'url' => '#'],
-                ['label' => 'E-Raport', 'url' => '#'],
-                ['label' => 'E-OSIS', 'url' => '#'],
-                ['label' => 'E-Lulus', 'url' => '#'],
-                ['label' => 'E-Majalah', 'url' => '#'],
+                ['label' => 'E-Siswa & Alumni', 'url' => '#'], // TODO: Add route when feature is implemented
+                ['label' => 'E-Raport', 'url' => '#'], // TODO: Add route when feature is implemented
+                ['label' => 'E-OSIS', 'url' => '#'], // TODO: Add route when feature is implemented
+                ['label' => 'E-Lulus', 'url' => 'route:public.graduation.check'],
+                ['label' => 'E-Majalah', 'url' => '#'], // TODO: Add route when feature is implemented
             ],
         ],
         [
             'label' => 'EVENT MAUDU',
-            'url' => '#event-maudu',
+            'url' => 'route:public.kegiatan',
         ],
     ],
 ];

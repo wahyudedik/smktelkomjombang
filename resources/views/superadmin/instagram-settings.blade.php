@@ -5,7 +5,7 @@
     @endpush
 
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-3xl font-bold text-slate-900 flex items-center">
                     <i class="fab fa-instagram mr-3"
@@ -33,7 +33,7 @@
         <!-- Status Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-slate-100">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div class="flex items-center gap-4">
                         @if ($settings && $settings->is_active)
                             <div class="relative">

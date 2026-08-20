@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <div class="flex items-center space-x-2 text-sm text-slate-500 mb-1">
                     <a href="{{ route('admin.log-monitoring.index') }}" class="hover:text-blue-600 transition-colors">Log Monitoring</a>
@@ -12,7 +12,7 @@
                 <h1 class="text-2xl font-bold text-slate-900">Log File Viewer</h1>
                 <p class="text-slate-600 mt-1">Detail isi log file: {{ $logData['filename'] }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.log-monitoring.download', $logData['filename']) }}"
                    class="btn btn-secondary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,14 +121,14 @@
         </div>
 
         <!-- Action Bar -->
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <p class="text-sm text-slate-600">
                 Menampilkan <span class="font-semibold">{{ number_format(count($logData['lines'])) }}</span> baris
                 @if ($level || $search)
                     (filtered)
                 @endif
             </p>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <button onclick="toggleAutoScroll()" id="autoScrollBtn"
                         class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors
                                bg-green-100 text-green-700 hover:bg-green-200">
@@ -157,7 +157,7 @@
         <!-- Log Content -->
         <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
             <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
+                <div class="flex flex-wrap items-center gap-2">
                     <div class="w-3 h-3 rounded-full bg-red-500"></div>
                     <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
                     <div class="w-3 h-3 rounded-full bg-green-500"></div>

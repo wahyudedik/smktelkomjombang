@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Detail Izin / Sakit</h1>
                 <p class="text-slate-600 mt-1">{{ $excuse->nama }} — {{ $excuse->date->format('d F Y') }}</p>
@@ -25,7 +25,7 @@
         <!-- Detail Card -->
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <h2 class="text-lg font-semibold text-slate-900">Informasi Izin</h2>
                     <span class="px-3 py-1 bg-{{ $excuse->status_color }}-100 text-{{ $excuse->status_color }}-800 rounded-full text-sm font-medium">
                         {{ $excuse->status_label }}
@@ -128,7 +128,7 @@
                                         <textarea name="rejection_reason" rows="3" class="mt-1 block w-full rounded-md border-slate-300 text-sm"
                                             placeholder="Jelaskan alasan penolakan..." required></textarea>
                                     </div>
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         <button type="submit" class="btn bg-red-600 hover:bg-red-700 text-white text-sm"
                                             onclick="return confirm('Tolak izin ini?')">Konfirmasi Tolak</button>
                                         <button type="button" @click="showReject = false" class="btn btn-secondary text-sm">Batal</button>

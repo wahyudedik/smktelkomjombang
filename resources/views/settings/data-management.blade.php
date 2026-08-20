@@ -5,7 +5,7 @@
                 <div class="p-6 text-gray-900">
                     <!-- Header -->
                     <div class="mb-8">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">{{ __('common.data_management') }}</h1>
                                 <p class="text-gray-600 mt-2">{{ __('common.manage_data_description') }}</p>
@@ -110,7 +110,7 @@
 
                     <!-- Kelas Tab -->
                     <div id="content-kelas" class="tab-content">
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                             <h2 class="text-xl font-semibold text-gray-900">Data Kelas</h2>
                             <button onclick="openModal('kelas')"
                                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
@@ -121,7 +121,7 @@
                             <ul class="divide-y divide-gray-200">
                                 @forelse($kelas as $item)
                                     <li class="px-6 py-4">
-                                        <div class="flex items-center justify-between">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                             <div class="flex-1">
                                                 <h3 class="text-lg font-medium text-gray-900">{{ $item->nama }}</h3>
                                                 @if ($item->deskripsi)
@@ -153,7 +153,7 @@
 
                     <!-- Jurusan Tab -->
                     <div id="content-jurusan" class="tab-content hidden">
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                             <h2 class="text-xl font-semibold text-gray-900">Data Jurusan</h2>
                             <button onclick="openModal('jurusan')"
                                 class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
@@ -164,7 +164,7 @@
                             <ul class="divide-y divide-gray-200">
                                 @forelse($jurusan as $item)
                                     <li class="px-6 py-4">
-                                        <div class="flex items-center justify-between">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                             <div class="flex-1">
                                                 <h3 class="text-lg font-medium text-gray-900">{{ $item->nama }}</h3>
                                                 @if ($item->deskripsi)
@@ -196,7 +196,7 @@
 
                     <!-- Ekstrakurikuler Tab -->
                     <div id="content-ekstrakurikuler" class="tab-content hidden">
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                             <h2 class="text-xl font-semibold text-gray-900">Data Ekstrakurikuler</h2>
                             <button onclick="openModal('ekstrakurikuler')"
                                 class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
@@ -207,7 +207,7 @@
                             <ul class="divide-y divide-gray-200">
                                 @forelse($ekstrakurikuler as $item)
                                     <li class="px-6 py-4">
-                                        <div class="flex items-center justify-between">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                             <div class="flex-1">
                                                 <h3 class="text-lg font-medium text-gray-900">{{ $item->nama }}</h3>
                                                 @if ($item->deskripsi)
@@ -239,7 +239,7 @@
 
                     <!-- Mata Pelajaran Tab -->
                     <div id="content-mata-pelajaran" class="tab-content hidden">
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                             <h2 class="text-xl font-semibold text-gray-900">Data Mata Pelajaran</h2>
                             <button onclick="openModal('mata-pelajaran')"
                                 class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
@@ -250,7 +250,7 @@
                             <ul class="divide-y divide-gray-200">
                                 @forelse($mataPelajaran as $item)
                                     <li class="px-6 py-4">
-                                        <div class="flex items-center justify-between">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                             <div class="flex-1">
                                                 <h3 class="text-lg font-medium text-gray-900">{{ $item->nama }}</h3>
                                             </div>
@@ -285,7 +285,7 @@
     <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <h3 id="modal-title" class="text-lg font-medium text-gray-900"></h3>
                     <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times"></i>

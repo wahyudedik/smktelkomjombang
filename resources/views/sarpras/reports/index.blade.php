@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Laporan Sarana</h1>
                 <p class="text-slate-600 mt-1">Trace data kelas/room, barang rusak/hilang/baik, dan perbaikan</p>
@@ -163,7 +163,7 @@
         <!-- Condition Statistics -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div class="bg-white rounded-xl border border-slate-200 p-6">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-slate-600">Kondisi Baik</p>
                         <p class="text-2xl font-bold text-green-600">{{ $stats['kondisi_baik'] }}</p>
@@ -176,7 +176,7 @@
                 </div>
             </div>
             <div class="bg-white rounded-xl border border-slate-200 p-6">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-slate-600">Kondisi Rusak</p>
                         <p class="text-2xl font-bold text-red-600">{{ $stats['kondisi_rusak'] }}</p>
@@ -189,7 +189,7 @@
                 </div>
             </div>
             <div class="bg-white rounded-xl border border-slate-200 p-6">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-slate-600">Kondisi Hilang</p>
                         <p class="text-2xl font-bold text-gray-600">{{ $stats['kondisi_hilang'] }}</p>
@@ -205,7 +205,7 @@
 
         <!-- Barang Perlu Perbaikan -->
         <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <h3 class="text-lg font-semibold text-slate-900">Barang Perlu Perbaikan</h3>
                 <span class="badge badge-red">{{ $barangPerluPerbaikan->count() }} barang</span>
             </div>
@@ -259,7 +259,7 @@
 
         <!-- Data Sarana -->
         <div class="bg-white rounded-xl border border-slate-200 p-6">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <h3 class="text-lg font-semibold text-slate-900">Data Sarana</h3>
                 <span class="badge badge-blue">{{ $saranas->count() }} sarana</span>
             </div>

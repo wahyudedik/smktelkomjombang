@@ -14,6 +14,25 @@
 <!-- Breadcrumb End -->
 
 <!-- Blog Section Start -->
+<style>
+    @media (max-width: 767.98px) {
+        .featured-blog-item {
+            flex-direction: column !important;
+        }
+        .featured-blog-image {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        .featured-blog-image img,
+        .featured-blog-image div {
+            height: 220px !important;
+        }
+        .featured-blog-content {
+            padding: 24px 20px !important;
+            min-width: auto !important;
+        }
+    }
+</style>
 <div class="rs-blog style1 pt-100 pb-100 md-pt-70 md-pb-70">
     <div class="container">
 
@@ -50,8 +69,8 @@
             <!-- Featured Berita -->
             <div class="row mb-60">
                 <div class="col-12">
-                    <div class="blog-item" style="display: flex; flex-wrap: wrap; background: #f8f9fa; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
-                        <div style="flex: 0 0 45%; max-width: 45%;">
+                    <div class="blog-item featured-blog-item" style="display: flex; flex-wrap: wrap; background: #f8f9fa; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+                        <div class="featured-blog-image" style="flex: 0 0 45%; max-width: 45%;">
                             @if ($featured->featured_image)
                                 <img src="{{ Storage::url($featured->featured_image) }}" alt="{{ $featured->title }}"
                                     style="width: 100%; height: 320px; object-fit: cover; display: block;">
@@ -61,7 +80,7 @@
                                 </div>
                             @endif
                         </div>
-                        <div style="flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; min-width: 280px;">
+                        <div class="featured-blog-content" style="flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; min-width: 280px;">
                             <span class="sub-title primary" style="font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-bottom: 15px; display: block;">
                                 ★ BERITA UNGGULAN
                             </span>

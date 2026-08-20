@@ -1,7 +1,7 @@
 # 📋 Daftar Lengkap Fitur — SMK Telekomunikasi Darul Ulum
 
 > Dokumentasi lengkap semua fitur yang tersedia di sistem informasi SMK Telekomunikasi.
-> Diperbarui: 2026-08-16
+> Diperbarui: 2026-08-20
 
 ---
 
@@ -138,19 +138,20 @@
 | Export summary (Excel) | ✅ | Ringkasan per user |
 | Export user detail (Excel) | ✅ | Detail per user |
 | Report harian | ✅ | View sudah ada |
-| Report mingguan | ❌ | Controller ada, view belum |
-| Report bulanan | ❌ | Controller ada, view belum |
-| Report keterlambatan | ❌ | Controller ada, view belum |
-| Report user detail | ❌ | Controller ada, view belum |
-| Export PDF | ❌ | Belum ada |
+| Report mingguan | ✅ | `attendance/report/weekly.blade.php` |
+| Report bulanan | ✅ | `attendance/report/monthly.blade.php` |
+| Report keterlambatan | ✅ | `attendance/report/latecomers.blade.php` |
+| Report user detail | ✅ | `attendance/report/user-detail.blade.php` |
+| Export PDF | ✅ | 3 PDF views: daily, period, summary |
 
 #### 5.6 Sistem Izin/Sakit/Alpha
 | Fitur | Status | Keterangan |
 |-------|--------|-----------|
-| CRUD izin/sakit | ❌ | Belum ada |
-| Approve/reject izin | ❌ | Belum ada |
-| Mark alpha otomatis | ❌ | Belum ada |
-| Notifikasi absensi | ❌ | Belum ada |
+| CRUD izin/sakit | ✅ | `AttendanceExcuseController` (277 baris) + 4 views |
+| Approve/reject izin | ✅ | Routes dengan throttle middleware |
+| Mark alpha otomatis | ✅ | `MarkAlphaCommand` (jam 23:00) |
+| Notifikasi absensi | ✅ | `AttendanceNotifyCommand` (summary + late + excuse) |
+| Attendance config | ✅ | `config/attendance.php` (164 baris) — centralized |
 
 ### 6. 🗳️ OSIS Voting
 | Fitur | Status | Keterangan |
@@ -292,6 +293,8 @@
 | Canvas menu logo theme-aware | ✅ | Menggunakan `theme_image()` bukan hardcoded `asset()` |
 | Deployment seeder | ✅ | `ThemeSettingsSeeder` otomatis di `deploy.sh` & `update.sh` |
 | Dynamic registered themes | ✅ | `ThemeSetting::getRegisteredThemes()` reads from `config('themes.available')` |
+| MAUDU theme views | ✅ | 7 views: berita, pages, instagram, elulus (index + show + check + result) |
+| Theme settings admin (full) | ✅ | `ThemeSettingController` (566 baris) — preview, clone, import/export, comparison, analytics |
 
 ---
 

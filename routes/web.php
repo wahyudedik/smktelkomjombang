@@ -95,31 +95,33 @@ Route::match(['GET', 'POST'], '/iclock/cdata', [ZKTecoIClockController::class, '
 Route::match(['GET', 'POST'], '/iclock/getrequest', [ZKTecoIClockController::class, 'getrequest'])->name('zkteco.iclock.getrequest');
 Route::match(['GET', 'POST'], '/iclock/devicecmd', [ZKTecoIClockController::class, 'devicecmd'])->name('zkteco.iclock.devicecmd');
 
-// ZKTeco Debug Endpoints (untuk testing)
-Route::get('/iclock/test', function () {
-    return response()->json([
-        'status' => 'ok',
-        'message' => 'ZKTeco endpoint is accessible',
-        'timestamp' => now(),
-        'url' => url('/iclock/getrequest'),
-    ]);
-})->name('zkteco.test');
+// ZKTeco Debug Endpoints (superadmin only — NEVER expose publicly)
+Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    Route::get('/iclock/test', function () {
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'ZKTeco endpoint is accessible',
+            'timestamp' => now(),
+            'url' => url('/iclock/getrequest'),
+        ]);
+    })->name('zkteco.test');
 
-Route::get('/iclock/debug', function () {
-    \Log::info('ZKTeco debug endpoint accessed', [
-        'ip' => request()->ip(),
-        'user_agent' => request()->userAgent(),
-        'query' => request()->query(),
-    ]);
+    Route::get('/iclock/debug', function () {
+        \Log::info('ZKTeco debug endpoint accessed', [
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'query' => request()->query(),
+        ]);
 
-    return response()->json([
-        'status' => 'debug',
-        'ip' => request()->ip(),
-        'query' => request()->query(),
-        'headers' => request()->headers->all(),
-        'log' => 'Check storage/logs/laravel.log',
-    ]);
-})->name('zkteco.debug');
+        return response()->json([
+            'status' => 'debug',
+            'ip' => request()->ip(),
+            'query' => request()->query(),
+            'headers' => request()->headers->all(),
+            'log' => 'Check storage/logs/laravel.log',
+        ]);
+    })->name('zkteco.debug');
+});
 
 // Custom pages example
 Route::get('/custom-example', function () {
@@ -631,11 +633,11 @@ Route::get('/offline', function () {
 Route::get('/pages', [PageController::class, 'publicIndex'])->name('pages.public.index');
 Route::get('/page/{slug}', [PageController::class, 'publicShow'])->name('pages.public.show');
 
-// Seeder halaman statis (jalankan sekali)
+// Seeder halaman statis (superadmin only — can modify data)
 Route::get('/seed-static-pages', function () {
     $controller = new \App\Http\Controllers\LandingController();
     return $controller->createStaticPages();
-})->name('seed.static.pages');
+})->middleware(['auth', 'role:superadmin'])->name('seed.static.pages');
 
 // Berita / News Public Routes
 Route::get('/berita', [\App\Http\Controllers\BeritaController::class, 'publicIndex'])->name('berita.public.index');
@@ -693,11 +695,11 @@ Route::post('/email/verify/resend-auth', [App\Http\Controllers\Auth\EmailVerific
 // SETTINGS & API ROUTES (Admin only)
 // ========================================
 
-Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin')->name('admin.')->group(function () {
-    // Settings Routes (Admin only)
-    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::get('/settings/data-management', [SettingsController::class, 'dataManagement'])->name('settings.data-management');
-    Route::get('/settings/kelas-jurusan', [SettingsController::class, 'kelasJurusan'])->name('settings.kelas-jurusan');
+Route::middleware(['auth', 'verified', 'role:admin|superadmin', 'permission:settings.view|settings.manage'])->prefix('admin')->name('admin.')->group(function () {
+    // Settings Routes (Admin only — requires settings.view or settings.manage permission)
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index')->middleware('permission:settings.view');
+    Route::get('/settings/data-management', [SettingsController::class, 'dataManagement'])->name('settings.data-management')->middleware('permission:settings.manage');
+    Route::get('/settings/kelas-jurusan', [SettingsController::class, 'kelasJurusan'])->name('settings.kelas-jurusan')->middleware('permission:settings.manage');
 
     // Data Management CRUD Routes
     Route::prefix('settings/data-management')->name('settings.data-management.')->group(function () {
@@ -722,12 +724,12 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin'
         Route::delete('/mata-pelajaran/{id}', [DataManagementController::class, 'deleteMataPelajaran'])->name('mata-pelajaran.delete');
     });
 
-    // Landing Page Management Routes
-    Route::get('/settings/landing-page', [SettingsController::class, 'landingPage'])->name('settings.landing-page');
-    Route::post('/settings/landing-page', [SettingsController::class, 'updateLandingPage'])->name('settings.landing-page.update');
-    Route::post('/settings/landing-page/reset', [SettingsController::class, 'resetLandingPage'])->name('settings.landing-page.reset');
-    Route::get('/settings/seo', [SettingsController::class, 'seoSettings'])->name('settings.seo');
-    Route::post('/settings/seo', [SettingsController::class, 'updateSeoSettings'])->name('settings.seo.update');
+    // Landing Page Management Routes (requires settings.manage or settings.landing-page)
+    Route::get('/settings/landing-page', [SettingsController::class, 'landingPage'])->name('settings.landing-page')->middleware('permission:settings.manage|settings.landing-page');
+    Route::post('/settings/landing-page', [SettingsController::class, 'updateLandingPage'])->name('settings.landing-page.update')->middleware('permission:settings.manage|settings.landing-page');
+    Route::post('/settings/landing-page/reset', [SettingsController::class, 'resetLandingPage'])->name('settings.landing-page.reset')->middleware('permission:settings.manage|settings.landing-page');
+    Route::get('/settings/seo', [SettingsController::class, 'seoSettings'])->name('settings.seo')->middleware('permission:settings.manage');
+    Route::post('/settings/seo', [SettingsController::class, 'updateSeoSettings'])->name('settings.seo.update')->middleware('permission:settings.manage');
 
     // Theme Settings Management Routes
     Route::prefix('settings/themes')->name('themes.')->group(function () {

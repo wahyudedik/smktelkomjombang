@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">{{ __('common.detail_pemilih_osis') }}</h1>
                 <p class="text-slate-600 mt-1">{{ $pemilih->nama }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.osis.pemilih.edit', $pemilih) }}" class="btn btn-secondary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -30,9 +30,9 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- Pemilih Info -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between mb-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <h3 class="text-lg font-semibold text-slate-900">{{ __('common.voter_information') }}</h3>
-                        <div class="flex items-center space-x-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             @if ($pemilih->is_active)
                                 <span class="badge badge-success">{{ __('common.status_active') }}</span>
                             @else
@@ -170,27 +170,27 @@
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
                     <h3 class="text-lg font-semibold text-slate-900 mb-4">{{ __('common.status_information') }}</h3>
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.account_status') }}</span>
                             <span class="badge {{ $pemilih->is_active ? 'badge-success' : 'badge-warning' }}">
                                 {{ $pemilih->is_active ? __('common.status_active') : __('common.status_inactive') }}
                             </span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.voting_status') }}</span>
                             <span class="badge {{ $pemilih->has_voted ? 'badge-success' : 'badge-warning' }}">
                                 {{ $pemilih->has_voted ? __('common.has_voted') : __('common.not_voted') }}
                             </span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.registered') }}</span>
                             <span class="text-sm text-slate-900">{{ $pemilih->created_at->format('d M Y') }}</span>
                         </div>
 
                         @if ($pemilih->voted_at)
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <span class="text-sm text-slate-600">{{ __('common.last_voted') }}</span>
                                 <span class="text-sm text-slate-900">{{ $pemilih->voted_at->format('d M Y') }}</span>
                             </div>

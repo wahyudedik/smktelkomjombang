@@ -5,7 +5,7 @@
                 <div class="p-6 text-gray-900">
                     <!-- Header -->
                     <div class="mb-8">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">Theme Analytics</h1>
                                 <p class="text-gray-600 mt-2">Track halaman mana yang paling banyak dikunjungi per tema</p>

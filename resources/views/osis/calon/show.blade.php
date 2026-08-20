@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">{{ __('common.detail_calon_osis') }}</h1>
                 <p class="text-slate-600 mt-1">{{ $calon->full_candidate_name }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.osis.calon.edit', $calon) }}" class="btn btn-secondary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -30,7 +30,7 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- Candidate Info -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between mb-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <h3 class="text-lg font-semibold text-slate-900">{{ __('common.candidate_information') }}</h3>
                         <span class="badge {{ $calon->is_active ? 'badge-success' : 'badge-warning' }}">
                             {{ $calon->is_active ? __('common.status_active') : __('common.status_inactive') }}

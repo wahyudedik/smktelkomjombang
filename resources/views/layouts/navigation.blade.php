@@ -4,7 +4,7 @@
         <div class="flex justify-between h-16">
             <!-- Logo & Brand -->
             <div class="flex items-center">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2">
+                <a href="{{ route('admin.dashboard') }}" class="flex flex-wrap items-center gap-2">
                     <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}" alt="{{ theme_info('name', config('app.name')) }}"
                         style="max-height: 40px;">
                 </a>
@@ -302,65 +302,57 @@
                             <div
                                 class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                 <div class="py-2">
-                                    @if (Auth::check() && (Auth::user()->hasRole('superadmin') || Auth::user()->hasRole('admin')))
-                                        <a href="{{ route('admin.superadmin.users') }}"
-                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                                            <i class="fas fa-users-cog mr-2"></i>User Management
-                                        </a>
-                                    @elseif(auth()->user() &&
-                                            (auth()->user()->can('users.view') ||
-                                                auth()->user()->can('users.create') ||
-                                                auth()->user()->can('users.edit') ||
-                                                auth()->user()->can('users.delete')))
-                                        <a href="{{ route('admin.user-management.index') }}"
-                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                                            <i class="fas fa-users mr-2"></i>User Management
-                                        </a>
+                                    @if (Auth::user()->hasAnyRole(['superadmin', 'admin']) ||
+                                            Auth::user()->canAny(['users.view', 'users.create', 'users.edit', 'users.delete']))
+                                        @if (Auth::user()->hasAnyRole(['superadmin', 'admin']))
+                                            <a href="{{ route('admin.superadmin.users') }}"
+                                                class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                                <i class="fas fa-users-cog mr-2"></i>User Management
+                                            </a>
+                                        @else
+                                            <a href="{{ route('admin.user-management.index') }}"
+                                                class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                                <i class="fas fa-users mr-2"></i>User Management
+                                            </a>
+                                        @endif
                                     @endif
-                                    @if (auth()->user()->hasRole('superadmin'))
+                                    @canany(['roles.view', 'roles.create', 'roles.edit', 'roles.delete'])
                                         <a href="{{ route('admin.role-permissions.index') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-shield-alt mr-2"></i>Role & Permissions
                                         </a>
-                                    @endif
-                                    @if (auth()->user()->hasRole('superadmin'))
-                                        @can('viewAny', App\Models\Permission::class)
-                                            <a href="{{ route('admin.permissions.index') }}"
-                                                class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                                                <i class="fas fa-key mr-2"></i>Permission Management
-                                            </a>
-                                        @endcan
-                                    @endif
-                                    @if (auth()->user()->hasRole('superadmin'))
-                                        <a href="{{ route('admin.audit-logs.index') }}"
+                                    @endcanany
+                                    @canany(['permissions.view', 'permissions.create', 'permissions.edit', 'permissions.delete'])
+                                        <a href="{{ route('admin.permissions.index') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                                            <i class="fas fa-history mr-2"></i>Audit Logs
+                                            <i class="fas fa-key mr-2"></i>Permission Management
                                         </a>
-                                    @endif
-                                    @can('viewAnalytics', App\Models\User::class)
+                                    @endcanany
+                                    @canany(['system.analytics'])
                                         <a href="{{ route('admin.analytics') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-chart-line mr-2"></i>{{ __('common.analytics_dashboard') }}
                                         </a>
-                                    @endcan
-                                    @can('viewSystemHealth', App\Models\User::class)
+                                    @endcanany
+                                    @canany(['system.health'])
                                         <a href="{{ route('admin.system.health') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-heartbeat mr-2"></i>{{ __('common.system_health') }}
                                         </a>
-                                    @endcan
-                                    @if (Auth::check() && Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                    @endcanany
+                                    @if (Auth::user()->hasAnyRole(['admin', 'superadmin']) ||
+                                            Auth::user()->canAny(['log-monitoring.view', 'log-monitoring.manage']))
                                         <a href="{{ route('admin.log-monitoring.index') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-file-alt mr-2"></i>Log Monitoring
                                         </a>
                                     @endif
-                                    @can('viewNotifications', App\Models\User::class)
+                                    @canany(['notification.view', 'notification.manage', 'system.notifications'])
                                         <a href="{{ route('admin.notifications') }}"
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-bell mr-2"></i>{{ __('common.notification_center') }}
                                         </a>
-                                    @endcan
+                                    @endcanany
                                     @canany(['testimonials.view', 'testimonials.create', 'testimonials.edit',
                                         'testimonials.delete'])
                                         <a href="{{ route('admin.testimonials.index') }}"
@@ -374,10 +366,12 @@
                                             <i class="fas fa-link mr-2"></i>{{ __('common.testimonial_links') }}
                                         </a>
                                     @endcan
-                                    <a href="{{ route('admin.settings.index') }}"
-                                        class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                                        <i class="fas fa-cog mr-2"></i>{{ __('common.system_settings') }}
-                                    </a>
+                                    @canany(['settings.view', 'settings.manage'])
+                                        <a href="{{ route('admin.settings.index') }}"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                            <i class="fas fa-cog mr-2"></i>{{ __('common.system_settings') }}
+                                        </a>
+                                    @endcanany
                                 </div>
                             </div>
                         </div>
@@ -442,7 +436,7 @@
 
                             <!-- Header -->
                             <div class="px-4 py-3 border-b border-slate-200">
-                                <div class="flex items-center justify-between">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                     <h3 class="text-sm font-semibold text-slate-900">Notifications</h3>
                                     @if ($unreadCount > 0)
                                         <form action="{{ route('admin.notifications.mark-all-read') }}" method="POST"
@@ -512,16 +506,16 @@
                     <!-- Profile Dropdown -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open"
-                            class="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            class="flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                                 <span class="text-sm font-medium text-white">{{ substr(Auth::user()->name, 0, 1) }}</span>
                             </div>
-                            <div class="text-left">
+                            <div class="text-left hidden sm:block">
                                 <p class="text-sm font-medium text-slate-900">{{ Auth::user()->name }}</p>
                                 <p class="text-xs text-slate-500">
                                     {{ ucfirst(Auth::user()->getRoleNames()->first() ?? 'User') }}</p>
                             </div>
-                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
+                            <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 9l-7 7-7-7" />
@@ -644,7 +638,7 @@
                                             Instagram Settings
                                         </a>
                                     @endif
-                                    @if (Auth::check() && Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                    @canany(['settings.view', 'settings.manage'])
                                         <a href="{{ route('admin.settings.index') }}"
                                             class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
@@ -656,7 +650,7 @@
                                             </svg>
                                             System Settings
                                         </a>
-                                    @endif
+                                    @endcanany
                                 </div>
 
                                 <!-- Logout -->
@@ -875,61 +869,63 @@
                             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">System
                                 Management</div>
                             <div class="space-y-1 ml-2">
-                                @if (Auth::user()->hasAnyRole(['superadmin', 'admin']))
-                                    <a href="{{ route('admin.superadmin.users') }}"
-                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
-                                        <i class="fas fa-users-cog mr-2"></i>User Management
-                                    </a>
-                                @elseif (Auth::user()->canAny(['users.view', 'users.create', 'users.edit', 'users.delete']))
-                                    <a href="{{ route('admin.user-management.index') }}"
-                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
-                                        <i class="fas fa-users mr-2"></i>User Management
-                                    </a>
+                                @if (Auth::user()->hasAnyRole(['superadmin', 'admin']) ||
+                                        Auth::user()->canAny(['users.view', 'users.create', 'users.edit', 'users.delete']))
+                                    @if (Auth::user()->hasAnyRole(['superadmin', 'admin']))
+                                        <a href="{{ route('admin.superadmin.users') }}"
+                                            class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                            <i class="fas fa-users-cog mr-2"></i>User Management
+                                        </a>
+                                    @else
+                                        <a href="{{ route('admin.user-management.index') }}"
+                                            class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                            <i class="fas fa-users mr-2"></i>User Management
+                                        </a>
+                                    @endif
                                 @endif
-                                @if (Auth::user()->hasRole('superadmin'))
+                                @canany(['roles.view', 'roles.create', 'roles.edit', 'roles.delete'])
                                     <a href="{{ route('admin.role-permissions.index') }}"
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-shield-alt mr-2"></i>Role & Permissions
                                     </a>
-                                @endif
-                                @if (Auth::user()->hasRole('superadmin'))
-                                    @can('viewAny', App\Models\Permission::class)
-                                        <a href="{{ route('admin.permissions.index') }}"
-                                            class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
-                                            <i class="fas fa-key mr-2"></i>Permission Management
-                                        </a>
-                                    @endcan
-                                @endif
+                                @endcanany
+                                @canany(['permissions.view', 'permissions.create', 'permissions.edit', 'permissions.delete'])
+                                    <a href="{{ route('admin.permissions.index') }}"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                        <i class="fas fa-key mr-2"></i>Permission Management
+                                    </a>
+                                @endcanany
                                 @if (Auth::user()->hasRole('superadmin'))
                                     <a href="{{ route('admin.audit-logs.index') }}"
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-history mr-2"></i>Audit Logs
                                     </a>
                                 @endif
-                                @can('viewAnalytics', App\Models\User::class)
+                                @canany(['system.analytics'])
                                     <a href="{{ route('admin.analytics') }}"
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-chart-line mr-2"></i>{{ __('common.analytics_dashboard') }}
                                     </a>
-                                @endcan
-                                @can('viewSystemHealth', App\Models\User::class)
+                                @endcanany
+                                @canany(['system.health'])
                                     <a href="{{ route('admin.system.health') }}"
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-heartbeat mr-2"></i>{{ __('common.system_health') }}
                                     </a>
-                                @endcan
-                                @if (Auth::check() && Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                @endcanany
+                                @if (Auth::user()->hasAnyRole(['admin', 'superadmin']) ||
+                                        Auth::user()->canAny(['notification.view', 'notification.manage']))
                                     <a href="{{ route('admin.log-monitoring.index') }}"
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-file-alt mr-2"></i>Log Monitoring
                                     </a>
                                 @endif
-                                @can('viewNotifications', App\Models\User::class)
+                                @canany(['notification.view', 'notification.manage', 'system.notifications'])
                                     <a href="{{ route('admin.notifications') }}"
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-bell mr-2"></i>{{ __('common.notification_center') }}
                                     </a>
-                                @endcan
+                                @endcanany
                                 @canany(['testimonials.view', 'testimonials.create', 'testimonials.edit',
                                     'testimonials.delete'])
                                     <a href="{{ route('admin.testimonials.index') }}"
@@ -943,10 +939,12 @@
                                         <i class="fas fa-link mr-2"></i>{{ __('common.testimonial_links') }}
                                     </a>
                                 @endcan
-                                <a href="{{ route('admin.settings.index') }}"
-                                    class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
-                                    <i class="fas fa-cog mr-2"></i>{{ __('common.system_settings') }}
-                                </a>
+                                @canany(['settings.view', 'settings.manage'])
+                                    <a href="{{ route('admin.settings.index') }}"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                        <i class="fas fa-cog mr-2"></i>{{ __('common.system_settings') }}
+                                    </a>
+                                @endcanany
                             </div>
                         </div>
                     @endif

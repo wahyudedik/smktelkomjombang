@@ -9,7 +9,7 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-slate-900">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
                         <h2 class="text-xl font-semibold text-slate-800">Form Surat Keluar</h2>
                         <a href="{{ route('admin.letters.out.index') }}" class="text-slate-500 hover:text-slate-700">
                             <i class="fas fa-arrow-left mr-1"></i> Kembali

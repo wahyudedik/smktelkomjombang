@@ -11,7 +11,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <!-- Kelas Management -->
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                            <div class="flex items-center justify-between mb-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                                 <h2 class="text-xl font-semibold text-blue-900">Kelas</h2>
                                 <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">
                                     {{ $kelas->count() }} Total
@@ -48,7 +48,7 @@
 
                         <!-- Jurusan Management -->
                         <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-                            <div class="flex items-center justify-between mb-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                                 <h2 class="text-xl font-semibold text-green-900">Jurusan</h2>
                                 <span class="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded">
                                     {{ $jurusan->count() }} Total

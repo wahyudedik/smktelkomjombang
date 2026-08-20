@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Tambah Sarana</h1>
                 <p class="text-slate-600 mt-1">Tambah inventaris sarana baru</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.sarpras.sarana.index') }}" class="btn btn-secondary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -44,7 +44,7 @@
 
             <!-- Barang Selection -->
             <div class="bg-white rounded-xl border border-slate-200 p-6">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <h3 class="text-lg font-semibold text-slate-900">Pilih Barang</h3>
                     <button type="button" @click="addBarangRow()" class="btn btn-sm btn-primary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@
                     
                     <!-- Grand Total -->
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-lg font-semibold text-slate-900">Grand Total:</span>
                             <span class="text-xl font-bold text-blue-600" x-text="formatCurrency(getGrandTotal())"></span>
                         </div>

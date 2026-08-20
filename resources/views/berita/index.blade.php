@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Manajemen Berita</h1>
                 <p class="text-slate-600 mt-1">Kelola berita & artikel yang tampil di landing page</p>
@@ -121,7 +121,7 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="flex items-center space-x-2">
+                                        <div class="flex flex-wrap items-center gap-2">
                                             @can('berita.view')
                                                 <a href="{{ route('admin.berita.show', $berita) }}"
                                                     class="p-1.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors" title="Detail">

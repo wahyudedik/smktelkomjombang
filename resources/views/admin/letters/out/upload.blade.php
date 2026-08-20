@@ -9,7 +9,7 @@
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-slate-900">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
                         <h2 class="text-xl font-semibold text-slate-800">Upload File Scan</h2>
                         <a href="{{ route('admin.letters.out.index') }}" class="text-slate-500 hover:text-slate-700">
                             <i class="fas fa-arrow-left mr-1"></i> Kembali
@@ -17,7 +17,7 @@
                     </div>
 
                     <div class="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span class="block text-slate-500">Nomor Surat</span>
                                 <span class="font-semibold text-slate-800">{{ $letter->letter_number }}</span>

@@ -45,7 +45,7 @@
                         </div>
 
                         <!-- Remember Me & Forgot Password -->
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <label for="remember_me" class="flex items-center">
                                 <input id="remember_me" type="checkbox" name="remember"
                                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">

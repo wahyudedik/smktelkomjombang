@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('common.lesson_schedule') }}
             </h2>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.jadwal-pelajaran.calendar') }}"
                     class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
-use Milon\Barcode\Facades\DNS1DFacade;
-use Milon\Barcode\Facades\DNS2DFacade;
 use Carbon\Carbon;
 use App\Traits\Auditable;
 

@@ -61,7 +61,7 @@
                     </div>
 
                     <div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <label class="block text-sm font-medium text-slate-700">Segmen Format</label>
                             <button type="button" id="add-segment" class="text-sm text-blue-600 hover:underline">Tambah
                                 Segmen</button>

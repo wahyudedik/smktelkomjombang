@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">{{ __('common.data_calon_osis') }}</h1>
                 <p class="text-slate-600 mt-1">{{ __('common.manage_calon_description') }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <!-- Import/Export Dropdown -->
                 <div class="relative inline-block">
                     <button type="button" onclick="toggleDropdown('importExportDropdown')"
@@ -106,7 +106,7 @@
             <div class="divide-y divide-slate-200">
                 @forelse($calons as $calon)
                     <div class="p-6 hover:bg-slate-50 transition-colors">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div class="flex items-center space-x-4">
                                 <div class="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center">
                                     <span
@@ -125,7 +125,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <a href="{{ route('admin.osis.calon.show', $calon) }}"
                                     class="btn btn-secondary text-sm">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"

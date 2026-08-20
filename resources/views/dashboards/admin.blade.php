@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">
                     @if (Auth::user()->hasRole('superadmin'))
@@ -19,7 +19,7 @@
                 </h1>
                 <p class="text-slate-600 mt-1">{{ __('common.welcome_back') }}, {{ Auth::user()->name }}!</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 @if (Auth::user()->hasRole('superadmin'))
                     <span
                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -63,7 +63,7 @@
                     <!-- Total Students -->
                     <div
                         class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 hover:shadow-md transition-shadow">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <p class="text-sm font-medium text-slate-600 dark:text-dark-300">
                                     {{ __('common.total_siswa') }}</p>
@@ -92,7 +92,7 @@
                     <!-- Total Teachers -->
                     <div
                         class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 hover:shadow-md transition-shadow">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <p class="text-sm font-medium text-slate-600 dark:text-dark-300">
                                     {{ __('common.total_guru') }}</p>
@@ -121,7 +121,7 @@
                     <!-- Active Users -->
                     <div
                         class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 hover:shadow-md transition-shadow">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <p class="text-sm font-medium text-slate-600 dark:text-dark-300">
                                     {{ __('common.active_users') }}</p>
@@ -145,7 +145,7 @@
                     <!-- Student-specific widgets -->
                     <!-- My Profile Status -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <p class="text-sm font-medium text-slate-600">{{ __('common.profile_status') }}</p>
                                 <p class="text-2xl font-bold text-green-600">{{ __('common.complete') }}</p>
@@ -163,7 +163,7 @@
 
                     <!-- Academic Progress -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <p class="text-sm font-medium text-slate-600">{{ __('common.academic_progress') }}</p>
                                 <p class="text-2xl font-bold text-blue-600">85%</p>
@@ -181,7 +181,7 @@
 
                     <!-- Upcoming Events -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <p class="text-sm font-medium text-slate-600">{{ __('common.upcoming_events') }}</p>
                                 <p class="text-2xl font-bold text-purple-600">3</p>
@@ -202,7 +202,7 @@
                     <!-- Total Assets -->
                     <div
                         class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 hover:shadow-md transition-shadow">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <p class="text-sm font-medium text-slate-600 dark:text-dark-300">
                                     {{ __('common.total_assets') }}</p>
@@ -229,7 +229,7 @@
                     <!-- User Growth Chart (Chart.js) -->
                     <div
                         class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                             <div>
                                 <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
                                     {{ __('common.user_growth') }}</h3>
@@ -377,7 +377,7 @@
                     <div class="lg:col-span-2" x-data="{ searchQuery: '', expanded: true }">
                         <div
                             class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
-                            <div class="flex items-center justify-between mb-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                                 <div class="flex items-center gap-3 cursor-pointer" @click="expanded = !expanded">
                                     <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
                                         {{ __('common.recent_activity') }}</h3>
@@ -567,7 +567,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-200">
                             <div>
                                 <p class="text-sm text-slate-500">Kelas</p>
                                 <p class="text-sm font-medium text-slate-900">XII IPA 1</p>

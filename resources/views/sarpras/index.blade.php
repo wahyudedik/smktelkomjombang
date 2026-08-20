@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">{{ __('common.sarpras_dashboard') }}</h1>
                 <p class="text-slate-600 mt-1">{{ __('common.manage_school_facilities') }}</p>
@@ -127,7 +127,7 @@
                     <h3 class="text-lg font-semibold text-slate-900">{{ __('common.management') }}</h3>
                 </div>
                 <div class="card-body">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <a href="{{ route('admin.sarpras.kategori.index') }}"
                             class="flex flex-col items-center p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors group">
                             <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mb-2">
@@ -187,7 +187,7 @@
                     <h3 class="text-lg font-semibold text-slate-900">{{ __('common.data_management') }}</h3>
                 </div>
                 <div class="card-body">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <a href="{{ route('admin.sarpras.barang.import') }}"
                             class="flex flex-col items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group">
                             <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mb-2">
@@ -295,15 +295,15 @@
                 </div>
                 <div class="card-body">
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.good') }}</span>
                             <span class="text-sm font-medium text-slate-900">{{ $stats['items_good'] }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.needs_repair') }}</span>
                             <span class="text-sm font-medium text-slate-900">{{ $stats['items_repair'] }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.damaged') }}</span>
                             <span class="text-sm font-medium text-slate-900">{{ $stats['items_damaged'] }}</span>
                         </div>
@@ -318,17 +318,17 @@
                 </div>
                 <div class="card-body">
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.pending') }}</span>
                             <span
                                 class="text-sm font-medium text-slate-900">{{ $stats['maintenance_pending'] }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.in_progress') }}</span>
                             <span
                                 class="text-sm font-medium text-slate-900">{{ $stats['maintenance_in_progress'] }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">{{ __('common.completed') }}</span>
                             <span
                                 class="text-sm font-medium text-slate-900">{{ $stats['maintenance_completed'] }}</span>

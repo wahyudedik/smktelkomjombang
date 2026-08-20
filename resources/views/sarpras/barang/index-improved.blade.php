@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Daftar Barang Sarpras</h1>
                 <p class="text-slate-600 mt-1">Kelola data barang sarana dan prasarana</p>
@@ -219,7 +219,7 @@
                                     <p class="text-sm text-slate-900">{{ $b->ruang->nama_ruang ?? '-' }}</p>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         <a href="{{ route('admin.sarpras.barang.show', $b) }}"
                                             class="text-blue-600 hover:text-blue-700" title="Lihat Detail">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"

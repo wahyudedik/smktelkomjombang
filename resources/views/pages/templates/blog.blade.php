@@ -49,7 +49,7 @@
 
         <!-- Article Footer -->
         <footer class="mt-12 pt-8 border-t border-gray-200">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex items-center space-x-4">
                     <span class="text-sm text-gray-500">Published {{ $page->published_at->format('M d, Y') }}</span>
                     @if ($page->category)

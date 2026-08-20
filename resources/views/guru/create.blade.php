@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('common.tambah_data_guru') }}
             </h2>
@@ -48,7 +48,7 @@
                                 </div>
 
                                 <!-- Gelar -->
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label for="gelar_depan"
                                             class="block text-sm font-medium text-gray-700 mb-1">{{ __('common.title_prefix') }}</label>
@@ -94,7 +94,7 @@
                                 </div>
 
                                 <!-- Tanggal & Tempat Lahir -->
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label for="tanggal_lahir"
                                             class="block text-sm font-medium text-gray-700 mb-1">{{ __('common.birth_date') }} *</label>
@@ -131,7 +131,7 @@
                                 </div>
 
                                 <!-- Kontak -->
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-1">{{ __('common.phone_number_label') }}</label>
                                         <input type="text" name="no_telepon" id="no_telepon"
@@ -269,7 +269,7 @@
                                 </div>
 
                                 <!-- Pendidikan -->
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label for="pendidikan_terakhir"
                                             class="block text-sm font-medium text-gray-700 mb-1">{{ __('common.education_level') }}

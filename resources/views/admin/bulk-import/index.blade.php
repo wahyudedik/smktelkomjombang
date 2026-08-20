@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">
                     <i class="fas fa-file-upload mr-2 text-blue-600"></i>
@@ -22,7 +22,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <!-- Users Card -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <p class="text-sm text-slate-600">Total Users</p>
                             <p class="text-2xl font-bold text-slate-900 mt-1">{{ number_format($stats['total_users']) }}
@@ -36,7 +36,7 @@
 
                 <!-- Siswa Card -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <p class="text-sm text-slate-600">Total Siswa</p>
                             <p class="text-2xl font-bold text-slate-900 mt-1">{{ number_format($stats['total_siswa']) }}
@@ -50,7 +50,7 @@
 
                 <!-- Guru Card -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <p class="text-sm text-slate-600">Total Guru</p>
                             <p class="text-2xl font-bold text-slate-900 mt-1">{{ number_format($stats['total_guru']) }}
@@ -64,7 +64,7 @@
 
                 <!-- Barang Card -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <p class="text-sm text-slate-600">Total Barang</p>
                             <p class="text-2xl font-bold text-slate-900 mt-1">

@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Daftar Sarana</h1>
                 <p class="text-slate-600 mt-1">Kelola data inventaris sarana sekolah</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.sarpras.sarana.create') }}" class="btn btn-primary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -181,7 +181,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         <a href="{{ route('admin.sarpras.sarana.show', $sarana) }}"
                                             class="btn btn-sm btn-secondary" title="Detail">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,7 +277,7 @@
                     form.addEventListener('submit', function(e) {
                         e.preventDefault();
                         const saranaKode = this.getAttribute('data-sarana');
-                        
+
                         showConfirm(
                             'Hapus Sarana?',
                             `Apakah Anda yakin ingin menghapus sarana dengan kode ${saranaKode}? Tindakan ini tidak dapat dibatalkan.`,
@@ -306,7 +306,7 @@
     <div id="importModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <h3 class="text-lg font-semibold text-slate-900">Import Sarana dari Excel</h3>
                     <button onclick="document.getElementById('importModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,7 +314,7 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <div class="mb-4">
                     <p class="text-sm text-slate-600 mb-3">
                         Upload file Excel (.xlsx, .xls, atau .csv) yang berisi data sarana.

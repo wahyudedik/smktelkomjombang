@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Role & Permission Manager</h1>
                 <p class="text-slate-600 mt-1">Manage user roles and permissions with granular control</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <button onclick="showCreateRoleModal()" class="btn btn-primary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -28,9 +28,9 @@
         <!-- Current Roles Table -->
         <div class="bg-white rounded-xl border border-slate-200 mb-8">
             <div class="px-6 py-4 border-b border-slate-200">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <h3 class="text-lg font-semibold text-slate-900">Current Roles</h3>
-                    <div class="flex items-center space-x-2">
+                    <div class="flex flex-wrap items-center gap-2">
                         <div class="relative">
                             <input type="text" id="role-search" placeholder="Search roles..."
                                 class="form-input pl-10">
@@ -117,7 +117,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         <button onclick="editRole({{ $role->id }})"
                                             class="text-blue-600 hover:text-blue-900">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -153,12 +153,12 @@
                     <div class="p-6">
                         <div class="space-y-3">
                             @foreach ($groupPermissions as $permission)
-                                <div class="flex items-center justify-between">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                     <div>
                                         <div class="text-sm font-medium text-slate-900">{{ $permission->name }}</div>
                                         <div class="text-xs text-slate-500">{{ $permission->name }}</div>
                                     </div>
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         @foreach ($roles as $role)
                                             <input type="checkbox"
                                                 class="permission-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"

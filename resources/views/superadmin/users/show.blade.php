@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">User Details</h1>
                 <p class="text-slate-600 mt-1">{{ $user->name }}</p>
@@ -84,7 +84,7 @@
                 <!-- Role & Permissions -->
                 <div class="card mt-6">
                     <div class="card-header">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <h3 class="text-lg font-semibold text-slate-900">Role & Permissions</h3>
                             <a href="{{ route('admin.role-permissions.index') }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-shield-alt mr-1"></i> Manage Roles

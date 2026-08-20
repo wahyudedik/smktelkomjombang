@@ -9,9 +9,7 @@ use App\Models\Page;
 use App\Models\Partner;
 use App\Services\InstagramService;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Str;
 
 class LandingController extends Controller
 {

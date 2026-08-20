@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Sarpras Reports</h1>
                 <p class="text-slate-600 mt-1">Analytics and reports for school facilities</p>
@@ -119,13 +119,13 @@
                 <div class="card-body">
                     <div class="space-y-4">
                         @foreach ($analytics['items_by_category'] as $category)
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
                                     <span
                                         class="text-sm font-medium text-slate-900">{{ $category->nama_kategori }}</span>
                                 </div>
-                                <div class="flex items-center space-x-2">
+                                <div class="flex flex-wrap items-center gap-2">
                                     <span class="text-sm text-slate-600">{{ $category->barang_count }} items</span>
                                     <div class="w-20 bg-slate-200 rounded-full h-2">
                                         @php
@@ -152,28 +152,28 @@
                 </div>
                 <div class="card-body">
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div class="flex items-center space-x-3">
                                 <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
                                 <span class="text-sm font-medium text-slate-900">Pending</span>
                             </div>
                             <span class="text-sm text-slate-600">{{ $analytics['maintenance_pending'] }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div class="flex items-center space-x-3">
                                 <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
                                 <span class="text-sm font-medium text-slate-900">In Progress</span>
                             </div>
                             <span class="text-sm text-slate-600">{{ $analytics['maintenance_in_progress'] }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div class="flex items-center space-x-3">
                                 <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                                 <span class="text-sm font-medium text-slate-900">Completed</span>
                             </div>
                             <span class="text-sm text-slate-600">{{ $analytics['maintenance_completed'] }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div class="flex items-center space-x-3">
                                 <div class="w-3 h-3 bg-red-500 rounded-full"></div>
                                 <span class="text-sm font-medium text-slate-900">Cancelled</span>
@@ -194,9 +194,9 @@
                 </div>
                 <div class="card-body">
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Good</span>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <span class="text-sm font-medium text-slate-900">{{ $analytics['items_good'] }}</span>
                                 <div class="w-20 bg-slate-200 rounded-full h-2">
                                     <div class="bg-green-500 h-2 rounded-full"
@@ -204,9 +204,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Needs Repair</span>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <span
                                     class="text-sm font-medium text-slate-900">{{ $analytics['items_repair'] }}</span>
                                 <div class="w-20 bg-slate-200 rounded-full h-2">
@@ -215,9 +215,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Damaged</span>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <span
                                     class="text-sm font-medium text-slate-900">{{ $analytics['items_damaged'] }}</span>
                                 <div class="w-20 bg-slate-200 rounded-full h-2">
@@ -237,23 +237,23 @@
                 </div>
                 <div class="card-body">
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">This Month</span>
                             <span class="text-sm font-medium text-slate-900">Rp
                                 {{ number_format($analytics['maintenance_cost_month'], 0, ',', '.') }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">This Year</span>
                             <span class="text-sm font-medium text-slate-900">Rp
                                 {{ number_format($analytics['maintenance_cost_year'], 0, ',', '.') }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Total Spent</span>
                             <span class="text-sm font-medium text-slate-900">Rp
                                 {{ number_format($analytics['maintenance_cost_total'], 0, ',', '.') }}</span>
                         </div>
                         <div class="pt-4 border-t border-slate-200">
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <span class="text-sm font-medium text-slate-900">Average per Item</span>
                                 <span class="text-sm font-medium text-slate-900">Rp
                                     {{ number_format($analytics['maintenance_cost_average'], 0, ',', '.') }}</span>

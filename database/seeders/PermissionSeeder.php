@@ -942,6 +942,62 @@ class PermissionSeeder extends Seeder
                 'action' => 'delete',
                 'guard_name' => 'web',
             ],
+
+            // Surat Management - Manage permission (format surat access)
+            [
+                'name' => 'surat.manage',
+                'display_name' => 'Surat - Kelola Format & Pengaturan',
+                'description' => 'Permission untuk mengelola format surat dan pengaturan surat',
+                'module' => 'surat',
+                'action' => 'manage',
+                'guard_name' => 'web',
+            ],
+
+            // Notification Center permissions
+            [
+                'name' => 'notification.view',
+                'display_name' => 'Notifikasi - Lihat Pusat Notifikasi',
+                'description' => 'Permission untuk melihat pusat notifikasi',
+                'module' => 'notification',
+                'action' => 'view',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'notification.manage',
+                'display_name' => 'Notifikasi - Kelola Notifikasi',
+                'description' => 'Permission untuk mengelola notifikasi sistem',
+                'module' => 'notification',
+                'action' => 'manage',
+                'guard_name' => 'web',
+            ],
+
+            // Theme Management permissions (singular form for navigation checks)
+            [
+                'name' => 'theme.view',
+                'display_name' => 'Tema - Lihat Tema',
+                'description' => 'Permission untuk melihat tema aktif',
+                'module' => 'theme',
+                'action' => 'view',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'theme.manage',
+                'display_name' => 'Tema - Kelola Tema',
+                'description' => 'Permission untuk mengelola tema sistem',
+                'module' => 'theme',
+                'action' => 'manage',
+                'guard_name' => 'web',
+            ],
+
+            // Settings - Landing Page permission
+            [
+                'name' => 'settings.landing-page',
+                'display_name' => 'Settings - Kelola Landing Page',
+                'description' => 'Permission untuk mengelola pengaturan landing page',
+                'module' => 'settings',
+                'action' => 'landing-page',
+                'guard_name' => 'web',
+            ],
         ];
 
         foreach ($permissions as $permissionData) {

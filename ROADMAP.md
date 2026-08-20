@@ -1,7 +1,7 @@
 # 🚀 Roadmap Pengembangan — SMK Telekomunikasi Darul Ulum
 
 > Dokumen ini mencatat seluruh rencana pengembangan proyek, status implementasi, dan prioritas.
-> Diperbarui: 2026-08-16
+> Diperbarui: 2026-08-20
 
 ---
 
@@ -83,80 +83,105 @@
 - [x] Fix footer & header "Link Terkait" → render dari `theme_config('related_links')`
 - [x] Update FEATURES.md & ROADMAP.md
 
+### Tahap 6: Lengkapi View Report Absensi (Selesai — 2026-08-20)
+- [x] View report mingguan (`attendance/report/weekly.blade.php`)
+- [x] View report bulanan (`attendance/report/monthly.blade.php`)
+- [x] View report keterlambatan (`attendance/report/latecomers.blade.php`)
+- [x] View report user detail (`attendance/report/user-detail.blade.php`)
+
+### Tahap 7: Sistem Izin/Sakit/Alpha (Selesai — 2026-08-20)
+- [x] Migration `attendance_excuses` table
+- [x] Model `AttendanceExcuse` (182 baris)
+- [x] Controller `AttendanceExcuseController` (277 baris)
+- [x] View CRUD izin/sakit (index, create, edit, show)
+- [x] `MarkAlphaCommand` + scheduler (jam 23:00)
+- [x] Integrasi dengan AttendanceSync
+
+### Tahap 8: Notifikasi Absensi (Selesai — 2026-08-20)
+- [x] Notification `AttendanceNotification`
+- [x] `AttendanceNotifyCommand` + scheduler (summary + late + excuse)
+- [x] Integrasi dengan AttendanceHelper
+
+### Tahap 9: Export PDF Absensi (Selesai — 2026-08-20)
+- [x] PDF view daily (`attendance/pdf/daily.blade.php`)
+- [x] PDF view period (`attendance/pdf/period.blade.php`)
+- [x] PDF view summary (`attendance/pdf/summary.blade.php`)
+- [x] Update AttendanceExportService
+- [x] Update AttendanceExportController
+
+### Tahap 10: Config Attendance Terpusat (Selesai — 2026-08-20)
+- [x] `config/attendance.php` (164 baris — centralized)
+- [x] Semua env vars `ATTENDANCE_*` terdefinisi
+
 ---
 
 ## 🔄 Fitur yang Sedang Dikerjakan
 
-### Tahap 6: Lengkapi View Report Absensi
-- [ ] View report mingguan (`weekly.blade.php`)
-- [ ] View report bulanan (`monthly.blade.php`)
-- [ ] View report keterlambatan (`latecomers.blade.php`)
-- [ ] View report user detail (`user-detail.blade.php`)
+### Tahap 11: MAUDU Theme Polish
+- [ ] Footer links validation (pastikan semua link aktif)
+- [ ] Login button visibility check
+- [ ] Menu config audit (semua menu routing benar)
+- [ ] MAUDU component review (header, footer, sidebar)
+- [ ] Breadcrumb MAUDU untuk semua halaman
+- [ ] Dual-theme testing (Telkom + MAUDU)
 
-### Tahap 7: Sistem Izin/Sakit/Alpha
-- [ ] Migration `attendance_excuses` table
-- [ ] Model `AttendanceExcuse`
-- [ ] Controller `AttendanceExcuseController`
-- [ ] View CRUD izin/sakit (index, create, edit, show)
-- [ ] `MarkAlphaCommand` + scheduler
-- [ ] Integrasi dengan AttendanceSync
+### Tahap 12: Documentation Sync
+- [ ] Sinkronisasi FEATURES.md dengan codebase
+- [ ] Sinkronisasi ROADMAP.md dengan codebase
+- [ ] Update README.md (judul, deskripsi, tech stack)
+- [ ] Update `.env.example` dengan semua env vars
+- [ ] Review & update AGENTS.md
+- [ ] Review & update semua plan docs di `plans/`
 
-### Tahap 8: Notifikasi Absensi
-- [ ] Notification `AttendanceNotification`
-- [ ] `AttendanceNotifyCommand` + scheduler
-- [ ] Integrasi dengan AttendanceHelper
+### Tahap 13: Security Hardening
+- [ ] Rate limiting untuk semua routes sensitif
+- [ ] Content Security Policy (CSP) headers
+- [ ] XSS audit semua form input
+- [ ] N+1 query audit
+- [ ] Dependency audit (`composer audit`, `npm audit`)
+- [ ] Session security hardening
 
-### Tahap 9: Export PDF Absensi
-- [ ] PDF view (daily, period, summary)
-- [ ] Update AttendanceExportService
-- [ ] Update AttendanceExportController
-- [ ] Update export index view
-
-### Tahap 10: Config Attendance Terpusat
-- [ ] `config/attendance.php`
-- [ ] Update `.env.example`
+### Tahap 14: Mobile Responsive Improvements
+- [ ] Audit responsive design di semua halaman admin
+- [ ] Fix table overflow di mobile
+- [ ] Fix form layout di small screen
+- [ ] Touch-friendly buttons & links
+- [ ] Test di berbagai viewport (320px, 768px, 1024px)
 
 ---
 
 ## 📋 Fitur yang Belum Dikerjakan
 
-### Kategori Prioritas Tinggi (🔴)
-1. **Sistem Izin/Sakit/Alpha** — Tidak ada sama sekali
-2. **Report Absensi Lengkap** — 4 view missing
-3. **Export PDF Absensi** — Hanya Excel
-4. **Notifikasi Absensi** — Belum diintegrasi
-5. **Config Attendance Terpusat** — Belum ada
-
 ### Kategori Prioritas Sedang (🟡)
-6. **MAUDU Public Pages** — Masih hardcoded ke Telkom
-7. **MAUDU Header/Footer** — Broken links
-8. **MAUDU Breadcrumb** — Tidak ada
-9. **Theme-Aware Controllers** — MAUDU belum support
-10. **Security Hardening** — Rate limiting belum lengkap
+1. **MAUDU Theme Polish** — Footer links, login button, menu config
+2. **Security Hardening** — CSP, rate limiting, XSS audit
+3. **Mobile Responsive** — Audit & fix semua halaman
+4. **Theme Inheritance** — Base → child themes
+5. **Performance Optimization** — CDN, eager loading audit
 
 ### Kategori Prioritas Rendah (🟢)
-11. **Admin UI Modernization** — Chart.js, Alpine.js interactivity
-12. **Dark Mode** — Toggle light/dark
-13. **Theme Inheritance** — Base → child themes
-14. **Performance Optimization** — CDN, eager loading audit
-15. **Comprehensive Test Suite** — Target 80% coverage
+6. **Admin UI Modernization** — Chart.js, Alpine.js interactivity
+7. **Dark Mode** — Toggle light/dark
+8. **Comprehensive Test Suite** — Target 80% coverage
+9. **Compliance & Accessibility** — WCAG 2.1 AA
+10. **Internationalization Expansion** — Tambah bahasa baru
 
 ---
 
 ## 🎯 Milestones
 
-### Milestone 1: Attendance Complete (Target: Agustus 2026)
-- [ ] Lengkapi semua view report absensi
-- [ ] Sistem izin/sakit/alpha
-- [ ] Export PDF absensi
-- [ ] Notifikasi absensi
-- [ ] Config attendance terpusat
+### Milestone 1: Attendance Complete — TERCAPAI (2026-08-20)
+- [x] Lengkapi semua view report absensi (weekly, monthly, latecomers, user-detail)
+- [x] Sistem izin/sakit/alpha (CRUD + approve/reject + MarkAlphaCommand)
+- [x] Export PDF absensi (daily, period, summary)
+- [x] Notifikasi absensi (AttendanceNotifyCommand)
+- [x] Config attendance terpusat (`config/attendance.php`)
 
 ### Milestone 2: MAUDU Theme Complete (Target: September 2026)
-- [ ] Theme-aware controllers
-- [ ] Semua view publik MAUDU
-- [ ] Fix component MAUDU
-- [ ] Breadcrumb MAUDU
+- [x] Theme-aware controllers (generic `LandingController`)
+- [x] Semua view publik MAUDU (berita, pages, instagram, elulus)
+- [ ] Fix component MAUDU (header/footer review)
+- [ ] Breadcrumb MAUDU untuk semua halaman
 - [ ] Dual-theme testing
 
 ### Milestone 3: Security & Quality (Target: Oktober 2026)
@@ -164,7 +189,7 @@
 - [ ] N+1 query audit
 - [ ] XSS audit
 - [ ] Comprehensive test suite
-- [ ] Documentation update
+- [x] Documentation update (FEATURES.md, ROADMAP.md, README.md, .env.example)
 
 ### Milestone 4: Enhancement (Target: November 2026)
 - [ ] Admin UI modernization

@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">{{ __('common.user_management') }}</h1>
                 <p class="text-slate-600 mt-1">{{ __('common.manage_users_custom_roles') }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <button onclick="showInviteUserModal()" class="btn btn-primary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -35,9 +35,9 @@
         <!-- Users Table -->
         <div class="bg-white rounded-xl border border-slate-200">
             <div class="px-6 py-4 border-b border-slate-200">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <h3 class="text-lg font-semibold text-slate-900">{{ __('common.all_users') }}</h3>
-                        <div class="flex items-center space-x-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <div class="relative">
                                 <input type="text" id="user-search" placeholder="{{ __('common.search_users') }}"
                                     class="form-input pl-10">
@@ -130,7 +130,7 @@
                                     {{ $user->created_at->format('M d, Y') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         @if (!$user->hasRole('superadmin'))
                                             <button onclick="editUser({{ $user->id }})"
                                                 class="text-blue-600 hover:text-blue-900">

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">{{ __('common.osis_teacher_view_title') }}</h1>
                 <p class="text-slate-600 mt-1">{{ __('common.teacher_view_description') }}</p>
@@ -51,7 +51,7 @@
                         class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
                         <!-- Header -->
                         <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white">
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
                                     <h3 class="text-lg font-semibold">{{ $calon->full_candidate_name }}</h3>
                                     <p class="text-blue-100 text-sm">{{ $calon->pencalonan_type_display }}</p>

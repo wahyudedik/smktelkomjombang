@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">{{ __('common.election_results') }}</h1>
                 <p class="text-slate-600 mt-1">{{ __('common.election_results_description') }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 @if (Auth::user()->hasRole('siswa'))
                     <a href="{{ route('admin.osis.voting') }}" class="btn btn-primary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +119,7 @@
                 <div class="space-y-4">
                     @foreach ($calons as $index => $candidate)
                         <div class="bg-white rounded-xl border border-slate-200 p-6">
-                            <div class="flex items-center justify-between mb-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                                 <div class="flex items-center space-x-4">
                                     <div
                                         class="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-semibold">

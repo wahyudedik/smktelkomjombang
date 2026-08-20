@@ -41,9 +41,9 @@
                     <div class="footer-widget-box list">
                         <h4 class="footer-widget-title">Link Terkait</h4>
                         <ul class="footer-list">
-                            <li><a href="#"><i class="fas fa-caret-right"></i> Tentang Yayasan</a></li>
-                            <li><a href="#"><i class="fas fa-caret-right"></i> Tentang Madrasah</a></li>
-                            <li><a href="#"><i class="fas fa-caret-right"></i> Testimonials</a></li>
+                            <li><a href="{{ resolve_theme_url('route:pages.public.show,tentang-yayasan') }}"><i class="fas fa-caret-right"></i> Tentang Yayasan</a></li>
+                            <li><a href="{{ resolve_theme_url('route:pages.public.show,tentang-madrasah') }}"><i class="fas fa-caret-right"></i> Tentang Madrasah</a></li>
+                            <li><a href="{{ resolve_theme_url('route:testimonials.create') }}"><i class="fas fa-caret-right"></i> Testimonials</a></li>
                         </ul>
                     </div>
                 </div>
@@ -53,12 +53,12 @@
                     <div class="footer-widget-box list">
                         <h4 class="footer-widget-title">Madrasah Corner</h4>
                         <ul class="footer-list">
-                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Raport</a></li>
-                            <li><a href="#"><i class="fas fa-caret-right"></i> E-OSIS</a></li>
-                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Sarpras</a></li>
-                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Library</a></li>
-                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Lulus</a></li>
-                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Majalah</a></li>
+                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Raport</a></li> {{-- TODO: Add route when feature is implemented --}}
+                            <li><a href="#"><i class="fas fa-caret-right"></i> E-OSIS</a></li> {{-- TODO: Add route when feature is implemented --}}
+                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Sarpras</a></li> {{-- TODO: Add route when feature is implemented --}}
+                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Library</a></li> {{-- TODO: Add route when feature is implemented --}}
+                            <li><a href="{{ resolve_theme_url('route:public.graduation.check') }}"><i class="fas fa-caret-right"></i> E-Lulus</a></li>
+                            <li><a href="#"><i class="fas fa-caret-right"></i> E-Majalah</a></li> {{-- TODO: Add route when feature is implemented --}}
                         </ul>
                     </div>
                 </div>

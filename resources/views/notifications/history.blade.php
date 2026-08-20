@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Riwayat Notifikasi</h1>
                 <p class="text-slate-600 mt-1">Lihat semua notifikasi yang telah dikirim</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.notifications.preferences') }}" class="btn btn-secondary">
                     ⚙️ Pengaturan
                 </a>

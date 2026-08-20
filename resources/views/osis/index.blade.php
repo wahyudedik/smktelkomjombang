@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">{{ __('common.e_osis_dashboard') }}</h1>
                 <p class="text-slate-600 mt-1">{{ __('common.digital_election_system') }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 @can('export', App\Models\Calon::class)
                     <a href="{{ route('admin.osis.calon.export') }}" class="btn btn-secondary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,7 +208,7 @@
 
             <!-- Calon List -->
             <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <h3 class="text-lg font-semibold text-slate-900">Daftar Calon</h3>
                     <a href="{{ route('admin.osis.calon.index') }}"
                         class="text-sm text-blue-600 hover:text-blue-700 font-medium">Lihat semua</a>
@@ -246,7 +246,7 @@
 
         <!-- Recent Votes -->
         <div class="bg-white rounded-xl border border-slate-200 p-6">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <h3 class="text-lg font-semibold text-slate-900">Voting Terbaru</h3>
                 <a href="{{ route('admin.osis.voting') }}"
                     class="text-sm text-blue-600 hover:text-blue-700 font-medium">Lihat semua</a>

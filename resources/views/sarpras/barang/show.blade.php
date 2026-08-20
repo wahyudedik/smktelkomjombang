@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Detail Barang Sarpras</h1>
                 <p class="text-slate-600 mt-1">{{ $barang->nama_barang }}</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.sarpras.barang.edit', $barang) }}" class="btn btn-secondary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -30,9 +30,9 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- Barang Info -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
-                    <div class="flex items-center justify-between mb-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <h3 class="text-lg font-semibold text-slate-900">Informasi Barang</h3>
-                        <div class="flex items-center space-x-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <span class="badge {{ $barang->kondisi_badge_color }}">
                                 {{ $barang->kondisi_display }}
                             </span>
@@ -140,7 +140,7 @@
                 <!-- Sarana that use this barang -->
                 @if ($barang->sarana && $barang->sarana->count() > 0)
                     <div class="bg-white rounded-xl border border-slate-200 p-6">
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                             <h3 class="text-lg font-semibold text-slate-900">Sarana yang Menggunakan Barang Ini</h3>
                             <a href="{{ route('admin.sarpras.sarana.index', ['barang_id' => $barang->id]) }}"
                                 class="text-sm text-blue-600 hover:text-blue-700 font-medium">
@@ -305,29 +305,29 @@
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
                     <h3 class="text-lg font-semibold text-slate-900 mb-4">Informasi Tambahan</h3>
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Usia Barang</span>
                             <span class="text-sm font-semibold text-slate-900">{{ $barang->age_display }}</span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Total Sarana</span>
                             <span class="text-sm font-semibold text-slate-900">{{ $barang->sarana->count() ?? 0 }}</span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Status</span>
                             <span class="badge {{ $barang->is_active ? 'badge-success' : 'badge-warning' }}">
                                 {{ $barang->is_active ? 'Aktif' : 'Tidak Aktif' }}
                             </span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Dibuat</span>
                             <span class="text-sm text-slate-900">{{ $barang->created_at->format('d M Y') }}</span>
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <span class="text-sm text-slate-600">Diperbarui</span>
                             <span class="text-sm text-slate-900">{{ $barang->updated_at->format('d M Y') }}</span>
                         </div>

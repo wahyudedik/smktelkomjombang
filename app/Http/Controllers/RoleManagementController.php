@@ -8,7 +8,6 @@ use Spatie\Permission\Models\Permission;
 use App\Models\User;
 use App\Helpers\RoleHelper;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
 
 class RoleManagementController extends Controller
 {

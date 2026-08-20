@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 bg-white shadow sm:rounded-lg space-y-6">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
                     <h2 class="text-xl font-semibold text-slate-800">Edit Format: {{ $letterFormat->name }}</h2>
                     <a href="{{ route('admin.letters.formats.index') }}" class="text-slate-500 hover:text-slate-700">
                         <i class="fas fa-arrow-left mr-1"></i> Kembali
@@ -80,7 +80,7 @@
                     </div>
 
                     <div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <label class="block text-sm font-medium text-slate-700">Segmen Format</label>
                             <button type="button" id="add-segment" class="text-sm text-blue-600 hover:underline">Tambah
                                 Segmen</button>

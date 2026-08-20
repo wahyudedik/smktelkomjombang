@@ -17,7 +17,6 @@ use App\Exports\CalonExport;
 use App\Imports\PemilihImport;
 use App\Exports\PemilihExport;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\DB;
 
 class OSISController extends Controller
 {

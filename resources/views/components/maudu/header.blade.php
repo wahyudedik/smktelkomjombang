@@ -87,7 +87,20 @@
                     </ul>
 
                     <div class="nav-right">
-                        <div class="nav-right-btn mt-2">
+                        <div class="nav-right-btn mt-2 d-flex align-items-center gap-2">
+                            @auth
+                                <a href="{{ route('admin.dashboard') }}"
+                                    class="theme-btn"
+                                    style="background: transparent; border: 2px solid #fff; padding: 10px 20px; border-radius: 5px;">
+                                    <i class="fa fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}"
+                                    class="theme-btn"
+                                    style="background: transparent; border: 2px solid #fff; padding: 10px 20px; border-radius: 5px;">
+                                    <i class="fa fa-sign-in-alt"></i> Masuk
+                                </a>
+                            @endauth
                             <a href="{{ theme_config('linktree_url', theme_config('ppdb_url', '#')) }}" target="_blank"
                                 class="theme-btn">
                                 <span class="fal fa-book"></span> INFORMASI PENDAFTARAN

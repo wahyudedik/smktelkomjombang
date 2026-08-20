@@ -60,7 +60,7 @@
                                                 {{ in_array($user->id, $roleUsers) ? 'checked' : '' }}
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                             <div class="ml-3 flex-1">
-                                                <div class="flex items-center justify-between">
+                                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                                     <div>
                                                         <p class="text-sm font-medium text-gray-900">{{ $user->name }}
                                                         </p>

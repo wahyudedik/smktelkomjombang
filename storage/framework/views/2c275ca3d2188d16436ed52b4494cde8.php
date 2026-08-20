@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Print Barcode Labels</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .barcode-label {
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #000;
+            padding: 10px;
+            margin: 10px auto;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+
+        .barcode-image {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+        }
+
+        .item-info {
+            font-size: 12px;
+            margin: 5px 0;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .barcode-code {
+            font-family: monospace;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            .barcode-label {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <h1>Bulk Print Barcode Labels</h1>
+        <p>Total items: <?php echo e($barangs->count()); ?></p>
+        <button onclick="window.print()"
+            style="padding: 10px 20px; font-size: 16px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Print All Labels
+        </button>
+        <button onclick="window.close()"
+            style="padding: 10px 20px; font-size: 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+            Close
+        </button>
+    </div>
+
+    <?php $__currentLoopData = $barangs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $barang): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <!-- Barcode Linear (Garis-garis) -->
+        <div class="barcode-label">
+            <div class="item-name"><?php echo e($barang->nama_barang); ?></div>
+
+            <img src="<?php echo e($barang->barcode_image_url); ?>" alt="Barcode" class="barcode-image">
+
+            <div class="barcode-code"><?php echo e($barang->barcode); ?></div>
+
+            <div class="item-info">
+                <div><strong>Kode:</strong> <?php echo e($barang->kode_barang); ?></div>
+                <div><strong>Kategori:</strong> <?php echo e($barang->kategori->nama_kategori ?? 'N/A'); ?></div>
+                <div><strong>Ruang:</strong> <?php echo e($barang->ruang->nama_ruang ?? 'N/A'); ?></div>
+                <div><strong>Kondisi:</strong> <?php echo e($barang->kondisi_display); ?></div>
+                <div><strong>Status:</strong> <?php echo e($barang->status); ?></div>
+            </div>
+        </div>
+
+        <!-- QR Code (Kotak) -->
+        <div class="barcode-label">
+            <div class="item-name"><?php echo e($barang->nama_barang); ?></div>
+
+            <img src="<?php echo e($barang->qr_code_image_url); ?>" alt="QR Code" class="barcode-image">
+
+            <div class="barcode-code"><?php echo e($barang->qr_code); ?></div>
+
+            <div class="item-info">
+                <div><strong>Kode:</strong> <?php echo e($barang->kode_barang); ?></div>
+                <div><strong>Kategori:</strong> <?php echo e($barang->kategori->nama_kategori ?? 'N/A'); ?></div>
+                <div><strong>Ruang:</strong> <?php echo e($barang->ruang->nama_ruang ?? 'N/A'); ?></div>
+                <div><strong>Kondisi:</strong> <?php echo e($barang->kondisi_display); ?></div>
+                <div><strong>Status:</strong> <?php echo e($barang->status); ?></div>
+            </div>
+        </div>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+</body>
+
+</html>
+<?php /**PATH E:\PROJEKU\telkom\resources\views\sarpras\bulk-print-barcode.blade.php ENDPATH**/ ?>

@@ -129,7 +129,7 @@
             <!-- Testimonials Table -->
             <div class="bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                         <h3 class="text-lg font-medium text-gray-900">{{ __('common.testimonials') }}</h3>
                         <div class="text-sm text-gray-500">
                             {{ str_replace([':first', ':last', ':total'], [$testimonials->firstItem(), $testimonials->lastItem(), $testimonials->total()], __('common.showing_results')) }}
@@ -323,7 +323,7 @@
         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                     <h3 class="text-lg font-medium text-gray-900">{{ __('common.testimonial_details') }}</h3>
                     <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times text-xl"></i>
@@ -397,7 +397,7 @@
                                 </div>
 
                                 <!-- Rating -->
-                                <div class="flex items-center space-x-2">
+                                <div class="flex flex-wrap items-center gap-2">
                                     <span class="text-sm font-medium">{{ __('common.rating') }}:</span>
                                     <div class="flex items-center">
                                         ${Array.from({length: 5}, (_, i) => 
@@ -413,7 +413,7 @@
                                 </div>
 
                                 <!-- Status -->
-                                <div class="flex items-center space-x-2">
+                                <div class="flex flex-wrap items-center gap-2">
                                     ${testimonial.is_approved ?
                                         '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">{{ __('common.approved') }}</span>' :
                                         '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">{{ __('common.pending') }}</span>'
