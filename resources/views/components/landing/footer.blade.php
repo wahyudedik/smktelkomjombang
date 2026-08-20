@@ -1,8 +1,6 @@
 <!-- footer area -->
 <footer class="footer-area">
-    <div class="footer-shape">
-        <img src="{{ asset('assets/img/shape/03.png') }}" alt="">
-    </div>
+    <div class="footer-shape" style="background: linear-gradient(135deg, rgba(13,110,253,0.15) 0%, rgba(102,16,242,0.10) 100%); position: absolute; top: 0; left: 0; right: 0; height: 120px; pointer-events: none;"></div>
     <div class="footer-widget">
         <div class="container">
             <div class="row footer-widget-wrapper pt-100 pb-70">
