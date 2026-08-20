@@ -14,7 +14,7 @@
                                     alt="{{ cache('site_setting_site_name', 'SMK Telekomunikasi') }}"
                                     style="max-height: 50px; filter: brightness(0) invert(1);">
                             @else
-                                <img src="{{ asset('assets_telkom/assets/images/logo.png') }}" alt="">
+                                <img src="{{ theme_image('logo_light', theme_info('defaults.logo_light', 'assets_telkom/assets/images/logo.png')) }}" alt="{{ theme_info('name', config('app.name')) }}">
                             @endif
                         </a>
                         <p class="mb-3">

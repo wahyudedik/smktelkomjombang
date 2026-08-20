@@ -5,7 +5,7 @@
             <!-- Logo & Brand -->
             <div class="flex items-center">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2">
-                    <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}" alt="Logo Telkom"
+                    <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}" alt="{{ theme_info('name', config('app.name')) }}"
                         style="max-height: 40px;">
                 </a>
             </div>

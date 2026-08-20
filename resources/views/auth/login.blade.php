@@ -6,7 +6,7 @@
                 <!-- Header -->
                 <div class="text-center lg:text-left">
                     <div class="mx-auto lg:mx-0 flex items-center justify-center lg:justify-start">
-                        <img src="{{ asset('assets_telkom/assets/images/logo-dark.png') }}" alt="Logo Telkom" style="max-height: 60px;">
+                        <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png')) }}" alt="{{ theme_info('name', config('app.name')) }}" style="max-height: 60px;">
                     </div>
                     <h2 class="mt-6 text-4xl font-bold text-gray-900">{{ __('common.welcome') }}</h2>
                     <p class="mt-2 text-lg text-gray-700">{{ __('common.login_to_your_account') }}</p>
@@ -105,7 +105,7 @@
                     <div class="mb-8">
                         <div
                             class="w-32 h-32 bg-white bg-opacity-30 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg">
-                            <img src="{{ asset('assets_telkom/assets/images/logo.png') }}" alt="Logo Telkom" style="max-height: 80px;">
+                            <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo.png')) }}" alt="{{ theme_info('name', config('app.name')) }}" style="max-height: 80px;">
                         </div>
                     </div>
 

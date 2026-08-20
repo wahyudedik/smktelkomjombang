@@ -5,7 +5,7 @@
             <!-- Logo & Brand -->
             <div class="flex items-center">
                 <a href="<?php echo e(route('admin.dashboard')); ?>" class="flex items-center space-x-2">
-                    <img src="<?php echo e(asset('assets_telkom/assets/images/logo-dark.png')); ?>" alt="Logo Telkom"
+                    <img src="<?php echo e(theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png'))); ?>" alt="<?php echo e(theme_info('name', config('app.name'))); ?>"
                         style="max-height: 40px;">
                 </a>
             </div>

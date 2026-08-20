@@ -74,7 +74,7 @@
                         <img src="{{ Storage::url(cache('site_setting_logo')) }}"
                             alt="{{ cache('site_setting_site_name', 'SMK Telekomunikasi') }}" style="max-height: 50px;">
                     @else
-                        <img src="{{ asset('assets_telkom/assets/images/logo.png') }}" alt="logo">
+                        <img src="{{ theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo.png')) }}" alt="{{ theme_info('name', config('app.name')) }}">
                     @endif
                 </a>
                 <div class="mobile-menu-right">

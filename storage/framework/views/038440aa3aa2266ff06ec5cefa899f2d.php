@@ -60,10 +60,9 @@
                                 <button type="button" class="cat-btn"><i class="fa fa-th"></i>Link Terkait</button>
                                 <div class="cat-menu-inner">
                                     <ul id="cat-menu">
-                                        <li><a href="#">E-Rapor</a></li>
-                                        <li><a href="#">E-Learning</a></li>
-                                        <li><a href="#">E-Perpus</a></li>
-                                        <li><a href="#">E-Administrasi</a></li>
+                                        <?php $__currentLoopData = theme_config('related_links', []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $link): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <li><a href="<?php echo e(resolve_theme_url($link['url'] ?? '#')); ?>"><?php echo e($link['label'] ?? ''); ?></a></li>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </ul>
                                 </div>
                             </div>
@@ -120,7 +119,7 @@
             </div>
             <div class="canvas-logo">
                 <a href="<?php echo e(route('landing')); ?>">
-                    <img src="<?php echo e(asset('assets_telkom/assets/images/logo-dark.png')); ?>"
+                    <img src="<?php echo e(theme_image('logo', theme_info('defaults.logo', 'assets_telkom/assets/images/logo-dark.png'))); ?>"
                         alt="<?php echo e(theme_info('name', 'Logo')); ?>">
                 </a>
             </div>

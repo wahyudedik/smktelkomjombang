@@ -37,7 +37,7 @@ return [
     // Assets
     'assets_path' => 'assets_telkom',
     'favicon' => 'assets_telkom/assets/images/fav.png',
-    'logo' => 'assets_telkom/assets/images/logo-dark.png',       // Dark text logo for light header (default state)
+    'logo' => 'assets_telkom/assets/images/logo.png',       // Dark text logo for light header (default state)
     'logo_light' => 'assets_telkom/assets/images/logo.png',      // Light/white logo for dark header (sticky state)
 
     // Hero Slider (paths only — resolve with asset() in views/helpers)

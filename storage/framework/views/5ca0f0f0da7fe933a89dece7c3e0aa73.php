@@ -14,10 +14,9 @@
                 <div class="col-lg-4 col-md-12 col-sm-12 footer-widget md-mb-50">
                     <h4 class="widget-title">Link Terkait</h4>
                     <ul class="site-map">
-                        <li><a href="#">E-Rapor</a></li>
-                        <li><a href="#">E-Osis</a></li>
-                        <li><a href="#">E-Learning</a></li>
-                        <li><a href="#">E-Perpus</a></li>
+                        <?php $__currentLoopData = theme_config('related_links', []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $link): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><a href="<?php echo e(resolve_theme_url($link['url'] ?? '#')); ?>"><?php echo e($link['label'] ?? ''); ?></a></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
 
