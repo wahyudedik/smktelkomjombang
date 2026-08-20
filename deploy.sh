@@ -258,7 +258,6 @@ $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
 $PHP_BIN artisan view:cache
 $PHP_BIN artisan event:cache
-$PHP_BIN artisan icons:cache 2>/dev/null || true
 
 # 12. Clear cache data (bukan config/route/view)
 info "Membersihkan data cache..."
@@ -272,9 +271,9 @@ $PHP_BIN artisan storage:link 2>/dev/null || true
 info "Merestart queue worker..."
 $PHP_BIN artisan queue:restart
 
-# 15. Restart scheduler (jika menggunakan supervisor)
-info "Merestart scheduler..."
-$PHP_BIN artisan schedule:work --stop-when-empty 2>/dev/null || true
+# 15. Jalankan scheduler sekali (scheduler berjalan via cron/supervisor)
+info "Menjalankan scheduler (sekali)..."
+$PHP_BIN artisan schedule:run 2>/dev/null || true
 
 # 16. Set permission yang benar
 info "Mengatur permission..."

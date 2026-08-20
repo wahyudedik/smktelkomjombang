@@ -237,7 +237,6 @@ $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
 $PHP_BIN artisan view:cache
 $PHP_BIN artisan event:cache
-$PHP_BIN artisan icon:cache 2>/dev/null || true
 
 # 10. Link storage (jika belum)
 info "Memastikan storage link..."
