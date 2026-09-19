@@ -23,11 +23,15 @@ class StaticPageGenerator
             $pageData['user_id'] = $adminUserId;
             $pageData['published_at'] = now();
 
-            $slug = $pageData['slug'];
-            unset($pageData['slug']); // Hapus slug dari data untuk updateOrCreate
+            // Lookup by title instead of slug.
+            // Reason: Page model boot() always overrides slug from title via Str::slug($page->title),
+            // so the slug we define here ('struktur-smk') gets changed to 'struktur-organisasi-smk'
+            // on creation. Using slug as lookup key would never match the stored record,
+            // causing duplicate UniqueConstraintViolationException on subsequent runs.
+            $title = $pageData['title'];
 
             $result = Page::updateOrCreate(
-                ['slug' => $slug],
+                ['title' => $title],
                 $pageData
             );
 

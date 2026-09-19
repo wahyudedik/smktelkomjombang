@@ -240,7 +240,11 @@ $PHP_BIN artisan event:cache
 
 # 10. Link storage (jika belum)
 info "Memastikan storage link..."
-$PHP_BIN artisan storage:link 2>/dev/null || true
+if [ -L "$APP_DIR/public/storage" ]; then
+    info "  ✓ Storage link sudah ada. Melewati."
+else
+    $PHP_BIN artisan storage:link 2>/dev/null || warn "Gagal membuat storage link. Buat manual: php artisan storage:link"
+fi
 
 # 11. Seed theme settings (safe — tidak overwrites data existing)
 info "Seed theme settings..."
