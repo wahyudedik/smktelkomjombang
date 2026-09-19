@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceExcuse;
 use App\Models\AttendanceIdentity;
+use App\Models\AuditLog;
+use App\Traits\AttendanceAuthorization;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Storage;
 
 class AttendanceExcuseController extends BaseController
 {
+    use AttendanceAuthorization;
     /**
      * List semua izin/sakit dengan filter
      */
@@ -227,7 +230,20 @@ class AttendanceExcuseController extends BaseController
     {
         $this->requireAdminOrPermission('attendance.excuses.approve');
 
+        $oldStatus = $excuse->status;
         $excuse->approve(auth()->id());
+
+        // Audit trail logging
+        AuditLog::createLog(
+            action: 'attendance.approve_excuse',
+            userId: auth()->id(),
+            modelType: AttendanceExcuse::class,
+            modelId: $excuse->id,
+            oldValues: ['status' => $oldStatus],
+            newValues: ['status' => 'approved', 'approved_by' => auth()->id(), 'approved_at' => now()->toDateTimeString()],
+            ipAddress: request()->ip(),
+            userAgent: request()->userAgent()
+        );
 
         return redirect()->back()
             ->with('success', 'Izin/sakit berhasil disetujui');
@@ -246,31 +262,23 @@ class AttendanceExcuseController extends BaseController
             'rejection_reason.required' => 'Alasan penolakan wajib diisi',
         ]);
 
+        $oldStatus = $excuse->status;
         $excuse->reject(auth()->id(), $validated['rejection_reason']);
+
+        // Audit trail logging
+        AuditLog::createLog(
+            action: 'attendance.reject_excuse',
+            userId: auth()->id(),
+            modelType: AttendanceExcuse::class,
+            modelId: $excuse->id,
+            oldValues: ['status' => $oldStatus],
+            newValues: ['status' => 'rejected', 'approved_by' => auth()->id(), 'rejection_reason' => $validated['rejection_reason']],
+            ipAddress: request()->ip(),
+            userAgent: request()->userAgent()
+        );
 
         return redirect()->back()
             ->with('success', 'Izin/sakit berhasil ditolak');
     }
 
-    /**
-     * Check permission (admin atau spesifik permission)
-     */
-    private function requireAdminOrPermission(string $permission): void
-    {
-        $user = auth()->user();
-
-        if (!$user) {
-            abort(403);
-        }
-
-        if ($user->hasAnyRole(['admin', 'superadmin'])) {
-            return;
-        }
-
-        if ($user->can($permission)) {
-            return;
-        }
-
-        abort(403);
-    }
 }

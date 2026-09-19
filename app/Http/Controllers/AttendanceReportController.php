@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\AttendanceIdentity;
+use App\Traits\AttendanceAuthorization;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -13,6 +14,7 @@ use Illuminate\Routing\Controller as BaseController;
  */
 class AttendanceReportController extends BaseController
 {
+    use AttendanceAuthorization;
     /**
      * Tampil form report
      */
@@ -84,7 +86,7 @@ class AttendanceReportController extends BaseController
     }
 
     /**
-     * Report bulanan
+     * Report bulanan — batch query (fix N+1)
      */
     public function monthly(Request $request)
     {
@@ -97,8 +99,16 @@ class AttendanceReportController extends BaseController
         $month = Carbon::createFromFormat('Y-m', $validated['month']);
         $start = $month->copy()->startOfMonth();
         $end = $month->copy()->endOfMonth();
+        $totalDays = $end->diffInDays($start) + 1;
 
-        // Group by user
+        // Batch: ambil semua attendance untuk date range SEKALI
+        $attendanceCounts = Attendance::query()
+            ->whereBetween('date', [$start, $end])
+            ->selectRaw('attendance_identity_id, COUNT(*) as hadir_count')
+            ->groupBy('attendance_identity_id')
+            ->pluck('hadir_count', 'attendance_identity_id');
+
+        // Ambil semua identities aktif (1 query)
         $identities = AttendanceIdentity::query()
             ->with(['guru', 'siswa', 'user'])
             ->where('is_active', true)
@@ -107,29 +117,23 @@ class AttendanceReportController extends BaseController
         $report = [];
 
         foreach ($identities as $identity) {
-            $attendances = Attendance::query()
-                ->where('attendance_identity_id', $identity->id)
-                ->whereBetween('date', [$start, $end])
-                ->get();
-
-            $totalDays = $end->diffInDays($start) + 1;
-            $hadir = $attendances->count();
+            $hadir = (int) ($attendanceCounts->get($identity->id, 0));
             $tidakHadir = $totalDays - $hadir;
 
-            $nama = $identity->user?->name 
-                ?? $identity->guru?->nama_lengkap 
-                ?? $identity->siswa?->nama_lengkap 
+            $nama = $identity->user?->name
+                ?? $identity->guru?->nama_lengkap
+                ?? $identity->siswa?->nama_lengkap
                 ?? '-';
 
             $report[] = [
-                'identity' => $identity,
-                'nama' => $nama,
-                'kind' => $identity->kind,
-                'pin' => $identity->device_pin,
-                'total_days' => $totalDays,
-                'hadir' => $hadir,
+                'identity'    => $identity,
+                'nama'        => $nama,
+                'kind'        => $identity->kind,
+                'pin'         => $identity->device_pin,
+                'total_days'  => $totalDays,
+                'hadir'       => $hadir,
                 'tidak_hadir' => $tidakHadir,
-                'persentase' => $totalDays > 0 ? round(($hadir / $totalDays) * 100, 2) : 0,
+                'persentase'  => $totalDays > 0 ? round(($hadir / $totalDays) * 100, 2) : 0,
             ];
         }
 
@@ -137,8 +141,8 @@ class AttendanceReportController extends BaseController
         usort($report, fn($a, $b) => $b['persentase'] <=> $a['persentase']);
 
         $stats = [
-            'total_users' => count($report),
-            'avg_attendance' => round(array_sum(array_column($report, 'persentase')) / max(count($report), 1), 2),
+            'total_users'     => count($report),
+            'avg_attendance'  => round(array_sum(array_column($report, 'persentase')) / max(count($report), 1), 2),
         ];
 
         return view('attendance.report.monthly', compact('report', 'month', 'stats'));
@@ -165,9 +169,9 @@ class AttendanceReportController extends BaseController
             ->orderBy('date')
             ->paginate(50);
 
-        $nama = $identity->user?->name 
-            ?? $identity->guru?->nama_lengkap 
-            ?? $identity->siswa?->nama_lengkap 
+        $nama = $identity->user?->name
+            ?? $identity->guru?->nama_lengkap
+            ?? $identity->siswa?->nama_lengkap
             ?? '-';
 
         $stats = [
@@ -188,7 +192,7 @@ class AttendanceReportController extends BaseController
     }
 
     /**
-     * Report keterlambatan
+     * Report keterlambatan — filter di SQL, bukan PHP
      */
     public function latecomers(Request $request)
     {
@@ -204,16 +208,14 @@ class AttendanceReportController extends BaseController
         $end = Carbon::createFromFormat('Y-m-d', $validated['end_date'])->endOfDay();
         $thresholdTime = Carbon::createFromFormat('H:i', $validated['threshold_time']);
 
+        // Filter langsung di SQL: TIME(first_in_at) > threshold
         $attendances = Attendance::query()
             ->with(['identity.guru', 'identity.siswa', 'identity.user'])
             ->whereBetween('date', [$start, $end])
             ->whereNotNull('first_in_at')
-            ->get()
-            ->filter(function ($attendance) use ($thresholdTime) {
-                $firstInTime = $attendance->first_in_at->copy()->setDate(2000, 1, 1);
-                return $firstInTime->gt($thresholdTime);
-            })
-            ->sortBy(fn($a) => $a->first_in_at);
+            ->whereRaw('TIME(first_in_at) > ?', [$thresholdTime->format('H:i:s')])
+            ->orderBy('first_in_at')
+            ->get();
 
         $stats = [
             'total_latecomers' => $attendances->count(),
@@ -221,24 +223,5 @@ class AttendanceReportController extends BaseController
         ];
 
         return view('attendance.report.latecomers', compact('attendances', 'start', 'end', 'stats'));
-    }
-
-    private function requireAdminOrPermission(string $permission): void
-    {
-        $user = auth()->user();
-
-        if (!$user) {
-            abort(403);
-        }
-
-        if ($user->hasAnyRole(['admin', 'superadmin'])) {
-            return;
-        }
-
-        if ($user->can($permission)) {
-            return;
-        }
-
-        abort(403);
     }
 }

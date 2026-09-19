@@ -6,12 +6,14 @@ use App\Models\Attendance;
 use App\Models\AttendanceDevice;
 use App\Models\AttendanceIdentity;
 use App\Models\AttendanceLog;
+use App\Traits\AttendanceAuthorization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller as BaseController;
 
 class AttendanceController extends BaseController
 {
+    use AttendanceAuthorization;
     public function index()
     {
         $this->requireAccess('attendance.view');
@@ -196,22 +198,4 @@ class AttendanceController extends BaseController
         abort(403);
     }
 
-    private function requireAdminOrPermission(string $permission): void
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            abort(403);
-        }
-
-        if ($user->hasAnyRole(['admin', 'superadmin'])) {
-            return;
-        }
-
-        if ($user->can($permission)) {
-            return;
-        }
-
-        abort(403);
-    }
 }

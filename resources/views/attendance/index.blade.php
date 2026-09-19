@@ -11,7 +11,10 @@
                 <a href="{{ route('admin.absensi.devices.index') }}" class="btn btn-secondary">Devices</a>
                 <a href="{{ route('admin.absensi.mapping.index') }}" class="btn btn-secondary">Mapping</a>
                 <a href="{{ route('admin.absensi.export.index') }}" class="btn btn-primary">Export</a>
-                {{-- <a href="{{ route('admin.absensi.report.index') }}" class="btn btn-primary">Report</a> --}}
+                <a href="{{ route('admin.absensi.report.index') }}" class="btn btn-primary">Report</a>
+                <button onclick="location.reload()" class="btn btn-secondary" id="refreshBtn" title="Refresh data (auto-refresh setiap 60 detik)">
+                    🔄 Refresh
+                </button>
             </div>
         </div>
     </x-slot>
@@ -154,4 +157,40 @@
             </div>
         </div>
     </div>
+
+    {{-- Auto-refresh indicator --}}
+    <div id="autoRefreshIndicator" style="position: fixed; bottom: 20px; right: 20px; background: #1c2b4a; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; display: none;">
+        <i class="fa fa-sync-alt fa-spin" style="margin-right: 6px;"></i>
+        Auto-refresh dalam <span id="countdown">60</span> detik
+    </div>
 </x-app-layout>
+
+@push('scripts')
+<script>
+    (function() {
+        const REFRESH_INTERVAL = 60; // seconds
+        let countdown = REFRESH_INTERVAL;
+        const countdownEl = document.getElementById('countdown');
+        const indicator = document.getElementById('autoRefreshIndicator');
+
+        // Show indicator
+        indicator.style.display = 'block';
+
+        const timer = setInterval(function() {
+            countdown--;
+            if (countdownEl) {
+                countdownEl.textContent = countdown;
+            }
+            if (countdown <= 0) {
+                clearInterval(timer);
+                location.reload();
+            }
+        }, 1000);
+
+        // Reset countdown when user clicks refresh button
+        document.getElementById('refreshBtn')?.addEventListener('click', function() {
+            clearInterval(timer);
+        });
+    })();
+</script>
+@endpush

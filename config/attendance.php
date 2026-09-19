@@ -155,7 +155,7 @@ return [
     */
 
     // Aktifkan auto-cleanup log lama
-    'cleanup_enabled' => env('ATTENDANCE_CLEANUP_ENABLED', false),
+    'cleanup_enabled' => env('ATTENDANCE_CLEANUP_ENABLED', true),
 
     // Simpan log selama X hari (0 = tidak pernah hapus)
     'cleanup_retention_days' => env('ATTENDANCE_CLEANUP_RETENTION_DAYS', 365),

@@ -56,6 +56,13 @@ Schedule::command('attendance:notify --excuse')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Clean up old attendance logs and records (daily at 02:00)
+// Removes attendance_logs older than 90 days and attendances older than 180 days
+Schedule::command('attendance:cleanup')
+    ->dailyAt('02:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Clean up old async jobs and their files (daily at 03:00)
 // Removes jobs older than 7 days and their associated export files
 Schedule::call(function () {

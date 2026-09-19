@@ -14,6 +14,10 @@ use App\Models\Kelulusan;
 use App\Models\Page;
 use App\Models\AuditLog;
 use App\Models\JadwalPelajaran;
+use App\Models\Attendance;
+use App\Models\AttendanceExcuse;
+use App\Models\AttendanceIdentity;
+use App\Policies\AttendancePolicy;
 use App\Policies\UserPolicy;
 use App\Policies\SarprasPolicy;
 use App\Policies\OSISPolicy;
@@ -44,6 +48,9 @@ class AuthServiceProvider extends ServiceProvider
         Page::class => PagePolicy::class,
         AuditLog::class => AuditLogPolicy::class,
         JadwalPelajaran::class => JadwalPelajaranPolicy::class,
+        Attendance::class => AttendancePolicy::class,
+        AttendanceExcuse::class => AttendancePolicy::class,
+        AttendanceIdentity::class => AttendancePolicy::class,
     ];
 
     /**

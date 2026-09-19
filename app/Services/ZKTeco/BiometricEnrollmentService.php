@@ -4,16 +4,23 @@ namespace App\Services\ZKTeco;
 
 use App\Models\AttendanceDevice;
 use App\Models\AttendanceIdentity;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Service untuk enroll biometric (fingerprint/face/RFID) dari web
- * Menggunakan ZKTeco SDK via TCP connection
+ * Menggunakan IClockCommandQueue untuk queue command ke device
  */
 class BiometricEnrollmentService
 {
-    private $device;
+    private ?AttendanceDevice $device = null;
     private $connection;
+    private IClockCommandQueue $commandQueue;
+
+    public function __construct(?IClockCommandQueue $commandQueue = null)
+    {
+        $this->commandQueue = $commandQueue ?? new IClockCommandQueue();
+    }
 
     /**
      * Connect ke device ZKTeco
@@ -22,7 +29,7 @@ class BiometricEnrollmentService
     {
         try {
             $this->device = $device;
-            
+
             // Buka socket connection ke device
             $this->connection = @fsockopen(
                 $device->ip_address,
@@ -71,7 +78,7 @@ class BiometricEnrollmentService
             // Command untuk get user list
             $command = $this->buildCommand('GET_USER_LIST');
             fwrite($this->connection, $command);
-            
+
             $response = '';
             while (!feof($this->connection)) {
                 $response .= fgets($this->connection, 128);
@@ -85,40 +92,53 @@ class BiometricEnrollmentService
     }
 
     /**
-     * Enroll fingerprint untuk user
-     * 
+     * Enroll fingerprint untuk user via command queue
+     *
+     * Command di-queue ke database. Device akan pull command saat poll /iclock/getrequest.
+     *
      * @param string $pin PIN user di device
      * @param string $name Nama user
      * @param int $fingerIndex Index jari (0-9)
      */
     public function enrollFingerprint(string $pin, string $name, int $fingerIndex = 0): array
     {
-        if (!$this->connection) {
-            return [
-                'success' => false,
-                'message' => 'Device tidak terhubung',
-            ];
-        }
-
         try {
-            // Dalam implementasi real, ini memerlukan:
-            // 1. Komunikasi dengan device untuk mulai enrollment
-            // 2. User scan jari di device
-            // 3. Device mengirim template fingerprint
-            // 4. Simpan template ke device
+            $devices = AttendanceDevice::query()
+                ->where('is_active', true)
+                ->get();
 
-            // Untuk MVP, kita queue command untuk device
-            // Device akan menampilkan prompt untuk scan jari
+            if ($devices->isEmpty()) {
+                return [
+                    'success' => false,
+                    'message' => 'Tidak ada device aktif yang ditemukan',
+                ];
+            }
 
-            $command = "ENROLL_FINGERPRINT PIN={$pin} INDEX={$fingerIndex}";
-            
-            Log::info("Fingerprint enrollment queued for PIN {$pin}");
+            $queuedCount = 0;
+            foreach ($devices as $device) {
+                $command = "DATA UPDATE USERINFO PIN={$pin} Name={$name} FingerIdx={$fingerIndex} EnrollFP=1";
+
+                DB::table('attendance_commands')->insert([
+                    'attendance_device_id' => $device->id,
+                    'kind' => 'enroll_fingerprint',
+                    'device_pin' => $pin,
+                    'command' => $command,
+                    'status' => 'pending',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $queuedCount++;
+            }
+
+            Log::info("Fingerprint enrollment queued for PIN {$pin} on {$queuedCount} device(s)");
 
             return [
                 'success' => true,
-                'message' => "Enrollment fingerprint untuk PIN {$pin} dimulai. Silakan scan jari di device.",
+                'message' => "Enrollment fingerprint untuk PIN {$pin} di-queue ke {$queuedCount} device. Silakan scan jari di device.",
                 'pin' => $pin,
                 'finger_index' => $fingerIndex,
+                'queued_devices' => $queuedCount,
             ];
         } catch (\Exception $e) {
             Log::error("Fingerprint enrollment error: {$e->getMessage()}");
@@ -130,26 +150,49 @@ class BiometricEnrollmentService
     }
 
     /**
-     * Enroll face untuk user
+     * Enroll face untuk user via command queue
+     *
+     * @param string $pin PIN user di device
+     * @param string $name Nama user
      */
     public function enrollFace(string $pin, string $name): array
     {
-        if (!$this->connection) {
-            return [
-                'success' => false,
-                'message' => 'Device tidak terhubung',
-            ];
-        }
-
         try {
-            $command = "ENROLL_FACE PIN={$pin}";
-            
-            Log::info("Face enrollment queued for PIN {$pin}");
+            $devices = AttendanceDevice::query()
+                ->where('is_active', true)
+                ->get();
+
+            if ($devices->isEmpty()) {
+                return [
+                    'success' => false,
+                    'message' => 'Tidak ada device aktif yang ditemukan',
+                ];
+            }
+
+            $queuedCount = 0;
+            foreach ($devices as $device) {
+                $command = "DATA UPDATE USERINFO PIN={$pin} Name={$name} EnrollFace=1";
+
+                DB::table('attendance_commands')->insert([
+                    'attendance_device_id' => $device->id,
+                    'kind' => 'enroll_face',
+                    'device_pin' => $pin,
+                    'command' => $command,
+                    'status' => 'pending',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $queuedCount++;
+            }
+
+            Log::info("Face enrollment queued for PIN {$pin} on {$queuedCount} device(s)");
 
             return [
                 'success' => true,
-                'message' => "Enrollment face untuk PIN {$pin} dimulai. Silakan posisikan wajah di depan kamera device.",
+                'message' => "Enrollment face untuk PIN {$pin} di-queue ke {$queuedCount} device. Silakan posisikan wajah di depan kamera device.",
                 'pin' => $pin,
+                'queued_devices' => $queuedCount,
             ];
         } catch (\Exception $e) {
             Log::error("Face enrollment error: {$e->getMessage()}");
@@ -161,27 +204,51 @@ class BiometricEnrollmentService
     }
 
     /**
-     * Enroll RFID card untuk user
+     * Enroll RFID card untuk user via command queue
+     *
+     * @param string $pin PIN user di device
+     * @param string $name Nama user
+     * @param string $cardNumber Nomor kartu RFID
      */
     public function enrollRFID(string $pin, string $name, string $cardNumber): array
     {
-        if (!$this->connection) {
-            return [
-                'success' => false,
-                'message' => 'Device tidak terhubung',
-            ];
-        }
-
         try {
-            $command = "ENROLL_RFID PIN={$pin} CARD={$cardNumber}";
-            
-            Log::info("RFID enrollment queued for PIN {$pin}");
+            $devices = AttendanceDevice::query()
+                ->where('is_active', true)
+                ->get();
+
+            if ($devices->isEmpty()) {
+                return [
+                    'success' => false,
+                    'message' => 'Tidak ada device aktif yang ditemukan',
+                ];
+            }
+
+            $queuedCount = 0;
+            foreach ($devices as $device) {
+                $command = "DATA UPDATE USERINFO PIN={$pin} Name={$name} Card={$cardNumber}";
+
+                DB::table('attendance_commands')->insert([
+                    'attendance_device_id' => $device->id,
+                    'kind' => 'enroll_rfid',
+                    'device_pin' => $pin,
+                    'command' => $command,
+                    'status' => 'pending',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $queuedCount++;
+            }
+
+            Log::info("RFID enrollment queued for PIN {$pin} on {$queuedCount} device(s)");
 
             return [
                 'success' => true,
-                'message' => "Enrollment RFID untuk PIN {$pin} dimulai. Silakan tempel kartu ke reader device.",
+                'message' => "Enrollment RFID untuk PIN {$pin} di-queue ke {$queuedCount} device.",
                 'pin' => $pin,
                 'card_number' => $cardNumber,
+                'queued_devices' => $queuedCount,
             ];
         } catch (\Exception $e) {
             Log::error("RFID enrollment error: {$e->getMessage()}");
@@ -193,28 +260,25 @@ class BiometricEnrollmentService
     }
 
     /**
-     * Delete fingerprint user
+     * Delete fingerprint user via command queue
      */
     public function deleteFingerprint(string $pin, int $fingerIndex = -1): array
     {
-        if (!$this->connection) {
-            return [
-                'success' => false,
-                'message' => 'Device tidak terhubung',
-            ];
-        }
-
         try {
-            $command = $fingerIndex === -1 
-                ? "DELETE_FINGERPRINT PIN={$pin}" 
-                : "DELETE_FINGERPRINT PIN={$pin} INDEX={$fingerIndex}";
-            
+            $command = $fingerIndex === -1
+                ? "DATA DELETE USER PIN={$pin} ENROLLFP=1"
+                : "DATA DELETE USER PIN={$pin} ENROLLFP=1 FingerIdx={$fingerIndex}";
+
+            // Use the existing IClockCommandQueue for delete
+            $queuedCount = $this->commandQueue->enqueueDeleteUserByPin($pin);
+
             Log::info("Fingerprint deletion queued for PIN {$pin}");
 
             return [
                 'success' => true,
-                'message' => "Fingerprint untuk PIN {$pin} berhasil dihapus",
+                'message' => "Fingerprint untuk PIN {$pin} berhasil di-queue untuk penghapusan",
                 'pin' => $pin,
+                'queued_devices' => $queuedCount,
             ];
         } catch (\Exception $e) {
             Log::error("Fingerprint deletion error: {$e->getMessage()}");
@@ -230,7 +294,7 @@ class BiometricEnrollmentService
      */
     public function getDeviceInfo(): array
     {
-        if (!$this->connection) {
+        if (!$this->device) {
             return [];
         }
 
@@ -250,20 +314,53 @@ class BiometricEnrollmentService
     }
 
     /**
-     * Test connection ke device
+     * Test connection ke device via TCP socket
+     *
+     * Mencoba membuka koneksi TCP ke device pada port yang dikonfigurasi.
+     * Jika berhasil, berarti device dapat diakses dari jaringan.
+     *
+     * Mendukung 2 signature:
+     * - testConnection(AttendanceDevice $device): array  (recommended)
+     * - testConnection(string $ipAddress, int $port): bool  (backward compat)
+     *
+     * @param AttendanceDevice|string $device Device atau IP address
+     * @param int $port Port (hanya digunakan jika $device adalah string)
+     * @return array|bool
      */
-    public static function testConnection(string $ipAddress, int $port = 4370): bool
+    public static function testConnection(AttendanceDevice|string $device, int $port = 4370): array|bool
     {
-        try {
-            $connection = @fsockopen($ipAddress, $port, $errno, $errstr, 5);
-            if ($connection) {
-                fclose($connection);
+        // Backward compatible: string IP + port → return bool
+        if (is_string($device)) {
+            $ipAddress = $device;
+        } else {
+            $ipAddress = $device->ip_address;
+            $port = $device->port ?? 4370;
+        }
+
+        $fp = @fsockopen($ipAddress, $port, $errno, $errstr, 5);
+        if ($fp) {
+            fclose($fp);
+            Log::info("Connection test successful to {$ipAddress}:{$port}");
+
+            // Return based on input type
+            if (is_string(func_get_arg(0))) {
                 return true;
             }
-            return false;
-        } catch (\Exception $e) {
+            return [
+                'success' => true,
+                'message' => 'Connection successful',
+            ];
+        }
+
+        Log::warning("Connection test failed to {$ipAddress}:{$port}: {$errstr} ({$errno})");
+
+        if (is_string(func_get_arg(0))) {
             return false;
         }
+        return [
+            'success' => false,
+            'message' => "Connection failed: {$errstr} ({$errno})",
+        ];
     }
 
     /**

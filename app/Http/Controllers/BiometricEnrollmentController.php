@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AttendanceDevice;
 use App\Models\AttendanceIdentity;
 use App\Services\ZKTeco\BiometricEnrollmentService;
+use App\Traits\AttendanceAuthorization;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
@@ -13,6 +14,7 @@ use Illuminate\Routing\Controller as BaseController;
  */
 class BiometricEnrollmentController extends BaseController
 {
+    use AttendanceAuthorization;
     public function __construct(
         private readonly BiometricEnrollmentService $enrollmentService,
     ) {}
@@ -50,9 +52,9 @@ class BiometricEnrollmentController extends BaseController
             ->orderBy('name')
             ->get();
 
-        $name = $identity->user?->name 
-            ?? $identity->guru?->nama_lengkap 
-            ?? $identity->siswa?->nama_lengkap 
+        $name = $identity->user?->name
+            ?? $identity->guru?->nama_lengkap
+            ?? $identity->siswa?->nama_lengkap
             ?? "User {$identity->device_pin}";
 
         return view('attendance.biometric.enroll-fingerprint', compact(
@@ -110,9 +112,9 @@ class BiometricEnrollmentController extends BaseController
             ->orderBy('name')
             ->get();
 
-        $name = $identity->user?->name 
-            ?? $identity->guru?->nama_lengkap 
-            ?? $identity->siswa?->nama_lengkap 
+        $name = $identity->user?->name
+            ?? $identity->guru?->nama_lengkap
+            ?? $identity->siswa?->nama_lengkap
             ?? "User {$identity->device_pin}";
 
         return view('attendance.biometric.enroll-face', compact(
@@ -168,9 +170,9 @@ class BiometricEnrollmentController extends BaseController
             ->orderBy('name')
             ->get();
 
-        $name = $identity->user?->name 
-            ?? $identity->guru?->nama_lengkap 
-            ?? $identity->siswa?->nama_lengkap 
+        $name = $identity->user?->name
+            ?? $identity->guru?->nama_lengkap
+            ?? $identity->siswa?->nama_lengkap
             ?? "User {$identity->device_pin}";
 
         return view('attendance.biometric.enroll-rfid', compact(
@@ -247,22 +249,4 @@ class BiometricEnrollmentController extends BaseController
         ], 400);
     }
 
-    private function requireAdminOrPermission(string $permission): void
-    {
-        $user = auth()->user();
-
-        if (!$user) {
-            abort(403);
-        }
-
-        if ($user->hasAnyRole(['admin', 'superadmin'])) {
-            return;
-        }
-
-        if ($user->can($permission)) {
-            return;
-        }
-
-        abort(403);
-    }
 }

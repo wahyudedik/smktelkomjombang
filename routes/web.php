@@ -143,6 +143,12 @@ Route::get('/locale/{locale}', [LocaleController::class, 'switchLocale'])->name(
 Route::post('/currency/{currency}', [LocaleController::class, 'switchCurrency'])->name('currency.switch');
 Route::post('/timezone', [LocaleController::class, 'switchTimezone'])->name('timezone.switch');
 
+// Public Attendance Self-Service (no auth required)
+Route::get('/absensi/saya', [\App\Http\Controllers\PublicAttendanceController::class, 'index'])->name('public.attendance.index');
+Route::post('/absensi/saya', [\App\Http\Controllers\PublicAttendanceController::class, 'check'])
+    ->middleware('throttle:10,1') // Max 10 checks per minute
+    ->name('public.attendance.check');
+
 // ========================================
 // ADMIN PANEL (All authenticated users)
 // ========================================
@@ -194,6 +200,8 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::post('/mapping', [AttendanceController::class, 'storeMapping'])->name('mapping.store');
 
     // User Management (CRUD PIN mapping)
+    Route::get('/users/import', [App\Http\Controllers\AttendanceUserController::class, 'importForm'])->name('users.import');
+    Route::post('/users/import', [App\Http\Controllers\AttendanceUserController::class, 'import'])->name('users.import.store');
     Route::get('/users', [App\Http\Controllers\AttendanceUserController::class, 'index'])->name('users.index');
     Route::post('/users', [App\Http\Controllers\AttendanceUserController::class, 'store'])->name('users.store');
     Route::get('/users/{identity}/edit', [App\Http\Controllers\AttendanceUserController::class, 'edit'])->name('users.edit');

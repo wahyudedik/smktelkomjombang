@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\AttendanceIdentityImport;
 use App\Models\AttendanceIdentity;
+use App\Models\AuditLog;
 use App\Models\Guru;
 use App\Models\Siswa;
 use App\Models\User;
 use App\Services\ZKTeco\UserSyncService;
+use App\Traits\AttendanceAuthorization;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 /**
  * Controller untuk manage user absensi (CRUD PIN mapping)
@@ -16,6 +21,7 @@ use Illuminate\Routing\Controller as BaseController;
  */
 class AttendanceUserController extends BaseController
 {
+    use AttendanceAuthorization;
     public function __construct(
         private readonly UserSyncService $syncService,
     ) {}
@@ -98,11 +104,23 @@ class AttendanceUserController extends BaseController
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
+        // Audit trail logging
+        AuditLog::createLog(
+            action: 'attendance.create_identity',
+            userId: auth()->id() ?? null,
+            modelType: AttendanceIdentity::class,
+            modelId: $identity->id,
+            oldValues: null,
+            newValues: $identity->only(['kind', 'device_pin', 'is_active', 'user_id', 'guru_id', 'siswa_id']),
+            ipAddress: request()->ip(),
+            userAgent: request()->userAgent()
+        );
+
         // Auto-sync ke device jika aktif
         if ($identity->is_active) {
-            $name = $identity->user?->name 
-                ?? $identity->guru?->nama_lengkap 
-                ?? $identity->siswa?->nama_lengkap 
+            $name = $identity->user?->name
+                ?? $identity->guru?->nama_lengkap
+                ?? $identity->siswa?->nama_lengkap
                 ?? "User {$identity->device_pin}";
 
             $this->syncService->enqueueAddUser($identity->device_pin, $name);
@@ -156,11 +174,26 @@ class AttendanceUserController extends BaseController
         $wasActive = $identity->is_active;
         $isNowActive = $validated['is_active'] ?? true;
 
+        // Audit trail logging (before update)
+        $oldValues = $identity->only(['device_pin', 'is_active']);
+
         // Update identity
         $identity->update([
             'device_pin' => $newPin,
             'is_active' => $isNowActive,
         ]);
+
+        // Audit trail logging (after update)
+        AuditLog::createLog(
+            action: 'attendance.update_identity',
+            userId: auth()->id() ?? null,
+            modelType: AttendanceIdentity::class,
+            modelId: $identity->id,
+            oldValues: $oldValues,
+            newValues: ['device_pin' => $newPin, 'is_active' => $isNowActive],
+            ipAddress: request()->ip(),
+            userAgent: request()->userAgent()
+        );
 
         // Handle sync ke device
         if ($oldPin !== $newPin) {
@@ -168,9 +201,9 @@ class AttendanceUserController extends BaseController
             $this->syncService->enqueueDeleteUser($oldPin);
 
             if ($isNowActive) {
-                $name = $identity->user?->name 
-                    ?? $identity->guru?->nama_lengkap 
-                    ?? $identity->siswa?->nama_lengkap 
+                $name = $identity->user?->name
+                    ?? $identity->guru?->nama_lengkap
+                    ?? $identity->siswa?->nama_lengkap
                     ?? "User {$newPin}";
 
                 $this->syncService->enqueueAddUser($newPin, $name);
@@ -180,9 +213,9 @@ class AttendanceUserController extends BaseController
             $this->syncService->enqueueDeleteUser($newPin);
         } elseif (!$wasActive && $isNowActive) {
             // Jika diaktifkan: tambah ke device
-            $name = $identity->user?->name 
-                ?? $identity->guru?->nama_lengkap 
-                ?? $identity->siswa?->nama_lengkap 
+            $name = $identity->user?->name
+                ?? $identity->guru?->nama_lengkap
+                ?? $identity->siswa?->nama_lengkap
                 ?? "User {$newPin}";
 
             $this->syncService->enqueueAddUser($newPin, $name);
@@ -200,6 +233,18 @@ class AttendanceUserController extends BaseController
         $this->requireAdminOrPermission('attendance.users.manage');
 
         $pin = $identity->device_pin;
+
+        // Audit trail logging (before delete)
+        AuditLog::createLog(
+            action: 'attendance.delete_identity',
+            userId: auth()->id() ?? null,
+            modelType: AttendanceIdentity::class,
+            modelId: $identity->id,
+            oldValues: $identity->only(['kind', 'device_pin', 'is_active', 'user_id', 'guru_id', 'siswa_id']),
+            newValues: null,
+            ipAddress: request()->ip(),
+            userAgent: request()->userAgent()
+        );
 
         // Hapus dari device
         $this->syncService->enqueueDeleteUser($pin);
@@ -236,23 +281,64 @@ class AttendanceUserController extends BaseController
             ->with('success', "{$count} user dijadwalkan untuk sync ke device");
     }
 
-    private function requireAdminOrPermission(string $permission): void
+    /**
+     * Tampil form import identity dari Excel/CSV
+     */
+    public function importForm()
     {
-        $user = auth()->user();
+        $this->requireAdminOrPermission('attendance.users.manage');
 
-        if (!$user) {
-            abort(403);
+        return view('attendance.users.import');
+    }
+
+    /**
+     * Proses import identity dari Excel/CSV
+     */
+    public function import(Request $request)
+    {
+        $this->requireAdminOrPermission('attendance.users.manage');
+
+        $request->validate([
+            'file' => 'required|file|max:10240|mimes:xlsx,xls,csv',
+        ], [
+            'file.required' => 'File wajib diupload',
+            'file.max'      => 'Ukuran file maksimal 10MB',
+            'file.mimes'    => 'Format file harus .xlsx, .xls, atau .csv',
+        ]);
+
+        try {
+            $import = new AttendanceIdentityImport();
+            Excel::import($import, $request->file('file'));
+
+            $errors = $import->errors();
+            $errorCount = $errors->count();
+            $successCount = $import->getSuccessCount();
+
+            if ($errorCount > 0 && $successCount === 0) {
+                return back()->withErrors([
+                    'import' => "Import gagal. Errors: " . $errors->first(),
+                ])->withInput();
+            }
+
+            $message = "Import selesai: {$successCount} identity berhasil ditambahkan";
+            if ($errorCount > 0) {
+                $message .= ", {$errorCount} baris memiliki error (dilewati)";
+            }
+
+            return redirect()->route('admin.absensi.users.index')
+                ->with('success', $message);
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = collect($failures)->map(fn($f) => 'Baris ' . $f->row() . ': ' . implode(', ', $f->errors()))->implode('; ');
+
+            return back()->withErrors([
+                'import' => "Import gagal validasi: {$errorMessages}",
+            ])->withInput();
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'import' => "Terjadi kesalahan saat import: {$e->getMessage()}",
+            ])->withInput();
         }
-
-        if ($user->hasAnyRole(['admin', 'superadmin'])) {
-            return;
-        }
-
-        if ($user->can($permission)) {
-            return;
-        }
-
-        abort(403);
     }
 }
 

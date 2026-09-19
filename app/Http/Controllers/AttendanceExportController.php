@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceIdentity;
 use App\Services\AttendanceExportService;
+use App\Traits\AttendanceAuthorization;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Maatwebsite\Excel\Excel as ExcelWriter;
  */
 class AttendanceExportController extends BaseController
 {
+    use AttendanceAuthorization;
     public function __construct(
         private readonly AttendanceExportService $exportService,
     ) {}
@@ -244,22 +246,4 @@ class AttendanceExportController extends BaseController
     // Helpers
     // ==========================================
 
-    private function requireAdminOrPermission(string $permission): void
-    {
-        $user = auth()->user();
-
-        if (!$user) {
-            abort(403);
-        }
-
-        if ($user->hasAnyRole(['admin', 'superadmin'])) {
-            return;
-        }
-
-        if ($user->can($permission)) {
-            return;
-        }
-
-        abort(403);
-    }
 }

@@ -9,6 +9,7 @@ use App\Models\AttendanceLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceSync extends Command
 {
@@ -88,10 +89,40 @@ class AttendanceSync extends Command
                     $lastOut = $log->log_time;
                 }
 
+                // Determine status based on late threshold
+                $lateThreshold = config('attendance.late_threshold', '07:30');
+                $thresholdTime = $date->copy()->setTimeFromTimeString($lateThreshold);
+                $status = ($firstIn && $firstIn->gt($thresholdTime)) ? 'late' : 'present';
+
+                // Overtime calculation
+                $overtimeMinutes = 0;
+                if (config('attendance.overtime_enabled', false) && $lastOut) {
+                    $overtimeStart = config('attendance.overtime_start', '16:00');
+                    $overtimeStartTime = $date->copy()->setTimeFromTimeString($overtimeStart);
+
+                    if ($lastOut->gt($overtimeStartTime)) {
+                        $overtimeMinutes = (int) $lastOut->diffInMinutes($overtimeStartTime);
+                        Log::info("Overtime detected", [
+                            'attendance_id' => $attendance->id,
+                            'last_out' => $lastOut->toDateTimeString(),
+                            'overtime_start' => $overtimeStartTime->toDateTimeString(),
+                            'overtime_minutes' => $overtimeMinutes,
+                        ]);
+                    }
+                }
+
                 $attendance->forceFill([
                     'first_in_at' => $firstIn,
                     'last_out_at' => $lastOut,
+                    'status' => $status,
                 ])->save();
+
+                // Store overtime info in notes if we have overtime
+                if ($overtimeMinutes > 0 && method_exists($attendance, 'notes')) {
+                    $attendance->forceFill([
+                        'notes' => "Overtime: {$overtimeMinutes} menit",
+                    ])->save();
+                }
 
                 $log->forceFill(['processed_at' => now()])->save();
 
