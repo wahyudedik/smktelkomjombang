@@ -242,7 +242,7 @@ class ContentSanitizer
         );
 
         // Tambah rel="noopener noreferrer" ke iframe
-        $html = preg_replace(
+        $html = preg_replace_callback(
             '/<iframe\b([^>]*)>/i',
             function ($matches) {
                 $attrs = $matches[1];
