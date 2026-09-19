@@ -748,6 +748,54 @@ class PermissionSeeder extends Seeder
                 'action' => 'export',
                 'guard_name' => 'web'
             ],
+            [
+                'name' => 'attendance.users.manage',
+                'display_name' => 'Absensi - Kelola User PIN',
+                'description' => 'Mengelola mapping PIN attendance user',
+                'module' => 'attendance',
+                'action' => 'users.manage',
+                'guard_name' => 'web'
+            ],
+            [
+                'name' => 'attendance.excuses.view',
+                'display_name' => 'Absensi - Lihat Izin',
+                'description' => 'Melihat data izin/sakit/alpha',
+                'module' => 'attendance',
+                'action' => 'excuses.view',
+                'guard_name' => 'web'
+            ],
+            [
+                'name' => 'attendance.excuses.create',
+                'display_name' => 'Absensi - Buat Izin',
+                'description' => 'Membuat/mengedit izin/sakit/alpha',
+                'module' => 'attendance',
+                'action' => 'excuses.create',
+                'guard_name' => 'web'
+            ],
+            [
+                'name' => 'attendance.excuses.approve',
+                'display_name' => 'Absensi - Approve Izin',
+                'description' => 'Menyetujui/menolak izin/sakit/alpha',
+                'module' => 'attendance',
+                'action' => 'excuses.approve',
+                'guard_name' => 'web'
+            ],
+            [
+                'name' => 'attendance.report',
+                'display_name' => 'Absensi - Lihat Report',
+                'description' => 'Melihat laporan absensi',
+                'module' => 'attendance',
+                'action' => 'report',
+                'guard_name' => 'web'
+            ],
+            [
+                'name' => 'attendance.biometric.manage',
+                'display_name' => 'Absensi - Kelola Biometric',
+                'description' => 'Mengelola enrollment biometric',
+                'module' => 'attendance',
+                'action' => 'biometric.manage',
+                'guard_name' => 'web'
+            ],
 
             // Surat Management permissions
             [
@@ -1032,6 +1080,20 @@ class PermissionSeeder extends Seeder
             $this->command->info('Assigned ' . $allPermissions->count() . ' permissions to superadmin role');
         } else {
             $this->command->error('Superadmin role not found!');
+        }
+
+        // Default permission assignment untuk role admin
+        $adminRole = Role::where('name', 'admin')->first();
+        if ($adminRole) {
+            $attendancePermissions = Permission::where('module', 'attendance')->pluck('id');
+            $adminRole->syncPermissions($attendancePermissions);
+        }
+
+        // Default permission assignment untuk role guru (hanya view)
+        $guruRole = Role::where('name', 'guru')->first();
+        if ($guruRole) {
+            $guruPermissions = Permission::whereIn('name', ['attendance.view'])->pluck('id');
+            $guruRole->syncPermissions($guruPermissions);
         }
 
         // Other roles are created dynamically by superadmin

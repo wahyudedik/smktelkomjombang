@@ -16,7 +16,7 @@ class AttendanceController extends BaseController
     use AttendanceAuthorization;
     public function index()
     {
-        $this->requireAccess('attendance.view');
+        $this->requireAdminOrPermission('attendance.view');
 
         $date = request()->string('date')->toString();
         if ($date === '') {
@@ -44,7 +44,7 @@ class AttendanceController extends BaseController
 
     public function logs(Request $request)
     {
-        $this->requireAccess('attendance.view');
+        $this->requireAdminOrPermission('attendance.view');
 
         $query = AttendanceLog::query()
             ->with('device')
@@ -177,25 +177,6 @@ class AttendanceController extends BaseController
         ])->save();
 
         return redirect()->route('admin.absensi.mapping.index')->with('success', 'Mapping berhasil disimpan');
-    }
-
-    private function requireAccess(string $permission): void
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            abort(403);
-        }
-
-        if ($user->hasAnyRole(['guru', 'admin', 'superadmin'])) {
-            return;
-        }
-
-        if ($user->can($permission)) {
-            return;
-        }
-
-        abort(403);
     }
 
 }

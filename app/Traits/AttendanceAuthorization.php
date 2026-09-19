@@ -26,6 +26,10 @@ trait AttendanceAuthorization
             return;
         }
 
+        if ($user->hasRole('guru') && in_array($permission, ['attendance.view'])) {
+            return;
+        }
+
         if ($user->can($permission)) {
             return;
         }
