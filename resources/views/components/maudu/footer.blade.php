@@ -95,14 +95,18 @@
                     </div>
                     <div class="col-md-6 align-self-center">
                         <ul class="footer-social">
-                            <li><a href="{{ theme_config('facebook_url', '#') }}" target="_blank"><i
-                                        class="fab fa-facebook-f"></i></a></li>
-                            <li><a href="{{ theme_config('instagram_url', '#') }}" target="_blank"><i
-                                        class="fab fa-instagram"></i></a></li>
-                            <li><a href="{{ theme_config('youtube_url', '#') }}" target="_blank"><i
-                                        class="fab fa-youtube"></i></a></li>
-                            <li><a href="{{ theme_config('whatsapp_url', '#') }}" target="_blank"><i
-                                        class="fab fa-whatsapp"></i></a></li>
+                            @if (theme_config('facebook_url'))
+                                <li><a href="{{ theme_config('facebook_url') }}" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                            @endif
+                            @if (theme_config('instagram_url'))
+                                <li><a href="{{ theme_config('instagram_url') }}" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+                            @endif
+                            @if (theme_config('youtube_url'))
+                                <li><a href="{{ theme_config('youtube_url') }}" target="_blank" rel="noopener" title="YouTube"><i class="fab fa-youtube"></i></a></li>
+                            @endif
+                            @if (theme_config('whatsapp_url'))
+                                <li><a href="{{ theme_config('whatsapp_url') }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fab fa-whatsapp"></i></a></li>
+                            @endif
                         </ul>
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Testimonial;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -36,6 +37,12 @@ class TestimonialController extends Controller
         $data = $request->all();
         $data['ip_address'] = $request->ip();
         $data['user_agent'] = $request->userAgent();
+
+        // Sanitize testimonial text to prevent XSS attacks
+        if (!empty($data['testimonial'])) {
+            $sanitizer = new ContentSanitizer();
+            $data['testimonial'] = $sanitizer->sanitizeSimple($data['testimonial']);
+        }
 
         // Handle photo upload
         if ($request->hasFile('photo')) {

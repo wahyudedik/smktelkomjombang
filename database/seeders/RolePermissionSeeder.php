@@ -6,10 +6,26 @@ use Illuminate\Database\Seeder;
 use App\Models\Role;
 use App\Models\Permission;
 
+/**
+ * @deprecated This seeder is DEPRECATED and no longer called by DatabaseSeeder.
+ *
+ * Replaced by:
+ *   - RoleSeeder (database/seeders/RoleSeeder.php) — creates core system roles
+ *   - PermissionSeeder (database/seeders/PermissionSeeder.php) — creates all permissions and assigns to superadmin
+ *
+ * This seeder is kept for historical reference only. It uses App\Models\Role and
+ * App\Models\Permission (non-Spatie models) which conflict with the current Spatie
+ * Laravel-Permission based RoleSeeder and PermissionSeeder.
+ *
+ * DO NOT add this seeder to DatabaseSeeder::run().
+ * DO NOT run this seeder on new or existing installations.
+ */
 class RolePermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @deprecated Use RoleSeeder + PermissionSeeder instead.
      */
     public function run(): void
     {

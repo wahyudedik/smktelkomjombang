@@ -4,23 +4,23 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('common.edit_data_guru') }}
             </h2>
-            <div class="flex space-x-2">
+            <div class="flex flex-wrap gap-2">
                 <a href="{{ route('admin.guru.show', $guru) }}"
-                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm">
                     {{ __('common.view_details') }}
                 </a>
                 <a href="{{ route('admin.guru.index') }}"
-                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm">
                     {{ __('common.back') }}
                 </a>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 lg:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+                <div class="p-4 lg:p-6 text-gray-900">
                     <form method="POST" action="{{ route('admin.guru.update', $guru) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')

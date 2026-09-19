@@ -6,10 +6,18 @@
                 <div class="header-top-left">
                     <div class="header-top-social">
                         <span>Follow Us: </span>
-                        <a href="{{ theme_config('facebook_url', '#') }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                        <a href="{{ theme_config('instagram_url', '#') }}" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="{{ theme_config('youtube_url', '#') }}" target="_blank"><i class="fab fa-youtube"></i></a>
-                        <a href="{{ theme_config('whatsapp_url', '#') }}" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        @if (theme_config('facebook_url'))
+                            <a href="{{ theme_config('facebook_url') }}" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        @endif
+                        @if (theme_config('instagram_url'))
+                            <a href="{{ theme_config('instagram_url') }}" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        @endif
+                        @if (theme_config('youtube_url'))
+                            <a href="{{ theme_config('youtube_url') }}" target="_blank" rel="noopener" title="YouTube"><i class="fab fa-youtube"></i></a>
+                        @endif
+                        @if (theme_config('whatsapp_url'))
+                            <a href="{{ theme_config('whatsapp_url') }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                        @endif
                     </div>
                 </div>
                 <div class="header-top-right">
@@ -22,7 +30,7 @@
                             </li>
                             <li>
                                 <a href="mailto:{{ theme_config('email') }}" target="_blank">
-                                    <i class="far fa-envelopes"></i> {{ theme_config('email') }}
+                                    <i class="far fa-envelope"></i> {{ theme_config('email') }}
                                 </a>
                             </li>
                             <li>
@@ -88,19 +96,6 @@
 
                     <div class="nav-right">
                         <div class="nav-right-btn mt-2 d-flex align-items-center gap-2">
-                            @auth
-                                <a href="{{ route('admin.dashboard') }}"
-                                    class="theme-btn"
-                                    style="background: transparent; border: 2px solid #fff; padding: 10px 20px; border-radius: 5px;">
-                                    <i class="fa fa-tachometer-alt"></i> Dashboard
-                                </a>
-                            @else
-                                <a href="{{ route('login') }}"
-                                    class="theme-btn"
-                                    style="background: transparent; border: 2px solid #fff; padding: 10px 20px; border-radius: 5px;">
-                                    <i class="fa fa-sign-in-alt"></i> Masuk
-                                </a>
-                            @endauth
                             <a href="{{ theme_config('linktree_url', theme_config('ppdb_url', '#')) }}" target="_blank"
                                 class="theme-btn">
                                 <span class="fal fa-book"></span> INFORMASI PENDAFTARAN

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Events;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
@@ -61,13 +62,19 @@ class EventController extends Controller
 
         $data = $request->only(['title', 'description', 'date', 'category', 'status']);
 
+        // Sanitize HTML content to prevent XSS attacks
+        if (!empty($data['description'])) {
+            $sanitizer = new ContentSanitizer();
+            $data['description'] = $sanitizer->sanitize($data['description']);
+        }
+
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('events', 'public');
         }
 
         Events::create($data);
 
-        Cache::forget('telkom_events');
+        $this->clearEventsCache();
 
         return redirect()->route('admin.events.index')
             ->with('success', 'Kegiatan berhasil ditambahkan.');
@@ -106,6 +113,12 @@ class EventController extends Controller
 
         $data = $request->only(['title', 'description', 'date', 'category', 'status']);
 
+        // Sanitize HTML content to prevent XSS attacks
+        if (!empty($data['description'])) {
+            $sanitizer = new ContentSanitizer();
+            $data['description'] = $sanitizer->sanitize($data['description']);
+        }
+
         if ($request->hasFile('image')) {
             // Hapus gambar lama jika ada
             if ($event->image) {
@@ -116,7 +129,7 @@ class EventController extends Controller
 
         $event->update($data);
 
-        Cache::forget('telkom_events');
+        $this->clearEventsCache();
 
         return redirect()->route('admin.events.index')
             ->with('success', 'Kegiatan berhasil diperbarui.');
@@ -133,9 +146,23 @@ class EventController extends Controller
 
         $event->delete();
 
-        Cache::forget('telkom_events');
+        $this->clearEventsCache();
 
         return redirect()->route('admin.events.index')
             ->with('success', 'Kegiatan berhasil dihapus.');
+    }
+
+    /**
+     * Clear events cache for ALL themes.
+     *
+     * Admin CRUD operations are theme-agnostic — events data is shared across all themes.
+     * LandingController caches events per-theme as "landing_{theme}_events",
+     * so we must clear cache for every registered theme.
+     */
+    private function clearEventsCache(): void
+    {
+        foreach (available_themes() as $theme) {
+            Cache::forget("landing_{$theme}_events");
+        }
     }
 }

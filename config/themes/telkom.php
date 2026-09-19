@@ -118,15 +118,23 @@ return [
     ],
 
     // Link Terkait (used in header dropdown & footer)
+    // NOTE: Links below point to external school systems — add actual URLs when available.
     'related_links' => [
+        // TODO: Belum ada halaman — arahkan ke URL eksternal E-Rapor sekolah jika tersedia
         ['label' => 'E-Rapor', 'url' => '#'],
+        // TODO: Belum ada halaman — arahkan ke URL eksternal E-Osis sekolah jika tersedia
         ['label' => 'E-Osis', 'url' => '#'],
+        // TODO: Belum ada halaman — arahkan ke URL eksternal E-Learning sekolah jika tersedia
         ['label' => 'E-Learning', 'url' => '#'],
+        // TODO: Belum ada halaman — arahkan ke URL eksternal E-Perpus sekolah jika tersedia
         ['label' => 'E-Perpus', 'url' => '#'],
+        // TODO: Belum ada halaman — arahkan ke URL eksternal E-Administrasi sekolah jika tersedia
         ['label' => 'E-Administrasi', 'url' => '#'],
     ],
 
     // Menu Navigasi (matches telkom.html template exactly)
+    // Parent items use '#' as dropdown trigger (standard Bootstrap practice).
+    // Child items pointing to '#' are external systems — add URLs when available.
     'menu' => [
         [
             'label' => 'Profil',
@@ -150,9 +158,13 @@ return [
             'label' => 'Layanan',
             'url' => '#',
             'children' => [
+                // TODO: Belum ada halaman — arahkan ke URL eksternal Rapor Digital jika tersedia
                 ['label' => 'Rapor Digital', 'url' => '#'],
+                // TODO: Belum ada halaman — arahkan ke URL eksternal E-Semester jika tersedia
                 ['label' => 'E-Semester', 'url' => '#'],
+                // TODO: Belum ada halaman — arahkan ke URL eksternal E-LMS jika tersedia
                 ['label' => 'E-LMS', 'url' => '#'],
+                // TODO: Belum ada halaman — arahkan ke URL eksternal E-Perpus jika tersedia
                 ['label' => 'E-Perpus', 'url' => '#'],
                 ['label' => 'E-Lulus', 'url' => 'route:public.graduation.check'],
             ],

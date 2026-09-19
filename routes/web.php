@@ -80,7 +80,9 @@ Route::post('/check-graduation', [KelulusanController::class, 'publicProcessChec
 
 // Public kegiatan page (Instagram feed integration)
 Route::get('/kegiatan', [InstagramController::class, 'index'])->name('public.kegiatan');
-Route::get('/kegiatan/refresh', [InstagramController::class, 'refresh'])->name('public.kegiatan.refresh');
+Route::get('/kegiatan/refresh', [InstagramController::class, 'refresh'])
+    ->middleware('throttle:10,1') // Max 10 refreshes per minute
+    ->name('public.kegiatan.refresh');
 Route::get('/kegiatan/posts', [InstagramController::class, 'getPosts'])->name('public.kegiatan.posts');
 
 // Instagram OAuth Callback (for receiving access token from Meta)
@@ -88,12 +90,20 @@ Route::get('/instagram/callback', [InstagramController::class, 'handleOAuthCallb
 
 // Instagram Webhook Endpoints (for Meta verification & notifications)
 Route::get('/instagram/webhook', [InstagramController::class, 'verifyWebhook'])->name('instagram.webhook.verify');
-Route::post('/instagram/webhook', [InstagramController::class, 'handleWebhook'])->name('instagram.webhook.handle');
+Route::post('/instagram/webhook', [InstagramController::class, 'handleWebhook'])
+    ->middleware('throttle:webhook') // Max 120 requests/minute (external webhook)
+    ->name('instagram.webhook.handle');
 
 // ZKTeco iClock Endpoints
-Route::match(['GET', 'POST'], '/iclock/cdata', [ZKTecoIClockController::class, 'cdata'])->name('zkteco.iclock.cdata');
-Route::match(['GET', 'POST'], '/iclock/getrequest', [ZKTecoIClockController::class, 'getrequest'])->name('zkteco.iclock.getrequest');
-Route::match(['GET', 'POST'], '/iclock/devicecmd', [ZKTecoIClockController::class, 'devicecmd'])->name('zkteco.iclock.devicecmd');
+Route::match(['GET', 'POST'], '/iclock/cdata', [ZKTecoIClockController::class, 'cdata'])
+    ->middleware('throttle:device-api') // Max 120 requests/minute (ZKTeco device)
+    ->name('zkteco.iclock.cdata');
+Route::match(['GET', 'POST'], '/iclock/getrequest', [ZKTecoIClockController::class, 'getrequest'])
+    ->middleware('throttle:device-api') // Max 120 requests/minute (ZKTeco device)
+    ->name('zkteco.iclock.getrequest');
+Route::match(['GET', 'POST'], '/iclock/devicecmd', [ZKTecoIClockController::class, 'devicecmd'])
+    ->middleware('throttle:device-api') // Max 120 requests/minute (ZKTeco device)
+    ->name('zkteco.iclock.devicecmd');
 
 // ZKTeco Debug Endpoints (superadmin only — NEVER expose publicly)
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
@@ -190,7 +200,9 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::put('/users/{identity}', [App\Http\Controllers\AttendanceUserController::class, 'update'])->name('users.update');
     Route::delete('/users/{identity}', [App\Http\Controllers\AttendanceUserController::class, 'destroy'])->name('users.destroy');
     Route::get('/users/{identity}/sync-status', [App\Http\Controllers\AttendanceUserController::class, 'syncStatus'])->name('users.sync-status');
-    Route::post('/users/sync-all', [App\Http\Controllers\AttendanceUserController::class, 'syncAll'])->name('users.sync-all');
+    Route::post('/users/sync-all', [App\Http\Controllers\AttendanceUserController::class, 'syncAll'])
+        ->middleware('throttle:5,1') // Max 5 sync-all operations per minute
+        ->name('users.sync-all');
 
     // Biometric Enrollment (NEW)
     Route::get('/biometric', [App\Http\Controllers\BiometricEnrollmentController::class, 'index'])->name('biometric.index');
@@ -200,19 +212,35 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::post('/biometric/{identity}/face', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollFace'])->name('biometric.face.store');
     Route::get('/biometric/{identity}/rfid', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollRFIDForm'])->name('biometric.rfid.form');
     Route::post('/biometric/{identity}/rfid', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollRFID'])->name('biometric.rfid.store');
-    Route::post('/biometric/test-connection', [App\Http\Controllers\BiometricEnrollmentController::class, 'testConnection'])->name('biometric.test-connection');
+    Route::post('/biometric/test-connection', [App\Http\Controllers\BiometricEnrollmentController::class, 'testConnection'])
+        ->middleware('throttle:5,1') // Max 5 test connections per minute
+        ->name('biometric.test-connection');
 
     // Export (NEW)
     Route::get('/export', [App\Http\Controllers\AttendanceExportController::class, 'index'])->name('export.index');
-    Route::post('/export/daily', [App\Http\Controllers\AttendanceExportController::class, 'exportDaily'])->name('export.daily');
-    Route::post('/export/period', [App\Http\Controllers\AttendanceExportController::class, 'exportPeriod'])->name('export.period');
-    Route::post('/export/summary', [App\Http\Controllers\AttendanceExportController::class, 'exportSummary'])->name('export.summary');
-    Route::post('/export/user/{identity}', [App\Http\Controllers\AttendanceExportController::class, 'exportUserDetail'])->name('export.user');
+    Route::post('/export/daily', [App\Http\Controllers\AttendanceExportController::class, 'exportDaily'])
+        ->middleware('throttle:10,1') // Max 10 exports per minute
+        ->name('export.daily');
+    Route::post('/export/period', [App\Http\Controllers\AttendanceExportController::class, 'exportPeriod'])
+        ->middleware('throttle:10,1') // Max 10 exports per minute
+        ->name('export.period');
+    Route::post('/export/summary', [App\Http\Controllers\AttendanceExportController::class, 'exportSummary'])
+        ->middleware('throttle:10,1') // Max 10 exports per minute
+        ->name('export.summary');
+    Route::post('/export/user/{identity}', [App\Http\Controllers\AttendanceExportController::class, 'exportUserDetail'])
+        ->middleware('throttle:10,1') // Max 10 exports per minute
+        ->name('export.user');
 
     // Export PDF
-    Route::post('/export/pdf/daily', [App\Http\Controllers\AttendanceExportController::class, 'exportDailyPdf'])->name('export.pdf.daily');
-    Route::post('/export/pdf/period', [App\Http\Controllers\AttendanceExportController::class, 'exportPeriodPdf'])->name('export.pdf.period');
-    Route::post('/export/pdf/summary', [App\Http\Controllers\AttendanceExportController::class, 'exportSummaryPdf'])->name('export.pdf.summary');
+    Route::post('/export/pdf/daily', [App\Http\Controllers\AttendanceExportController::class, 'exportDailyPdf'])
+        ->middleware('throttle:10,1') // Max 10 PDF exports per minute
+        ->name('export.pdf.daily');
+    Route::post('/export/pdf/period', [App\Http\Controllers\AttendanceExportController::class, 'exportPeriodPdf'])
+        ->middleware('throttle:10,1') // Max 10 PDF exports per minute
+        ->name('export.pdf.period');
+    Route::post('/export/pdf/summary', [App\Http\Controllers\AttendanceExportController::class, 'exportSummaryPdf'])
+        ->middleware('throttle:10,1') // Max 10 PDF exports per minute
+        ->name('export.pdf.summary');
 
     // Report (NEW)
     Route::get('/report', [App\Http\Controllers\AttendanceReportController::class, 'index'])->name('report.index');
@@ -267,15 +295,21 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('admin/supera
     // Instagram Settings Management
     Route::get('/instagram-settings', [InstagramSettingController::class, 'index'])->name('instagram-settings');
     Route::post('/instagram-settings', [InstagramSettingController::class, 'store'])->name('instagram-settings.store');
-    Route::post('/instagram-settings/test-connection', [InstagramSettingController::class, 'testConnection'])->name('instagram-settings.test-connection');
-    Route::post('/instagram-settings/sync', [InstagramSettingController::class, 'syncData'])->name('instagram-settings.sync');
+    Route::post('/instagram-settings/test-connection', [InstagramSettingController::class, 'testConnection'])
+        ->middleware('throttle:5,1') // Max 5 test connections per minute
+        ->name('instagram-settings.test-connection');
+    Route::post('/instagram-settings/sync', [InstagramSettingController::class, 'syncData'])
+        ->middleware('throttle:10,1') // Max 10 sync operations per minute
+        ->name('instagram-settings.sync');
     Route::post('/instagram-settings/deactivate', [InstagramSettingController::class, 'deactivate'])->name('instagram-settings.deactivate');
     Route::get('/instagram-settings/current', [InstagramSettingController::class, 'getSettings'])->name('instagram-settings.current');
 
     // Bulk Import Management
     Route::prefix('bulk-import')->name('bulk-import.')->group(function () {
         Route::get('/', [App\Http\Controllers\BulkImportController::class, 'index'])->name('index');
-        Route::post('/process', [App\Http\Controllers\BulkImportController::class, 'processBulkImport'])->name('process');
+        Route::post('/process', [App\Http\Controllers\BulkImportController::class, 'processBulkImport'])
+            ->middleware('throttle:bulk') // Max 5 bulk imports per minute
+            ->name('process');
         Route::get('/template/{module}', [App\Http\Controllers\BulkImportController::class, 'downloadTemplate'])->name('template');
     });
 
@@ -285,8 +319,12 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('admin/supera
         Route::get('/{job}/status', [App\Http\Controllers\AsyncJobController::class, 'status'])->name('status');
         Route::get('/{job}/download', [App\Http\Controllers\AsyncJobController::class, 'download'])->name('download');
         Route::post('/{job}/cancel', [App\Http\Controllers\AsyncJobController::class, 'cancel'])->name('cancel');
-        Route::post('/import/{module}', [App\Http\Controllers\AsyncJobController::class, 'dispatchImport'])->name('import');
-        Route::post('/export/{module}', [App\Http\Controllers\AsyncJobController::class, 'dispatchExport'])->name('export');
+        Route::post('/import/{module}', [App\Http\Controllers\AsyncJobController::class, 'dispatchImport'])
+            ->middleware('throttle:10,1') // Max 10 async imports per minute
+            ->name('import');
+        Route::post('/export/{module}', [App\Http\Controllers\AsyncJobController::class, 'dispatchExport'])
+            ->middleware('throttle:10,1') // Max 10 async exports per minute
+            ->name('export');
     });
 });
 
@@ -313,7 +351,9 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('admin/roles'
     Route::put('/{role}', [App\Http\Controllers\RoleManagementController::class, 'update'])->name('update');
     Route::delete('/{role}', [App\Http\Controllers\RoleManagementController::class, 'destroy'])->name('destroy');
     Route::get('/{role}/assign-users', [App\Http\Controllers\RoleManagementController::class, 'assignUsers'])->name('assign-users');
-    Route::post('/{role}/sync-users', [App\Http\Controllers\RoleManagementController::class, 'syncUsers'])->name('sync-users');
+    Route::post('/{role}/sync-users', [App\Http\Controllers\RoleManagementController::class, 'syncUsers'])
+        ->middleware('throttle:10,1') // Max 10 role sync operations per minute
+        ->name('sync-users');
 });
 
 // Page Management (Access: admin, superadmin)
@@ -425,7 +465,9 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('a
     Route::get('/pemilih', [OSISController::class, 'pemilihIndex'])->name('pemilih.index')->middleware('permission:osis.view');
     Route::get('/pemilih/create', [OSISController::class, 'createPemilih'])->name('pemilih.create')->middleware('permission:osis.create');
     Route::post('/pemilih', [OSISController::class, 'storePemilih'])->name('pemilih.store')->middleware('permission:osis.create');
-    Route::post('/pemilih/generate-from-users', [OSISController::class, 'generatePemilihFromUsers'])->name('pemilih.generate-from-users')->middleware('permission:osis.create');
+    Route::post('/pemilih/generate-from-users', [OSISController::class, 'generatePemilihFromUsers'])
+        ->middleware(['permission:osis.create', 'throttle:bulk']) // Max 5 generations per minute
+        ->name('pemilih.generate-from-users');
 
     // Pemilih CRUD with model binding (must be after specific routes)
     Route::get('/pemilih/{pemilih}', [OSISController::class, 'showPemilih'])->name('pemilih.show')->middleware('permission:osis.view');
@@ -434,7 +476,9 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('a
     Route::delete('/pemilih/{pemilih}', [OSISController::class, 'destroyPemilih'])->name('pemilih.destroy')->middleware('permission:osis.delete');
 
     Route::get('/voting', [OSISController::class, 'voting'])->name('voting');
-    Route::post('/vote', [OSISController::class, 'processVote'])->name('vote');
+    Route::post('/vote', [OSISController::class, 'processVote'])
+        ->middleware('throttle:voting') // Max 5 votes per minute (anti-fraud)
+        ->name('vote');
     Route::get('/results', [OSISController::class, 'results'])->name('results')->middleware('permission:osis.results');
     Route::get('/results/export/pdf', [OSISController::class, 'exportVotingResultsPdf'])->name('results.export.pdf')->middleware('permission:osis.results');
     Route::get('/results/export/json', [OSISController::class, 'exportVotingResultsJson'])->name('results.export.json')->middleware('permission:osis.results');
@@ -446,7 +490,9 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('a
 // OSIS Student Routes (Access: siswa) - Voting and Results
 Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('admin/osis')->name('admin.osis.')->group(function () {
     Route::get('/voting', [OSISController::class, 'voting'])->name('voting');
-    Route::post('/vote', [OSISController::class, 'processVote'])->name('vote');
+    Route::post('/vote', [OSISController::class, 'processVote'])
+        ->middleware('throttle:voting') // Max 5 votes per minute (anti-fraud)
+        ->name('vote');
     Route::get('/results', [OSISController::class, 'results'])->name('results');
 });
 
@@ -572,7 +618,9 @@ Route::middleware(['auth', 'verified', 'role:sarpras|admin|superadmin'])->prefix
     Route::get('/sarana/get-barang-by-ruang', [SaranaController::class, 'getBarangByRuang'])->name('sarana.getBarangByRuang');
     Route::get('/sarana/export-excel', [SaranaController::class, 'exportExcel'])->name('sarana.exportExcel');
     Route::get('/sarana/download-template', [SaranaController::class, 'downloadTemplate'])->name('sarana.downloadTemplate');
-    Route::post('/sarana/import-excel', [SaranaController::class, 'importExcel'])->name('sarana.importExcel');
+    Route::post('/sarana/import-excel', [SaranaController::class, 'importExcel'])
+        ->middleware('throttle:10,1') // Max 10 imports per minute
+        ->name('sarana.importExcel');
     Route::get('/sarana/{sarana}', [SaranaController::class, 'show'])->name('sarana.show');
     Route::get('/sarana/{sarana}/edit', [SaranaController::class, 'edit'])->name('sarana.edit');
     Route::put('/sarana/{sarana}', [SaranaController::class, 'update'])->name('sarana.update');
@@ -648,7 +696,9 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/
     Route::get('/', [\App\Http\Controllers\BeritaController::class, 'index'])->name('index')->middleware('permission:berita.view');
     Route::get('/create', [\App\Http\Controllers\BeritaController::class, 'create'])->name('create')->middleware('permission:berita.create');
     Route::post('/', [\App\Http\Controllers\BeritaController::class, 'store'])->name('store')->middleware('permission:berita.create');
-    Route::post('/upload-image', [\App\Http\Controllers\BeritaController::class, 'uploadImage'])->name('upload-image')->middleware('permission:berita.create');
+    Route::post('/upload-image', [\App\Http\Controllers\BeritaController::class, 'uploadImage'])
+        ->middleware(['permission:berita.create', 'throttle:30,1']) // Max 30 image uploads per minute
+        ->name('upload-image');
     Route::get('/{berita}', [\App\Http\Controllers\BeritaController::class, 'show'])->name('show')->middleware('permission:berita.view');
     Route::get('/{berita}/edit', [\App\Http\Controllers\BeritaController::class, 'edit'])->name('edit')->middleware('permission:berita.edit');
     Route::put('/{berita}', [\App\Http\Controllers\BeritaController::class, 'update'])->name('update')->middleware('permission:berita.edit');
@@ -666,9 +716,13 @@ Route::get('/qrcode/{code}', [SarprasController::class, 'generateQRCode'])->name
 
 // Additional Barcode Routes (for authenticated users)
 Route::middleware(['auth', 'verified', 'role:sarpras'])->prefix('admin/sarpras')->name('admin.sarpras.')->group(function () {
-    Route::post('/barcode/generate-all', [SarprasController::class, 'generateAllBarcodes'])->name('barcode.generate-all');
+    Route::post('/barcode/generate-all', [SarprasController::class, 'generateAllBarcodes'])
+        ->middleware('throttle:bulk') // Max 5 bulk generations per minute
+        ->name('barcode.generate-all');
     Route::get('/barcode/print/{barang}', [SarprasController::class, 'printBarcode'])->name('barcode.print');
-    Route::post('/barcode/bulk-print', [SarprasController::class, 'bulkPrintBarcodes'])->name('barcode.bulk-print');
+    Route::post('/barcode/bulk-print', [SarprasController::class, 'bulkPrintBarcodes'])
+        ->middleware('throttle:10,1') // Max 10 bulk prints per minute
+        ->name('barcode.bulk-print');
     Route::get('/barcode/scan', [SarprasController::class, 'showScanPage'])->name('barcode.scan');
     Route::post('/barcode/scan', [SarprasController::class, 'processScan'])->name('barcode.scan.process');
 });
@@ -681,11 +735,17 @@ Route::middleware('auth')->group(function () {
 
 // Email Verification Routes - handled in routes/auth.php
 
-Route::get('/email/verify/resend', [App\Http\Controllers\Auth\EmailVerificationController::class, 'resendForGuest'])->name('verification.resend-guest');
-Route::post('/email/verify/resend', [App\Http\Controllers\Auth\EmailVerificationController::class, 'resendForGuest'])->name('verification.resend-guest.post');
+Route::get('/email/verify/resend', [App\Http\Controllers\Auth\EmailVerificationController::class, 'resendForGuest'])
+    ->middleware('throttle:email-verify') // Max 3 email verification resend per minute
+    ->name('verification.resend-guest');
+Route::post('/email/verify/resend', [App\Http\Controllers\Auth\EmailVerificationController::class, 'resendForGuest'])
+    ->middleware('throttle:email-verify') // Max 3 email verification resend per minute
+    ->name('verification.resend-guest.post');
 
 // Email Verification for Authenticated Users (moved from auth.php)
-Route::post('/email/verify/resend-auth', [App\Http\Controllers\Auth\EmailVerificationController::class, 'resend'])->name('verification.resend')->middleware('auth');
+Route::post('/email/verify/resend-auth', [App\Http\Controllers\Auth\EmailVerificationController::class, 'resend'])
+    ->middleware(['auth', 'throttle:email-verify']) // Max 3 email verification resend per minute
+    ->name('verification.resend');
 
 // Registration Routes
 // Route::get('/register', [App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -736,14 +796,20 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin', 'permission:sett
         Route::get('/', [ThemeSettingController::class, 'index'])->name('index')->middleware('permission:themes.view');
         Route::get('/{theme}/edit', [ThemeSettingController::class, 'edit'])->name('edit')->middleware('permission:themes.edit');
         Route::put('/{theme}', [ThemeSettingController::class, 'update'])->name('update')->middleware('permission:themes.edit');
-        Route::post('/{theme}/seed-defaults', [ThemeSettingController::class, 'seedDefaults'])->name('seed-defaults')->middleware('permission:themes.edit');
-        Route::post('/{theme}/reset-defaults', [ThemeSettingController::class, 'resetDefaults'])->name('reset-defaults')->middleware('permission:themes.edit');
+        Route::post('/{theme}/seed-defaults', [ThemeSettingController::class, 'seedDefaults'])
+            ->middleware(['permission:themes.edit', 'throttle:bulk']) // Max 5 seed operations per minute
+            ->name('seed-defaults');
+        Route::post('/{theme}/reset-defaults', [ThemeSettingController::class, 'resetDefaults'])
+            ->middleware(['permission:themes.edit', 'throttle:bulk']) // Max 5 reset operations per minute
+            ->name('reset-defaults');
 
         // P3-6.1: Theme Preview
         Route::get('/{theme}/preview', [ThemeSettingController::class, 'preview'])->name('preview')->middleware('permission:themes.view');
 
         // P3-6.2: Theme Clone
-        Route::post('/{theme}/clone', [ThemeSettingController::class, 'cloneTheme'])->name('clone')->middleware('permission:themes.edit');
+        Route::post('/{theme}/clone', [ThemeSettingController::class, 'cloneTheme'])
+            ->middleware(['permission:themes.edit', 'throttle:bulk']) // Max 5 clone operations per minute
+            ->name('clone');
 
         // P3-6.3: Import/Export
         Route::get('/{theme}/export', [ThemeSettingController::class, 'exportTheme'])->name('export')->middleware('permission:themes.view');
@@ -790,8 +856,12 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin', 'permission:sett
 
 // Push Notifications (Access: All authenticated users)
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    Route::post('/push/subscribe', [App\Http\Controllers\PushNotificationController::class, 'subscribe'])->name('push.subscribe');
-    Route::post('/push/unsubscribe', [App\Http\Controllers\PushNotificationController::class, 'unsubscribe'])->name('push.unsubscribe');
+    Route::post('/push/subscribe', [App\Http\Controllers\PushNotificationController::class, 'subscribe'])
+        ->middleware('throttle:30,1') // Max 30 subscribe operations per minute
+        ->name('push.subscribe');
+    Route::post('/push/unsubscribe', [App\Http\Controllers\PushNotificationController::class, 'unsubscribe'])
+        ->middleware('throttle:30,1') // Max 30 unsubscribe operations per minute
+        ->name('push.unsubscribe');
     Route::get('/push/vapid-key', [App\Http\Controllers\PushNotificationController::class, 'vapidPublicKey'])->name('push.vapid-key');
 });
 
@@ -801,12 +871,18 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin'
     // User Management (Superadmin only)
     Route::prefix('user-management')->name('user-management.')->group(function () {
         Route::get('/', [App\Http\Controllers\UserManagementController::class, 'index'])->name('index');
-        Route::post('/invite', [App\Http\Controllers\UserManagementController::class, 'inviteUser'])->name('invite');
-        Route::post('/create', [App\Http\Controllers\UserManagementController::class, 'createUser'])->name('create');
+        Route::post('/invite', [App\Http\Controllers\UserManagementController::class, 'inviteUser'])
+            ->middleware('throttle:5,1') // Max 5 user invites per minute
+            ->name('invite');
+        Route::post('/create', [App\Http\Controllers\UserManagementController::class, 'createUser'])
+            ->middleware('throttle:5,1') // Max 5 user creations per minute
+            ->name('create');
         Route::get('/users/{user}/edit', [App\Http\Controllers\UserManagementController::class, 'editUser'])->name('edit');
         Route::put('/users/{user}', [App\Http\Controllers\UserManagementController::class, 'updateUser'])->name('update');
         Route::delete('/users/{user}', [App\Http\Controllers\UserManagementController::class, 'deleteUser'])->name('delete');
-        Route::post('/users/{user}/toggle-status', [App\Http\Controllers\UserManagementController::class, 'toggleUserStatus'])->name('toggle-status');
+        Route::post('/users/{user}/toggle-status', [App\Http\Controllers\UserManagementController::class, 'toggleUserStatus'])
+            ->middleware('throttle:10,1') // Max 10 status toggles per minute
+            ->name('toggle-status');
         Route::get('/roles', [App\Http\Controllers\UserManagementController::class, 'getUserRoles'])->name('roles');
     });
 

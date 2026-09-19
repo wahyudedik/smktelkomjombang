@@ -2,6 +2,7 @@
 
 > File ini membantu AI assistant memahami project ini saat memulai chat baru atau pindah ke chat baru.
 > Mirip dengan `CLAUDE.md`, `.cursorrules`, atau `copilot-instructions.md`.
+> Diperbarui: 2026-08-21
 
 ---
 
@@ -24,6 +25,7 @@ Project ini mengelola: landing page, data siswa/guru, absensi, OSIS voting, sarp
 | JS | Alpine.js, jQuery, Owl Carousel, WOW.js |
 | Auth | Laravel Breeze (Jetstream-style) |
 | Permission | Spatie Laravel-Permission |
+| Security | SecurityHeaders middleware (CSP, HSTS, X-Frame-Options) |
 | Autoload | PSR-4 (`App\` → `app/`) |
 
 ---
@@ -41,9 +43,12 @@ app/
 │   ├── DashboardController.php
 │   ├── SettingsController.php
 │   └── ThemeSettingController.php
+├── Http/Middleware/
+│   └── SecurityHeaders.php    # ⭐ CSP, HSTS, X-Frame-Options, dll
 ├── Models/                    # 41 model Eloquent
 ├── Services/                  # Service classes
 │   ├── InstagramService.php   # Instagram Graph API integration
+│   ├── ContentSanitizer.php   # ⭐ XSS prevention — sanitize HTML content
 │   ├── StaticPageGenerator.php # Generate halaman statis landing page
 │   ├── WebPushService.php     # Push notification
 │   ├── AttendanceExportService.php
@@ -73,11 +78,11 @@ resources/
 │   │   └── guest.blade.php    # Auth layout
 │   ├── berita/public/         # Berita views (convention: index.blade.php, index-maudu.blade.php)
 │   ├── pages/public/          # Pages views (convention: index.blade.php, show.blade.php)
-│   └── components/            # Blade components (per tema: telkom/, maudu/)
-public/
-├── assets_telkom/             # Static assets tema telkom
-├── assets_maudu/              # Static assets tema maudu
-└── assets_{theme}/            # Static assets tema lainnya
+│   └── components/            # Blade components (per tema: telkom/, maudu/, admin/)
+├── public/
+│   ├── assets_telkom/         # Static assets tema telkom
+│   ├── assets_maudu/          # Static assets tema maudu
+│   └── assets_{theme}/        # Static assets tema lainnya
 plans/
 ├── theme-switching-maudu.md   # Dokumentasi detail sistem theme switching
 └── theme-system-refactoring.md # ⭐ Plan refactoring theme system + panduan menambah tema
@@ -175,6 +180,7 @@ Pattern: `{path}/{base}-{theme}.blade.php` → fallback `{path}/{base}.blade.php
 - Layout per tema: `layouts/telkom.blade.php`, `layouts/maudu.blade.php`
 - Landing page views: `telkom.blade.php`, `maudu.blade.php`
 - Gunakan `{{ theme_config('key') }}` untuk akses data tema
+- Breadcrumb components per tema: `<x-telkom.breadcrumb>`, `<x-maudu.breadcrumb>`, `<x-admin.breadcrumb>`
 
 ### Database
 - MySQL dengan charset utf8mb4
@@ -191,11 +197,56 @@ DEFAULT_THEME=telkom          # atau 'maudu'
 APP_NAME="SMK Telekomunikasi Darul Ulum"
 APP_LOCALE=id
 APP_TIMEZONE=Asia/Jakarta
+APP_CURRENCY=IDR              # Default currency (used by config/i18n.php)
 DB_DATABASE=telkom_db
 FILESYSTEM_DISK=local
 CACHE_STORE=database
 QUEUE_CONNECTION=database
 ```
+
+---
+
+## 🔒 Security
+
+### Rate Limiting
+Semua routes sensitif sudah dilindungi oleh `throttle` middleware. Total 42+ routes dilindungi:
+
+| Rate Limit | Routes | Keterangan |
+|------------|--------|------------|
+| `throttle:5,1` | Login, user invite, user create, testimonial, Instagram test-connection | 5 requests/menit |
+| `throttle:10,1` | Import/export semua modul, excuses store, bulk ops, role sync | 10 requests/menit |
+| `throttle:20,1` | Excuses approve/reject | 20 requests/menit |
+| `throttle:30,1` | Image upload, push subscribe/unsubscribe | 30 requests/menit |
+| `throttle:3,1` | Password reset | 3 requests/menit |
+| `throttle:6,1` | Email verification | 6 requests/menit |
+| `throttle:voting` | OSIS voting (custom) | 5 votes/menit (anti-fraud) |
+| `throttle:webhook` | Instagram webhook (custom) | 120 requests/menit |
+| `throttle:device-api` | ZKTeco iClock endpoints (custom) | 120 requests/menit |
+| `throttle:bulk` | Bulk import/seed/clone/generate (custom) | 5 operations/menit |
+
+### Security Headers (`SecurityHeaders` Middleware)
+Middleware [`SecurityHeaders`](app/Http/Middleware/SecurityHeaders.php) otomatis menambahkan:
+- **X-Frame-Options**: `DENY` — mencegah iframe embedding (clickjacking)
+- **X-Content-Type-Options**: `nosniff` — mencegah MIME type sniffing
+- **X-XSS-Protection**: `1; mode=block` — legacy XSS filter untuk browser lama
+- **Referrer-Policy**: `strict-origin-when-cross-origin`
+- **Permissions-Policy**: Disable camera, microphone, geolocation, payment, dll
+- **Content-Security-Policy (CSP)**: Dasar CSP dengan whitelist CDN (cdnjs, jsdelivr, fonts.bunny.net). Hanya aktif di production.
+- **Strict-Transport-Security (HSTS)**: `max-age=31536000; includeSubDomains` (hanya HTTPS)
+- **X-Permitted-Cross-Domain-Policies**: `none`
+
+> **Skip conditions**: API/JSON responses, Instagram webhook, iClock endpoints, file downloads (PDF, Excel, CSV)
+
+### Content Sanitization
+[`ContentSanitizer`](app/Services/ContentSanitizer.php) digunakan untuk mencegah XSS dari user input HTML:
+
+| Controller | Field yang di-sanitize | Method |
+|------------|----------------------|--------|
+| [`BeritaController`](app/Http/Controllers/BeritaController.php) | `content` | `sanitize()` |
+| [`PageController`](app/Http/Controllers/PageController.php) | `content` | `sanitize()` |
+| [`EventController`](app/Http/Controllers/EventController.php) | `description` | `sanitize()` |
+| [`TestimonialController`](app/Http/Controllers/TestimonialController.php) | `testimonial` | `sanitizeSimple()` |
+| [`SettingsController`](app/Http/Controllers/SettingsController.php) | Multiple HTML fields | `sanitize()` |
 
 ---
 
@@ -464,7 +515,39 @@ Buat `resources/views/components/smk_xyz/footer.blade.php`:
 </footer>
 ```
 
-### Step 6: Buat Assets
+### Step 6: Buat Breadcrumb Component (Opsional)
+
+Buat `resources/views/components/smk_xyz/breadcrumb.blade.php`:
+
+```html
+@props([
+    'title'  => '',
+    'image'  => null,
+    'items'  => [],
+])
+<section class="breadcrumb-area" style="background: linear-gradient(135deg, #your-primary 0%, #your-secondary 100%); padding: 80px 0;">
+    <div class="container">
+        <h1>{{ $title }}</h1>
+        @if(count($items) > 0)
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    @foreach($items as $index => $item)
+                        @if($index === count($items) - 1)
+                            <li class="breadcrumb-item active">{{ $item['label'] }}</li>
+                        @else
+                            <li class="breadcrumb-item"><a href="{{ $item['url'] }}">{{ $item['label'] }}</a></li>
+                        @endif
+                    @endforeach
+                </ol>
+            </nav>
+        @endif
+    </div>
+</section>
+```
+
+Usage: `<x-smk_xyz.breadcrumb title="Berita" :items="[['label' => 'Beranda', 'url' => route('landing')], ['label' => 'Berita']]" />`
+
+### Step 7: Buat Assets
 
 ```bash
 mkdir -p public/assets_smk_xyz/css
@@ -480,7 +563,7 @@ Siapkan file-file:
 - `public/assets_smk_xyz/images/logo-light.png` — Logo light
 - `public/assets_smk_xyz/images/favicon.png` — Favicon
 
-### Step 7: Set Environment
+### Step 8: Set Environment
 
 Edit `.env`:
 
@@ -488,7 +571,7 @@ Edit `.env`:
 DEFAULT_THEME=smk_xyz
 ```
 
-### Step 8: (Optional) View Overrides
+### Step 9: (Optional) View Overrides
 
 Jika ingin custom view untuk halaman tertentu (berita, pages, dll), buat file dengan naming convention:
 
@@ -500,7 +583,7 @@ resources/views/pages/public/index-smk_xyz.blade.php     ← override pages inde
 
 > **Tanpa override**: otomatis fallback ke view default (e.g., `berita/public/index.blade.php`)
 
-### Step 9: Upload Branding via Admin (Opsional)
+### Step 10: Upload Branding via Admin (Opsional)
 
 ```
 Admin → Theme Settings → SMK XYZ → General
@@ -510,7 +593,7 @@ Admin → Theme Settings → SMK XYZ → General
 └── Lainnya (headmaster_photo, video_thumbnail, dll)
 ```
 
-### Step 10: Clear Cache & Test
+### Step 11: Clear Cache & Test
 
 ```bash
 php artisan config:clear
@@ -549,11 +632,12 @@ php artisan serve
 7. **Assets per tema**: `public/assets_telkom/`, `public/assets_maudu/`, `public/assets_{theme}/` — jangan campur aduk
 8. **Menu URL format**: Gunakan `route:name` syntax di config (e.g., `'route:berita.public.index'`), bukan `route()` langsung
 9. **View naming**: Pattern `{base}-{theme}.blade.php` untuk override per tema
-10. **Content Sanitization** — Selalu gunakan `ContentSanitizer` untuk sanitize HTML content CMS sebelum disimpan (mencegah XSS)
-11. **Rate Limiting** — Routes sensitif (login, import, excuses) sudah dilindungi throttle middleware
-12. **Security Headers** — Middleware `SecurityHeaders` otomatis menambahkan CSP, X-Frame-Options, HSTS, dll
+10. **Content Sanitization** — Selalu gunakan [`ContentSanitizer`](app/Services/ContentSanitizer.php) untuk sanitize HTML content CMS sebelum disimpan (mencegah XSS). Sudah diimplementasikan di: BeritaController, PageController, EventController, TestimonialController, SettingsController
+11. **Rate Limiting** — Routes sensitif sudah dilindungi throttle middleware (42+ routes). Lihat section Security untuk detail rate limit per route
+12. **Security Headers** — Middleware [`SecurityHeaders`](app/Http/Middleware/SecurityHeaders.php) otomatis menambahkan CSP, X-Frame-Options, HSTS, dll. Skip untuk API, webhook, dan file downloads
 13. **Attendance Config** — Semua config absensi di `config/attendance.php`, override via env vars `ATTENDANCE_*`
 14. **Attendance Scheduler** — `attendance:mark-alpha` berjalan jam 23:00, `attendance:notify --summary` jam 16:00
+15. **Breadcrumb Components** — Tersedia per tema: `<x-telkom.breadcrumb>`, `<x-maudu.breadcrumb>`, `<x-admin.breadcrumb>`
 
 ---
 
@@ -564,4 +648,6 @@ php artisan serve
 - [`plans/attendance-features-plan.md`](plans/attendance-features-plan.md) — Plan lengkap fitur absensi (excuse, notification, report, config)
 - [`plans/maudu-public-features-complete.md`](plans/maudu-public-features-complete.md) — Plan lengkap fitur publik tema MAUDU
 - [`README.md`](README.md) — Readme project
+- [`ROADMAP.md`](ROADMAP.md) — Roadmap pengembangan proyek
+- [`FEATURES.md`](FEATURES.md) — Daftar lengkap fitur yang sudah diimplementasi
 - [`.kiro/hooks/laravel-expert.kiro.hook`](.kiro/hooks/laravel-expert.kiro.hook) — Laravel best practices hook

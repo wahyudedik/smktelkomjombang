@@ -6,10 +6,6 @@ const DYNAMIC_CACHE_NAME = 'ig-to-web-dynamic-v1';
 // Assets to cache on install
 const STATIC_ASSETS = [
     '/',
-    '/assets/css/all-fontawesome.min.css',
-    '/assets/css/style.css',
-    '/assets/js/bootstrap.bundle.min.js',
-    '/assets/js/jquery-3.7.1.min.js',
     '/favicon.ico',
 ];
 
@@ -154,8 +150,8 @@ self.addEventListener('push', (event) => {
     let notificationData = {
         title: 'IG to Web',
         body: 'Anda memiliki notifikasi baru',
-        icon: '/assets/img/logo/favicon.png',
-        badge: '/assets/img/logo/favicon.png',
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
         tag: 'notification',
         data: {
             url: '/admin/notifications',

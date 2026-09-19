@@ -96,11 +96,16 @@ class SecurityHeaders
         if (!app()->environment('local', 'development')) {
             $cspDirectives = [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
-                "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
+                // 'unsafe-inline' diperlukan untuk inline scripts di Blade templates
+                // 'unsafe-eval' diperlukan untuk beberapa library JS (Chart.js, Alpine.js)
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net https://code.jquery.com https://cdn.quilljs.com",
+                // 'unsafe-inline' diperlukan untuk inline styles di Blade templates
+                "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net https://cdn.quilljs.com",
+                // blob: diperlukan untuk image generation (canvas), data: untuk inline images
                 "img-src 'self' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
                 "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
-                "connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
+                // connect-src untuk AJAX calls dan preconnect
+                "connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net",
                 "frame-ancestors 'none'",
                 "base-uri 'self'",
                 "form-action 'self'",

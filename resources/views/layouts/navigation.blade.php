@@ -677,11 +677,19 @@
             <!-- Mobile menu button -->
             <div class="md:hidden flex items-center">
                 <button @click="open = !open"
-                    class="p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    class="p-2 rounded-md text-slate-600 hover:text-slate-900 dark:text-dark-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path x-show="!open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <path x-show="!open" x-transition:enter="transition ease-in duration-200"
+                            x-transition:enter-start="opacity-0 rotate-90" x-transition:enter-end="opacity-100 rotate-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
-                        <path x-show="open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <path x-show="open" x-transition:enter="transition ease-in duration-200"
+                            x-transition:enter-start="opacity-0 -rotate-90" x-transition:enter-end="opacity-100 rotate-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
@@ -690,8 +698,15 @@
 
         <!-- Mobile Navigation -->
         @auth
-            <div x-show="open" x-transition class="md:hidden border-t border-slate-200">
-                <div class="px-2 pt-2 pb-3 space-y-1">
+            <div x-show="open"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 -translate-y-2"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 -translate-y-2"
+                class="md:hidden border-t border-slate-200 dark:border-dark-700">
+                <div class="px-2 pt-2 pb-3 space-y-1 max-h-[70vh] overflow-y-auto">
                     <!-- Dashboard -->
                     <a href="{{ route('admin.dashboard') }}"
                         class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">

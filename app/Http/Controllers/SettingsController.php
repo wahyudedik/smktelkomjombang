@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Page;
@@ -268,6 +269,26 @@ class SettingsController extends Controller
             'contact_section_title' => $request->contact_section_title,
             'contact_section_description' => $request->contact_section_description,
         ];
+
+        // Sanitize HTML fields yang ditampilkan dengan {!! !!} di Blade templates
+        // Mencegah XSS dari admin input yang mengandung tag berbahaya
+        $sanitizer = new ContentSanitizer();
+        $htmlFields = [
+            'headmaster_description', 'headmaster_vision',
+            'campus_life_headmaster_description', 'campus_life_headmaster_vision',
+            'cta_description', 'footer_text',
+            'hero_slide1_title', 'hero_slide2_title', 'hero_slide3_title',
+            'about_section_description',
+            'about_feature_1_description', 'about_feature_2_description',
+            'about_feature_3_description', 'about_feature_4_description',
+            'program_ipa_description', 'program_ips_description', 'program_religion_description',
+            'contact_section_description',
+        ];
+        foreach ($htmlFields as $field) {
+            if (!empty($settings[$field])) {
+                $settings[$field] = $sanitizer->sanitize($settings[$field]);
+            }
+        }
 
         // Handle file uploads with old file deletion
         try {

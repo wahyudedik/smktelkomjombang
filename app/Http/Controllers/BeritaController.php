@@ -13,7 +13,6 @@ use Illuminate\Support\Str;
 class BeritaController extends Controller
 {
     private const CATEGORY = 'berita';
-    private const CACHE_KEY = 'telkom_blogs';
 
     // =========================================================
     // ADMIN CRUD
@@ -81,7 +80,7 @@ class BeritaController extends Controller
         }
 
         Page::create($data);
-        Cache::forget(self::CACHE_KEY);
+        $this->clearBlogsCache();
 
         return redirect()->route('admin.berita.index')
             ->with('success', 'Berita berhasil ditambahkan.');
@@ -137,7 +136,7 @@ class BeritaController extends Controller
         }
 
         $berita->update($data);
-        Cache::forget(self::CACHE_KEY);
+        $this->clearBlogsCache();
 
         return redirect()->route('admin.berita.index')
             ->with('success', 'Berita berhasil diperbarui.');
@@ -152,7 +151,7 @@ class BeritaController extends Controller
         }
 
         $berita->delete();
-        Cache::forget(self::CACHE_KEY);
+        $this->clearBlogsCache();
 
         return redirect()->route('admin.berita.index')
             ->with('success', 'Berita berhasil dihapus.');
@@ -221,6 +220,20 @@ class BeritaController extends Controller
     // =========================================================
     // HELPERS
     // =========================================================
+
+    /**
+     * Clear blogs cache for ALL themes.
+     *
+     * Admin CRUD operations are theme-agnostic — berita data is shared across all themes.
+     * LandingController caches blogs per-theme as "landing_{theme}_blogs",
+     * so we must clear cache for every registered theme.
+     */
+    private function clearBlogsCache(): void
+    {
+        foreach (available_themes() as $theme) {
+            Cache::forget("landing_{$theme}_blogs");
+        }
+    }
 
     private function uniqueSlug(string $title): string
     {

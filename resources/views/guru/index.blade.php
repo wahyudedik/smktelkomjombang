@@ -1,24 +1,27 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('common.teacher_data') }}
-            </h2>
-            <div class="flex flex-wrap items-center gap-2">
-                @can('import', App\Models\Guru::class)
-                    <a href="{{ route('admin.guru.import') }}"
-                        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                        {{ __('common.import') }}
-                    </a>
-                @endcan
+        <div class="bg-white dark:bg-dark-800 border-b border-slate-200 dark:border-dark-700">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                    <x-admin.breadcrumb :title="__('common.teacher_data')" :items="[
+                        ['label' => __('common.dashboard'), 'url' => route('admin.dashboard')],
+                        ['label' => __('common.teacher_data'), 'url' => route('admin.guru.index')],
+                    ]" />
+                    <div class="flex flex-wrap items-center gap-2">
+                        @can('import', App\Models\Guru::class)
+                            <a href="{{ route('admin.guru.import') }}"
+                                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                {{ __('common.import') }}
+                            </a>
+                        @endcan
                 @can('export', App\Models\Guru::class)
                     <div class="relative inline-block" x-data="{ open: false }">
                         <button @click="open = !open"
-                            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm inline-flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -53,18 +56,20 @@
                 @endcan
                 @can('create', App\Models\Guru::class)
                     <a href="{{ route('admin.guru.create') }}"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm">
                         {{ __('common.add_teacher') }}
                     </a>
                 @endcan
+                </div>
+                </div>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 lg:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+                <div class="p-4 lg:p-6 text-gray-900">
 
                     <!-- Filters -->
                     <div class="mb-6 bg-gray-50 p-4 rounded-lg">
@@ -118,13 +123,13 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="flex items-end space-x-2">
+                            <div class="flex items-end gap-2">
                                 <button type="submit"
-                                    class="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                    class="flex-1 min-w-0 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm">
                                     {{ __('common.filter') }}
                                 </button>
                                 <a href="{{ route('admin.guru.index') }}"
-                                    class="flex-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-center">
+                                    class="flex-1 min-w-0 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm text-center">
                                     {{ __('common.reset') }}
                                 </a>
                             </div>
@@ -137,58 +142,58 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'nama_lengkap', 'sort_order' => request('sort_order') == 'asc' ? 'desc' : 'asc']) }}"
                                             class="hover:text-gray-700">
                                             {{ __('common.name') }}
                                         </a>
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        class="hidden md:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         {{ __('common.nip') }}</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        class="hidden md:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         {{ __('common.status') }}</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        class="hidden lg:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         {{ __('common.employment_status') }}</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        class="hidden lg:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         {{ __('common.subject') }}</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         {{ __('common.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($gurus as $guru)
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 @if ($guru->foto)
-                                                    <img class="h-10 w-10 rounded-full object-cover mr-3"
+                                                    <img class="h-8 w-8 lg:h-10 lg:w-10 rounded-full object-cover mr-2 lg:mr-3"
                                                         src="{{ $guru->photo_url }}"
                                                         alt="{{ $guru->nama_lengkap }}">
                                                 @else
                                                     <div
-                                                        class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
+                                                        class="h-8 w-8 lg:h-10 lg:w-10 rounded-full bg-gray-300 flex items-center justify-center mr-2 lg:mr-3">
                                                         <span
-                                                            class="text-gray-600 font-medium">{{ substr($guru->nama_lengkap, 0, 1) }}</span>
+                                                            class="text-gray-600 font-medium text-sm">{{ substr($guru->nama_lengkap, 0, 1) }}</span>
                                                     </div>
                                                 @endif
                                                 <div>
                                                     <div class="text-sm font-medium text-gray-900">
                                                         {{ $guru->full_name }}
                                                     </div>
-                                                    <div class="text-sm text-gray-500">{{ $guru->jabatan ?? 'Guru' }}
+                                                    <div class="text-xs lg:text-sm text-gray-500">{{ $guru->jabatan ?? 'Guru' }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td class="hidden md:table-cell px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $guru->nip }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="hidden md:table-cell px-4 lg:px-6 py-4 whitespace-nowrap">
                                             <span
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                 @if ($guru->status_badge_color === 'green') bg-green-100 text-green-800
@@ -198,7 +203,7 @@
                                                 {{ ucfirst(str_replace('_', ' ', $guru->status_aktif)) }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="hidden lg:table-cell px-4 lg:px-6 py-4 whitespace-nowrap">
                                             <span
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                 @if ($guru->employment_badge_color === 'green') bg-green-100 text-green-800
@@ -210,11 +215,11 @@
                                                 {{ $guru->status_kepegawaian }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td class="hidden lg:table-cell px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $guru->subjects_string }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex space-x-2">
+                                        <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex flex-wrap gap-1 lg:gap-2">
                                                 @can('view', $guru)
                                                     <a href="{{ route('admin.guru.show', $guru) }}"
                                                         class="text-blue-600 hover:text-blue-900">{{ __('common.view') }}</a>
@@ -238,7 +243,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                        <td colspan="3" class="px-4 lg:px-6 py-4 text-center text-gray-500">
                                             {{ __('common.no_teacher_data_found') }}
                                         </td>
                                     </tr>
