@@ -212,6 +212,9 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
         ->middleware('throttle:5,1') // Max 5 sync-all operations per minute
         ->name('users.sync-all');
 
+    Route::get('/users/import/template', [App\Http\Controllers\AttendanceUserController::class, 'downloadTemplate'])->name('users.import.template');
+    Route::post('/users/auto-map', [App\Http\Controllers\AttendanceUserController::class, 'autoMap'])->name('users.auto-map');
+
     // Biometric Enrollment (NEW)
     Route::get('/biometric', [App\Http\Controllers\BiometricEnrollmentController::class, 'index'])->name('biometric.index');
     Route::get('/biometric/{identity}/fingerprint', [App\Http\Controllers\BiometricEnrollmentController::class, 'enrollFingerprintForm'])->name('biometric.fingerprint.form');

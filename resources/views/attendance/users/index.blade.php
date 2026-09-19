@@ -6,6 +6,24 @@
                 <p class="text-slate-600 mt-1">Tambah, edit, hapus user dan sinkronisasi ke device</p>
             </div>
             <div class="flex items-center gap-2">
+                <a href="{{ route('admin.absensi.users.import') }}"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    Import Excel
+                </a>
+                <form method="POST" action="{{ route('admin.absensi.users.auto-map') }}" style="display: inline;"
+                    onsubmit="return confirm('Auto-map akan membuat identity untuk semua siswa/guru yang belum punya mapping. Lanjutkan?')">
+                    @csrf
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-amber-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-amber-600 focus:bg-amber-600 active:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Auto-Map
+                    </button>
+                </form>
                 <a href="{{ route('admin.absensi.index') }}" class="btn btn-secondary">Rekap</a>
                 <a href="{{ route('admin.absensi.logs') }}" class="btn btn-secondary">Logs</a>
                 <a href="{{ route('admin.absensi.devices.index') }}" class="btn btn-secondary">Devices</a>
@@ -74,7 +92,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700">PIN Device</label>
-                    <input type="text" name="device_pin" placeholder="Contoh: 1001" 
+                    <input type="text" name="device_pin" placeholder="Contoh: 1001"
                         class="mt-1 block w-full rounded-md border-slate-300" required>
                 </div>
                 <div class="flex items-end gap-2">

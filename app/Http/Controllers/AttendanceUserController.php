@@ -12,6 +12,7 @@ use App\Services\ZKTeco\UserSyncService;
 use App\Traits\AttendanceAuthorization;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Artisan;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 
@@ -339,6 +340,46 @@ class AttendanceUserController extends BaseController
                 'import' => "Terjadi kesalahan saat import: {$e->getMessage()}",
             ])->withInput();
         }
+    }
+
+    /**
+     * Auto-map semua siswa/guru yang belum punya AttendanceIdentity
+     */
+    public function autoMap(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $this->requireAdminOrPermission('attendance.users.manage');
+
+        try {
+            $exitCode = Artisan::call('attendance:auto-map-identities');
+            $output = Artisan::output();
+
+            return redirect()->route('admin.absensi.users.index')
+                ->with('success', "Auto-map selesai!\n" . $output);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.absensi.users.index')
+                ->with('error', "Auto-map gagal: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Download template CSV untuk import absensi
+     */
+    public function downloadTemplate(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="template-import-absensi.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['device_pin', 'kind', 'reference_name']);
+            fputcsv($file, ['1001', 'siswa', 'Nama Siswa']);
+            fputcsv($file, ['9001', 'guru', 'Nama Guru']);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
 
