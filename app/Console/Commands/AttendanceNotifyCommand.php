@@ -34,7 +34,7 @@ class AttendanceNotifyCommand extends Command
 
     public function handle(): int
     {
-        if (!config('attendance.notify.enabled', true)) {
+        if (!attendance_config('notify_enabled', true)) {
             $this->info('Notifikasi absensi dinonaktifkan di config.');
             return Command::SUCCESS;
         }
@@ -84,7 +84,7 @@ class AttendanceNotifyCommand extends Command
         $presentCount = $attendances->where('status', 'present')->count();
         $alphaCount = $attendances->where('status', 'alpha')->count();
         $lateCount = $attendances->filter(function ($a) use ($date) {
-            return $a->first_in_at && $a->first_in_at->format('H:i') > config('attendance.late_threshold', '07:30');
+            return $a->first_in_at && $a->first_in_at->format('H:i') > attendance_config('late_threshold', '07:30');
         })->count();
 
         $totalIdentities = AttendanceIdentity::where('is_active', true)->count();
@@ -116,7 +116,7 @@ class AttendanceNotifyCommand extends Command
     {
         $this->info('⏰ Mengirim notifikasi keterlambatan...');
 
-        $threshold = config('attendance.late_threshold', '07:30');
+        $threshold = attendance_config('late_threshold', '07:30');
         $lateRecords = Attendance::with(['identity.guru', 'identity.siswa', 'identity.user'])
             ->whereDate('date', $date)
             ->whereNotNull('first_in_at')
@@ -190,7 +190,7 @@ class AttendanceNotifyCommand extends Command
      */
     private function getAdminUsers()
     {
-        $targets = config('attendance.notify.targets', ['admin']);
+        $targets = explode(',', attendance_config('notify_targets', 'admin'));
 
         return User::whereHas('roles', function ($query) use ($targets) {
             $query->whereIn('name', $targets);

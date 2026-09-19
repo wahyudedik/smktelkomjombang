@@ -15,7 +15,7 @@ class AttendanceCleanupCommand extends Command
 
     public function handle(): int
     {
-        if (!config('attendance.cleanup_enabled', false)) {
+        if (!attendance_config('cleanup_enabled', false)) {
             $this->info('Cleanup dinonaktifkan di config attendance.cleanup_enabled. Lewati.');
 
             return 0;

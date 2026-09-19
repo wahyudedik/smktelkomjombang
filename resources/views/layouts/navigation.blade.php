@@ -81,6 +81,12 @@
                                             class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
                                             <i class="fas fa-user-check mr-2"></i>Absensi
                                         </a>
+                                        @if (Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                            <a href="{{ route('admin.absensi.settings') }}"
+                                                class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                                <i class="fas fa-cog mr-2"></i>Pengaturan Absensi
+                                            </a>
+                                        @endif
                                     @endif
                                     @if (Auth::check() &&
                                             (Auth::user()->hasAnyRole(['sarpras', 'admin', 'superadmin']) ||
@@ -748,6 +754,12 @@
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-user-check mr-2"></i>Absensi
                                     </a>
+                                    @if (Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                                        <a href="{{ route('admin.absensi.settings') }}"
+                                            class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                            <i class="fas fa-cog mr-2"></i>Pengaturan Absensi
+                                        </a>
+                                    @endif
                                 @endif
                                 @if (Auth::user()->hasAnyRole(['sarpras', 'admin', 'superadmin']) ||
                                         Auth::user()->can('sarpras.view') ||

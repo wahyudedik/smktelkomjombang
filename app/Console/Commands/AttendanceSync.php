@@ -90,14 +90,14 @@ class AttendanceSync extends Command
                 }
 
                 // Determine status based on late threshold
-                $lateThreshold = config('attendance.late_threshold', '07:30');
+                $lateThreshold = attendance_config('late_threshold', '07:30');
                 $thresholdTime = $date->copy()->setTimeFromTimeString($lateThreshold);
                 $status = ($firstIn && $firstIn->gt($thresholdTime)) ? 'late' : 'present';
 
                 // Overtime calculation
                 $overtimeMinutes = 0;
-                if (config('attendance.overtime_enabled', false) && $lastOut) {
-                    $overtimeStart = config('attendance.overtime_start', '16:00');
+                if (attendance_config('overtime_enabled', false) && $lastOut) {
+                    $overtimeStart = attendance_config('overtime_start', '16:00');
                     $overtimeStartTime = $date->copy()->setTimeFromTimeString($overtimeStart);
 
                     if ($lastOut->gt($overtimeStartTime)) {

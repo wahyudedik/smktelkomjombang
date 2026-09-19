@@ -277,6 +277,15 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::post('/excuses/{excuse}/reject', [App\Http\Controllers\AttendanceExcuseController::class, 'reject'])
         ->middleware('throttle:20,1')
         ->name('excuses.reject');
+
+    // Settings (admin|superadmin only — already scoped by middleware above)
+    Route::middleware(['role:admin|superadmin'])->group(function () {
+        Route::get('/settings', [App\Http\Controllers\AttendanceSettingController::class, 'index'])->name('settings');
+        Route::put('/settings', [App\Http\Controllers\AttendanceSettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/reset', [App\Http\Controllers\AttendanceSettingController::class, 'reset'])->name('settings.reset');
+        Route::get('/settings/export', [App\Http\Controllers\AttendanceSettingController::class, 'export'])->name('settings.export');
+        Route::post('/settings/import', [App\Http\Controllers\AttendanceSettingController::class, 'import'])->name('settings.import');
+    });
 });
 
 // ========================================

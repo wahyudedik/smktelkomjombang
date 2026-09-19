@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
 
             // Module-specific seeders (butuh UserSeeder untuk user_id)
             GuruSeeder::class, // Butuh UserSeeder
-            SiswaSeeder::class, // Butuh UserSeeder 
+            SiswaSeeder::class, // Butuh UserSeeder
             KelulusanSeeder::class, // Tidak ada dependency
             SarprasSeeder::class, // Butuh UserSeeder untuk maintenance user_id
             OSISSeeder::class, // Tidak ada dependency
@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             NotificationSeeder::class, // Butuh UserSeeder
             LetterSeeder::class, // Format Surat
             AttendanceSeeder::class, // Absensi
+            AttendanceSettingSeeder::class, // Absensi settings defaults
 
             // Telkom Landing Page seeders
             PartnerSeeder::class, // Partner data

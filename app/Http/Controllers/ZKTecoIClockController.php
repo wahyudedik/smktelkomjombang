@@ -156,7 +156,7 @@ class ZKTecoIClockController extends BaseController
 
     private function requireToken(Request $request): void
     {
-        $expected = (string) config('attendance.iclock_secret');
+        $expected = (string) attendance_config('iclock_secret', '');
         if ($expected === '') {
             Log::warning('ZKTeco token validation skipped: no secret configured');
             return;
