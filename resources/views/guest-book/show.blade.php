@@ -19,7 +19,6 @@
                             @can('buku-tamu.checkout')
                                 <form method="POST" action="{{ route('admin.buku-tamu.checkout', $guest) }}" class="inline">
                                     @csrf
-                                    @method('PATCH')
                                     <button type="submit"
                                         class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm"
                                         onclick="return confirm('Check-out tamu ini?')">
@@ -242,7 +241,6 @@
                             @can('buku-tamu.checkout')
                                 <form method="POST" action="{{ route('admin.buku-tamu.checkout', $guest) }}" class="inline">
                                     @csrf
-                                    @method('PATCH')
                                     <button type="submit"
                                         class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded"
                                         onclick="return confirm('Check-out tamu ini?')">

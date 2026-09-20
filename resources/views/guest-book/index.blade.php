@@ -278,7 +278,6 @@
                                                     @can('buku-tamu.checkout')
                                                         <form method="POST" action="{{ route('admin.buku-tamu.checkout', $guest) }}" class="inline">
                                                             @csrf
-                                                            @method('PATCH')
                                                             <button type="submit"
                                                                 class="inline-flex items-center gap-1 text-orange-600 hover:text-orange-800 hover:bg-orange-50 px-2 py-1 rounded-md transition-colors duration-150"
                                                                 title="Check-out"
