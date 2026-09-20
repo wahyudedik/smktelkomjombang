@@ -167,7 +167,7 @@
                                             <input type="text"
                                                 id="settings_{{ $fieldKey }}"
                                                 name="settings[{{ $fieldKey }}]"
-                                                value="{{ $field['value'] }}"
+                                                value="{{ is_array($field['value']) ? implode(', ', $field['value']) : $field['value'] }}"
                                                 class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                         @endif
                                     </div>

@@ -258,7 +258,7 @@ class AttendanceSettingController extends Controller
         return match ($type) {
             'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
             'integer' => (int) $value,
-            default   => $value,
+            default   => is_array($value) ? implode(', ', $value) : $value,
         };
     }
 
