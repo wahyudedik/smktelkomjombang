@@ -1151,15 +1151,15 @@
 
             // Show success/error messages with Sweet Alert
             @if (session('success'))
-                showSuccess('Berhasil!', '{{ session('success') }}');
+                showSuccess('Berhasil!', @json(session('success')));
             @endif
 
             @if (session('error'))
-                showError('Error!', '{{ session('error') }}');
+                showError('Error!', @json(session('error')));
             @endif
 
             @if ($errors->any())
-                showError('Terjadi Kesalahan!', '{!! implode('<br>', $errors->all()) !!}');
+                showError('Terjadi Kesalahan!', @json(implode("\n", $errors->all())));
             @endif
         }
 

@@ -238,7 +238,7 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const successKey = 'calon_edit_success_' + '{{ md5(session('success') . time()) }}';
                 if (!sessionStorage.getItem(successKey) && typeof showSuccess !== 'undefined') {
-                    showSuccess('{{ session('success') }}');
+                    showSuccess(@json(session('success')));
                     sessionStorage.setItem(successKey, 'shown');
                 }
             });
@@ -250,7 +250,7 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const errorKey = 'calon_edit_error_' + '{{ md5(session('error') . time()) }}';
                 if (!sessionStorage.getItem(errorKey) && typeof showError !== 'undefined') {
-                    showError('{{ session('error') }}');
+                    showError(@json(session('error')));
                     sessionStorage.setItem(errorKey, 'shown');
                 }
             });
@@ -262,7 +262,7 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const errorsKey = 'calon_edit_errors_' + '{{ md5(json_encode($errors->all()) . time()) }}';
                 if (!sessionStorage.getItem(errorsKey) && typeof showError !== 'undefined') {
-                    showError('{{ $errors->first() }}');
+                    showError(@json($errors->first()));
                     sessionStorage.setItem(errorsKey, 'shown');
                 }
             });

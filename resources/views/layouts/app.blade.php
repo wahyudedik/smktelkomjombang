@@ -117,11 +117,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             @if (session('success'))
-                window.showSuccess && window.showSuccess('Berhasil', '{{ session('success') }}');
+                window.showSuccess && window.showSuccess('Berhasil', @json(session('success')));
             @endif
 
             @if (session('error'))
-                window.showError && window.showError('Gagal', '{{ session('error') }}');
+                window.showError && window.showError('Gagal', @json(session('error')));
             @endif
         });
     </script>

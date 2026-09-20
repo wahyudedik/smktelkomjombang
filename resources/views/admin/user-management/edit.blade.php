@@ -114,13 +114,13 @@
                 // Show success message if user was updated
                 @if (session('success'))
                     if (typeof showSuccess !== 'undefined') {
-                        showSuccess('{{ __('Success') }}', '{{ session('success') }}');
+                        showSuccess(@json(__('Success')), @json(session('success')));
                     }
                 @endif
 
                 @if (session('error'))
                     if (typeof showError !== 'undefined') {
-                        showError('{{ __('Error') }}', '{{ session('error') }}');
+                        showError(@json(__('Error')), @json(session('error')));
                     }
                 @endif
             });

@@ -409,6 +409,19 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/
     Route::delete('/{event}', [App\Http\Controllers\EventController::class, 'destroy'])->name('destroy')->middleware('permission:events.delete');
 });
 
+// Buku Tamu Management (Access: admin, superadmin)
+Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/buku-tamu')->name('admin.buku-tamu.')->group(function () {
+    Route::get('/', [App\Http\Controllers\GuestBookController::class, 'index'])->name('index');
+    Route::get('/create', [App\Http\Controllers\GuestBookController::class, 'create'])->name('create');
+    Route::post('/', [App\Http\Controllers\GuestBookController::class, 'store'])->name('store');
+    Route::get('/export', [App\Http\Controllers\GuestBookController::class, 'export'])->name('export');
+    Route::get('/{guest}', [App\Http\Controllers\GuestBookController::class, 'show'])->name('show');
+    Route::get('/{guest}/edit', [App\Http\Controllers\GuestBookController::class, 'edit'])->name('edit');
+    Route::put('/{guest}', [App\Http\Controllers\GuestBookController::class, 'update'])->name('update');
+    Route::delete('/{guest}', [App\Http\Controllers\GuestBookController::class, 'destroy'])->name('destroy');
+    Route::post('/{guest}/checkout', [App\Http\Controllers\GuestBookController::class, 'checkout'])->name('checkout');
+});
+
 // ========================================
 // MODULE MANAGEMENT ROUTES (Role-based access)
 // ========================================

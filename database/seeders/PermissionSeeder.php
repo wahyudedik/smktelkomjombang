@@ -1046,6 +1046,56 @@ class PermissionSeeder extends Seeder
                 'action' => 'landing-page',
                 'guard_name' => 'web',
             ],
+
+            // Buku Tamu permissions
+            [
+                'name' => 'buku-tamu.view',
+                'display_name' => 'Buku Tamu - Lihat Data',
+                'description' => 'Permission untuk melihat data buku tamu',
+                'module' => 'buku-tamu',
+                'action' => 'view',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'buku-tamu.create',
+                'display_name' => 'Buku Tamu - Tambah Data',
+                'description' => 'Permission untuk menambah data buku tamu',
+                'module' => 'buku-tamu',
+                'action' => 'create',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'buku-tamu.update',
+                'display_name' => 'Buku Tamu - Edit Data',
+                'description' => 'Permission untuk mengedit data buku tamu',
+                'module' => 'buku-tamu',
+                'action' => 'update',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'buku-tamu.delete',
+                'display_name' => 'Buku Tamu - Hapus Data',
+                'description' => 'Permission untuk menghapus data buku tamu',
+                'module' => 'buku-tamu',
+                'action' => 'delete',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'buku-tamu.export',
+                'display_name' => 'Buku Tamu - Export Data',
+                'description' => 'Permission untuk export data buku tamu',
+                'module' => 'buku-tamu',
+                'action' => 'export',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'buku-tamu.checkout',
+                'display_name' => 'Buku Tamu - Checkout Tamu',
+                'description' => 'Permission untuk melakukan checkout tamu',
+                'module' => 'buku-tamu',
+                'action' => 'checkout',
+                'guard_name' => 'web',
+            ],
         ];
 
         foreach ($permissions as $permissionData) {
@@ -1087,6 +1137,16 @@ class PermissionSeeder extends Seeder
         if ($adminRole) {
             $attendancePermissions = Permission::where('module', 'attendance')->pluck('id');
             $adminRole->syncPermissions($attendancePermissions);
+
+            // Assign buku-tamu permissions ke admin (kecuali delete)
+            $adminBukuTamuPermissions = Permission::whereIn('name', [
+                'buku-tamu.view',
+                'buku-tamu.create',
+                'buku-tamu.update',
+                'buku-tamu.export',
+                'buku-tamu.checkout',
+            ])->pluck('id');
+            $adminRole->givePermissionTo($adminBukuTamuPermissions);
         }
 
         // Default permission assignment untuk role guru (hanya view)

@@ -109,10 +109,18 @@ class RolePermissionSeeder extends Seeder
             'settings.view',
             'settings.manage',
             'settings.landing-page',
+
+            // Buku Tamu permissions
+            'buku-tamu.view',
+            'buku-tamu.create',
+            'buku-tamu.update',
+            'buku-tamu.delete',
+            'buku-tamu.export',
+            'buku-tamu.checkout',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
         // Assign permissions to roles using Spatie

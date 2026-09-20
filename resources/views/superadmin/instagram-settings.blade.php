@@ -518,13 +518,13 @@
                 // Welcome notification using global helpers
                 setTimeout(() => {
                     @if (session('success'))
-                        showSuccess('Berhasil', '{{ session('success') }}');
+                        showSuccess('Berhasil', @json(session('success')));
                     @elseif (session('error'))
-                        showError('Error', '{{ session('error') }}');
+                        showError('Error', @json(session('error')));
                     @elseif (session('warning'))
-                        showAlert('Peringatan', '{{ session('warning') }}', 'warning');
+                        showAlert('Peringatan', @json(session('warning')), 'warning');
                     @elseif (session('info'))
-                        showAlert('Info', '{{ session('info') }}', 'info');
+                        showAlert('Info', @json(session('info')), 'info');
                     @endif
                 }, 500);
 

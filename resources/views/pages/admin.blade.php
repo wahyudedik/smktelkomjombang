@@ -257,13 +257,13 @@
                 // Show success message if page was created/updated/deleted
                 @if (session('success'))
                     if (typeof showSuccess !== 'undefined') {
-                        showSuccess('{{ __('common.success') }}', '{{ session('success') }}');
+                        showSuccess(@json(__('common.success')), @json(session('success')));
                     }
                 @endif
 
                 @if (session('error'))
                     if (typeof showError !== 'undefined') {
-                        showError('{{ __('common.error') }}', '{{ session('error') }}');
+                        showError(@json(__('common.error')), @json(session('error')));
                     }
                 @endif
             });

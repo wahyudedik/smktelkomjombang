@@ -269,7 +269,7 @@
             document.addEventListener('DOMContentLoaded', function() {
                 // Check if this alert has already been shown
                 if (!sessionStorage.getItem(successKey)) {
-                    showSuccess('{{ session('success') }}');
+                    showSuccess(@json(session('success')));
                     // Mark this alert as shown
                     sessionStorage.setItem(successKey, 'shown');
 
@@ -289,7 +289,7 @@
 
             document.addEventListener('DOMContentLoaded', function() {
                 if (!sessionStorage.getItem(errorKey)) {
-                    showError('{{ session('error') }}');
+                    showError(@json(session('error')));
                     sessionStorage.setItem(errorKey, 'shown');
 
                     const keys = Object.keys(sessionStorage).filter(k => k.startsWith('guru_alert_error_'));
@@ -307,7 +307,7 @@
 
             document.addEventListener('DOMContentLoaded', function() {
                 if (!sessionStorage.getItem(validationKey)) {
-                    showError('{!! implode('<br>', $errors->all()) !!}');
+                    showError(@json(implode("\n", $errors->all())));
                     sessionStorage.setItem(validationKey, 'shown');
 
                     const keys = Object.keys(sessionStorage).filter(k => k.startsWith('guru_alert_validation_'));

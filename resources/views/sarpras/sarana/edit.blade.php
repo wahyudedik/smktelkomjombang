@@ -59,8 +59,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 bg-slate-50 rounded-lg">
                             <div>
                                 <label class="form-label">Barang</label>
-                                <select x-bind:name="'barang_ids[' + index + ']'" 
-                                    x-model="barang.barang_id" 
+                                <select x-bind:name="'barang_ids[' + index + ']'"
+                                    x-model="barang.barang_id"
                                     x-init="
                                         (function() {
                                             var updateSelect = function() {
@@ -86,7 +86,7 @@
                                     @change="updateBarangHarga(index)">
                                     <option value="">Pilih Barang</option>
                                     <template x-for="barangOption in getBarangOptions()" :key="barangOption.id">
-                                        <option x-bind:value="String(barangOption.id)" 
+                                        <option x-bind:value="String(barangOption.id)"
                                             x-bind:selected="String(barangOption.id) === String(barang.barang_id)"
                                             x-bind:data-harga="barangOption.harga_beli || 0"
                                             x-text="barangOption.nama_barang + ' (' + barangOption.kode_barang + ')' + (barangOption.ruang_id ? '' : ' - Belum ada ruang')"></option>
@@ -134,7 +134,7 @@
                             </div>
                         </div>
                     </template>
-                    
+
                     <!-- Grand Total -->
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -242,11 +242,11 @@
                         // Ensure existing barang data is preserved
                         console.log('Initial barangs:', this.barangs);
                         console.log('Initial allBarangs:', this.allBarangs);
-                        
+
                         // Set filteredBarangs to allBarangs initially so dropdown options are available
                         // This ensures that barang_id in barangs can match with options
                         this.filteredBarangs = [...this.allBarangs];
-                        
+
                         // Load barang for current ruang on init (only for filtering options)
                         // This will NOT overwrite existing barangs because preserveExisting = true
                         if (this.ruangId) {
@@ -258,14 +258,14 @@
                             // If no ruangId, ensure filteredBarangs is set so dropdowns work
                             this.filteredBarangs = [...this.allBarangs];
                         }
-                        
+
                         // Watch for ruang_id changes
                         this.$watch('ruangId', (value) => {
                             if (value && value !== '{{ $sarana->ruang_id }}') {
                                 this.loadBarangByRuang(value, false);
                             }
                         });
-                        
+
                         // Force update dropdowns after a short delay to ensure DOM is ready
                         setTimeout(() => {
                             this.barangs.forEach((barang, index) => {
@@ -288,12 +288,12 @@
                         try {
                             const response = await fetch(`{{ route('admin.sarpras.sarana.getBarangByRuang') }}?ruang_id=${ruangId}&sarana_id={{ $sarana->id }}`);
                             const data = await response.json();
-                            
+
                             if (data.success) {
                                 // Merge filteredBarangs with allBarangs to ensure existing barang options are available
                                 // This is important for edit mode where barang might not be in filteredBarangs
                                 const mergedBarangs = [...data.barangs];
-                                
+
                                 // Add barang from allBarangs that are in current barangs but not in filteredBarangs
                                 this.barangs.forEach(barang => {
                                     if (barang.barang_id) {
@@ -306,9 +306,9 @@
                                         }
                                     }
                                 });
-                                
+
                                 this.filteredBarangs = mergedBarangs;
-                                
+
                                 // Only auto-fill if not preserving existing
                                 if (!preserveExisting && data.barangs.length > 0) {
                                     this.barangs = data.barangs.map(barang => ({
@@ -351,14 +351,14 @@
                     getBarangOptions() {
                         // Always return a combination to ensure existing barang options are available
                         const options = this.filteredBarangs.length > 0 ? this.filteredBarangs : this.allBarangs;
-                        
+
                         // Ensure all barang from current barangs are included
                         const currentBarangIds = this.barangs.map(b => String(b.barang_id)).filter(id => id && id !== '');
                         const missingBarangs = currentBarangIds
                             .filter(id => !options.find(opt => String(opt.id) === id))
                             .map(id => this.allBarangs.find(b => String(b.id) === id))
                             .filter(b => b !== undefined);
-                        
+
                         return [...options, ...missingBarangs];
                     },
 
@@ -378,7 +378,7 @@
                             this.barangs[index].kondisi = 'baik';
                             return;
                         }
-                        
+
                         // Find harga and kondisi from allBarangs or filteredBarangs
                         const allOptions = this.getBarangOptions();
                         const selectedBarang = allOptions.find(b => String(b.id) == String(selectedBarangId));
@@ -428,7 +428,7 @@
                             }
                             return;
                         }
-                        
+
                         if (!this.kodeSumberDana) {
                             this.showModal = true;
                         } else {
@@ -455,7 +455,7 @@
                                 showError('Validasi Gagal', 'Kode sumber dana harus diisi!');
                                 return;
                             }
-                            
+
                             // Validate that at least one barang is selected
                             const hasBarang = this.barangs.some(b => b.barang_id && b.barang_id !== '');
                             if (!hasBarang) {
@@ -463,9 +463,9 @@
                                 return;
                             }
                         }
-                        
+
                         this.showModal = false;
-                        
+
                         // Small delay to ensure modal is closed
                         setTimeout(() => {
                             const form = document.getElementById('saranaForm');
@@ -500,15 +500,15 @@
 
                 // Show success/error messages with Sweet Alert
                 @if (session('success'))
-                    showSuccess('Berhasil!', '{{ session('success') }}');
+                    showSuccess('Berhasil!', @json(session('success')));
                 @endif
 
                 @if (session('error'))
-                    showError('Error!', '{{ session('error') }}');
+                    showError('Error!', @json(session('error')));
                 @endif
 
                 @if ($errors->any())
-                    showError('Terjadi Kesalahan!', '{!! implode('<br>', $errors->all()) !!}');
+                    showError('Terjadi Kesalahan!', @json(implode("\n", $errors->all())));
                 @endif
             }
 

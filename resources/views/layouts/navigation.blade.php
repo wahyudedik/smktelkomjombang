@@ -143,6 +143,7 @@
                                     'kelulusan.view',
                                     'lulus.view',
                                     'surat.view',
+                                    'buku-tamu.view',
                                 ]));
                     @endphp
                     @if ($showEServices)
@@ -194,6 +195,13 @@
                                             </a>
                                         @endif
                                     @endif
+                                    @can('buku-tamu.view')
+                                        <div class="border-t border-slate-100 my-1"></div>
+                                        <a href="{{ route('admin.buku-tamu.index') }}"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 {{ request()->routeIs('admin.buku-tamu.*') ? 'bg-blue-50 text-blue-700' : '' }}">
+                                            <i class="fas fa-book-open mr-2"></i>Buku Tamu
+                                        </a>
+                                    @endcan
                                 </div>
                             </div>
                         </div>
@@ -871,6 +879,13 @@
                                         </a>
                                     @endif
                                 @endif
+                                @can('buku-tamu.view')
+                                    <div class="border-t border-slate-100 my-1"></div>
+                                    <a href="{{ route('admin.buku-tamu.index') }}"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg {{ request()->routeIs('admin.buku-tamu.*') ? 'bg-blue-50 text-blue-700' : '' }}">
+                                        <i class="fas fa-book-open mr-2"></i>Buku Tamu
+                                    </a>
+                                @endcan
                             </div>
                         </div>
                     @endif

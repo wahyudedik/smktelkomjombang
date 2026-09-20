@@ -178,7 +178,7 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const successKey = 'osis_teacher_view_success_' + '{{ md5(session('success') . time()) }}';
                 if (!sessionStorage.getItem(successKey) && typeof showSuccess !== 'undefined') {
-                    showSuccess('{{ session('success') }}');
+                    showSuccess(@json(session('success')));
                     sessionStorage.setItem(successKey, 'shown');
                 }
             });
@@ -190,7 +190,7 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const errorKey = 'osis_teacher_view_error_' + '{{ md5(session('error') . time()) }}';
                 if (!sessionStorage.getItem(errorKey) && typeof showError !== 'undefined') {
-                    showError('{{ session('error') }}');
+                    showError(@json(session('error')));
                     sessionStorage.setItem(errorKey, 'shown');
                 }
             });
@@ -201,7 +201,7 @@
         <script>
             const infoKey = 'osis_teacher_view_info_' + '{{ md5(session('info') . time()) }}';
             if (!sessionStorage.getItem(infoKey)) {
-                showAlert('Info', '{{ session('info') }}', 'info');
+                showAlert('Info', @json(session('info')), 'info');
                 sessionStorage.setItem(infoKey, 'shown');
             }
         </script>

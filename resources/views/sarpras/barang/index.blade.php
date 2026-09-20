@@ -603,7 +603,7 @@
 
             document.addEventListener('DOMContentLoaded', function() {
                 if (!sessionStorage.getItem(successKey)) {
-                    showSuccess('{{ session('success') }}');
+                    showSuccess(@json(session('success')));
                     sessionStorage.setItem(successKey, 'shown');
 
                     const keys = Object.keys(sessionStorage).filter(k => k.startsWith('barang_alert_'));
@@ -621,7 +621,7 @@
 
             document.addEventListener('DOMContentLoaded', function() {
                 if (!sessionStorage.getItem(errorKey)) {
-                    showError('{{ session('error') }}');
+                    showError(@json(session('error')));
                     sessionStorage.setItem(errorKey, 'shown');
 
                     const keys = Object.keys(sessionStorage).filter(k => k.startsWith('barang_alert_error_'));
@@ -639,7 +639,7 @@
 
             document.addEventListener('DOMContentLoaded', function() {
                 if (!sessionStorage.getItem(validationKey)) {
-                    showError('{!! implode('<br>', $errors->all()) !!}');
+                    showError(@json(implode("\n", $errors->all())));
                     sessionStorage.setItem(validationKey, 'shown');
 
                     const keys = Object.keys(sessionStorage).filter(k => k.startsWith('barang_alert_validation_'));

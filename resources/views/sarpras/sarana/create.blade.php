@@ -64,7 +64,7 @@
                                     @change="updateBarangHarga(index)">
                                     <option value="">Pilih Barang</option>
                                     <template x-for="barangOption in getBarangOptions()" :key="barangOption.id">
-                                        <option x-bind:value="barangOption.id" 
+                                        <option x-bind:value="barangOption.id"
                                             x-bind:data-harga="barangOption.harga_beli || 0"
                                             x-text="barangOption.nama_barang + ' (' + barangOption.kode_barang + ')' + (barangOption.ruang_id ? '' : ' - Belum ada ruang')"></option>
                                     </template>
@@ -111,7 +111,7 @@
                             </div>
                         </div>
                     </template>
-                    
+
                     <!-- Grand Total -->
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -229,7 +229,7 @@
                         if (this.ruangId) {
                             this.loadBarangByRuang(this.ruangId);
                         }
-                        
+
                         // Pre-select barang if barang_id is pre-filled
                         @if(isset($prefilledBarangId))
                             this.$nextTick(() => {
@@ -242,7 +242,7 @@
                                 }
                             });
                         @endif
-                        
+
                         // Watch for ruang_id changes
                         this.$watch('ruangId', (value) => {
                             if (value) {
@@ -251,7 +251,7 @@
                                 this.filteredBarangs = [];
                             }
                         });
-                        
+
                         // Add form submit listener to prevent any interference
                         this.$nextTick(() => {
                             const form = document.getElementById('saranaForm');
@@ -270,7 +270,7 @@
                         try {
                             const response = await fetch(`{{ route('admin.sarpras.sarana.getBarangByRuang') }}?ruang_id=${ruangId}`);
                             const data = await response.json();
-                            
+
                             if (data.success && data.barangs.length > 0) {
                                 // Auto-fill barang yang ada di ruang tersebut
                                 this.barangs = data.barangs.map(barang => ({
@@ -321,7 +321,7 @@
                             this.barangs[index].kondisi = 'baik';
                             return;
                         }
-                        
+
                         // Find harga and kondisi from allBarangs or filteredBarangs
                         const allOptions = this.getBarangOptions();
                         const selectedBarang = allOptions.find(b => b.id == selectedBarangId);
@@ -369,7 +369,7 @@
                             }
                             return;
                         }
-                        
+
                         if (!this.kodeSumberDana) {
                             this.showModal = true;
                         } else {
@@ -384,7 +384,7 @@
                             barangs: this.barangs,
                             ruangId: this.ruangId
                         });
-                        
+
                         // Check if Sweet Alert functions are available
                         if (typeof showError === 'undefined' || typeof showLoading === 'undefined') {
                             console.warn('Sweet Alert functions not available, using fallback');
@@ -403,7 +403,7 @@
                                 showError('Validasi Gagal', 'Kode sumber dana harus diisi!');
                                 return;
                             }
-                            
+
                             // Validate that at least one barang is selected
                             const hasBarang = this.barangs.some(b => b.barang_id && b.barang_id !== '');
                             if (!hasBarang) {
@@ -411,9 +411,9 @@
                                 return;
                             }
                         }
-                        
+
                         this.showModal = false;
-                        
+
                         // Small delay to ensure modal is closed
                         setTimeout(() => {
                             const form = document.getElementById('saranaForm');
@@ -423,12 +423,12 @@
                                     method: form.method,
                                     formData: new FormData(form)
                                 });
-                                
+
                                 // Show loading if available
                                 if (typeof showLoading !== 'undefined') {
                                     showLoading('Menyimpan Data...', 'Mohon tunggu, data sedang disimpan');
                                 }
-                                
+
                                 // Ensure form is visible and enabled
                                 form.style.display = 'block';
                                 form.submit();
@@ -458,15 +458,15 @@
 
                 // Show success/error messages with Sweet Alert
                 @if (session('success'))
-                    showSuccess('Berhasil!', '{{ session('success') }}');
+                    showSuccess('Berhasil!', @json(session('success')));
                 @endif
 
                 @if (session('error'))
-                    showError('Error!', '{{ session('error') }}');
+                    showError('Error!', @json(session('error')));
                 @endif
 
                 @if ($errors->any())
-                    showError('Terjadi Kesalahan!', '{!! implode('<br>', $errors->all()) !!}');
+                    showError('Terjadi Kesalahan!', @json(implode("\n", $errors->all())));
                 @endif
             }
 

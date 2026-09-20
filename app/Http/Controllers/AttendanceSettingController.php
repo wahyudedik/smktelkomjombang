@@ -7,7 +7,6 @@ use App\Traits\AttendanceAuthorization;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class AttendanceSettingController extends Controller
@@ -168,8 +167,8 @@ class AttendanceSettingController extends Controller
         // Save to database
         AttendanceSetting::setMany($validated);
 
-        // Clear all attendance config cache
-        Cache::tags(['attendance_config'])->flush();
+        // Clear all attendance config cache (per-key, no tags needed)
+        AttendanceSetting::clearCache();
 
         return redirect()->route('admin.absensi.settings')
             ->with('success', 'Pengaturan absensi berhasil disimpan.');
@@ -191,8 +190,8 @@ class AttendanceSettingController extends Controller
             AttendanceSetting::deleteMany($keys);
         }
 
-        // Clear all attendance config cache
-        Cache::tags(['attendance_config'])->flush();
+        // Clear all attendance config cache (per-key, no tags needed)
+        AttendanceSetting::clearCache();
 
         $message = empty($keys)
             ? 'Semua pengaturan absensi di-reset ke default.'
@@ -241,8 +240,8 @@ class AttendanceSettingController extends Controller
 
         AttendanceSetting::setMany($json['settings']);
 
-        // Clear all attendance config cache
-        Cache::tags(['attendance_config'])->flush();
+        // Clear all attendance config cache (per-key, no tags needed)
+        AttendanceSetting::clearCache();
 
         $count = count($json['settings']);
 
