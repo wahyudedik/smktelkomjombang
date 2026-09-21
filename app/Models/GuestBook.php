@@ -61,6 +61,23 @@ class GuestBook extends Model
     }
 
     /**
+     * Scope untuk check-out guests
+     */
+    public function scopeCheckOut($query)
+    {
+        return $query->where('status', 'check_out');
+    }
+
+    /**
+     * Scope untuk data bulan ini
+     */
+    public function scopeThisMonth($query)
+    {
+        return $query->whereMonth('check_in_at', now()->month)
+                     ->whereYear('check_in_at', now()->year);
+    }
+
+    /**
      * Boot method — auto-generate ticket_number and check_in_at
      */
     protected static function boot(): void

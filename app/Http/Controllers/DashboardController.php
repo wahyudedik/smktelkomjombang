@@ -13,6 +13,7 @@ use App\Models\Page;
 use App\Models\InstagramSetting;
 use App\Models\Calon;
 use App\Models\Pemilih;
+use App\Models\GuestBook;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,11 +41,25 @@ class DashboardController extends Controller
         $moduleUsage = $this->calculateModuleUsage();
         $userGrowth = $this->calculateUserGrowth();
 
+        // Guest Book Stats (hanya jika user punya permission)
+        $guestBookToday = 0;
+        $guestBookCheckedIn = 0;
+        $guestBookThisMonth = 0;
+
+        if ($user->can('buku-tamu.view')) {
+            $guestBookToday = $this->safe(fn() => GuestBook::today()->count(), 0);
+            $guestBookCheckedIn = $this->safe(fn() => GuestBook::active()->count(), 0);
+            $guestBookThisMonth = $this->safe(fn() => GuestBook::thisMonth()->count(), 0);
+        }
+
         return view('dashboards.admin', [
             'statistics' => $stats,
             'recentActivities' => $stats['recent_activities'],
             'moduleUsage' => $moduleUsage,
             'userGrowth' => $userGrowth,
+            'guestBookToday' => $guestBookToday,
+            'guestBookCheckedIn' => $guestBookCheckedIn,
+            'guestBookThisMonth' => $guestBookThisMonth,
         ]);
     }
 

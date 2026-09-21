@@ -217,6 +217,44 @@
                 @endif
             </div>
 
+            <!-- Guest Book Widget -->
+            @can('buku-tamu.view')
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                    <div class="sm:col-span-2 lg:col-span-3 bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Buku Tamu</h3>
+                                    <p class="text-xs text-slate-500 dark:text-dark-400">Statistik kunjungan tamu</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.buku-tamu.index') }}" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                                Lihat Semua →
+                            </a>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $guestBookToday ?? 0 }}</div>
+                                <div class="text-xs text-slate-500 dark:text-dark-400 mt-1">Hari Ini</div>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $guestBookCheckedIn ?? 0 }}</div>
+                                <div class="text-xs text-slate-500 dark:text-dark-400 mt-1">Sedang Check-In</div>
+                            </div>
+                            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ $guestBookThisMonth ?? 0 }}</div>
+                                <div class="text-xs text-slate-500 dark:text-dark-400 mt-1">Bulan Ini</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endcan
+
             <!-- Charts and Analytics Section -->
             @if (Auth::user()->hasAnyRole(['guru', 'admin', 'superadmin']))
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-8" x-data x-init="$nextTick(() => initCharts())">
@@ -363,6 +401,38 @@
                                             Instagram</span>
                                     </a>
                                 @endif
+
+                                @can('buku-tamu.create')
+                                    <a href="{{ route('admin.buku-tamu.create') }}"
+                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
+                                        <div
+                                            class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+                                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="text-sm font-medium text-slate-900 dark:text-white">Check-In Tamu</span>
+                                    </a>
+                                @endcan
+
+                                @can('buku-tamu.view')
+                                    <a href="{{ route('admin.buku-tamu.index') }}"
+                                        class="flex items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
+                                        <div
+                                            class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+                                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="text-sm font-medium text-slate-900 dark:text-white">Lihat Semua Tamu</span>
+                                    </a>
+                                @endcan
                             </div>
                         </div>
                     </div>

@@ -16,6 +16,13 @@
                             </a>
                         @endcan
                         @if ($guest->status === 'check_in')
+                            @can('buku-tamu.view')
+                                <a href="{{ route('admin.buku-tamu.print', $guest) }}"
+                                   target="_blank"
+                                   class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm">
+                                    <i class="fas fa-print mr-1"></i> Cetak Tiket
+                                </a>
+                            @endcan
                             @can('buku-tamu.checkout')
                                 <form method="POST" action="{{ route('admin.buku-tamu.checkout', $guest) }}" class="inline">
                                     @csrf
@@ -238,6 +245,13 @@
                             </a>
                         @endcan
                         @if ($guest->status === 'check_in')
+                            @can('buku-tamu.view')
+                                <a href="{{ route('admin.buku-tamu.print', $guest) }}"
+                                   target="_blank"
+                                   class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 lg:px-4 rounded text-sm">
+                                    <i class="fas fa-print mr-1"></i> Cetak Tiket
+                                </a>
+                            @endcan
                             @can('buku-tamu.checkout')
                                 <form method="POST" action="{{ route('admin.buku-tamu.checkout', $guest) }}" class="inline">
                                     @csrf

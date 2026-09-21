@@ -149,6 +149,15 @@ Route::post('/absensi/saya', [\App\Http\Controllers\PublicAttendanceController::
     ->middleware('throttle:10,1') // Max 10 checks per minute
     ->name('public.attendance.check');
 
+// Public Guest Book - Self Check-In (no auth required)
+Route::prefix('guest-book')->name('guest-book.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\GuestBookController::class, 'publicForm'])->name('form');
+    Route::post('/', [\App\Http\Controllers\GuestBookController::class, 'publicStore'])
+        ->middleware('throttle:5,1') // Max 5 check-ins per minute (anti-spam)
+        ->name('store');
+    Route::get('/thank-you/{guest}', [\App\Http\Controllers\GuestBookController::class, 'publicThankYou'])->name('thank-you');
+});
+
 // ========================================
 // ADMIN PANEL (All authenticated users)
 // ========================================
@@ -409,12 +418,13 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/
     Route::delete('/{event}', [App\Http\Controllers\EventController::class, 'destroy'])->name('destroy')->middleware('permission:events.delete');
 });
 
-// Buku Tamu Management (Access: admin, superadmin)
-Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/buku-tamu')->name('admin.buku-tamu.')->group(function () {
+// Buku Tamu Management (Access: admin, superadmin, satpam, guru)
+Route::middleware(['auth', 'verified', 'role:admin|superadmin|satpam|guru'])->prefix('admin/buku-tamu')->name('admin.buku-tamu.')->group(function () {
     Route::get('/', [App\Http\Controllers\GuestBookController::class, 'index'])->name('index');
     Route::get('/create', [App\Http\Controllers\GuestBookController::class, 'create'])->name('create');
     Route::post('/', [App\Http\Controllers\GuestBookController::class, 'store'])->name('store');
-    Route::get('/export', [App\Http\Controllers\GuestBookController::class, 'export'])->name('export');
+    Route::get('/export', [App\Http\Controllers\GuestBookController::class, 'export'])->middleware('throttle:10,1')->name('export');
+    Route::get('/{guest}/print', [App\Http\Controllers\GuestBookController::class, 'printTicket'])->name('print');
     Route::get('/{guest}', [App\Http\Controllers\GuestBookController::class, 'show'])->name('show');
     Route::get('/{guest}/edit', [App\Http\Controllers\GuestBookController::class, 'edit'])->name('edit');
     Route::put('/{guest}', [App\Http\Controllers\GuestBookController::class, 'update'])->name('update');

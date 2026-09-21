@@ -1149,11 +1149,41 @@ class PermissionSeeder extends Seeder
             $adminRole->givePermissionTo($adminBukuTamuPermissions);
         }
 
-        // Default permission assignment untuk role guru (hanya view)
+        // Default permission assignment untuk role guru
         $guruRole = Role::where('name', 'guru')->first();
         if ($guruRole) {
             $guruPermissions = Permission::whereIn('name', ['attendance.view'])->pluck('id');
             $guruRole->syncPermissions($guruPermissions);
+
+            // Assign buku-tamu permissions ke guru: view (lihat data) + create (input mandiri)
+            // Guru TIDAK boleh punya update/delete (hanya admin/superadmin)
+            $guruBukuTamuPermissions = Permission::whereIn('name', [
+                'buku-tamu.view',
+                'buku-tamu.create',
+            ])->get();
+            $guruRole->givePermissionTo($guruBukuTamuPermissions);
+
+            $this->command->info('Assigned buku-tamu permissions to guru role');
+        }
+
+        // Create satpam role if it doesn't exist (not a core role, created on-demand)
+        $satpamRole = Role::firstOrCreate(
+            ['name' => 'satpam', 'guard_name' => 'web'],
+            ['display_name' => 'Satpam', 'description' => 'Security guard role for guest management']
+        );
+
+        // Default permission assignment untuk role satpam
+        if ($satpamRole) {
+            // Assign buku-tamu permissions ke satpam: view + create (check-in) + checkout
+            // Satpam TIDAK boleh punya update/delete (hanya admin/superadmin)
+            $satpamBukuTamuPermissions = Permission::whereIn('name', [
+                'buku-tamu.view',
+                'buku-tamu.create',
+                'buku-tamu.checkout',
+            ])->get();
+            $satpamRole->givePermissionTo($satpamBukuTamuPermissions);
+
+            $this->command->info('Assigned buku-tamu permissions to satpam role');
         }
 
         // Other roles are created dynamically by superadmin
