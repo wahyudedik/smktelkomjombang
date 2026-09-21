@@ -145,14 +145,14 @@
                                     {{-- Video Preview --}}
                                     <div id="video-wrapper" class="relative mx-auto" style="max-width: 240px;">
                                         <video id="camera-video" autoplay playsinline muted
-                                               class="w-full rounded-lg border border-gray-300 bg-gray-100"
+                                               class="w-full rounded-lg border border-gray-300 bg-gray-100 shadow-sm"
                                                style="aspect-ratio: 2/3; object-fit: cover;"></video>
                                         {{-- Aspect Ratio Guide Overlay --}}
                                         <div id="ratio-guide" class="absolute inset-0 pointer-events-none flex items-center justify-center">
                                             <div class="w-[80%] h-[85%] border-2 border-dashed border-white/70 rounded-lg"></div>
                                         </div>
                                         {{-- Camera Placeholder --}}
-                                        <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 rounded-lg">
+                                        <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
                                             <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
@@ -163,14 +163,14 @@
 
                                     {{-- Photo Preview (hidden by default) --}}
                                     <div id="photo-preview-wrapper" class="hidden mx-auto" style="max-width: 240px;">
-                                        <img id="photo-preview" class="w-full rounded-lg border border-gray-300" style="aspect-ratio: 2/3; object-fit: cover;" alt="Foto Tamu">
+                                        <img id="photo-preview" class="w-full rounded-lg border border-gray-300 shadow-md" style="aspect-ratio: 2/3; object-fit: cover;" alt="Foto Tamu">
                                     </div>
                                 </div>
 
                                 {{-- Camera Buttons --}}
-                                <div id="camera-buttons" class="flex items-center justify-center gap-2">
+                                <div id="camera-buttons" class="flex items-center justify-center gap-3">
                                     <button type="button" id="btn-start-camera" onclick="initCamera()"
-                                            class="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                            class="inline-flex items-center gap-1.5 px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg guest-book-btn">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
@@ -195,11 +195,18 @@
 
                                 {{-- Fallback File Input (shown when camera not supported) --}}
                                 <div id="camera-fallback" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Foto (4×6)</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Foto <span class="text-gray-400 font-normal">(4×6)</span></label>
+                                    <label for="photo-file"
+                                           class="guest-book-file-label flex items-center justify-center gap-2 w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                        </svg>
+                                        <span id="file-label-text">Upload dari Galeri</span>
+                                    </label>
                                     <input type="file" name="photo_file" id="photo-file" accept="image/*" capture="user"
                                            onchange="handleFileUpload(event)"
-                                           class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:text-white file:cursor-pointer guest-book-btn">
-                                    <p class="text-xs text-gray-400 mt-1">Format: JPG/PNG, rasio 4×6 (2:3)</p>
+                                           class="hidden">
+                                    <p class="text-xs text-gray-400 mt-1.5 text-center">Format: JPG/PNG, rasio 4×6 (2:3)</p>
                                 </div>
 
                                 <input type="hidden" name="photo" id="photo-data" value="{{ old('photo') }}">
@@ -438,6 +445,25 @@
         #btn-retake.active {
             display: inline-flex;
         }
+
+        /* Styled File Upload Label */
+        .guest-book-file-label {
+            border: 2px dashed var(--theme-primary, #00529C);
+            background-color: color-mix(in srgb, var(--theme-primary, #00529C) 5%, white);
+            transition: all 0.2s ease;
+        }
+        .guest-book-file-label:hover {
+            background-color: color-mix(in srgb, var(--theme-primary, #00529C) 10%, white);
+            border-color: color-mix(in srgb, var(--theme-primary, #00529C) 80%, black);
+        }
+        .guest-book-file-label:active {
+            transform: scale(0.98);
+        }
+
+        /* Active camera placeholder state */
+        #camera-placeholder {
+            transition: opacity 0.2s ease;
+        }
     </style>
 
     <script>
@@ -625,6 +651,12 @@
     function handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
+
+        // Update file label text
+        const fileLabel = document.getElementById('file-label-text');
+        if (fileLabel) {
+            fileLabel.textContent = file.name.length > 25 ? file.name.substring(0, 22) + '...' : file.name;
+        }
 
         const reader = new FileReader();
         reader.onload = function(e) {
