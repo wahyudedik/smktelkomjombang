@@ -220,9 +220,14 @@ fi
 info "Menjalankan migrasi database..."
 $PHP_BIN artisan migrate --force
 
-# 7. Seed permissions Spatie (jika ada perubahan)
-info "Sync permissions Spatie..."
+# 7. Seed permissions & settings Spatie
+#    - RolePermissionSeeder: backward compat (data lama, deprecated)
+#    - PermissionSeeder: pengganti utama (permissions & roles lengkap)
+#    - AttendanceSettingSeeder: seed settings default absensi
+info "Sync permissions & attendance settings..."
 $PHP_BIN artisan db:seed --class=RolePermissionSeeder 2>/dev/null || true
+$PHP_BIN artisan db:seed --class=PermissionSeeder 2>/dev/null || true
+$PHP_BIN artisan db:seed --class=AttendanceSettingSeeder 2>/dev/null || true
 
 # 8. Clear cache lama (individual commands — hindari optimize:clear mbstring error)
 info "Membersihkan cache lama..."
