@@ -276,6 +276,12 @@ class GuestBookController extends Controller
             Storage::disk('public')->delete($guest->photo_path);
         }
 
+        // Delete signature from storage
+        if ($guest->signature_path) {
+            $signatureFullPath = str_replace('storage/', '', $guest->signature_path);
+            Storage::disk('public')->delete($signatureFullPath);
+        }
+
         // Hard delete (bypass soft delete)
         $guest->forceDelete();
 

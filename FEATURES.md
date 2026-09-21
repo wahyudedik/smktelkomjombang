@@ -1,7 +1,7 @@
 # 📋 Daftar Lengkap Fitur — SMK Telekomunikasi Darul Ulum
 
 > Dokumentasi lengkap semua fitur yang tersedia di sistem informasi SMK Telekomunikasi.
-> Diperbarui: 2026-08-21
+> Diperbarui: 2026-09-21
 
 ---
 
@@ -254,10 +254,22 @@
 | SweetAlert2 | `✅ Selesai` | Modal dialogs |
 | Chart.js | `⬜ Belum Dikerjakan` | Belum terintegrasi secara optimal di admin UI |
 | Alpine.js | `⬜ Belum Dikerjakan` | Belum terintegrasi secara optimal di admin UI |
-| Responsive design | `🔄 Dalam Pengembangan` | Landing page responsive, admin perlu audit & fix |
+| Responsive design | `✅ Selesai` | Landing page + admin responsive (6 views di-audit & di-fix) |
 | CSRF protection | `✅ Selesai` | Laravel default |
-| Rate limiting | `🔄 Dalam Pengembangan` | Sudah ada di import routes (10/minute), perlu diperluas ke semua routes sensitif |
+| Rate limiting | `✅ Selesai` | 42+ routes dilindungi throttle middleware (5-120 req/menit) |
 | Barcode generation | `✅ Selesai` | 1D barcode + QR code (Milon) |
+
+### 15. 📋 Buku Tamu
+| Fitur | Status | Keterangan |
+|-------|--------|-----------|
+| Self check-in publik | `✅ Selesai` | Tanpa login, form check-in dengan data diri |
+| Foto 4x6 + tanda tangan digital | `✅ Selesai` | Upload foto & canvas signature |
+| Admin CRUD | `✅ Selesai` | `GuestBookController` — list, show, delete |
+| Checkout | `✅ Selesai` | Admin bisa checkout tamu |
+| Print ticket | `✅ Selesai` | Cetak tiket kunjungan |
+| Export Excel/PDF | `✅ Selesai` | `GuestBookExport` — export data tamu |
+| Multi-theme support | `✅ Selesai` | Layout component per tema |
+| Data privacy | `✅ Selesai` | Signature files cleanup saat deletion |
 
 ---
 
@@ -266,12 +278,16 @@
 | Fitur | Status | Keterangan |
 |-------|--------|-----------|
 | CSRF Protection | `✅ Selesai` | Laravel default |
-| XSS Protection | `✅ Selesai` | Eloquent ORM + Blade escaping |
+| XSS Protection | `✅ Selesai` | Eloquent ORM + Blade escaping + ContentSanitizer |
 | SQL Injection Protection | `✅ Selesai` | Eloquent ORM |
 | Role-Based Access Control | `✅ Selesai` | Spatie Permission |
 | Permission-Based Access | `✅ Selesai` | Granular per action |
 | Audit Logging | `✅ Selesai` | Create/update/delete tracking |
-| Rate Limiting (import routes) | `✅ Selesai` | Import routes (10/minute) |
+| Rate Limiting (komprehensif) | `✅ Selesai` | 42+ routes dilindungi (5-120 req/menit) |
+| Content Security Policy (CSP) | `✅ Selesai` | Via SecurityHeaders middleware |
+| Security Headers | `✅ Selesai` | X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy |
+| Content Sanitization | `✅ Selesai` | ContentSanitizer di 5 controller |
+| Session Security | `✅ Selesai` | Secure cookies, session hardening |
 | Email Verification | `✅ Selesai` | Admin + auto |
 | Anti-Fraud Voting | `✅ Selesai` | IP tracking, user_agent, one-vote |
 | Blocking Logic E-Surat | `✅ Selesai` | Sequential upload requirement |
@@ -300,53 +316,14 @@
 | Dynamic registered themes | `✅ Selesai` | `ThemeSetting::getRegisteredThemes()` reads from `config('themes.available')` |
 | MAUDU theme views | `✅ Selesai` | 7 views: berita, pages, instagram, elulus (index + show + check + result) |
 | Theme settings admin (full) | `✅ Selesai` | `ThemeSettingController` (566 baris) — preview, clone, import/export, comparison, analytics |
-
----
-
-## 🔄 Dalam Pengembangan
-
-### MAUDU Theme Polish
-| Fitur | Status | Keterangan |
-|-------|--------|-----------|
-| Footer links validation | `🔄 Dalam Pengembangan` | Pastikan semua link aktif dan benar |
-| Login button visibility | `🔄 Dalam Pengembangan` | Check visibility di semua halaman MAUDU |
-| Menu config audit | `🔄 Dalam Pengembangan` | Semua menu routing benar |
-| MAUDU component review | `🔄 Dalam Pengembangan` | Header, footer, sidebar perlu review |
-| Breadcrumb MAUDU | `🔄 Dalam Pengembangan` | Breadcrumb untuk semua halaman |
-| Dual-theme testing | `🔄 Dalam Pengembangan` | Testing Telkom + MAUDU side-by-side |
-
-### Documentation Sync
-| Fitur | Status | Keterangan |
-|-------|--------|-----------|
-| Sinkronisasi .env.example | `✅ Selesai` | Semua env vars sudah terdefinisi |
-| Sinkronisasi FEATURES.md | `🔄 Dalam Pengembangan` | Update dengan kondisi aktual |
-| Sinkronisasi ROADMAP.md | `🔄 Dalam Pengembangan` | Update dengan kondisi aktual |
-| Update README.md | `🔄 Dalam Pengembangan` | Judul, deskripsi, tech stack |
-| Review AGENTS.md | `🔄 Dalam Pengembangan` | Review & update konteks AI |
-| Review plan docs | `🔄 Dalam Pengembangan` | Review semua plan di `plans/` |
+| MAUDU Theme Polish | `✅ Selesai` | Footer links, login button, menu config, component review, breadcrumb, dual-theme testing |
+| Documentation Sync | `✅ Selesai` | FEATURES.md, ROADMAP.md, README.md, .env.example, AGENTS.md, plan docs |
+| Security Hardening | `✅ Selesai` | 42+ routes throttled, CSP, ContentSanitizer, security headers, session hardening |
+| Mobile Responsive | `✅ Selesai` | 6 admin views di-audit & di-fix (table overflow, form layout, touch-friendly) |
 
 ---
 
 ## ⬜ Belum Dikerjakan
-
-### 🔒 Security Hardening
-| Fitur | Status | Keterangan |
-|-------|--------|-----------|
-| Rate limiting komprehensif | `⬜ Belum Dikerjakan` | Rate limiting untuk semua routes sensitif (bukan hanya import) |
-| Content Security Policy (CSP) | `⬜ Belum Dikerjakan` | CSP headers untuk mencegah XSS |
-| XSS audit semua form input | `⬜ Belum Dikerjakan` | Audit keamanan form inputs |
-| N+1 query audit | `⬜ Belum Dikerjakan` | Optimasi query Eloquent |
-| Dependency audit | `⬜ Belum Dikerjakan` | `composer audit` + `npm audit` |
-| Session security hardening | `⬜ Belum Dikerjakan` | Secure cookies, session timeout |
-
-### 📱 Mobile Responsive Improvements
-| Fitur | Status | Keterangan |
-|-------|--------|-----------|
-| Audit responsive design admin | `⬜ Belum Dikerjakan` | Audit semua halaman admin |
-| Fix table overflow mobile | `⬜ Belum Dikerjakan` | Tabel tidak overflow di mobile |
-| Fix form layout small screen | `⬜ Belum Dikerjakan` | Form responsif di layar kecil |
-| Touch-friendly buttons | `⬜ Belum Dikerjakan` | Tombol & link touch-friendly |
-| Viewport testing | `⬜ Belum Dikerjakan` | Test di 320px, 768px, 1024px |
 
 ### ⚡ Performance Optimization
 | Fitur | Status | Keterangan |
@@ -381,11 +358,8 @@
 
 | # | Issue | Prioritas | Keterangan |
 |---|-------|-----------|-----------|
-| 1 | MAUDU footer links belum divalidasi | 🟡 Sedang | Beberapa link mungkin belum aktif |
-| 2 | MAUDU login button visibility | 🟡 Sedang | Perlu check di semua halaman |
-| 3 | Responsive admin belum optimal | 🟡 Sedang | Table overflow di mobile |
-| 4 | Rate limiting belum komprehensif | 🟡 Sedang | Hanya di import routes |
-| 5 | N+1 query belum diaudit | 🟢 Rendah | Potensi performance issue |
+| 1 | N+1 query belum diaudit | 🟢 Rendah | Potensi performance issue |
+| 2 | Chart.js & Alpine.js belum optimal | 🟢 Rendah | Belum terintegrasi secara optimal di admin UI |
 
 ---
 
@@ -393,16 +367,13 @@
 
 | # | Fitur | Prioritas | Target |
 |---|-------|-----------|--------|
-| 1 | MAUDU Theme Polish | 🟡 Sedang | September 2026 |
-| 2 | Security Hardening | 🟡 Sedang | Oktober 2026 |
-| 3 | Mobile Responsive Audit | 🟡 Sedang | Oktober 2026 |
-| 4 | Performance Optimization | 🟡 Sedang | November 2026 |
-| 5 | Admin UI Modernization | 🟢 Rendah | November 2026 |
-| 6 | Dark Mode | 🟢 Rendah | November 2026 |
-| 7 | Comprehensive Test Suite | 🟢 Rendah | Desember 2026 |
-| 8 | WCAG 2.1 AA Compliance | 🟢 Rendah | Q1 2027 |
-| 9 | Theme Inheritance | 🟢 Rendah | Q1 2027 |
-| 10 | Internationalization Expansion | 🟢 Rendah | Q1 2027 |
+| 1 | Performance Optimization | 🟡 Sedang | November 2026 |
+| 2 | Admin UI Modernization | 🟢 Rendah | November 2026 |
+| 3 | Dark Mode | 🟢 Rendah | November 2026 |
+| 4 | Comprehensive Test Suite | 🟢 Rendah | Desember 2026 |
+| 5 | WCAG 2.1 AA Compliance | 🟢 Rendah | Q1 2027 |
+| 6 | Theme Inheritance | 🟢 Rendah | Q1 2027 |
+| 7 | Internationalization Expansion | 🟢 Rendah | Q1 2027 |
 
 ---
 
