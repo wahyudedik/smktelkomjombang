@@ -445,7 +445,7 @@ class GuestBookController extends Controller
             if ($imageBinary) {
                 $photoPath = 'guest-photos/' . $guest->ticket_number . '_photo.jpg';
                 Storage::disk('public')->put($photoPath, $imageBinary);
-                $guest->update(['photo_path' => 'storage/' . $photoPath]);
+                $guest->update(['photo_path' => $photoPath]);
             }
         }
 
