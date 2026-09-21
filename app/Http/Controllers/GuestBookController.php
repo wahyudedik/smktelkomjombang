@@ -163,7 +163,7 @@ class GuestBookController extends Controller
             if ($imageBinary) {
                 $signaturePath = 'guest-books/signatures/' . $guest->ticket_number . '_signature.png';
                 Storage::disk('public')->put($signaturePath, $imageBinary);
-                $guest->update(['signature_path' => 'storage/' . $signaturePath]);
+                $guest->update(['signature_path' => $signaturePath]);
             }
         }
 
@@ -247,8 +247,7 @@ class GuestBookController extends Controller
         if (!empty($request->signature)) {
             // Delete old signature if exists
             if ($guest->signature_path) {
-                $oldSignaturePath = str_replace('storage/', '', $guest->signature_path);
-                Storage::disk('public')->delete($oldSignaturePath);
+                Storage::disk('public')->delete($guest->signature_path);
             }
 
             $signatureData = $request->signature;
@@ -258,7 +257,7 @@ class GuestBookController extends Controller
             if ($imageBinary) {
                 $signaturePath = 'guest-books/signatures/' . $guest->ticket_number . '_signature.png';
                 Storage::disk('public')->put($signaturePath, $imageBinary);
-                $guest->update(['signature_path' => 'storage/' . $signaturePath]);
+                $guest->update(['signature_path' => $signaturePath]);
             }
         }
 
@@ -278,8 +277,7 @@ class GuestBookController extends Controller
 
         // Delete signature from storage
         if ($guest->signature_path) {
-            $signatureFullPath = str_replace('storage/', '', $guest->signature_path);
-            Storage::disk('public')->delete($signatureFullPath);
+            Storage::disk('public')->delete($guest->signature_path);
         }
 
         // Hard delete (bypass soft delete)
@@ -464,7 +462,7 @@ class GuestBookController extends Controller
             if ($imageBinary) {
                 $signaturePath = 'guest-books/signatures/' . $guest->ticket_number . '_signature.png';
                 Storage::disk('public')->put($signaturePath, $imageBinary);
-                $guest->update(['signature_path' => 'storage/' . $signaturePath]);
+                $guest->update(['signature_path' => $signaturePath]);
             }
         }
 

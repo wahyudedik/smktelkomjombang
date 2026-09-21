@@ -111,11 +111,7 @@ class GuestBook extends Model
      */
     public function getSignatureUrlAttribute(): ?string
     {
-        if ($this->signature_path) {
-            // signature_path sudah termasuk 'storage/' prefix
-            return asset($this->signature_path);
-        }
-        return null;
+        return $this->signature_path ? asset('storage/' . $this->signature_path) : null;
     }
 
     /**
