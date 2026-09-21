@@ -62,6 +62,9 @@
 
 <body class="font-sans text-gray-900 antialiased">
     {{ $slot }}
+
+    <!-- Additional Scripts -->
+    @stack('scripts')
 </body>
 
 </html>
