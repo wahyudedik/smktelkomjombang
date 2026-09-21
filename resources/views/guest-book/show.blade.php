@@ -226,6 +226,16 @@
                         </div>
                     @endif
 
+                    <!-- Tanda Tangan Digital -->
+                    @if($guest->signature_url)
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Tanda Tangan Digital</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <img src="{{ $guest->signature_url }}" alt="Tanda Tangan Digital" class="h-24 border rounded bg-white">
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Catatan -->
                     @if ($guest->notes)
                         <div class="mb-6 sm:mb-8">

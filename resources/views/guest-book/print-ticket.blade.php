@@ -321,6 +321,12 @@
                         <span class="info-label">Dicatat Oleh</span>
                         <span class="info-value">{{ $guest->creator->name ?? '-' }}</span>
                     </div>
+                @if($guest->signature_url)
+                    <div class="section" style="margin-top: 15px;">
+                        <div class="label" style="font-size: 8px; color: #666; margin-bottom: 3px;">Tanda Tangan</div>
+                        <img src="{{ $guest->signature_url }}" alt="Tanda Tangan" style="height: 50px; max-width: 150px;">
+                    </div>
+                @endif
                 </div>
             </div>
 

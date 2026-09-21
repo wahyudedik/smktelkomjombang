@@ -67,9 +67,9 @@
                                     @enderror
                                 </div>
 
-                                <!-- No. Telepon -->
+                                <!-- No. WhatsApp -->
                                 <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
+                                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">No. WhatsApp</label>
                                     <input type="text" name="phone" id="phone"
                                         value="{{ old('phone', $guest->phone) }}"
                                         class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('phone') border-red-500 @else border-gray-300 @enderror">
@@ -106,10 +106,11 @@
 
                                 <!-- Instansi / Organisasi -->
                                 <div>
-                                    <label for="organization" class="block text-sm font-medium text-gray-700 mb-1">Instansi / Organisasi</label>
+                                    <label for="organization" class="block text-sm font-medium text-gray-700 mb-1">Instansi / Asal *</label>
                                     <input type="text" name="organization" id="organization"
                                         value="{{ old('organization', $guest->organization) }}"
-                                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('organization') border-red-500 @else border-gray-300 @enderror">
+                                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('organization') border-red-500 @else border-gray-300 @enderror"
+                                        required>
                                     @error('organization')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -155,11 +156,12 @@
                                     @enderror
                                 </div>
 
-                                <!-- Keperluan -->
+                                <!-- Keperluan Kunjungan -->
                                 <div>
-                                    <label for="visit_purpose" class="block text-sm font-medium text-gray-700 mb-1">Keperluan</label>
+                                    <label for="visit_purpose" class="block text-sm font-medium text-gray-700 mb-1">Keperluan Kunjungan *</label>
                                     <textarea name="visit_purpose" id="visit_purpose" rows="3"
-                                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('visit_purpose') border-red-500 @else border-gray-300 @enderror">{{ old('visit_purpose', $guest->visit_purpose) }}</textarea>
+                                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('visit_purpose') border-red-500 @else border-gray-300 @enderror"
+                                        required>{{ old('visit_purpose', $guest->visit_purpose) }}</textarea>
                                     @error('visit_purpose')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -244,6 +246,27 @@
                             @enderror
                         </div>
 
+                        {{-- Signature Pad --}}
+                        <div class="mt-4 sm:mt-6">
+                            <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Tanda Tangan Digital</h3>
+                            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-800">
+                                <canvas id="signature-pad" width="400" height="200" class="w-full cursor-crosshair border border-gray-200 rounded" style="touch-action: none;"></canvas>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button type="button" id="clear-signature" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">
+                                        <i class="fas fa-eraser mr-1"></i> Hapus
+                                    </button>
+                                    <span class="text-xs text-gray-500">Tanda tangan di area di atas</span>
+                                </div>
+                                <input type="hidden" name="signature" id="signature-data">
+                            </div>
+                            @if($guest->signature_url)
+                                <div class="mt-2">
+                                    <p class="text-xs text-gray-500 mb-1">Signature saat ini:</p>
+                                    <img src="{{ $guest->signature_url }}" alt="Signature saat ini" class="h-16 border rounded">
+                                </div>
+                            @endif
+                        </div>
+
                         <!-- Submit Button -->
                         <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row sm:justify-end gap-3">
                             <a href="{{ route('admin.buku-tamu.show', $guest) }}"
@@ -273,6 +296,91 @@
                 }
             };
         }
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const canvas = document.getElementById('signature-pad');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // Load existing signature as background if available
+        const existingSignature = @json($guest->signature_url);
+        if (existingSignature) {
+            const img = new Image();
+            img.onload = function() {
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+            img.src = existingSignature;
+        } else {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function startDraw(e) {
+            isDrawing = true;
+            const pos = getPos(e);
+            lastX = pos.x;
+            lastY = pos.y;
+            e.preventDefault();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            lastX = pos.x;
+            lastY = pos.y;
+            e.preventDefault();
+        }
+
+        function stopDraw() {
+            if (isDrawing) {
+                isDrawing = false;
+                document.getElementById('signature-data').value = canvas.toDataURL('image/png');
+            }
+        }
+
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('mouseleave', stopDraw);
+        canvas.addEventListener('touchstart', startDraw);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDraw);
+
+        document.getElementById('clear-signature').addEventListener('click', function() {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('signature-data').value = '';
+        });
+    });
     </script>
 
     @if (session('success'))

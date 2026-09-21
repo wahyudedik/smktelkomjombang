@@ -92,10 +92,10 @@
                                     @enderror
                                 </div>
 
-                                {{-- No. Telepon --}}
+                                {{-- No. WhatsApp --}}
                                 <div>
                                     <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
-                                        No. Telepon
+                                        No. WhatsApp
                                     </label>
                                     <input type="text" name="phone" id="phone"
                                            value="{{ old('phone') }}"
@@ -134,11 +134,12 @@
                                 {{-- Instansi/Organisasi --}}
                                 <div>
                                     <label for="organization" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Instansi / Organisasi
+                                        Instansi / Asal <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" name="organization" id="organization"
                                            value="{{ old('organization') }}"
                                            placeholder="Nama instansi / perusahaan"
+                                           required
                                            class="w-full px-3 py-2.5 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('organization') border-red-500 @else border-gray-300 @enderror">
                                     @error('organization')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -197,10 +198,11 @@
                                 {{-- Keperluan --}}
                                 <div>
                                     <label for="visit_purpose" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Keperluan / Uraian Kunjungan
+                                        Keperluan / Uraian Kunjungan <span class="text-red-500">*</span>
                                     </label>
                                     <textarea name="visit_purpose" id="visit_purpose" rows="3"
                                               placeholder="Jelaskan keperluan kunjungan Anda..."
+                                              required
                                               class="w-full px-3 py-2.5 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none @error('visit_purpose') border-red-500 @else border-gray-300 @enderror">{{ old('visit_purpose') }}</textarea>
                                     @error('visit_purpose')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -252,10 +254,32 @@
                             </div>
                         </fieldset>
 
-                        {{-- === Catatan === --}}
+                        {{-- === Tanda Tangan Digital === --}}
                         <fieldset class="mb-6">
                             <legend class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                                 <span class="w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                                Tanda Tangan Digital
+                            </legend>
+
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
+                                <canvas id="signature-pad" width="400" height="200" class="w-full cursor-crosshair border border-gray-200 rounded bg-white" style="touch-action: none;"></canvas>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button type="button" id="clear-signature" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">
+                                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Hapus
+                                    </button>
+                                    <span class="text-xs text-gray-500">Tanda tangan di area di atas</span>
+                                </div>
+                                <input type="hidden" name="signature" id="signature-data">
+                            </div>
+                        </fieldset>
+
+                        {{-- === Catatan === --}}
+                        <fieldset class="mb-6">
+                            <legend class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                <span class="w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">5</span>
                                 Catatan <span class="text-gray-400 font-normal">(opsional)</span>
                             </legend>
 
@@ -320,6 +344,79 @@
             btnText.textContent = 'Memproses...';
             btnSpinner.classList.remove('hidden');
         });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const canvas = document.getElementById('signature-pad');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function startDraw(e) {
+            isDrawing = true;
+            const pos = getPos(e);
+            lastX = pos.x;
+            lastY = pos.y;
+            e.preventDefault();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            lastX = pos.x;
+            lastY = pos.y;
+            e.preventDefault();
+        }
+
+        function stopDraw() {
+            if (isDrawing) {
+                isDrawing = false;
+                document.getElementById('signature-data').value = canvas.toDataURL('image/png');
+            }
+        }
+
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('mouseleave', stopDraw);
+        canvas.addEventListener('touchstart', startDraw);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDraw);
+
+        document.getElementById('clear-signature').addEventListener('click', function() {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('signature-data').value = '';
+        });
+    });
     </script>
     @endpush
 </x-layouts.guest>

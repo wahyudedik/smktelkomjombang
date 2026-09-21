@@ -25,6 +25,7 @@ class GuestBook extends Model
         'visit_purpose',
         'visit_target',
         'photo_path',
+        'signature_path',
         'vehicle_type',
         'vehicle_plate',
         'status',
@@ -103,6 +104,18 @@ class GuestBook extends Model
     public function getPhotoUrlAttribute(): ?string
     {
         return $this->photo_path ? asset('storage/' . $this->photo_path) : null;
+    }
+
+    /**
+     * Accessor untuk signature URL
+     */
+    public function getSignatureUrlAttribute(): ?string
+    {
+        if ($this->signature_path) {
+            // signature_path sudah termasuk 'storage/' prefix
+            return asset($this->signature_path);
+        }
+        return null;
     }
 
     /**
