@@ -274,7 +274,7 @@
                     btn.disabled = true;
                     text.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>{{ __('common.refreshing') }}';
 
-                    fetch('/instagram/analytics/refresh', {
+                    fetch('{{ route('admin.instagram.analytics.refresh') }}', {
                             headers: {
                                 'Accept': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest'

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Letter;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,6 +46,13 @@ class LetterInController extends BaseController
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
+        // Sanitize text fields
+        $sanitizer = app(ContentSanitizer::class);
+        $validated['subject'] = $sanitizer->sanitizeText($validated['subject']);
+        if (!empty($validated['description'])) {
+            $validated['description'] = $sanitizer->sanitizeSimple($validated['description']);
+        }
+
         $filePath = null;
         if ($request->hasFile('file')) {
             $filePath = $request->file('file')->store('letters/incoming', 'public');
@@ -76,6 +84,7 @@ class LetterInController extends BaseController
     public function show(Letter $letter)
     {
         if ($letter->type !== 'incoming') abort(404);
+        $letter->load('activityLogs.user');
         return view('admin.letters.in.show', compact('letter'));
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Guru;
 use App\Models\User;
 use App\Models\MataPelajaran;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -124,6 +125,15 @@ class GuruController extends Controller
 
         $data = $request->all();
 
+        // Sanitize text fields
+        $sanitizer = app(ContentSanitizer::class);
+        $textFields = ['alamat', 'sertifikasi', 'prestasi', 'catatan'];
+        foreach ($textFields as $field) {
+            if (!empty($data[$field])) {
+                $data[$field] = $sanitizer->sanitizeSimple($data[$field]);
+            }
+        }
+
         // Handle photo upload
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('guru/photos', 'public');
@@ -140,7 +150,7 @@ class GuruController extends Controller
      */
     public function show(Guru $guru)
     {
-        $guru->load('user');
+        $guru->load('user.roles');
         return view('guru.show', compact('guru'));
     }
 
@@ -205,6 +215,15 @@ class GuruController extends Controller
         ]);
 
         $data = $request->all();
+
+        // Sanitize text fields
+        $sanitizer = app(ContentSanitizer::class);
+        $textFields = ['alamat', 'sertifikasi', 'prestasi', 'catatan'];
+        foreach ($textFields as $field) {
+            if (!empty($data[$field])) {
+                $data[$field] = $sanitizer->sanitizeSimple($data[$field]);
+            }
+        }
 
         // Handle photo upload
         if ($request->hasFile('foto')) {

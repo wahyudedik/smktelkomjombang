@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Letter;
 use App\Models\LetterFormat;
 use App\Models\LetterCounter;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -57,6 +58,13 @@ class LetterOutController extends BaseController
             'description' => 'nullable|string',
         ]);
 
+        // Sanitize text fields
+        $sanitizer = app(ContentSanitizer::class);
+        $validated['subject'] = $sanitizer->sanitizeText($validated['subject']);
+        if (!empty($validated['description'])) {
+            $validated['description'] = $sanitizer->sanitizeSimple($validated['description']);
+        }
+
         // 0. BLOCKING LOGIC: Check if previous letter of this format/scope has a file uploaded
         $format = LetterFormat::findOrFail($validated['letter_format_id']);
         $user = Auth::user();
@@ -79,11 +87,11 @@ class LetterOutController extends BaseController
             ->whereYear('letter_date', $year); // Assuming sequence resets yearly or matches year context
 
         if ($scopeUnitCode) {
-            // If unit scoped, we only care about letters from this unit? 
-            // The counter is unit scoped, so the sequence is unit scoped. 
+            // If unit scoped, we only care about letters from this unit?
+            // The counter is unit scoped, so the sequence is unit scoped.
             // We should check the last letter generated for this unit.
             // Since we don't store unit_code on letter directly, we check creator's unit or infer from counter logic.
-            // However, simpler is: if counter_scope is unit, we check letters created by users of that unit? 
+            // However, simpler is: if counter_scope is unit, we check letters created by users of that unit?
             // Or more robustly, we rely on the sequence number.
             // Let's assume for now we check the latest letter created by THIS user (or users in same unit) for this format.
             $lastLetterQuery->whereHas('creator', function ($q) use ($scopeUnitCode) {
@@ -187,6 +195,7 @@ class LetterOutController extends BaseController
     public function show(Letter $letter)
     {
         if ($letter->type !== 'outgoing') abort(404);
+        $letter->load('activityLogs.user');
         return view('admin.letters.out.show', compact('letter'));
     }
 

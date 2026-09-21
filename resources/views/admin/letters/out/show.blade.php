@@ -66,7 +66,7 @@
                     <div class="mt-8 border-t border-slate-100 pt-6">
                         <h3 class="text-sm font-semibold text-slate-500 uppercase mb-4">Riwayat Aktivitas</h3>
                         <div class="space-y-4">
-                            @foreach ($letter->activityLogs()->latest()->get() as $log)
+                            @foreach ($letter->activityLogs->sortByDesc('created_at') as $log)
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-500 mr-3"></div>
                                     <div>

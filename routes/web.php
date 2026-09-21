@@ -180,7 +180,7 @@ Route::prefix('admin/surat')->name('admin.letters.')->middleware(['auth', 'verif
     Route::prefix('out')->name('out.')->group(function () {
         Route::get('/', [LetterOutController::class, 'index'])->name('index');
         Route::get('/create', [LetterOutController::class, 'create'])->name('create');
-        Route::post('/', [LetterOutController::class, 'store'])->name('store');
+        Route::post('/', [LetterOutController::class, 'store'])->name('store')->middleware('throttle:20,1');
         Route::get('/{letter}', [LetterOutController::class, 'show'])->name('show');
         Route::get('/{letter}/print', [LetterOutController::class, 'print'])->name('print');
         Route::get('/{letter}/upload', [LetterOutController::class, 'upload'])->name('upload');
@@ -191,7 +191,7 @@ Route::prefix('admin/surat')->name('admin.letters.')->middleware(['auth', 'verif
     Route::prefix('in')->name('in.')->group(function () {
         Route::get('/', [LetterInController::class, 'index'])->name('index');
         Route::get('/create', [LetterInController::class, 'create'])->name('create');
-        Route::post('/', [LetterInController::class, 'store'])->name('store');
+        Route::post('/', [LetterInController::class, 'store'])->name('store')->middleware('throttle:20,1');
         Route::get('/{letter}', [LetterInController::class, 'show'])->name('show');
     });
 
@@ -442,10 +442,10 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::get('/import', [GuruController::class, 'import'])->name('import');
     Route::get('/import/template', [GuruController::class, 'downloadTemplate'])->name('downloadTemplate');
     Route::post('/import', [GuruController::class, 'processImport'])->name('processImport')->middleware('throttle:10,1'); // Max 10 imports per minute
-    Route::get('/export', [GuruController::class, 'export'])->name('export');
-    Route::get('/export/pdf', [GuruController::class, 'exportPdf'])->name('export.pdf');
-    Route::get('/export/json', [GuruController::class, 'exportJson'])->name('export.json');
-    Route::get('/export/xml', [GuruController::class, 'exportXml'])->name('export.xml');
+    Route::get('/export', [GuruController::class, 'export'])->name('export')->middleware('throttle:10,1');
+    Route::get('/export/pdf', [GuruController::class, 'exportPdf'])->name('export.pdf')->middleware('throttle:10,1');
+    Route::get('/export/json', [GuruController::class, 'exportJson'])->name('export.json')->middleware('throttle:10,1');
+    Route::get('/export/xml', [GuruController::class, 'exportXml'])->name('export.xml')->middleware('throttle:10,1');
 
     // Subject management routes
     Route::post('/add-subject', [GuruController::class, 'addSubject'])->name('addSubject');
@@ -466,10 +466,10 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::get('/import', [SiswaController::class, 'import'])->name('import');
     Route::get('/import/template', [SiswaController::class, 'downloadTemplate'])->name('downloadTemplate');
     Route::post('/import', [SiswaController::class, 'processImport'])->name('processImport')->middleware('throttle:10,1'); // Max 10 imports per minute
-    Route::get('/export', [SiswaController::class, 'export'])->name('export');
-    Route::get('/export/pdf', [SiswaController::class, 'exportPdf'])->name('export.pdf');
-    Route::get('/export/json', [SiswaController::class, 'exportJson'])->name('export.json');
-    Route::get('/export/xml', [SiswaController::class, 'exportXml'])->name('export.xml');
+    Route::get('/export', [SiswaController::class, 'export'])->name('export')->middleware('throttle:10,1');
+    Route::get('/export/pdf', [SiswaController::class, 'exportPdf'])->name('export.pdf')->middleware('throttle:10,1');
+    Route::get('/export/json', [SiswaController::class, 'exportJson'])->name('export.json')->middleware('throttle:10,1');
+    Route::get('/export/xml', [SiswaController::class, 'exportXml'])->name('export.xml')->middleware('throttle:10,1');
 
     // CRUD routes
     Route::get('/', [SiswaController::class, 'index'])->name('index');
@@ -489,7 +489,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('a
     Route::get('/calon/import', [OSISController::class, 'importCalon'])->name('calon.import')->middleware('permission:osis.create');
     Route::get('/calon/import/template', [OSISController::class, 'downloadCalonTemplate'])->name('calon.downloadTemplate')->middleware('permission:osis.create');
     Route::post('/calon/import', [OSISController::class, 'processCalonImport'])->name('calon.processImport')->middleware(['permission:osis.create', 'throttle:10,1']);
-    Route::get('/calon/export', [OSISController::class, 'exportCalon'])->name('calon.export')->middleware('permission:osis.view');
+    Route::get('/calon/export', [OSISController::class, 'exportCalon'])->name('calon.export')->middleware(['permission:osis.view', 'throttle:10,1']);
 
     Route::get('/calon', [OSISController::class, 'calonIndex'])->name('calon.index')->middleware('permission:osis.view');
     Route::get('/calon/create', [OSISController::class, 'createCalon'])->name('calon.create')->middleware('permission:osis.create');
@@ -503,7 +503,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('a
     Route::get('/pemilih/import', [OSISController::class, 'importPemilih'])->name('pemilih.import')->middleware('permission:osis.create');
     Route::get('/pemilih/import/template', [OSISController::class, 'downloadPemilihTemplate'])->name('pemilih.downloadTemplate')->middleware('permission:osis.create');
     Route::post('/pemilih/import', [OSISController::class, 'processPemilihImport'])->name('pemilih.processImport')->middleware(['permission:osis.create', 'throttle:10,1']);
-    Route::get('/pemilih/export', [OSISController::class, 'exportPemilih'])->name('pemilih.export')->middleware('permission:osis.view');
+    Route::get('/pemilih/export', [OSISController::class, 'exportPemilih'])->name('pemilih.export')->middleware(['permission:osis.view', 'throttle:10,1']);
 
     Route::get('/pemilih', [OSISController::class, 'pemilihIndex'])->name('pemilih.index')->middleware('permission:osis.view');
     Route::get('/pemilih/create', [OSISController::class, 'createPemilih'])->name('pemilih.create')->middleware('permission:osis.create');
@@ -545,10 +545,10 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|guru'])->prefix('a
     Route::get('/import', [KelulusanController::class, 'import'])->name('import')->middleware('permission:kelulusan.import');
     Route::get('/import/template', [KelulusanController::class, 'downloadTemplate'])->name('downloadTemplate')->middleware('permission:kelulusan.import');
     Route::post('/import', [KelulusanController::class, 'processImport'])->name('processImport')->middleware(['permission:kelulusan.import', 'throttle:10,1']);
-    Route::get('/export', [KelulusanController::class, 'export'])->name('export')->middleware('permission:kelulusan.export');
-    Route::get('/export/pdf', [KelulusanController::class, 'exportPdf'])->name('export.pdf')->middleware('permission:kelulusan.export');
-    Route::get('/export/json', [KelulusanController::class, 'exportJson'])->name('export.json')->middleware('permission:kelulusan.export');
-    Route::get('/export/xml', [KelulusanController::class, 'exportXml'])->name('export.xml')->middleware('permission:kelulusan.export');
+    Route::get('/export', [KelulusanController::class, 'export'])->name('export')->middleware(['permission:kelulusan.export', 'throttle:10,1']);
+    Route::get('/export/pdf', [KelulusanController::class, 'exportPdf'])->name('export.pdf')->middleware(['permission:kelulusan.export', 'throttle:10,1']);
+    Route::get('/export/json', [KelulusanController::class, 'exportJson'])->name('export.json')->middleware(['permission:kelulusan.export', 'throttle:10,1']);
+    Route::get('/export/xml', [KelulusanController::class, 'exportXml'])->name('export.xml')->middleware(['permission:kelulusan.export', 'throttle:10,1']);
     Route::get('/check', [KelulusanController::class, 'checkStatus'])->name('check');
     Route::post('/check', [KelulusanController::class, 'processCheck'])->name('check.process');
 
@@ -576,10 +576,10 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     // Import/Export routes (must be before resource routes)
     Route::get('/import', [App\Http\Controllers\JadwalPelajaranController::class, 'import'])->name('import');
     Route::post('/import', [App\Http\Controllers\JadwalPelajaranController::class, 'import'])->name('processImport')->middleware('throttle:10,1');
-    Route::get('/export', [App\Http\Controllers\JadwalPelajaranController::class, 'export'])->name('export');
-    Route::get('/export/pdf', [App\Http\Controllers\JadwalPelajaranController::class, 'exportPdf'])->name('export.pdf');
-    Route::get('/export/json', [App\Http\Controllers\JadwalPelajaranController::class, 'exportJson'])->name('export.json');
-    Route::get('/export/xml', [App\Http\Controllers\JadwalPelajaranController::class, 'exportXml'])->name('export.xml');
+    Route::get('/export', [App\Http\Controllers\JadwalPelajaranController::class, 'export'])->name('export')->middleware('throttle:10,1');
+    Route::get('/export/pdf', [App\Http\Controllers\JadwalPelajaranController::class, 'exportPdf'])->name('export.pdf')->middleware('throttle:10,1');
+    Route::get('/export/json', [App\Http\Controllers\JadwalPelajaranController::class, 'exportJson'])->name('export.json')->middleware('throttle:10,1');
+    Route::get('/export/xml', [App\Http\Controllers\JadwalPelajaranController::class, 'exportXml'])->name('export.xml')->middleware('throttle:10,1');
 
     // Calendar view
     Route::get('/calendar', [App\Http\Controllers\JadwalPelajaranController::class, 'calendar'])->name('calendar');
@@ -625,10 +625,10 @@ Route::middleware(['auth', 'verified', 'role:sarpras|admin|superadmin'])->prefix
     Route::get('/barang/import', [SarprasController::class, 'importBarang'])->name('barang.import');
     Route::get('/barang/import/template', [SarprasController::class, 'downloadBarangTemplate'])->name('barang.downloadTemplate');
     Route::post('/barang/import', [SarprasController::class, 'processBarangImport'])->name('barang.processImport')->middleware('throttle:10,1'); // Max 10 imports per minute
-    Route::get('/barang/export', [SarprasController::class, 'exportBarang'])->name('barang.export');
-    Route::get('/barang/export/pdf', [SarprasController::class, 'exportBarangPdf'])->name('barang.export.pdf');
-    Route::get('/barang/export/json', [SarprasController::class, 'exportBarangJson'])->name('barang.export.json');
-    Route::get('/barang/export/xml', [SarprasController::class, 'exportBarangXml'])->name('barang.export.xml');
+    Route::get('/barang/export', [SarprasController::class, 'exportBarang'])->name('barang.export')->middleware('throttle:10,1');
+    Route::get('/barang/export/pdf', [SarprasController::class, 'exportBarangPdf'])->name('barang.export.pdf')->middleware('throttle:10,1');
+    Route::get('/barang/export/json', [SarprasController::class, 'exportBarangJson'])->name('barang.export.json')->middleware('throttle:10,1');
+    Route::get('/barang/export/xml', [SarprasController::class, 'exportBarangXml'])->name('barang.export.xml')->middleware('throttle:10,1');
 
     // Barang CRUD with model binding (must be after specific routes)
     Route::get('/barang/{barang}', [SarprasController::class, 'showBarang'])->name('barang.show');
@@ -659,7 +659,7 @@ Route::middleware(['auth', 'verified', 'role:sarpras|admin|superadmin'])->prefix
     Route::get('/sarana/create', [SaranaController::class, 'create'])->name('sarana.create');
     Route::post('/sarana', [SaranaController::class, 'store'])->name('sarana.store');
     Route::get('/sarana/get-barang-by-ruang', [SaranaController::class, 'getBarangByRuang'])->name('sarana.getBarangByRuang');
-    Route::get('/sarana/export-excel', [SaranaController::class, 'exportExcel'])->name('sarana.exportExcel');
+    Route::get('/sarana/export-excel', [SaranaController::class, 'exportExcel'])->name('sarana.exportExcel')->middleware('throttle:10,1');
     Route::get('/sarana/download-template', [SaranaController::class, 'downloadTemplate'])->name('sarana.downloadTemplate');
     Route::post('/sarana/import-excel', [SaranaController::class, 'importExcel'])
         ->middleware('throttle:10,1') // Max 10 imports per minute
@@ -694,15 +694,18 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/
     Route::put('/{testimonialLink}', [App\Http\Controllers\TestimonialLinkController::class, 'update'])->name('update');
     Route::post('/{testimonialLink}/toggle-active', [App\Http\Controllers\TestimonialLinkController::class, 'toggleActive'])->name('toggle-active');
     Route::delete('/{testimonialLink}', [App\Http\Controllers\TestimonialLinkController::class, 'destroy'])->name('destroy');
+});
 
-    // Instagram Analytics (Admin only)
+// Instagram Admin Management (Analytics & Account — Access: admin, superadmin)
+Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/instagram')->name('admin.instagram.')->group(function () {
+    // Analytics routes
     Route::get('/analytics', [InstagramAnalyticsController::class, 'index'])->name('analytics');
     Route::get('/analytics/data', [InstagramAnalyticsController::class, 'getAnalyticsData'])->name('analytics.data');
     Route::get('/analytics/engagement', [InstagramAnalyticsController::class, 'getEngagementData'])->name('analytics.engagement');
     Route::post('/analytics/refresh', [InstagramAnalyticsController::class, 'refreshAnalytics'])->name('analytics.refresh');
     Route::get('/analytics/top-posts', [InstagramAnalyticsController::class, 'getTopPosts'])->name('analytics.top-posts');
 
-    // Instagram Account Info (Admin only)
+    // Account Info routes
     Route::get('/account', [InstagramController::class, 'getAccountInfo'])->name('account');
     Route::get('/validate', [InstagramController::class, 'validateConnection'])->name('validate');
     Route::get('/posts', [InstagramController::class, 'getPosts'])->name('posts');

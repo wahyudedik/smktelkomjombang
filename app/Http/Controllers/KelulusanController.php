@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kelulusan;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -114,6 +115,15 @@ class KelulusanController extends Controller
 
         $data = $request->all();
 
+        // Sanitize text fields
+        $sanitizer = app(ContentSanitizer::class);
+        $textFields = ['alamat', 'prestasi', 'catatan', 'tempat_kuliah', 'tempat_kerja', 'jurusan_kuliah', 'jabatan_kerja'];
+        foreach ($textFields as $field) {
+            if (!empty($data[$field])) {
+                $data[$field] = $sanitizer->sanitizeSimple($data[$field]);
+            }
+        }
+
         // If siswa_id is provided, get data from siswa
         if ($request->filled('siswa_id')) {
             $siswa = \App\Models\Siswa::findOrFail($request->siswa_id);
@@ -191,6 +201,15 @@ class KelulusanController extends Controller
         ]);
 
         $data = $request->all();
+
+        // Sanitize text fields
+        $sanitizer = app(ContentSanitizer::class);
+        $textFields = ['alamat', 'prestasi', 'catatan', 'tempat_kuliah', 'tempat_kerja', 'jurusan_kuliah', 'jabatan_kerja'];
+        foreach ($textFields as $field) {
+            if (!empty($data[$field])) {
+                $data[$field] = $sanitizer->sanitizeSimple($data[$field]);
+            }
+        }
 
         // Handle photo upload
         if ($request->hasFile('foto')) {

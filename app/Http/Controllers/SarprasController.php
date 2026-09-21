@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\Ruang;
 use App\Models\Maintenance;
 use App\Models\Sarana;
+use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -141,8 +142,9 @@ class SarprasController extends Controller
         $data['is_active'] = $request->has('is_active');
 
         // Sanitize input data
-        $data['nama_kategori'] = strip_tags($data['nama_kategori']);
-        $data['deskripsi'] = strip_tags($data['deskripsi'] ?? '');
+        $sanitizer = app(ContentSanitizer::class);
+        $data['nama_kategori'] = $sanitizer->sanitizeText($data['nama_kategori']);
+        $data['deskripsi'] = $sanitizer->sanitizeSimple($data['deskripsi'] ?? '');
 
         KategoriSarpras::create($data);
         cache()->forget('sarpras_dashboard_stats');
@@ -176,8 +178,9 @@ class SarprasController extends Controller
         $data['is_active'] = $request->has('is_active');
 
         // Sanitize input data
-        $data['nama_kategori'] = strip_tags($data['nama_kategori']);
-        $data['deskripsi'] = strip_tags($data['deskripsi'] ?? '');
+        $sanitizer = app(ContentSanitizer::class);
+        $data['nama_kategori'] = $sanitizer->sanitizeText($data['nama_kategori']);
+        $data['deskripsi'] = $sanitizer->sanitizeSimple($data['deskripsi'] ?? '');
 
         $kategori->update($data);
         cache()->forget('sarpras_dashboard_stats');
@@ -311,11 +314,12 @@ class SarprasController extends Controller
         $data = $request->all();
 
         // Sanitize input data
-        $data['nama_barang'] = strip_tags($data['nama_barang']);
-        $data['deskripsi'] = strip_tags($data['deskripsi'] ?? '');
-        $data['merk'] = strip_tags($data['merk'] ?? '');
-        $data['model'] = strip_tags($data['model'] ?? '');
-        $data['catatan'] = strip_tags($data['catatan'] ?? '');
+        $sanitizer = app(ContentSanitizer::class);
+        $data['nama_barang'] = $sanitizer->sanitizeText($data['nama_barang']);
+        $data['deskripsi'] = $sanitizer->sanitizeSimple($data['deskripsi'] ?? '');
+        $data['merk'] = $sanitizer->sanitizeText($data['merk'] ?? '');
+        $data['model'] = $sanitizer->sanitizeText($data['model'] ?? '');
+        $data['catatan'] = $sanitizer->sanitizeSimple($data['catatan'] ?? '');
 
         // Handle photo upload - move to public storage
         if ($request->hasFile('foto')) {
@@ -378,11 +382,12 @@ class SarprasController extends Controller
         $data = $request->all();
 
         // Sanitize input data
-        $data['nama_barang'] = strip_tags($data['nama_barang']);
-        $data['deskripsi'] = strip_tags($data['deskripsi'] ?? '');
-        $data['merk'] = strip_tags($data['merk'] ?? '');
-        $data['model'] = strip_tags($data['model'] ?? '');
-        $data['catatan'] = strip_tags($data['catatan'] ?? '');
+        $sanitizer = app(ContentSanitizer::class);
+        $data['nama_barang'] = $sanitizer->sanitizeText($data['nama_barang']);
+        $data['deskripsi'] = $sanitizer->sanitizeSimple($data['deskripsi'] ?? '');
+        $data['merk'] = $sanitizer->sanitizeText($data['merk'] ?? '');
+        $data['model'] = $sanitizer->sanitizeText($data['model'] ?? '');
+        $data['catatan'] = $sanitizer->sanitizeSimple($data['catatan'] ?? '');
 
         // Handle photo upload - move to public storage
         if ($request->hasFile('foto')) {
