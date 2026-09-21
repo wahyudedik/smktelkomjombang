@@ -283,7 +283,7 @@
         <div class="ticket">
             <!-- Header -->
             <div class="ticket-header">
-                <div class="school-name">SMK Telekomunikasi Darul Ulum</div>
+                <div class="school-name">{{ theme_config('name') ?? 'SMK Telekomunikasi Darul Ulum' }}</div>
                 <div class="ticket-title">Tiket Kunjungan / Visitor Pass</div>
             </div>
 
@@ -339,9 +339,9 @@
             <div class="ticket-footer">
                 <hr class="dashed-divider">
                 <div class="footer-address" style="margin-top: 10px;">
-                    <strong>SMK Telekomunikasi Darul Ulum</strong><br>
-                    Jl. Raya Jenu, Jenu, Tuban, Jawa Timur<br>
-                    Telp: {{ theme_config('phone') ?? '(0356) 123456' }}
+                    <strong>{{ theme_config('name') ?? 'SMK Telekomunikasi Darul Ulum' }}</strong><br>
+                    {{ theme_config('address') ?? 'Jl. Raya Jenu, Jenu, Tuban, Jawa Timur' }}<br>
+                    Telp: {{ theme_config('phone') ?? '085649400339' }}
                 </div>
             </div>
         </div>
