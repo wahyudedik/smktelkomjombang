@@ -68,7 +68,7 @@
                             tetap sama di semua halaman.</p>
 
                         <div class="mt-4">
-                            <a href="/" class="theme-btn me-3">
+                            <a href="{{ route('landing') }}" class="theme-btn me-3">
                                 <i class="fas fa-home"></i> Kembali ke Home
                             </a>
                             <a href="{{ route('pages.public.index') }}" class="theme-btn">

@@ -6,7 +6,7 @@
             <div class="row footer-widget-wrapper pt-100 pb-70">
                 <div class="col-md-6 col-lg-4">
                     <div class="footer-widget-box about-us">
-                        <a href="/" class="footer-logo">
+                        <a href="{{ route('landing') }}" class="footer-logo">
                             @if (cache('site_setting_logo'))
                                 <img src="{{ Storage::url(cache('site_setting_logo')) }}"
                                     alt="{{ cache('site_setting_site_name', 'SMK Telekomunikasi') }}"

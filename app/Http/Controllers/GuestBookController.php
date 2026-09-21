@@ -398,7 +398,7 @@ class GuestBookController extends Controller
      */
     public function publicForm(): \Illuminate\View\View
     {
-        return view('guest-book.public-form');
+        return view(theme_view('guest-book.public-form'));
     }
 
     /**
@@ -471,6 +471,6 @@ class GuestBookController extends Controller
      */
     public function publicThankYou(GuestBook $guest): \Illuminate\View\View
     {
-        return view('guest-book.thank-you', compact('guest'));
+        return view(theme_view('guest-book.thank-you'), compact('guest'));
     }
 }

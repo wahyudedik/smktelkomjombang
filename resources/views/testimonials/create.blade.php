@@ -6,7 +6,7 @@
         <div class="container">
             <h2 class="breadcrumb-title">{{ $link->title }}</h2>
             <ul class="breadcrumb-menu">
-                <li><a href="/">Home</a></li>
+                <li><a href="{{ route('landing') }}">Home</a></li>
                 <li class="active">Testimonial</li>
             </ul>
         </div>

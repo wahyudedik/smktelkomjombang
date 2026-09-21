@@ -6,7 +6,7 @@
         <div class="container">
             <h2 class="breadcrumb-title">Testimonial Link Expired</h2>
             <ul class="breadcrumb-menu">
-                <li><a href="/">Home</a></li>
+                <li><a href="{{ route('landing') }}">Home</a></li>
                 <li class="active">Expired</li>
             </ul>
         </div>
@@ -39,7 +39,7 @@
 
                             <!-- Action -->
                             <div class="mt-4">
-                                <a href="/" class="btn btn-primary">
+                                <a href="{{ route('landing') }}" class="btn btn-primary">
                                     <i class="fas fa-home mr-2"></i>
                                     Kembali ke Beranda
                                 </a>

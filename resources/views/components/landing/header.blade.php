@@ -69,7 +69,7 @@
     <div class="main-navigation">
         <nav class="navbar navbar-expand-lg">
             <div class="container position-relative">
-                <a class="navbar-brand" href="/">
+                <a class="navbar-brand" href="{{ route('landing') }}">
                     @if (cache('site_setting_logo'))
                         <img src="{{ Storage::url(cache('site_setting_logo')) }}"
                             alt="{{ cache('site_setting_site_name', 'SMK Telekomunikasi') }}" style="max-height: 50px;">

@@ -66,7 +66,7 @@
             Aplikasi sedang berjalan dalam mode offline.
             Halaman yang pernah Anda kunjungi sebelumnya masih dapat diakses.
         </p>
-        <a href="/" class="btn">Kembali ke Beranda</a>
+        <a href="{{ route('landing') }}" class="btn">Kembali ke Beranda</a>
     </div>
 </body>
 

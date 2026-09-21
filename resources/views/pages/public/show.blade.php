@@ -15,7 +15,7 @@
                             {{ $page->title }}
                         </h2>
                         <div class="breadcrumb-links" style="color: #ffffff; opacity: 0.95; font-size: 1rem;">
-                            <a href="/" style="color: #ffffff; text-decoration: none; transition: opacity 0.3s;">Home</a>
+                            <a href="{{ route('landing') }}" style="color: #ffffff; text-decoration: none; transition: opacity 0.3s;">Home</a>
                             <span style="margin: 0 10px; opacity: 0.7;">/</span>
                             <a href="{{ route('pages.public.index') }}" style="color: #ffffff; text-decoration: none; transition: opacity 0.3s;">Halaman</a>
                             <span style="margin: 0 10px; opacity: 0.7;">/</span>

@@ -14,7 +14,7 @@ class PublicAttendanceController extends BaseController
      */
     public function index()
     {
-        return view('attendance.public.check');
+        return view(theme_view('attendance.public.check'));
     }
 
     /**
@@ -36,7 +36,7 @@ class PublicAttendanceController extends BaseController
             ->first();
 
         if (!$identity) {
-            return view('attendance.public.check', [
+            return view(theme_view('attendance.public.check'), [
                 'error' => 'PIN tidak ditemukan atau tidak aktif. Silakan periksa kembali.',
             ]);
         }
@@ -57,7 +57,7 @@ class PublicAttendanceController extends BaseController
             ->orderByDesc('first_in_at')
             ->get();
 
-        return view('attendance.public.check', [
+        return view(theme_view('attendance.public.check'), [
             'identity' => $identity,
             'name' => $name,
             'attendances' => $attendances,

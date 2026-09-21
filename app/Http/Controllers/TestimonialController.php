@@ -13,7 +13,7 @@ class TestimonialController extends Controller
     // Public form untuk submit testimonial (tanpa login)
     public function create()
     {
-        return view('testimonials.create');
+        return view(theme_view('testimonials.create'));
     }
 
     // Store testimonial dari public form

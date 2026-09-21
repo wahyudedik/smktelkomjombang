@@ -15,7 +15,7 @@
                             Semua Halaman
                         </h2>
                         <div style="color: #ffffff; opacity: 0.95; font-size: 1rem;">
-                            <a href="/" style="color: #ffffff; text-decoration: none;">Home</a>
+                            <a href="{{ route('landing') }}" style="color: #ffffff; text-decoration: none;">Home</a>
                             <span style="margin: 0 10px; opacity: 0.7;">/</span>
                             <span style="opacity: 0.95; font-weight: 500;">Semua Halaman</span>
                         </div>

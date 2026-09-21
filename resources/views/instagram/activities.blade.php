@@ -6,7 +6,7 @@
         <div class="container">
             <h2 class="breadcrumb-title">{{ __('common.event_maudu') }}</h2>
             <ul class="breadcrumb-menu">
-                <li><a href="/">{{ __('common.home') }}</a></li>
+                <li><a href="{{ route('landing') }}">{{ __('common.home') }}</a></li>
                 <li class="active">{{ __('common.kegiatan') }}</li>
             </ul>
         </div>
