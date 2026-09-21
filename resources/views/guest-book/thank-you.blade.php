@@ -1,4 +1,4 @@
-<x-layouts.guest>
+<x-guest-layout>
     <div class="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 py-8 px-4 sm:px-6 lg:px-8">
 
         {{-- Header: Logo & School Name --}}
@@ -133,4 +133,4 @@
             </div>
         </div>
     </div>
-</x-layouts.guest>
+</x-guest-layout>
