@@ -132,10 +132,85 @@
                             </div>
                         </fieldset>
 
-                        {{-- === Instansi / Keperluan === --}}
+                        {{-- === Foto Tamu (4×6) === --}}
                         <fieldset class="mb-6">
                             <legend class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                                 <span class="guest-book-step w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                                Foto Tamu <span class="text-gray-400 font-normal">(4×6)</span>
+                            </legend>
+
+                            <div class="space-y-4">
+                                {{-- Camera Container --}}
+                                <div id="camera-container" class="relative">
+                                    {{-- Video Preview --}}
+                                    <div id="video-wrapper" class="relative mx-auto" style="max-width: 240px;">
+                                        <video id="camera-video" autoplay playsinline muted
+                                               class="w-full rounded-lg border border-gray-300 bg-gray-100"
+                                               style="aspect-ratio: 2/3; object-fit: cover;"></video>
+                                        {{-- Aspect Ratio Guide Overlay --}}
+                                        <div id="ratio-guide" class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                                            <div class="w-[80%] h-[85%] border-2 border-dashed border-white/70 rounded-lg"></div>
+                                        </div>
+                                        {{-- Camera Placeholder --}}
+                                        <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 rounded-lg">
+                                            <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                                            </svg>
+                                            <span class="text-xs text-gray-400">Kamera belum aktif</span>
+                                        </div>
+                                    </div>
+
+                                    {{-- Photo Preview (hidden by default) --}}
+                                    <div id="photo-preview-wrapper" class="hidden mx-auto" style="max-width: 240px;">
+                                        <img id="photo-preview" class="w-full rounded-lg border border-gray-300" style="aspect-ratio: 2/3; object-fit: cover;" alt="Foto Tamu">
+                                    </div>
+                                </div>
+
+                                {{-- Camera Buttons --}}
+                                <div id="camera-buttons" class="flex items-center justify-center gap-2">
+                                    <button type="button" id="btn-start-camera" onclick="initCamera()"
+                                            class="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                                        </svg>
+                                        Aktifkan Kamera
+                                    </button>
+                                    <button type="button" id="btn-capture" onclick="capturePhoto()" class="hidden
+                                            inline-flex items-center gap-1.5 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors guest-book-btn">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        Ambil Foto
+                                    </button>
+                                    <button type="button" id="btn-retake" onclick="retakePhoto()" class="hidden
+                                            inline-flex items-center gap-1.5 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                        </svg>
+                                        Foto Ulang
+                                    </button>
+                                </div>
+
+                                {{-- Fallback File Input (shown when camera not supported) --}}
+                                <div id="camera-fallback" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Foto (4×6)</label>
+                                    <input type="file" name="photo_file" id="photo-file" accept="image/*" capture="user"
+                                           onchange="handleFileUpload(event)"
+                                           class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:text-white file:cursor-pointer guest-book-btn">
+                                    <p class="text-xs text-gray-400 mt-1">Format: JPG/PNG, rasio 4×6 (2:3)</p>
+                                </div>
+
+                                <input type="hidden" name="photo" id="photo-data" value="{{ old('photo') }}">
+                                <p id="photo-error" class="text-xs text-gray-400 text-center hidden">Foto tidak berhasil diambil. Silakan coba lagi.</p>
+                            </div>
+                        </fieldset>
+
+                        {{-- === Instansi / Keperluan === --}}
+                        <fieldset class="mb-6">
+                            <legend class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                <span class="guest-book-step w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                                 Instansi & Keperluan
                             </legend>
 
@@ -223,7 +298,7 @@
                         {{-- === Kendaraan === --}}
                         <fieldset class="mb-6">
                             <legend class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                <span class="guest-book-step w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                                <span class="guest-book-step w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">4</span>
                                 Kendaraan <span class="text-gray-400 font-normal">(opsional)</span>
                             </legend>
 
@@ -266,7 +341,7 @@
                         {{-- === Tanda Tangan Digital === --}}
                         <fieldset class="mb-6">
                             <legend class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                <span class="guest-book-step w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                                <span class="guest-book-step w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">5</span>
                                 Tanda Tangan Digital
                             </legend>
 
@@ -288,7 +363,7 @@
                         {{-- === Catatan === --}}
                         <fieldset class="mb-6">
                             <legend class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                <span class="guest-book-step w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">5</span>
+                                <span class="guest-book-step w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">6</span>
                                 Catatan <span class="text-gray-400 font-normal">(opsional)</span>
                             </legend>
 
@@ -343,6 +418,28 @@
     </div>
 
     @push('scripts')
+    <style>
+        /* Photo Camera Styles */
+        #camera-video {
+            transform: scaleX(-1);
+        }
+        #photo-preview {
+            transform: scaleX(-1);
+        }
+        #btn-capture {
+            display: none;
+        }
+        #btn-capture.active {
+            display: inline-flex;
+        }
+        #btn-retake {
+            display: none;
+        }
+        #btn-retake.active {
+            display: inline-flex;
+        }
+    </style>
+
     <script>
         document.getElementById('guestCheckinForm').addEventListener('submit', function() {
             const btn = document.getElementById('submitBtn');
@@ -426,6 +523,155 @@
             document.getElementById('signature-data').value = '';
         });
     });
+
+    // =============================================
+    // Camera / Photo Functionality
+    // =============================================
+    let cameraStream = null;
+
+    async function initCamera() {
+        const video = document.getElementById('camera-video');
+        const placeholder = document.getElementById('camera-placeholder');
+        const ratioGuide = document.getElementById('ratio-guide');
+        const btnStart = document.getElementById('btn-start-camera');
+        const btnCapture = document.getElementById('btn-capture');
+        const photoError = document.getElementById('photo-error');
+
+        photoError.classList.add('hidden');
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 600 }, height: { ideal: 900 } }
+            });
+            cameraStream = stream;
+            video.srcObject = stream;
+            video.play();
+
+            placeholder.classList.add('hidden');
+            ratioGuide.classList.remove('hidden');
+            btnStart.classList.add('hidden');
+            btnCapture.classList.add('active');
+            btnCapture.classList.remove('hidden');
+        } catch (err) {
+            // Fallback: show file input
+            document.getElementById('camera-fallback').classList.remove('hidden');
+            btnStart.classList.add('hidden');
+        }
+    }
+
+    function capturePhoto() {
+        const video = document.getElementById('camera-video');
+        const canvas = document.getElementById('capture-canvas') || createCaptureCanvas();
+        const ctx = canvas.getContext('2d');
+        const photoInput = document.getElementById('photo-data');
+        const previewWrapper = document.getElementById('photo-preview-wrapper');
+        const previewImg = document.getElementById('photo-preview');
+        const videoWrapper = document.getElementById('video-wrapper');
+        const btnCapture = document.getElementById('btn-capture');
+        const btnRetake = document.getElementById('btn-retake');
+        const ratioGuide = document.getElementById('ratio-guide');
+
+        // Crop center 2:3 from video
+        const ratio = 2 / 3;
+        let sw = video.videoWidth;
+        let sh = video.videoHeight;
+        let cw = sh * ratio;
+        let sx = (sw - cw) / 2;
+
+        // If video is mirrored, adjust crop
+        canvas.width = 600;
+        canvas.height = 900;
+        ctx.save();
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, sx, 0, cw, sh, 0, 0, 600, 900);
+        ctx.restore();
+
+        photoInput.value = canvas.toDataURL('image/jpeg', 0.85);
+
+        // Stop camera
+        stopCamera();
+
+        // Show preview
+        previewImg.src = canvas.toDataURL('image/jpeg', 0.85);
+        previewWrapper.classList.remove('hidden');
+        previewWrapper.classList.add('block');
+        videoWrapper.classList.add('hidden');
+        ratioGuide.classList.add('hidden');
+
+        // Toggle buttons
+        btnCapture.classList.add('hidden');
+        btnCapture.classList.remove('active');
+        btnRetake.classList.remove('hidden');
+        btnRetake.classList.add('active');
+    }
+
+    function retakePhoto() {
+        const photoInput = document.getElementById('photo-data');
+        const previewWrapper = document.getElementById('photo-preview-wrapper');
+        const videoWrapper = document.getElementById('video-wrapper');
+        const btnRetake = document.getElementById('btn-retake');
+
+        photoInput.value = '';
+        previewWrapper.classList.add('hidden');
+        previewWrapper.classList.remove('block');
+        videoWrapper.classList.remove('hidden');
+        btnRetake.classList.add('hidden');
+        btnRetake.classList.remove('active');
+
+        initCamera();
+    }
+
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ratio = 2 / 3;
+                let sw = img.width;
+                let sh = img.height;
+                let cw = sh * ratio;
+                let sx = (sw - cw) / 2;
+
+                canvas.width = 600;
+                canvas.height = 900;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, sx, 0, cw, sh, 0, 0, 600, 900);
+
+                document.getElementById('photo-data').value = canvas.toDataURL('image/jpeg', 0.85);
+
+                // Show preview
+                const previewWrapper = document.getElementById('photo-preview-wrapper');
+                const previewImg = document.getElementById('photo-preview');
+                previewImg.src = canvas.toDataURL('image/jpeg', 0.85);
+                previewWrapper.classList.remove('hidden');
+                previewWrapper.classList.add('block');
+
+                document.getElementById('camera-fallback').classList.add('hidden');
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function stopCamera() {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+    }
+
+    function createCaptureCanvas() {
+        const canvas = document.createElement('canvas');
+        canvas.id = 'capture-canvas';
+        canvas.style.display = 'none';
+        document.body.appendChild(canvas);
+        return canvas;
+    }
     </script>
     @endpush
 </x-guest-book-layout>
