@@ -114,30 +114,32 @@
             flex-shrink: 0 !important;
         }
 
-        /* TOP LEVEL NAV MENU ITEMS - CLEAN, FLEX-NOWRAP SINGLE ROW, ALWAYS SOLID WHITE (#ffffff) TEXT */
-        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu,
-        html body .rs-menu ul.nav-menu {
-            display: flex !important;
-            flex-wrap: nowrap !important;
-            white-space: nowrap !important;
-            align-items: center !important;
-            justify-content: flex-end !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            gap: 2px !important;
-        }
+        /* TOP LEVEL NAV MENU ITEMS - DESKTOP ONLY */
+        @media (min-width: 992px) {
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu,
+            html body .rs-menu ul.nav-menu {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                white-space: nowrap !important;
+                align-items: center !important;
+                justify-content: flex-end !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                gap: 2px !important;
+            }
 
-        html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li,
-        html body .rs-menu ul.nav-menu > li {
-            background: transparent !important;
-            background-color: transparent !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            flex-shrink: 0 !important;
-            float: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            white-space: nowrap !important;
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li,
+            html body .rs-menu ul.nav-menu > li {
+                background: transparent !important;
+                background-color: transparent !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                flex-shrink: 0 !important;
+                float: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                white-space: nowrap !important;
+            }
         }
 
         html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a,
