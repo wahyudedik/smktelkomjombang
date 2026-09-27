@@ -4963,3 +4963,19 @@
         min-height: 250px;
     }
 }
+
+/* ========================================
+   MOBILE MENU FIX: Show toggle arrows & sub-menu buttons on mobile
+   ======================================== */
+@media (max-width: 991px) {
+
+    html body span.rs-menu-parent,
+    html body .rs-menu-parent,
+    html body .rs-menu-parent *,
+    html body div.sub-menu-close,
+    html body .sub-menu-close,
+    html body .sub-menu-close * {
+        display: block !important;
+        visibility: visible !important;
+    }
+}
