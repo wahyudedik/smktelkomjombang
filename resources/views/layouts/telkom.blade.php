@@ -247,6 +247,48 @@
             font-weight: 700 !important;
             text-shadow: none !important;
         }
+
+        /* ========================================
+           MOBILE MENU: Force vertical stacking on mobile
+           ======================================== */
+        @media (max-width: 991px) {
+            html body .rs-menu ul.nav-menu,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu {
+                display: block !important;
+                flex-wrap: wrap !important;
+                flex-direction: column !important;
+                white-space: normal !important;
+                align-items: stretch !important;
+                justify-content: flex-start !important;
+                width: 100% !important;
+                padding: 10px !important;
+                margin: 0 !important;
+            }
+
+            html body .rs-menu ul.nav-menu > li,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li {
+                display: block !important;
+                flex-shrink: unset !important;
+                width: 100% !important;
+                padding: 8px 0 !important;
+                border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+            }
+
+            html body .rs-menu ul.nav-menu > li > a {
+                display: block !important;
+                color: #fff !important;
+                font-size: 15px !important;
+                padding: 8px 0 !important;
+            }
+
+            /* Sub-menu dropdowns */
+            html body .rs-menu ul.nav-menu .sub-menu {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                padding-left: 20px !important;
+            }
+        }
     </style>
 </head>
 
