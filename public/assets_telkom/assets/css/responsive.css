@@ -4904,14 +4904,10 @@
    TELKOM CUSTOM RESPONSIVE FIXES
    ============================================ */
 
-/* Fix: Nav menu overflow — sembunyikan desktop menu di mobile */
+/* Fix: Nav menu overflow — biarkan CSS responsive asli template mengelola mobile menu.
+   CSS sebelumnya yang display:none pada .nav-menu menyebabkan hamburger toggle tidak
+   bisa expand menu karena JS menghitung height() → return 0. */
 @media (max-width: 991px) {
-
-    html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu,
-    html body .rs-menu ul.nav-menu {
-        display: none !important;
-    }
-
     .full-width-header .rs-header .menu-area .mobile-menu {
         display: block !important;
     }

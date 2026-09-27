@@ -168,12 +168,7 @@
             align-items: center !important;
         }
 
-        /* HIDE ALL EXTRA JS ARROWS & CLOSE BUTTONS & PSEUDO ELEMENTS COMPLETELY */
-        html body span.rs-menu-parent,
-        html body .rs-menu-parent,
-        html body .rs-menu-parent *,
-        html body div.sub-menu-close,
-        html body .sub-menu-close,
+        /* HIDE EXTRA PSEUDO ELEMENTS ON NAV LINKS ONLY (not menu toggle elements) */
         html body .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a:after,
         html body .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a:before,
         html body .rs-menu ul.nav-menu > li > a:after,

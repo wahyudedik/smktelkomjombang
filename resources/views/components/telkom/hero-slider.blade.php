@@ -1,5 +1,5 @@
 <!-- Slider Section Start -->
-<div class="rs-slider style1 pb-30">
+<div class="rs-slider style1 pt-30 pb-30">
     @php
         $heroImages = $siteSettings['hero_images'] ?? [];
         $defaultImages = [
