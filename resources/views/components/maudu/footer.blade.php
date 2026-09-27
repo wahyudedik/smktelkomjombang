@@ -15,35 +15,41 @@
                                 alt="{{ theme_config('name') }}">
                         </a>
                         <p class="mb-3">
-                            MA Unggulan Darul Ulum Rejoso salah satu madrasah dalam naungan
-                            Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang
+                            {{ $siteSettings['site_description'] ?? theme_config('tagline', 'Madrasah Hebat, Bermartabat') }}
                         </p>
                         <ul class="footer-contact">
                             <li>
-                                <a href="{{ theme_config('whatsapp_url', '#') }}">
-                                    <i class="fab fa-whatsapp"></i>{{ theme_config('phone') }}
+                                <a href="{{ $siteSettings['whatsapp_url'] ?? theme_config('whatsapp_url', '#') }}">
+                                    <i class="fab fa-whatsapp"></i>{{ $siteSettings['contact_phone'] ?? theme_config('phone') }}
                                 </a>
                             </li>
                             <li>
-                                <i class="far fa-map-marker-alt"></i>{{ theme_config('address') }}
+                                <i class="far fa-map-marker-alt"></i>{{ $siteSettings['contact_address'] ?? theme_config('address') }}
                             </li>
                             <li>
-                                <a href="mailto:{{ theme_config('email') }}">
-                                    <i class="far fa-envelope"></i>{{ theme_config('email') }}
+                                <a href="mailto:{{ $siteSettings['contact_email'] ?? theme_config('email') }}">
+                                    <i class="far fa-envelope"></i>{{ $siteSettings['contact_email'] ?? theme_config('email') }}
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                {{-- Link Terkait --}}
+                {{-- Link Terkait — dynamic dari theme_config --}}
                 <div class="col-md-6 col-lg-2">
                     <div class="footer-widget-box list">
                         <h4 class="footer-widget-title">Link Terkait</h4>
                         <ul class="footer-list">
-                            <li><a href="{{ resolve_theme_url('route:pages.public.show,tentang-yayasan') }}"><i class="fas fa-caret-right"></i> Tentang Yayasan</a></li>
-                            <li><a href="{{ resolve_theme_url('route:pages.public.show,tentang-madrasah') }}"><i class="fas fa-caret-right"></i> Tentang Madrasah</a></li>
-                            <li><a href="{{ resolve_theme_url('route:testimonials.create') }}"><i class="fas fa-caret-right"></i> Testimonials</a></li>
+                            @php
+                                $relatedLinks = theme_config('related_links', [
+                                    ['label' => 'Tentang Yayasan', 'url' => 'route:pages.public.show,tentang-yayasan'],
+                                    ['label' => 'Tentang Madrasah', 'url' => 'route:pages.public.show,tentang-madrasah'],
+                                    ['label' => 'Testimonials', 'url' => 'route:testimonials.create'],
+                                ]);
+                            @endphp
+                            @foreach($relatedLinks as $link)
+                                <li><a href="{{ resolve_theme_url($link['url'] ?? '#') }}"><i class="fas fa-caret-right"></i> {{ $link['label'] ?? '' }}</a></li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
@@ -68,7 +74,7 @@
                     <div class="footer-widget-box list">
                         <h4 class="footer-widget-title">Slogan Kami</h4>
                         <div class="footer-newsletter">
-                            <p>Madrasah Hebat, Bermartabat</p>
+                            <p>{{ theme_config('slogan', 'Madrasah Hebat, Bermartabat') }}</p>
                             <div class="subscribe-form">
                                 <form action="{{ theme_config('ppdb_url', '#') }}" target="_blank">
                                     <button class="theme-btn" type="submit">
@@ -89,8 +95,8 @@
                 <div class="row">
                     <div class="col-md-6 align-self-center">
                         <p class="copyright-text">
-                            &copy; Copyright <span id="date" class="current-year">{{ date('Y') }}</span>
-                            {{ theme_config('name') }}. All Rights Reserved.
+                            {!! $siteSettings['footer_text'] ??
+                                '&copy; Copyright <span id="date" class="current-year">' . date('Y') . '</span> ' . theme_config('name') . '. All Rights Reserved.' !!}
                         </p>
                     </div>
                     <div class="col-md-6 align-self-center">
@@ -106,6 +112,15 @@
                             @endif
                             @if (theme_config('whatsapp_url'))
                                 <li><a href="{{ theme_config('whatsapp_url') }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fab fa-whatsapp"></i></a></li>
+                            @endif
+                            @if (theme_config('twitter_url'))
+                                <li><a href="{{ theme_config('twitter_url') }}" target="_blank" rel="noopener" title="Twitter/X"><i class="fab fa-x-twitter"></i></a></li>
+                            @endif
+                            @if (theme_config('tiktok_url'))
+                                <li><a href="{{ theme_config('tiktok_url') }}" target="_blank" rel="noopener" title="TikTok"><i class="fab fa-tiktok"></i></a></li>
+                            @endif
+                            @if (theme_config('pinterest_url'))
+                                <li><a href="{{ theme_config('pinterest_url') }}" target="_blank" rel="noopener" title="Pinterest"><i class="fab fa-pinterest-p"></i></a></li>
                             @endif
                         </ul>
                     </div>

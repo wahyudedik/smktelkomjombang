@@ -465,7 +465,7 @@
                                     <label for="social_facebook"
                                         class="block text-sm font-medium text-gray-700 mb-2">Facebook URL</label>
                                     <input type="url" id="social_facebook" name="social_facebook"
-                                        value="{{ $settings['social_facebook'] ?? '' }}"
+                                        value="{{ $settings['facebook_url'] ?? $settings['social_facebook'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="https://facebook.com/sekolah">
                                 </div>
@@ -473,7 +473,7 @@
                                     <label for="social_instagram"
                                         class="block text-sm font-medium text-gray-700 mb-2">Instagram URL</label>
                                     <input type="url" id="social_instagram" name="social_instagram"
-                                        value="{{ $settings['social_instagram'] ?? '' }}"
+                                        value="{{ $settings['instagram_url'] ?? $settings['social_instagram'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="https://instagram.com/sekolah">
                                 </div>
@@ -481,7 +481,7 @@
                                     <label for="social_youtube"
                                         class="block text-sm font-medium text-gray-700 mb-2">YouTube URL</label>
                                     <input type="url" id="social_youtube" name="social_youtube"
-                                        value="{{ $settings['social_youtube'] ?? '' }}"
+                                        value="{{ $settings['youtube_url'] ?? $settings['social_youtube'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="https://youtube.com/sekolah">
                                 </div>
@@ -489,9 +489,41 @@
                                     <label for="social_whatsapp"
                                         class="block text-sm font-medium text-gray-700 mb-2">WhatsApp URL</label>
                                     <input type="url" id="social_whatsapp" name="social_whatsapp"
-                                        value="{{ $settings['social_whatsapp'] ?? '' }}"
+                                        value="{{ $settings['whatsapp_url'] ?? $settings['social_whatsapp'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="https://wa.me/628123456789">
+                                </div>
+                                <div>
+                                    <label for="twitter_url"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Twitter/X URL</label>
+                                    <input type="url" id="twitter_url" name="twitter_url"
+                                        value="{{ $settings['twitter_url'] ?? '' }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="https://x.com/sekolah">
+                                </div>
+                                <div>
+                                    <label for="tiktok_url"
+                                        class="block text-sm font-medium text-gray-700 mb-2">TikTok URL</label>
+                                    <input type="url" id="tiktok_url" name="tiktok_url"
+                                        value="{{ $settings['tiktok_url'] ?? '' }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="https://tiktok.com/@sekolah">
+                                </div>
+                                <div>
+                                    <label for="pinterest_url"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Pinterest URL</label>
+                                    <input type="url" id="pinterest_url" name="pinterest_url"
+                                        value="{{ $settings['pinterest_url'] ?? '' }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="https://pinterest.com/sekolah">
+                                </div>
+                                <div>
+                                    <label for="google_maps_url"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Google Maps URL</label>
+                                    <input type="url" id="google_maps_url" name="google_maps_url"
+                                        value="{{ $settings['google_maps_url'] ?? '' }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="https://maps.google.com/?q=...">
                                 </div>
                             </div>
                         </div>
@@ -513,6 +545,14 @@
                                     <input type="text" id="contact_phone" name="contact_phone"
                                         value="{{ $settings['contact_phone'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label for="contact_phone_secondary"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Secondary Phone</label>
+                                    <input type="text" id="contact_phone_secondary" name="contact_phone_secondary"
+                                        value="{{ $settings['contact_phone_secondary'] ?? '' }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="(0321) 868188">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label for="contact_address"

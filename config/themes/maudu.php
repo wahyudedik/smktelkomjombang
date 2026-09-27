@@ -16,6 +16,7 @@ return [
     'address' => 'Jl. Wonokerto Selatan, Peterongan, Jombang',
     'phone' => '(0321) 868911',
     'phone_secondary' => '',
+    'contact_phone_secondary' => '',
     'whatsapp' => '628113383722',
     'whatsapp_url' => 'https://wa.me/628113383722',
     'google_maps_url' => 'https://share.google/XB6eTt65kqQF9xYVR',

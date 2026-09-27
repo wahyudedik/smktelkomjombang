@@ -29,13 +29,26 @@
                                 {{ $siteSettings['contact_address'] ?? theme_config('address', 'Ponpes Darul Ulum Jombang') }}
                             </div>
                         </li>
+                        @php
+                            $primaryPhone = $siteSettings['contact_phone'] ?? theme_config('phone', '');
+                            $secondaryPhone = $siteSettings['contact_phone_secondary'] ?? theme_config('phone_secondary', '');
+                        @endphp
+                        @if(!empty($primaryPhone) || !empty($secondaryPhone))
                         <li>
                             <i class="flaticon-call"></i>
                             <div class="desc">
-                                <a href="https://wa.me/{{ theme_config('whatsapp', '6285649400339') }}">{{ theme_config('phone', '085649400339') }}</a>
-                                , <a href="tel:{{ preg_replace('/[^0-9+]/', '', theme_config('phone_secondary', '(0321)868188')) }}">{{ theme_config('phone_secondary', '(0321)868188') }}</a>
+                                @if(!empty($primaryPhone))
+                                    <a href="https://wa.me/{{ $siteSettings['whatsapp_url'] ?? theme_config('whatsapp', '6285649400339') }}">{{ $primaryPhone }}</a>
+                                @endif
+                                @if(!empty($primaryPhone) && !empty($secondaryPhone))
+                                    ,
+                                @endif
+                                @if(!empty($secondaryPhone))
+                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $secondaryPhone) }}">{{ $secondaryPhone }}</a>
+                                @endif
                             </div>
                         </li>
+                        @endif
                         <li>
                             <i class="flaticon-email"></i>
                             <div class="desc">
@@ -75,7 +88,10 @@
                         <li><a href="{{ theme_config('youtube_url') }}" target="_blank" rel="noopener" title="YouTube"><i class="fab fa-youtube"></i></a></li>
                         @endif
                         @if (theme_config('twitter_url'))
-                        <li><a href="{{ theme_config('twitter_url') }}" target="_blank" rel="noopener" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="{{ theme_config('twitter_url') }}" target="_blank" rel="noopener" title="Twitter/X"><i class="fab fa-x-twitter"></i></a></li>
+                        @endif
+                        @if (theme_config('tiktok_url'))
+                        <li><a href="{{ theme_config('tiktok_url') }}" target="_blank" rel="noopener" title="TikTok"><i class="fab fa-tiktok"></i></a></li>
                         @endif
                         @if (theme_config('pinterest_url'))
                         <li><a href="{{ theme_config('pinterest_url') }}" target="_blank" rel="noopener" title="Pinterest"><i class="fab fa-pinterest-p"></i></a></li>

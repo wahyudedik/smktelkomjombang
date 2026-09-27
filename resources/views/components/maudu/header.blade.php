@@ -18,24 +18,27 @@
                         @if (theme_config('whatsapp_url'))
                             <a href="{{ theme_config('whatsapp_url') }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                         @endif
+                        @if (theme_config('twitter_url'))
+                            <a href="{{ theme_config('twitter_url') }}" target="_blank" rel="noopener" title="Twitter/X"><i class="fab fa-x-twitter"></i></a>
+                        @endif
                     </div>
                 </div>
                 <div class="header-top-right">
                     <div class="header-top-contact">
                         <ul>
                             <li>
-                                <a href="{{ theme_config('google_maps_url', '#') }}" target="_blank">
-                                    <i class="far fa-location-dot"></i> {{ theme_config('address') }}
+                                <a href="{{ $siteSettings['google_maps_url'] ?? theme_config('google_maps_url', '#') }}" target="_blank">
+                                    <i class="far fa-location-dot"></i> {{ $siteSettings['contact_address'] ?? theme_config('address') }}
                                 </a>
                             </li>
                             <li>
-                                <a href="mailto:{{ theme_config('email') }}" target="_blank">
-                                    <i class="far fa-envelope"></i> {{ theme_config('email') }}
+                                <a href="mailto:{{ $siteSettings['contact_email'] ?? theme_config('email') }}" target="_blank">
+                                    <i class="far fa-envelope"></i> {{ $siteSettings['contact_email'] ?? theme_config('email') }}
                                 </a>
                             </li>
                             <li>
-                                <a href="tel:{{ theme_config('phone') }}">
-                                    <i class="far fa-phone-volume"></i> {{ theme_config('phone') }}
+                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $siteSettings['contact_phone'] ?? theme_config('phone')) }}">
+                                    <i class="far fa-phone-volume"></i> {{ $siteSettings['contact_phone'] ?? theme_config('phone') }}
                                 </a>
                             </li>
                         </ul>

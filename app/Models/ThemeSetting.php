@@ -113,10 +113,12 @@ class ThemeSetting extends Model
             // Auto-detect type for json fields
             if (in_array($key, [
                 'hero_images',
+                'hero_slides',
                 'program_peminatan',
-                'features',
                 'program_unggulan',
+                'features',
                 'menu',
+                'related_links',
                 'working_hours',
                 'kepala_sekolah',
                 'jurusan',
@@ -263,12 +265,15 @@ class ThemeSetting extends Model
             'whatsapp' => 'general',
             'email' => 'general',
             'ppdb_url' => 'general',
+            'slogan' => 'general',
 
             // Logo & Assets
             'assets_path' => 'general',
             'favicon' => 'general',
             'logo' => 'general',
             'logo_light' => 'general',
+            'logo_icon' => 'general',
+            'logo_text' => 'general',
 
             // ═══ Landing Page: Site Info ═══
             'site_name' => 'general',
@@ -289,8 +294,13 @@ class ThemeSetting extends Model
             'instagram_url' => 'social',
             'youtube_url' => 'social',
             'tiktok_url' => 'social',
+            'twitter' => 'social',
+            'twitter_url' => 'social',
+            'whatsapp_url' => 'social',
+            'pinterest_url' => 'social',
+            'linktree_url' => 'social',
 
-            // ═══ Landing Page: Social (admin) ═══
+            // ═══ Landing Page: Social (admin — backward compat) ═══
             'social_facebook' => 'social',
             'social_instagram' => 'social',
             'social_youtube' => 'social',
@@ -298,6 +308,7 @@ class ThemeSetting extends Model
 
             // ═══ Hero ═══
             'hero_images' => 'hero',
+            'hero_slides' => 'hero',
 
             // ═══ Landing Page: Hero Slides ═══
             'hero_title' => 'hero',
@@ -396,15 +407,18 @@ class ThemeSetting extends Model
             'working_hours' => 'contact',
             'contact_email' => 'contact',
             'contact_phone' => 'contact',
+            'contact_phone_secondary' => 'contact',
             'contact_address' => 'contact',
             'contact_section_subtitle' => 'contact',
             'contact_section_title' => 'contact',
             'contact_section_description' => 'contact',
             'contact_map_url' => 'contact',
             'contact_operational_hours' => 'contact',
+            'google_maps_url' => 'contact',
 
             // ═══ Menu ═══
             'menu' => 'menu',
+            'related_links' => 'menu',
         ];
     }
 }

@@ -312,12 +312,22 @@ class LandingController extends Controller
             // Contact — theme-aware defaults
             'contact_email' => theme_config('contact_email') ?? ($themeData['email'] ?? 'info@smktelekom.sch.id'),
             'contact_phone' => theme_config('contact_phone') ?? ($themeData['phone'] ?? ''),
+            'contact_phone_secondary' => theme_config('contact_phone_secondary', '') ?: theme_config('phone_secondary', '') ?: ($themeData['phone_secondary'] ?? ''),
             'contact_address' => theme_config('contact_address') ?? ($themeData['address'] ?? ''),
             'contact_section_subtitle' => theme_config('contact_section_subtitle') ?? 'Hubungi Kami',
             'contact_section_title' => theme_config('contact_section_title') ?? 'Kontak',
             'contact_section_description' => theme_config('contact_section_description') ?? 'Jangan ragu untuk menghubungi kami jika memiliki pertanyaan',
 
-            // Social media — theme-aware defaults
+            // Social media — theme-aware defaults (new keys + backward compat old keys)
+            'facebook_url' => theme_config('facebook_url') ?? ($themeData['facebook_url'] ?? ''),
+            'instagram_url' => theme_config('instagram_url') ?? ($themeData['instagram_url'] ?? ''),
+            'youtube_url' => theme_config('youtube_url') ?? ($themeData['youtube_url'] ?? ''),
+            'whatsapp_url' => theme_config('whatsapp_url') ?? ('https://wa.me/' . ($themeData['whatsapp'] ?? '')),
+            'twitter_url' => theme_config('twitter_url') ?? '',
+            'tiktok_url' => theme_config('tiktok_url') ?? '',
+            'pinterest_url' => theme_config('pinterest_url') ?? '',
+            'google_maps_url' => theme_config('google_maps_url') ?? '',
+            // Backward compat: key lama (deprecated, gunakan key baru)
             'social_facebook' => theme_config('social_facebook') ?? ($themeData['facebook_url'] ?? ''),
             'social_instagram' => theme_config('social_instagram') ?? ($themeData['instagram_url'] ?? ''),
             'social_youtube' => theme_config('social_youtube') ?? ($themeData['youtube_url'] ?? ''),

@@ -16,6 +16,7 @@ return [
     'address' => 'Jl. Raya Jenu, Jenu, Tuban, Jawa Timur',
     'phone' => '085649400339',
     'phone_secondary' => '(0321)868188',
+    'contact_phone_secondary' => '(0321) 868188',
     'whatsapp' => '6285649400339',
     'email' => 'smktelkomdujbg@gmail.com',
     'ppdb_url' => 'https://psb.ponpesdarululum.id/',
