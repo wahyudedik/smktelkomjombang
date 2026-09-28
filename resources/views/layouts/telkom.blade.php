@@ -281,9 +281,11 @@
             }
 
             /* ---- Nav menu container: vertical stack ---- */
-            html body .rs-menu ul.nav-menu,
-            html body .main-menu .rs-menu-area ul.nav-menu,
-            html body ul.nav-menu {
+            /* Selector IDENTIK style.css (specificity 0,9,0) — required because
+               style.css sets display:flex !important WITHOUT media query.
+               Both use !important, so specificity wins. Same specificity = cascade order wins. */
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu,
+            html body .rs-menu ul.nav-menu {
                 display: block !important;
                 flex-wrap: wrap !important;
                 flex-direction: column !important;
@@ -298,16 +300,19 @@
             }
 
             /* ---- Nav menu items: full width blocks ---- */
-            html body .rs-menu ul.nav-menu > li,
-            html body .main-menu .rs-menu-area ul.nav-menu > li,
-            html body ul.nav-menu > li {
+            /* Selector IDENTIK style.css line 15510 (specificity 0,9,0) */
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li,
+            html body .rs-menu ul.nav-menu > li {
                 display: block !important;
                 flex-shrink: unset !important;
+                flex-grow: unset !important;
+                float: none !important;
                 width: 100% !important;
                 padding: 8px 0 !important;
                 border-bottom: 1px solid rgba(255,255,255,0.1) !important;
                 margin: 0 !important;
                 background: transparent !important;
+                white-space: normal !important;
             }
 
             /* ---- Nav links: visible and tappable ---- */
@@ -324,8 +329,8 @@
             }
 
             /* ---- Sub-menu dropdowns: static, full width ---- */
-            html body .rs-menu ul.nav-menu .sub-menu,
-            html body ul.nav-menu .sub-menu {
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu .sub-menu,
+            html body .rs-menu ul.nav-menu .sub-menu {
                 display: block !important;
                 position: static !important;
                 width: 100% !important;
