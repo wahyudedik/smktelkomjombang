@@ -252,8 +252,38 @@
            MOBILE MENU: Force vertical stacking on mobile
            ======================================== */
         @media (max-width: 991px) {
+            /* ---- Topbar: hide on mobile ---- */
+            html body .full-width-header .topbar-area {
+                display: none !important;
+            }
+
+            /* ---- Menu area full width on mobile ---- */
+            html body .full-width-header.header-style2 .rs-header .menu-area {
+                padding: 4px 0 !important;
+            }
+
+            /* ---- Logo: smaller on mobile ---- */
+            html body .logo-cat-wrap {
+                flex-wrap: nowrap !important;
+                gap: 8px !important;
+            }
+            html body .brand-logo-wrap .logo-badge {
+                height: 40px !important;
+                width: 40px !important;
+                max-height: 40px !important;
+            }
+            html body .brand-logo-wrap .logo-text {
+                height: 30px !important;
+                max-height: 30px !important;
+            }
+            html body .categories-btn {
+                display: none !important;
+            }
+
+            /* ---- Nav menu container: vertical stack ---- */
             html body .rs-menu ul.nav-menu,
-            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu {
+            html body .main-menu .rs-menu-area ul.nav-menu,
+            html body ul.nav-menu {
                 display: block !important;
                 flex-wrap: wrap !important;
                 flex-direction: column !important;
@@ -263,30 +293,84 @@
                 width: 100% !important;
                 padding: 10px !important;
                 margin: 0 !important;
+                max-height: 70vh !important;
+                overflow-y: auto !important;
             }
 
+            /* ---- Nav menu items: full width blocks ---- */
             html body .rs-menu ul.nav-menu > li,
-            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li {
+            html body .main-menu .rs-menu-area ul.nav-menu > li,
+            html body ul.nav-menu > li {
                 display: block !important;
                 flex-shrink: unset !important;
                 width: 100% !important;
                 padding: 8px 0 !important;
                 border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+                margin: 0 !important;
+                background: transparent !important;
             }
 
-            html body .rs-menu ul.nav-menu > li > a {
+            /* ---- Nav links: visible and tappable ---- */
+            html body .rs-menu ul.nav-menu > li > a,
+            html body ul.nav-menu > li > a {
                 display: block !important;
                 color: #fff !important;
                 font-size: 15px !important;
-                padding: 8px 0 !important;
+                font-weight: 600 !important;
+                padding: 10px 0 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                white-space: normal !important;
             }
 
-            /* Sub-menu dropdowns */
-            html body .rs-menu ul.nav-menu .sub-menu {
+            /* ---- Sub-menu dropdowns: static, full width ---- */
+            html body .rs-menu ul.nav-menu .sub-menu,
+            html body ul.nav-menu .sub-menu {
                 display: block !important;
                 position: static !important;
                 width: 100% !important;
                 padding-left: 20px !important;
+                background: rgba(255,255,255,0.05) !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+            html body .rs-menu ul.nav-menu .sub-menu li a,
+            html body ul.nav-menu .sub-menu li a {
+                color: #fff !important;
+                font-size: 14px !important;
+                padding: 8px 12px !important;
+                background: transparent !important;
+            }
+
+            /* ---- Canvas menu (right sidebar): visible on mobile ---- */
+            html body .right_menu_togle {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+
+            /* ---- Hide desktop-only elements ---- */
+            html body .menu-toggle-btn,
+            html body .rs-menu-toggle {
+                display: block !important;
+            }
+
+            /* ---- Fix inline style overrides for mobile ---- */
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a *,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li:hover > a,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li:hover > a *,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li.hover > a,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li.hover > a *,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a:hover,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li > a:hover *,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li.active-menu > a,
+            html body .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu > li.current-menu-item > a {
+                display: block !important;
+                white-space: normal !important;
+                padding: 10px 0 !important;
+                font-size: 15px !important;
             }
         }
     </style>
