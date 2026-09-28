@@ -4979,3 +4979,51 @@
         visibility: visible !important;
     }
 }
+
+/* ========================================
+   MOBILE MENU FIX: Force block layout for nav items on screens <=991px
+   This MUST be LAST in responsive.css to override all other flex rules.
+   Addresses: DevTools showing flex badge on .nav-menu > li at 375px viewport.
+   ======================================== */
+@media (max-width: 991px) {
+
+    /* Force nav-menu container to block layout */
+    .rs-menu ul.nav-menu,
+    .full-width-header .rs-header .menu-area .main-menu .rs-menu ul.nav-menu,
+    .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu {
+        display: block !important;
+        flex-wrap: wrap !important;
+        flex-direction: column !important;
+        white-space: normal !important;
+        align-items: stretch !important;
+        justify-content: flex-start !important;
+        width: 100% !important;
+    }
+
+    /* Force each nav item to full-width block */
+    .rs-menu ul.nav-menu>li,
+    .full-width-header .rs-header .menu-area .main-menu .rs-menu ul.nav-menu>li,
+    .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu>li {
+        display: block !important;
+        flex-shrink: unset !important;
+        flex-grow: unset !important;
+        width: 100% !important;
+        padding: 8px 0 !important;
+    }
+
+    /* Force nav links to block */
+    .rs-menu ul.nav-menu>li>a,
+    .full-width-header .rs-header .menu-area .main-menu .rs-menu ul.nav-menu>li>a {
+        display: block !important;
+        white-space: normal !important;
+    }
+
+    /* Force sub-menus to static full-width */
+    .rs-menu ul.nav-menu .sub-menu,
+    .full-width-header .rs-header .menu-area .main-menu .rs-menu ul.nav-menu .sub-menu,
+    .full-width-header.header-style2 .rs-header .menu-area .rs-menu-area .main-menu .rs-menu ul.nav-menu .sub-menu {
+        position: static !important;
+        width: 100% !important;
+        box-shadow: none !important;
+    }
+}
