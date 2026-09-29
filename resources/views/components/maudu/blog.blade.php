@@ -25,8 +25,8 @@
                                 <i class="fal fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($blog->created_at)->format('M d, Y') }}
                             </div>
                             <div class="blog-item-img">
-                                @if (!empty($blog->image))
-                                    <img src="{{ Storage::url($blog->image) }}" alt="{{ $blog->title }}">
+                                @if (!empty($blog->featured_image))
+                                    <img src="{{ Storage::url($blog->featured_image) }}" alt="{{ $blog->title }}">
                                 @else
                                     <img src="{{ asset('assets_maudu/assets/img/blog/0' . (($index % 3) + 1) . '.jpg') }}" alt="{{ $blog->title }}">
                                 @endif

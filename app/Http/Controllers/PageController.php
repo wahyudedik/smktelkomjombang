@@ -116,6 +116,7 @@ class PageController extends Controller
             'is_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
             'menu_position' => 'nullable|in:header,footer',
+            'theme' => 'nullable|string|max:50',
             'parent_id' => 'nullable|exists:pages,id',
             'menu_icon' => 'nullable|string|max:100',
             'menu_url' => 'nullable|string|max:500',
@@ -125,6 +126,8 @@ class PageController extends Controller
 
         $data = $request->all();
         $data['user_id'] = Auth::id();
+        // ⭐ Set theme: use selected theme or default to current theme for menu items
+        $data['theme'] = $request->input('theme') ?: ($request->boolean('is_menu') ? current_theme() : null);
         // Ensure slug is always generated correctly (remove any spaces, special chars)
         $data['slug'] = Str::slug($request->title);
 
@@ -195,8 +198,7 @@ class PageController extends Controller
 
             // Clear menu cache after creating page with menu
             if ($data['is_menu'] ?? false) {
-                cache()->forget('header_menus');
-                cache()->forget('footer_menus');
+                \App\Providers\MenuServiceProvider::clearMenuCache($data['theme'] ?? null);
             }
 
             return $page;
@@ -226,7 +228,14 @@ class PageController extends Controller
      */
     public function getMenus()
     {
+        $theme = current_theme();
+
         $headerMenus = Page::menu()
+            ->where(function ($query) use ($theme) {
+                $query->where('theme', $theme)
+                      ->orWhereNull('theme')
+                      ->orWhere('theme', '');
+            })
             ->menuPosition('header')
             ->mainMenu()
             ->orderBy('menu_sort_order')
@@ -234,6 +243,11 @@ class PageController extends Controller
             ->get();
 
         $footerMenus = Page::menu()
+            ->where(function ($query) use ($theme) {
+                $query->where('theme', $theme)
+                      ->orWhereNull('theme')
+                      ->orWhere('theme', '');
+            })
             ->menuPosition('footer')
             ->mainMenu()
             ->orderBy('menu_sort_order')
@@ -278,6 +292,7 @@ class PageController extends Controller
             'is_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
             'menu_position' => 'nullable|in:header,footer',
+            'theme' => 'nullable|string|max:50',
             'parent_id' => 'nullable|exists:pages,id',
             'menu_icon' => 'nullable|string|max:100',
             'menu_url' => 'nullable|string|max:500',
@@ -286,6 +301,8 @@ class PageController extends Controller
         ]);
 
         $data = $request->all();
+        // ⭐ Set theme: use selected theme or null for non-menu pages
+        $data['theme'] = $request->input('theme') ?: ($request->boolean('is_menu') ? current_theme() : null);
         // Ensure slug is always generated correctly (remove any spaces, special chars)
         $data['slug'] = Str::slug($request->title);
 
@@ -357,8 +374,8 @@ class PageController extends Controller
 
         // Clear menu cache after updating page with menu
         if ($data['is_menu'] ?? $page->is_menu) {
-            cache()->forget('header_menus');
-            cache()->forget('footer_menus');
+            $menuTheme = $data['theme'] ?? $page->theme ?? null;
+            \App\Providers\MenuServiceProvider::clearMenuCache($menuTheme);
         }
 
         return redirect()->route('admin.pages.index')

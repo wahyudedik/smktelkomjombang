@@ -21,6 +21,10 @@ class MenuSeeder extends Seeder
             return;
         }
 
+        // ⭐ Use current theme so menus are theme-specific, not global (null).
+        // This prevents duplicate menus when multiple themes have their own menus.
+        $theme = current_theme();
+
         // Create main menu items
         $profilMenu = Page::create([
             'title' => 'Profil Sekolah',
@@ -34,6 +38,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'PROFIL',
             'menu_position' => 'header',
+            'theme' => $theme,
             'menu_sort_order' => 1,
             'published_at' => now(),
             'user_id' => $superadmin->id,
@@ -51,6 +56,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'AKADEMIK',
             'menu_position' => 'header',
+            'theme' => $theme,
             'menu_sort_order' => 2,
             'published_at' => now(),
             'user_id' => $superadmin->id,
@@ -68,6 +74,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'LAYANAN DIGITAL',
             'menu_position' => 'header',
+            'theme' => $theme,
             'menu_sort_order' => 3,
             'published_at' => now(),
             'user_id' => $superadmin->id,
@@ -86,6 +93,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'SEJARAH',
             'menu_position' => 'header',
+            'theme' => $theme,
             'parent_id' => $profilMenu->id,
             'menu_sort_order' => 1,
             'published_at' => now(),
@@ -104,6 +112,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'VISI & MISI',
             'menu_position' => 'header',
+            'theme' => $theme,
             'parent_id' => $profilMenu->id,
             'menu_sort_order' => 2,
             'published_at' => now(),
@@ -122,6 +131,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'STRUKTUR ORGANISASI',
             'menu_position' => 'header',
+            'theme' => $theme,
             'parent_id' => $profilMenu->id,
             'menu_sort_order' => 3,
             'published_at' => now(),
@@ -141,6 +151,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'KURIKULUM',
             'menu_position' => 'header',
+            'theme' => $theme,
             'parent_id' => $akademikMenu->id,
             'menu_sort_order' => 1,
             'published_at' => now(),
@@ -159,6 +170,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'PROGRAM UNGGULAN',
             'menu_position' => 'header',
+            'theme' => $theme,
             'parent_id' => $akademikMenu->id,
             'menu_sort_order' => 2,
             'published_at' => now(),
@@ -178,6 +190,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'E-LEARNING',
             'menu_position' => 'header',
+            'theme' => $theme,
             'parent_id' => $layananMenu->id,
             'menu_sort_order' => 1,
             'published_at' => now(),
@@ -196,6 +209,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'PORTAL ORANG TUA',
             'menu_position' => 'header',
+            'theme' => $theme,
             'parent_id' => $layananMenu->id,
             'menu_sort_order' => 2,
             'published_at' => now(),
@@ -215,6 +229,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'Kebijakan Privasi',
             'menu_position' => 'footer',
+            'theme' => $theme,
             'menu_sort_order' => 1,
             'published_at' => now(),
             'user_id' => $superadmin->id,
@@ -232,6 +247,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'Syarat & Ketentuan',
             'menu_position' => 'footer',
+            'theme' => $theme,
             'menu_sort_order' => 2,
             'published_at' => now(),
             'user_id' => $superadmin->id,
@@ -249,6 +265,7 @@ class MenuSeeder extends Seeder
             'is_menu' => true,
             'menu_title' => 'Kontak Kami',
             'menu_position' => 'footer',
+            'theme' => $theme,
             'menu_sort_order' => 3,
             'published_at' => now(),
             'user_id' => $superadmin->id,

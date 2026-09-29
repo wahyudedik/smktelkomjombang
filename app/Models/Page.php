@@ -28,6 +28,7 @@ class Page extends Model
         'is_menu',
         'menu_title',
         'menu_position',
+        'theme',
         'parent_id',
         'menu_icon',
         'menu_url',
@@ -87,15 +88,17 @@ class Page extends Model
         parent::boot();
 
         static::creating(function ($page) {
-            // Always ensure slug is generated correctly from title
-            if (!empty($page->title)) {
-                $page->slug = Str::slug($page->title);
-            } elseif (empty($page->slug)) {
-                // If no title and no slug, set a default
-                $page->slug = Str::random(10);
-            } else {
-                // Sanitize existing slug if it contains invalid characters
+            // ⭐ Respect explicitly set slug (e.g., from SeedThemeMenus) — only override if slug is empty.
+            // This prevents unique slug collisions when seeding menu items for multiple themes.
+            if (!empty($page->slug)) {
+                // Slug was explicitly set — sanitize it but don't override
                 $page->slug = Str::slug($page->slug);
+            } elseif (!empty($page->title)) {
+                // No slug set — generate from title
+                $page->slug = Str::slug($page->title);
+            } else {
+                // Neither slug nor title — use random
+                $page->slug = Str::random(10);
             }
         });
 
@@ -181,10 +184,40 @@ class Page extends Model
     }
 
     /**
+     * Scope to filter pages by theme.
+     * null = global (all themes), or specific theme name.
+     */
+    public function scopeForTheme($query, ?string $theme = null): \Illuminate\Database\Eloquent\Builder
+    {
+        if ($theme === null) {
+            $theme = current_theme();
+        }
+
+        return $query->where(function ($q) use ($theme) {
+            $q->where('theme', $theme)
+              ->orWhereNull('theme')
+              ->orWhere('theme', '');
+        });
+    }
+
+    /**
+     * Scope to get menu pages for a specific theme.
+     * Combines menu() and forTheme() scopes.
+     */
+    public function scopeMenuForTheme($query, ?string $theme = null): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->menu()->forTheme($theme);
+    }
+
+    /**
      * Get the page URL.
      */
     public function getUrlAttribute(): string
     {
+        if (empty($this->slug)) {
+            return '#';
+        }
+
         return route('pages.public.show', $this->slug);
     }
 
@@ -210,7 +243,11 @@ class Page extends Model
             if (str_contains($customUrl, ' ') || !str_starts_with($customUrl, '/')) {
                 // Treat it as slug and generate proper route
                 $sanitizedSlug = Str::slug($customUrl);
-                return route('pages.public.show', $sanitizedSlug);
+                // Safety check: if slugification produces empty string (e.g. menu_url = "#"),
+                // fall back to the original custom URL to avoid UrlGenerationException
+                if (!empty($sanitizedSlug)) {
+                    return route('pages.public.show', $sanitizedSlug);
+                }
             }
             return $customUrl;
         }

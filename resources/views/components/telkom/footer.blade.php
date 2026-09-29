@@ -13,11 +13,28 @@
                 </div>
                 <div class="col-lg-4 col-md-12 col-sm-12 footer-widget md-mb-50">
                     <h4 class="widget-title">Link Terkait</h4>
-                    <ul class="site-map">
-                        @foreach(theme_config('related_links', []) as $link)
-                            <li><a href="{{ resolve_theme_url($link['url'] ?? '#') }}">{{ $link['label'] ?? '' }}</a></li>
-                        @endforeach
-                    </ul>
+                    {{-- DB footer menus first, config fallback --}}
+                    @if ($footerMenus->count() > 0)
+                        <ul class="site-map">
+                            @foreach ($footerMenus as $menu)
+                                @if ($menu->children->count() > 0)
+                                    @foreach ($menu->children as $submenu)
+                                        <li><a href="{{ $submenu->menu_url }}"
+                                            @if ($submenu->menu_target_blank) target="_blank" @endif>{{ $submenu->menu_title }}</a></li>
+                                    @endforeach
+                                @else
+                                    <li><a href="{{ $menu->menu_url }}"
+                                        @if ($menu->menu_target_blank) target="_blank" @endif>{{ $menu->menu_title }}</a></li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    @else
+                        <ul class="site-map">
+                            @foreach(theme_config('related_links', []) as $link)
+                                <li><a href="{{ resolve_theme_url($link['url'] ?? '#') }}">{{ $link['label'] ?? '' }}</a></li>
+                            @endforeach
+                        </ul>
+                    @endif
                 </div>
 
                 <div class="col-lg-4 col-md-12 col-sm-12 footer-widget">
@@ -25,7 +42,7 @@
                     <ul class="address-widget">
                         <li>
                             <i class="flaticon-location"></i>
-                            <div class="desc">
+                            <div class="desc" style="padding-left: 45px;">
                                 {{ $siteSettings['contact_address'] ?? theme_config('address', 'Ponpes Darul Ulum Jombang') }}
                             </div>
                         </li>
@@ -36,7 +53,7 @@
                         @if(!empty($primaryPhone) || !empty($secondaryPhone))
                         <li>
                             <i class="flaticon-call"></i>
-                            <div class="desc">
+                            <div class="desc" style="padding-left: 45px;">
                                 @if(!empty($primaryPhone))
                                     <a href="https://wa.me/{{ $siteSettings['whatsapp_url'] ?? theme_config('whatsapp', '6285649400339') }}">{{ $primaryPhone }}</a>
                                 @endif
@@ -51,7 +68,7 @@
                         @endif
                         <li>
                             <i class="flaticon-email"></i>
-                            <div class="desc">
+                            <div class="desc" style="padding-left: 45px;">
                                 <a href="mailto:{{ $siteSettings['contact_email'] ?? theme_config('email', 'smktelkomdujbg@gmail.com') }}">{{ $siteSettings['contact_email'] ?? theme_config('email', 'smktelkomdujbg@gmail.com') }}</a>
                             </div>
                         </li>

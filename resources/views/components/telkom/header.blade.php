@@ -78,26 +78,47 @@
                                 </div>
                                 <nav class="rs-menu">
                                     <ul class="nav-menu">
-                                        @foreach (theme_config('menu', []) as $item)
-                                            @if (isset($item['children']) && count($item['children']) > 0)
-                                                <li class="menu-item-has-children">
-                                                    <a
-                                                        href="{{ resolve_theme_url($item['url'] ?? '#') }}">{{ $item['label'] }} +</a>
-                                                    <ul class="sub-menu">
-                                                        @foreach ($item['children'] as $child)
-                                                            <li><a
-                                                                    href="{{ resolve_theme_url($child['url'] ?? '#') }}">{{ $child['label'] }}</a>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                </li>
-                                            @else
-                                                <li class="menu-item-has">
-                                                    <a href="{{ resolve_theme_url($item['url'] ?? '#') }}"
-                                                        @if (($item['target'] ?? '') === '_blank') target="_blank" @endif>{{ $item['label'] }}</a>
-                                                </li>
-                                            @endif
-                                        @endforeach
+                                        {{-- DB menus first, config fallback --}}
+                                        @php $useDbMenus = $headerMenus->count() > 0; @endphp
+                                        @if ($useDbMenus)
+                                            @foreach ($headerMenus as $menu)
+                                                @if ($menu->children->count() > 0)
+                                                    <li class="menu-item-has-children">
+                                                        <a href="{{ $menu->menu_url }}"
+                                                            @if ($menu->menu_target_blank) target="_blank" @endif>{{ $menu->menu_title }} +</a>
+                                                        <ul class="sub-menu">
+                                                            @foreach ($menu->children as $submenu)
+                                                                <li><a href="{{ $submenu->menu_url }}"
+                                                                    @if ($submenu->menu_target_blank) target="_blank" @endif>{{ $submenu->menu_title }}</a></li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </li>
+                                                @else
+                                                    <li class="menu-item-has">
+                                                        <a href="{{ $menu->menu_url }}"
+                                                            @if ($menu->menu_target_blank) target="_blank" @endif>{{ $menu->menu_title }}</a>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            @foreach (theme_config('menu', []) as $item)
+                                                @if (isset($item['children']) && count($item['children']) > 0)
+                                                    <li class="menu-item-has-children">
+                                                        <a href="{{ resolve_theme_url($item['url'] ?? '#') }}">{{ $item['label'] }} +</a>
+                                                        <ul class="sub-menu">
+                                                            @foreach ($item['children'] as $child)
+                                                                <li><a href="{{ resolve_theme_url($child['url'] ?? '#') }}">{{ $child['label'] }}</a></li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </li>
+                                                @else
+                                                    <li class="menu-item-has">
+                                                        <a href="{{ resolve_theme_url($item['url'] ?? '#') }}"
+                                                            @if (($item['target'] ?? '') === '_blank') target="_blank" @endif>{{ $item['label'] }}</a>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+                                        @endif
                                     </ul>
                                 </nav>
                             </div>

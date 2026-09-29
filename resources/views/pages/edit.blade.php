@@ -242,6 +242,15 @@
                                         </div>
 
                                         <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Tema</label>
+                                            <input type="hidden" name="theme" value="{{ current_theme() }}">
+                                            <div class="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-700 text-sm">
+                                                🎨 {{ config("themes.available." . current_theme() . ".name", current_theme()) }}
+                                            </div>
+                                            <p class="text-sm text-gray-500 mt-1">Halaman ini menggunakan tema aktif saat ini</p>
+                                        </div>
+
+                                        <div>
                                             <label for="parent_id"
                                                 class="block text-sm font-medium text-gray-700 mb-1">{{ __('common.parent_menu') }}</label>
                                             <select name="parent_id" id="parent_id"

@@ -35,22 +35,42 @@
                     </div>
                 </div>
 
-                {{-- Link Terkait — dynamic dari theme_config --}}
+                {{-- Link Terkait — DB footer menus first, config fallback --}}
                 <div class="col-md-6 col-lg-2">
                     <div class="footer-widget-box list">
                         <h4 class="footer-widget-title">Link Terkait</h4>
-                        <ul class="footer-list">
-                            @php
-                                $relatedLinks = theme_config('related_links', [
-                                    ['label' => 'Tentang Yayasan', 'url' => 'route:pages.public.show,tentang-yayasan'],
-                                    ['label' => 'Tentang Madrasah', 'url' => 'route:pages.public.show,tentang-madrasah'],
-                                    ['label' => 'Testimonials', 'url' => 'route:testimonials.create'],
-                                ]);
-                            @endphp
-                            @foreach($relatedLinks as $link)
-                                <li><a href="{{ resolve_theme_url($link['url'] ?? '#') }}"><i class="fas fa-caret-right"></i> {{ $link['label'] ?? '' }}</a></li>
-                            @endforeach
-                        </ul>
+                        @if ($footerMenus->count() > 0)
+                            <ul class="footer-list">
+                                @foreach ($footerMenus as $menu)
+                                    @if ($menu->children->count() > 0)
+                                        @foreach ($menu->children as $submenu)
+                                            <li><a href="{{ $submenu->menu_url }}"
+                                                @if ($submenu->menu_target_blank) target="_blank" @endif>
+                                                <i class="fas fa-caret-right"></i> {{ $submenu->menu_title }}
+                                            </a></li>
+                                        @endforeach
+                                    @else
+                                        <li><a href="{{ $menu->menu_url }}"
+                                            @if ($menu->menu_target_blank) target="_blank" @endif>
+                                            <i class="fas fa-caret-right"></i> {{ $menu->menu_title }}
+                                        </a></li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        @else
+                            <ul class="footer-list">
+                                @php
+                                    $relatedLinks = theme_config('related_links', [
+                                        ['label' => 'Tentang Yayasan', 'url' => 'route:pages.public.show,tentang-yayasan'],
+                                        ['label' => 'Tentang Madrasah', 'url' => 'route:pages.public.show,tentang-madrasah'],
+                                        ['label' => 'Testimonials', 'url' => 'route:testimonials.create'],
+                                    ]);
+                                @endphp
+                                @foreach($relatedLinks as $link)
+                                    <li><a href="{{ resolve_theme_url($link['url'] ?? '#') }}"><i class="fas fa-caret-right"></i> {{ $link['label'] ?? '' }}</a></li>
+                                @endforeach
+                            </ul>
+                        @endif
                     </div>
                 </div>
 

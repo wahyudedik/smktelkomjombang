@@ -20,6 +20,7 @@
         "vite": "^7.0.4"
     },
     "dependencies": {
+        "puppeteer": "^25.12.0",
         "sweetalert2": "^11.26.3"
     }
 }

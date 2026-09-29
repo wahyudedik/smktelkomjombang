@@ -1,4 +1,4 @@
-@extends('layouts.telkom')
+@extends(theme_info('layout', 'layouts.telkom'))
 
 @php
     $pageTitle = $page->title;

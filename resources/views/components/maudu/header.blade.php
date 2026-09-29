@@ -72,35 +72,65 @@
 
                 <div class="collapse navbar-collapse" id="main_nav">
                     <ul class="navbar-nav align-items-center mx-auto">
-                        @foreach (theme_config('menu', []) as $item)
-                            @if (isset($item['children']) && count($item['children']) > 0)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle"
-                                        href="{{ resolve_theme_url($item['url'] ?? '#') }}" data-bs-toggle="dropdown"
-                                        data-bs-auto-close="outside">
-                                        {{ $item['label'] }}
-                                    </a>
-                                    <ul class="dropdown-menu fade-down">
-                                        @foreach ($item['children'] as $child)
-                                            <li><a class="dropdown-item"
-                                                    href="{{ resolve_theme_url($child['url'] ?? '#') }}">{{ $child['label'] }}</a>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @else
-                                <li class="nav-item">
-                                    <a class="nav-link text-nowrap" href="{{ resolve_theme_url($item['url'] ?? '#') }}"
-                                        @if (($item['target'] ?? '') === '_blank') target="_blank" @endif>{{ $item['label'] }}</a>
-                                </li>
-                            @endif
-                        @endforeach
+                        {{-- DB menus first, config fallback --}}
+                        @php $useDbMenus = $headerMenus->count() > 0; @endphp
+                        @if ($useDbMenus)
+                            @foreach ($headerMenus as $menu)
+                                @if ($menu->children->count() > 0)
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle"
+                                            href="{{ $menu->menu_url }}" data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside"
+                                            @if ($menu->menu_target_blank) target="_blank" @endif>
+                                            {{ $menu->menu_title }}
+                                        </a>
+                                        <ul class="dropdown-menu fade-down">
+                                            @foreach ($menu->children as $submenu)
+                                                <li><a class="dropdown-item"
+                                                        href="{{ $submenu->menu_url }}"
+                                                        @if ($submenu->menu_target_blank) target="_blank" @endif>{{ $submenu->menu_title }}</a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @else
+                                    <li class="nav-item">
+                                        <a class="nav-link text-nowrap" href="{{ $menu->menu_url }}"
+                                            @if ($menu->menu_target_blank) target="_blank" @endif>{{ $menu->menu_title }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+                        @else
+                            @foreach (theme_config('menu', []) as $item)
+                                @if (isset($item['children']) && count($item['children']) > 0)
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle"
+                                            href="{{ resolve_theme_url($item['url'] ?? '#') }}" data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside">
+                                            {{ $item['label'] }}
+                                        </a>
+                                        <ul class="dropdown-menu fade-down">
+                                            @foreach ($item['children'] as $child)
+                                                <li><a class="dropdown-item"
+                                                        href="{{ resolve_theme_url($child['url'] ?? '#') }}">{{ $child['label'] }}</a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @else
+                                    <li class="nav-item">
+                                        <a class="nav-link text-nowrap" href="{{ resolve_theme_url($item['url'] ?? '#') }}"
+                                            @if (($item['target'] ?? '') === '_blank') target="_blank" @endif>{{ $item['label'] }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+                        @endif
                     </ul>
 
                     <div class="nav-right">
                         <div class="nav-right-btn mt-2 d-flex align-items-center gap-2">
                             <a href="{{ theme_config('linktree_url', theme_config('ppdb_url', '#')) }}" target="_blank"
-                                class="theme-btn">
+                                class="nav-cta-btn">
                                 <span class="fal fa-book"></span> INFORMASI PENDAFTARAN
                             </a>
                         </div>
@@ -109,5 +139,42 @@
             </div>
         </nav>
     </div>
+
+    <style>
+        .nav-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--color-white);
+            background: var(--theme-color2);
+            border-radius: 50px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            line-height: 1.4;
+        }
+        .nav-cta-btn:hover {
+            color: var(--color-white);
+            background: var(--theme-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+        .nav-cta-btn i,
+        .nav-cta-btn .fal {
+            font-size: 13px;
+        }
+        @media (max-width: 1199px) {
+            .nav-cta-btn {
+                padding: 10px 18px;
+                font-size: 11px;
+            }
+        }
+    </style>
 </header>
 <!-- Header End -->

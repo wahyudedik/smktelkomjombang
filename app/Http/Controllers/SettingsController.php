@@ -58,8 +58,12 @@ class SettingsController extends Controller
 
         $theme = current_theme();
 
-        // Performance: single query with eager loading instead of 3 separate queries
+        // ⭐ Filter pages by active theme (include global null-theme pages)
         $pages = Page::where('is_menu', true)
+            ->where(function ($query) use ($theme) {
+                $query->where('theme', $theme)
+                      ->orWhereNull('theme');
+            })
             ->with('children')
             ->orderBy('menu_sort_order')
             ->get();
