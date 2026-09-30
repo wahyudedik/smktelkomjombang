@@ -97,7 +97,7 @@ self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // Skip non-GET requests
+    // Skip non-GET requests — never cache POST/PUT/DELETE
     if (request.method !== 'GET') {
         return;
     }
@@ -107,23 +107,32 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Skip admin/auth routes (these should always be online)
-    if (url.pathname.startsWith('/admin') ||
-        url.pathname.startsWith('/login') ||
-        url.pathname.startsWith('/register')) {
-        event.respondWith(fetch(request));
-        return;
+    // ⚠️ Skip routes that must ALWAYS go to network (no caching, no interception).
+    // Using bare `return` (without respondWith) lets the browser handle the request natively.
+    const SKIP_PATHS = [
+        '/admin',
+        '/login',
+        '/logout',
+        '/register',
+        '/dashboard',
+        '/api',
+        '/sanctum',
+        '/ignition',
+        '/_debugbar',
+    ];
+    if (SKIP_PATHS.some((prefix) => url.pathname.startsWith(prefix))) {
+        return; // do NOT call respondWith — browser handles it directly
     }
 
     // Cache strategy based on resource type
     if (url.pathname.match(/\.(css|js|woff|woff2|ttf|png|jpg|jpeg|gif|svg|ico)$/)) {
         // Static assets: Cache First
         event.respondWith(cacheFirst(request));
-    } else if (url.pathname.startsWith('/api/')) {
-        // API requests: Network First
+    } else if (url.pathname.match(/\?(?:v|ver|version|t|cb)=/)) {
+        // Versioned/hard-refresh assets: Network First (avoid stale cache)
         event.respondWith(networkFirst(request));
     } else {
-        // HTML pages: Network First with fallback
+        // HTML pages & everything else: Network First with fallback
         event.respondWith(networkFirst(request));
     }
 });

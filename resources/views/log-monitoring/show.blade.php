@@ -228,13 +228,32 @@
 
         function copyLogContent() {
             const logText = document.getElementById('logPre').innerText;
-            navigator.clipboard.writeText(logText).then(function() {
+
+            function showToast() {
                 const toast = document.createElement('div');
                 toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
                 toast.textContent = 'Log copied to clipboard!';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
-            });
+            }
+
+            function fallbackCopy() {
+                const textArea = document.createElement('textarea');
+                textArea.value = logText;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast();
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(logText).then(showToast).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
         }
 
         // Keyboard shortcuts

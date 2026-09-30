@@ -341,9 +341,19 @@
                             'bulletedList', 'numberedList', '|',
                             'outdent', 'indent', '|',
                             'blockQuote', 'insertTable', '|',
+                            'imageUpload', '|',
                             'undo', 'redo'
                         ],
                         shouldNotGroupWhenFull: true
+                    },
+                    image: {
+                        toolbar: [
+                            'imageTextAlternative', 'toggleImageCaption', '|',
+                            'imageStyle:inline', 'imageStyle:block', 'imageStyle:side'
+                        ]
+                    },
+                    simpleUpload: {
+                        uploadUrl: '{{ route("admin.pages.upload-image") }}'
                     },
                     height: 400,
                     language: '{{ app()->getLocale() }}'

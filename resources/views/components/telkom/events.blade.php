@@ -4,8 +4,8 @@
         <div class="row">
             <div class="col-lg-6 pr-65 pt-24 md-pt-0 md-pr-15 md-mb-30">
                 <div class="sec-title mb-42">
-                    <div class="sub-title primary">Kegiatan Sekolah</div>
-                    <h2 class="title mb-0">SKATELDU</h2>
+                    <div class="sub-title primary">{{ theme_config('events_section_tag', 'Kegiatan Sekolah') }}</div>
+                    <h2 class="title mb-0">{{ theme_config('events_section_title', 'SKATELDU') }}</h2>
                 </div>
                 <div class="single-img wow fadeInUp" data-wow-delay="300ms" data-wow-duration="2000ms">
                     <img src="{{ asset('assets_telkom/assets/images/event/single.jpg') }}" alt="Event Image">
@@ -65,7 +65,7 @@
                         </div>
                     @endforelse
                     <div class="btn-part mt-55 md-mt-25 wow fadeInUp" data-wow-delay="600ms" data-wow-duration="2000ms">
-                        <a href="{{ $siteSettings['events_detail_url'] ?? '#' }}">Detail Kegiatan</a>
+                        <a href="{{ $siteSettings['events_detail_url'] ?? '#' }}">{{ theme_config('events_button_text', 'Detail Kegiatan') }}</a>
                     </div>
                 </div>
             </div>

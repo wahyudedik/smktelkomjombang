@@ -52,14 +52,12 @@ class PageController extends Controller
 
         $query = Page::with('user');
 
+        // Sembunyikan pages dengan kategori 'berita' (berita sudah punya halaman sendiri di /admin/berita)
+        $query->whereRaw('LOWER(category) != ?', ['berita']);
+
         // Filter by status (lebih robust: check filled)
         if ($request->filled('status')) {
             $query->where('status', $request->status);
-        }
-
-        // Filter by category (lebih robust: check filled)
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
         }
 
         // Search by title (lebih robust: check filled dan trim)
@@ -76,10 +74,9 @@ class PageController extends Controller
         $query->orderBy($sortBy, $sortOrder);
 
         $pages = $query->paginate(15)->withQueryString(); // Preserve query string saat pagination
-        $categories = Page::distinct()->pluck('category')->filter();
         $statuses = ['draft', 'published', 'archived'];
 
-        return view('pages.admin', compact('pages', 'categories', 'statuses'));
+        return view('pages.admin', compact('pages', 'statuses'));
     }
 
     /**
@@ -380,6 +377,30 @@ class PageController extends Controller
 
         return redirect()->route('admin.pages.index')
             ->with('success', 'Page updated successfully.');
+    }
+
+    // =========================================================
+    // IMAGE UPLOAD (CKEditor)
+    // =========================================================
+
+    /**
+     * Handle image upload from CKEditor content editor.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'upload' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+        ]);
+
+        $path = $request->file('upload')->store('pages/content', 'public');
+
+        return response()->json([
+            'urls' => [
+                'default' => Storage::url($path),
+            ],
+        ]);
     }
 
     /**

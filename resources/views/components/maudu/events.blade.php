@@ -6,9 +6,9 @@
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <div class="site-heading">
-                    <span class="sub-title">Kegiatan</span>
-                    <h2 class="title">Kegiatan Terkini</h2>
-                    <p class="desc">Berbagai kegiatan dan acara menarik di {{ theme_config('short_name', 'MAUDU') }}
+                    <span class="sub-title">{{ theme_config('events_section_tag', 'Kegiatan') }}</span>
+                    <h2 class="title">{{ theme_config('events_section_title', 'Kegiatan Terkini') }}</h2>
+                    <p class="desc">{{ theme_config('events_section_description', 'Berbagai kegiatan dan acara menarik di ' . theme_config('short_name', 'MAUDU')) }}
                     </p>
                 </div>
             </div>

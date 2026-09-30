@@ -396,6 +396,11 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->prefix('admin/
     Route::put('/{page}', [PageController::class, 'update'])->name('update');
     Route::delete('/{page}', [PageController::class, 'destroy'])->name('destroy');
 
+    // Page Image Upload (CKEditor)
+    Route::post('/upload-image', [PageController::class, 'uploadImage'])
+        ->middleware(['throttle:30,1']) // Max 30 image uploads per minute
+        ->name('upload-image');
+
     // Page Additional Actions
     Route::post('/{page}/publish', [PageController::class, 'publish'])->name('publish');
     Route::post('/{page}/unpublish', [PageController::class, 'unpublish'])->name('unpublish');

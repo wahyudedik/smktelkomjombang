@@ -28,6 +28,9 @@
     {{-- Testimonial --}}
     <x-maudu.testimonial :testimonials="$testimonials" />
 
+    {{-- Events / Kegiatan --}}
+    <x-maudu.events :events="$events" />
+
     {{-- Partner --}}
     <x-maudu.partner :partners="$partners" />
 @endsection

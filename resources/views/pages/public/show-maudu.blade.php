@@ -29,7 +29,17 @@
                         </a>
                     </div>
 
-                    <!-- Article Card -->
+                    {{-- ⭐ Template-aware content rendering --}}
+                    @php
+                        $templateName = $page->template ?? 'default';
+                        $templatePath = "pages.templates.{$templateName}";
+                    @endphp
+
+                    @if ($templateName !== 'default' && View::exists($templatePath))
+                        {{-- Custom template: include the template partial --}}
+                        @include($templatePath, ['page' => $page])
+                    @else
+                    <!-- Article Card (default template) -->
                     <article
                         style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
                         <!-- Featured Image -->
@@ -150,6 +160,7 @@
                             </div>
                         </div>
                     </article>
+                    @endif
 
                     <!-- Related Pages -->
                     @php
@@ -250,6 +261,25 @@
             border-radius: 10px;
             margin: 1rem 0;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+
+        .page-content-body figure.image {
+            margin: 1.5rem 0;
+            padding: 0;
+        }
+
+        .page-content-body figure.image img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .page-content-body figcaption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+            font-style: italic;
         }
 
         .page-content-body ul,
@@ -312,7 +342,7 @@
 @push('scripts')
     <script>
         function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
+            function showToast() {
                 var toast = document.createElement('div');
                 toast.innerHTML =
                     '<i class="fas fa-check-circle" style="margin-right: 8px;"></i>Link berhasil disalin!';
@@ -326,28 +356,25 @@
                         toast.remove();
                     }, 300);
                 }, 2500);
-            }).catch(function() {
+            }
+
+            function fallbackCopy() {
                 var textArea = document.createElement('textarea');
                 textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
+                showToast();
+            }
 
-                var toast = document.createElement('div');
-                toast.innerHTML =
-                    '<i class="fas fa-check-circle" style="margin-right: 8px;"></i>Link berhasil disalin!';
-                toast.style.cssText =
-                    'position: fixed; bottom: 30px; right: 30px; background: #1a5632; color: #fff; padding: 14px 24px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 9999; font-size: 0.95rem; animation: slideInRight 0.3s ease;';
-                document.body.appendChild(toast);
-                setTimeout(function() {
-                    toast.style.opacity = '0';
-                    toast.style.transition = 'opacity 0.3s ease';
-                    setTimeout(function() {
-                        toast.remove();
-                    }, 300);
-                }, 2500);
-            });
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(showToast).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
         }
     </script>
     <style>

@@ -416,6 +416,12 @@ class ThemeSetting extends Model
             'contact_operational_hours' => 'contact',
             'google_maps_url' => 'contact',
 
+            // ═══ Events / Kegiatan ═══
+            'events_section_tag' => 'events',
+            'events_section_title' => 'events',
+            'events_section_description' => 'events',
+            'events_button_text' => 'events',
+
             // ═══ Menu ═══
             'menu' => 'menu',
             'related_links' => 'menu',

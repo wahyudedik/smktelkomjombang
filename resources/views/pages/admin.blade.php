@@ -35,19 +35,6 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <select name="category"
-                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            onchange="document.getElementById('filterForm').submit();">
-                            <option value="">{{ __('common.all_categories') }}</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category }}"
-                                    {{ request('category') == $category ? 'selected' : '' }}>
-                                    {{ ucfirst($category) }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
                         <select name="status"
                             class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             onchange="document.getElementById('filterForm').submit();">
@@ -94,9 +81,6 @@
                                         {{ __('common.title') }}</th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {{ __('common.category') }}</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         {{ __('common.status') }}</th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -123,16 +107,6 @@
                                                     <div class="text-sm text-gray-500">{{ $page->slug }}</div>
                                                 </div>
                                             </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if ($page->category)
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    {{ ucfirst($page->category) }}
-                                                </span>
-                                            @else
-                                                <span class="text-sm text-gray-500">-</span>
-                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if ($page->status == 'published')
@@ -232,7 +206,7 @@
                         </svg>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('common.no_pages_found') }}</h3>
                         <p class="text-gray-500 mb-6">
-                            @if (request()->hasAny(['search', 'category', 'status']))
+                            @if (request()->hasAny(['search', 'status']))
                                 {{ __('common.try_adjusting_search') }}
                             @else
                                 {{ __('common.get_started_create_page') }}

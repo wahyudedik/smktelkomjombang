@@ -70,7 +70,7 @@
                                                 <div class="flex flex-wrap gap-1">
                                                     @foreach ($link->target_audience as $audience)
                                                         <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                             @if ($audience === 'Siswa') bg-blue-100 text-blue-800
                                                             @elseif($audience === 'Guru') bg-green-100 text-green-800
                                                             @else bg-purple-100 text-purple-800 @endif">
@@ -202,19 +202,25 @@
 
     <script>
         function copyLink(url) {
-            navigator.clipboard.writeText(url).then(function() {
-                showSuccess('Berhasil!', 'Link berhasil disalin ke clipboard');
-            }, function(err) {
-                console.error('Could not copy text: ', err);
-                // Fallback for older browsers
+            function fallbackCopy() {
                 const textArea = document.createElement('textarea');
                 textArea.value = url;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 showSuccess('Berhasil!', 'Link berhasil disalin ke clipboard');
-            });
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function() {
+                    showSuccess('Berhasil!', 'Link berhasil disalin ke clipboard');
+                }).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
         }
     </script>
 </x-app-layout>

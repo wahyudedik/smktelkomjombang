@@ -112,6 +112,12 @@ return [
     'cta_button_url' => 'https://psb.ponpesdarululum.id/',
     'cta_button_text' => 'DAFTAR',
 
+    // Events / Kegiatan Section
+    'events_section_tag' => 'Kegiatan Sekolah',
+    'events_section_title' => 'SKATELDU',
+    'events_section_description' => 'Berbagai kegiatan dan acara menarik di SMK Telekomunikasi Darul Ulum',
+    'events_button_text' => 'Detail Kegiatan',
+
     // Working Hours
     'working_hours' => [
         'days' => 'Sabtu - Kamis',

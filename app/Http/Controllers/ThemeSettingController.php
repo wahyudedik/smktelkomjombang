@@ -60,6 +60,7 @@ class ThemeSettingController extends Controller
             'cta' => ['label' => 'CTA / Pendaftaran', 'icon' => 'fas fa-bullhorn'],
             'contact' => ['label' => 'Kontak & Jam Kerja', 'icon' => 'fas fa-phone'],
             'social' => ['label' => 'Social Media', 'icon' => 'fas fa-share-alt'],
+            'events' => ['label' => 'Kegiatan / Events', 'icon' => 'fas fa-calendar-alt'],
             'menu' => ['label' => 'Navigasi Menu', 'icon' => 'fas fa-bars'],
         ];
 

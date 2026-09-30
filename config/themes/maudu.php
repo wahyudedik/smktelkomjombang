@@ -164,6 +164,12 @@ return [
     'cta_button_url' => 'https://psb.ponpesdarululum.id/',
     'cta_button_text' => 'Daftar Sekarang',
 
+    // Events / Kegiatan Section
+    'events_section_tag' => 'Kegiatan',
+    'events_section_title' => 'Kegiatan Terkini',
+    'events_section_description' => 'Berbagai kegiatan dan acara menarik di MAUDU',
+    'events_button_text' => 'Lihat Semua Kegiatan',
+
     // Working Hours
     'working_hours' => [
         'days' => 'Sabtu - Kamis',

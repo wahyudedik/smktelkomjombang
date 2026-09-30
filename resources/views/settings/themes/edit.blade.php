@@ -140,6 +140,7 @@
                                                             'about_text',
                                                             'video_description',
                                                             'cta_description',
+                                                            'events_section_description',
                                                         ])
                                                     ) {
                                                         $inputType = 'textarea';
@@ -196,7 +197,7 @@
                                                     </div>
                                                 @elseif ($inputType === 'textarea')
                                                     <div
-                                                        class="{{ in_array($setting->key, ['about_text', 'video_description', 'cta_description', 'site_description']) ? 'md:col-span-2' : '' }}">
+                                                        class="{{ in_array($setting->key, ['about_text', 'video_description', 'cta_description', 'site_description', 'events_section_description']) ? 'md:col-span-2' : '' }}">
                                                         <label for="{{ $setting->key }}"
                                                             class="block text-sm font-medium text-gray-700 mb-2">
                                                             {{ $setting->key }}
