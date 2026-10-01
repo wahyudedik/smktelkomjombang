@@ -57,10 +57,17 @@ class StaticPageGenerator
                 continue;
             }
 
-            // Page baru: buat sebagai non-menu agar tidak ikut tampil di header
+            // Page baru: buat sebagai non-menu agar tidak ikut tampil di header.
+            // ⭐ menu_position kolom NOT NULL (DEFAULT 'header' — lihat migration
+            //    2025_09_28_203342_add_menu_fields_to_pages_table). JANGAN kirim null:
+            //    sebelumnya menyebabkan QueryException 1048
+            //    "Column 'menu_position' cannot be null" saat seed di production.
+            //    Set eksplisit 'header' (sama dengan default DB) agar aman terhadap
+            //    constraint, bahkan jika default DB tidak ada di environment tertentu.
+            // menu_title nullable → null aman. menu_sort_order DEFAULT 0.
             $pageData['is_menu'] = false;
             $pageData['menu_title'] = null;
-            $pageData['menu_position'] = null;
+            $pageData['menu_position'] = 'header';
             $pageData['menu_sort_order'] = 0;
 
             Page::create($pageData);

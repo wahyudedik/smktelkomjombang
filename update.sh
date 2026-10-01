@@ -156,6 +156,8 @@ info "Mengaktifkan maintenance mode..."
 $PHP_BIN artisan down --refresh=15 --retry=60 || true
 
 # 2. Backup database (opsional, tapi direkomendasikan)
+#    Sifatnya NON-FATAL (deploy tetap lanjut jika backup gagal), tapi kegagalan
+#    harus TERLIHAT JELAS agar admin segera backup manual.
 info "Membuat backup database..."
 BACKUP_DIR="$APP_DIR/storage/backups"
 mkdir -p "$BACKUP_DIR"
@@ -165,23 +167,54 @@ if command -v mysqldump &>/dev/null; then
     DB_USER=$(grep DB_USERNAME "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
     DB_PASS=$(grep DB_PASSWORD "$APP_DIR/.env" | cut -d '=' -f2 | tr -d '"' | tr -d "'")
     if [ -n "$DB_NAME_CHECK" ]; then
+        BACKUP_OK=false
         if [ -n "$DB_PASS" ]; then
-            mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_NAME_CHECK" > "$BACKUP_FILE" 2>/dev/null || warn "Gagal backup database. Melanjutkan..."
+            if mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_NAME_CHECK" > "$BACKUP_FILE" 2>/dev/null; then
+                BACKUP_OK=true
+            fi
         else
-            mysqldump -u "$DB_USER" "$DB_NAME_CHECK" > "$BACKUP_FILE" 2>/dev/null || warn "Gagal backup database. Melanjutkan..."
+            if mysqldump -u "$DB_USER" "$DB_NAME_CHECK" > "$BACKUP_FILE" 2>/dev/null; then
+                BACKUP_OK=true
+            fi
         fi
-        if [ -f "$BACKUP_FILE" ]; then
+        if [ "$BACKUP_OK" = true ] && [ -s "$BACKUP_FILE" ]; then
             info "Backup database tersimpan: $BACKUP_FILE"
+        else
+            rm -f "$BACKUP_FILE" 2>/dev/null || true
+            warn "[!] DATABASE TIDAK TERBACKUP — jalankan backup manual segera!"
+            warn "    Perintah manual: mysqldump -u <user> -p <db_name> > storage/backups/manual_$(date +%Y%m%d_%H%M%S).sql"
+            warn "    Deploy dilanjutkan TANPA backup. Pastikan backup manual SEGERA setelah deploy."
         fi
+    else
+        warn "[!] DB_DATABASE kosong di .env — backup database TIDAK dibuat."
+        warn "    [!] DATABASE TIDAK TERBACKUP — jalankan backup manual segera!"
     fi
 else
     warn "mysqldump tidak ditemukan. Backup database dilewati."
+    warn "[!] DATABASE TIDAK TERBACKUP — instal mysql-client / jalankan backup manual segera!"
 fi
 
 # 3. Reset local changes & pull perubahan terbaru dari Git
 info "Mereset perubahan lokal..."
 git checkout -- .
-git clean -fd -e public/.user.ini -e public/.well-known -e .env -e .env.production -e .env.production.maudu -e .env.production.telkom
+# ⭐ PENTING: gunakan -e EXCLUDES untuk melindungi data production.
+#    -fdX TIDAK aman di sini: storage/framework/cache/data, storage/framework/sessions,
+#    storage/logs, dll justru DIIGNORE oleh .gitignore Laravel → -fdX akan menghapusnya.
+#    Dengan -e, direktori data production (uploads, backups, cache, sessions, logs,
+#    bootstrap/cache) dijamin tetap ada.
+git clean -fd \
+    -e public/.user.ini \
+    -e public/.well-known \
+    -e public/uploads \
+    -e .env \
+    -e .env.production \
+    -e .env.production.maudu \
+    -e .env.production.telkom \
+    -e storage/backups \
+    -e storage/framework/cache \
+    -e storage/framework/sessions \
+    -e storage/logs \
+    -e bootstrap/cache
 
 info "Pulling perubahan terbaru dari git..."
 git pull origin "$GIT_BRANCH" || error "Gagal pull dari git"
@@ -255,14 +288,22 @@ fi
 info "Seed theme settings..."
 $PHP_BIN artisan db:seed --class=ThemeSettingsSeeder 2>/dev/null || warn "ThemeSettingsSeeder dilewati."
 
-# 12. Seed static pages — DINONAKTIFKAN saat deploy.
+# 12. Seed static pages — GATED: hanya jalan jika SEED_STATIC_PAGES=true (opt-in).
 # Alasan: StaticPageGenerator sebelumnya menimpa field menu (is_menu/menu_title/menu_position)
 # setiap deploy → menu header yang sudah dikustomisasi admin hilang/reset.
-# Jalankan manual hanya jika memang diperlukan:
-#   php artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()"
-# (Generator versi terbaru sudah aman: page baru non-menu, page existing tidak menimpa field menu.)
-# info "Seed static pages..."
-# $PHP_BIN artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()" 2>/dev/null || warn "Static page generator dilewati."
+# Default: DILEWATKAN agar produksi tidak otomatis menjalankannya setiap deploy.
+# Jalankan bila diperlukan: SEED_STATIC_PAGES=true bash update.sh --theme <tema>
+# atau manual: php artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()"
+# (Generator versi terbaru sudah aman: page baru non-menu + menu_position default 'header',
+#  page existing tidak menimpa field menu.)
+# Sifatnya GAGAL-SOFT: jika seed error, deploy TETAP lanjut (tidak dianggap gagal).
+if [ "${SEED_STATIC_PAGES:-false}" = "true" ]; then
+    info "Seed static pages (SEED_STATIC_PAGES=true)..."
+    $PHP_BIN artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()" \
+        || warn "[WARN] Seed static pages gagal. Melanjutkan deploy..."
+else
+    info "Seed static pages dilewati (set SEED_STATIC_PAGES=true untuk menjalankan)."
+fi
 
 # 13. Restart queue worker
 info "Merestart queue worker..."
