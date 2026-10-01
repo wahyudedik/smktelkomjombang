@@ -119,9 +119,11 @@
                             <li><strong>email</strong> - Email pemilih (wajib)</li>
                             <li><strong>user_type</strong> - guru atau siswa (opsional, default: siswa) - digunakan untuk tracking di tabel pemilihs</li>
                             <li><strong>jenis_kelamin</strong> - L atau P (opsional)</li>
-                            <li><strong>kelas_jabatan</strong> - Kelas untuk siswa atau jabatan untuk guru (opsional)
+                            <li><strong>kelas</strong> - Kelas siswa (opsional, default: -; judul lama
+                                'kelas_jabatan' masih didukung)
                             </li>
-                            <li><strong>status</strong> - active atau inactive (opsional, default: active)</li>
+                            <li><strong>status</strong> - belum_memilih atau sudah_memilih (opsional, default:
+                                belum_memilih; juga menerima active/inactive, ya/tidak, 1/0)</li>
                         </ul>
                     </div>
                 </div>

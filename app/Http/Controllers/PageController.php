@@ -6,11 +6,14 @@ use App\Models\Page;
 use App\Models\PageVersion;
 use App\Models\User;
 use App\Services\ContentSanitizer;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class PageController extends Controller
 {
@@ -99,7 +102,7 @@ class PageController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => ['required', 'string', 'max:255', Rule::unique('pages', 'title')],
             'content' => 'required|string',
             'excerpt' => 'nullable|string|max:500',
             'category' => 'nullable|string|max:100',
@@ -125,8 +128,8 @@ class PageController extends Controller
         $data['user_id'] = Auth::id();
         // ⭐ Set theme: use selected theme or default to current theme for menu items
         $data['theme'] = $request->input('theme') ?: ($request->boolean('is_menu') ? current_theme() : null);
-        // Ensure slug is always generated correctly (remove any spaces, special chars)
-        $data['slug'] = Str::slug($request->title);
+        // ⭐ Generate unique slug (auto-suffix -2, -3 jika sudah dipakai) — mencegah UniqueConstraintViolationException
+        [$data['slug'], $originalSlug] = $this->generateUniqueSlug($request->title);
 
         // Sanitize HTML content to prevent XSS attacks
         if (!empty($data['content'])) {
@@ -187,22 +190,41 @@ class PageController extends Controller
         }
 
         // Use transaction for page creation with version
-        $page = DB::transaction(function () use ($data) {
-            $page = Page::create($data);
+        // ⭐ try-catch: safety net jika race condition / unique constraint tetap terjadi
+        // (judul/slug duplikat) — tampilkan toast error, JANGAN halaman 500 Laravel.
+        try {
+            $page = DB::transaction(function () use ($data) {
+                $page = Page::create($data);
 
-            // Create initial version
-            PageVersion::createFromPage($page, 'Initial version');
+                // Create initial version
+                PageVersion::createFromPage($page, 'Initial version');
 
-            // Clear menu cache after creating page with menu
-            if ($data['is_menu'] ?? false) {
-                \App\Providers\MenuServiceProvider::clearMenuCache($data['theme'] ?? null);
+                // Clear menu cache after creating page with menu
+                if ($data['is_menu'] ?? false) {
+                    \App\Providers\MenuServiceProvider::clearMenuCache($data['theme'] ?? null);
+                }
+
+                return $page;
+            });
+        } catch (UniqueConstraintViolationException $e) {
+            return redirect()->back()->withInput()->with('error', 'Judul atau slug "' . $request->title . '" sudah digunakan oleh halaman lain. Silakan gunakan judul lain.');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return redirect()->back()->withInput()->with('error', 'Judul atau slug "' . $request->title . '" sudah digunakan oleh halaman lain. Silakan gunakan judul lain.');
             }
 
-            return $page;
-        });
+            throw $e;
+        }
 
-        return redirect()->route('admin.pages.index')
+        $redirect = redirect()->route('admin.pages.index')
             ->with('success', 'Page created successfully.');
+
+        // ⭐ Info toast: beri tahu admin jika slug di-auto-suffix karena sudah dipakai
+        if ($data['slug'] !== $originalSlug) {
+            $redirect->with('info', "Slug '{$originalSlug}' sudah dipakai, disimpan sebagai '{$data['slug']}'");
+        }
+
+        return $redirect;
     }
 
     /**
@@ -275,7 +297,7 @@ class PageController extends Controller
     public function update(Request $request, Page $page)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => ['required', 'string', 'max:255', Rule::unique('pages', 'title')->ignore($page->id)],
             'content' => 'required|string',
             'excerpt' => 'nullable|string|max:500',
             'category' => 'nullable|string|max:100',
@@ -300,8 +322,8 @@ class PageController extends Controller
         $data = $request->all();
         // ⭐ Set theme: use selected theme or null for non-menu pages
         $data['theme'] = $request->input('theme') ?: ($request->boolean('is_menu') ? current_theme() : null);
-        // Ensure slug is always generated correctly (remove any spaces, special chars)
-        $data['slug'] = Str::slug($request->title);
+        // ⭐ Generate unique slug dari title (ignore id halaman ini) — auto-suffix jika bentrok
+        [$data['slug'], $originalSlug] = $this->generateUniqueSlug($request->title, $page->id);
 
         // Sanitize HTML content to prevent XSS attacks
         if (!empty($data['content'])) {
@@ -362,21 +384,39 @@ class PageController extends Controller
             $data['published_at'] = now();
         }
 
-        $page->update($data);
+        // ⭐ try-catch safety net: unique constraint (judul/slug duplikat) → toast error, bukan 500
+        try {
+            $page->update($data);
 
-        // Create new version if there are changes
-        if ($page->wasChanged()) {
-            PageVersion::createFromPage($page, $request->change_summary ?? 'Page updated');
+            // Create new version if there are changes
+            if ($page->wasChanged()) {
+                PageVersion::createFromPage($page, $request->change_summary ?? 'Page updated');
+            }
+
+            // Clear menu cache after updating page with menu
+            if ($data['is_menu'] ?? $page->is_menu) {
+                $menuTheme = $data['theme'] ?? $page->theme ?? null;
+                \App\Providers\MenuServiceProvider::clearMenuCache($menuTheme);
+            }
+        } catch (UniqueConstraintViolationException $e) {
+            return redirect()->back()->withInput()->with('error', 'Judul atau slug "' . $request->title . '" sudah digunakan oleh halaman lain. Silakan gunakan judul lain.');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return redirect()->back()->withInput()->with('error', 'Judul atau slug "' . $request->title . '" sudah digunakan oleh halaman lain. Silakan gunakan judul lain.');
+            }
+
+            throw $e;
         }
 
-        // Clear menu cache after updating page with menu
-        if ($data['is_menu'] ?? $page->is_menu) {
-            $menuTheme = $data['theme'] ?? $page->theme ?? null;
-            \App\Providers\MenuServiceProvider::clearMenuCache($menuTheme);
-        }
-
-        return redirect()->route('admin.pages.index')
+        $redirect = redirect()->route('admin.pages.index')
             ->with('success', 'Page updated successfully.');
+
+        // ⭐ Info toast jika slug di-auto-suffix
+        if ($data['slug'] !== $originalSlug) {
+            $redirect->with('info', "Slug '{$originalSlug}' sudah dipakai, disimpan sebagai '{$data['slug']}'");
+        }
+
+        return $redirect;
     }
 
     // =========================================================
@@ -408,12 +448,18 @@ class PageController extends Controller
      */
     public function destroy(Page $page)
     {
+        // ⭐ Simpan theme SEBELUM delete untuk clearMenuCache
+        $theme = $page->theme;
+
         // Delete featured image
         if ($page->featured_image) {
             Storage::disk('public')->delete($page->featured_image);
         }
 
         $page->delete();
+
+        // ⭐ Clear menu cache agar menu langsung hilang dari header/footer (tanpa tunggu TTL cache 1 jam)
+        \App\Providers\MenuServiceProvider::clearMenuCache($theme);
 
         return redirect()->route('admin.pages.index')
             ->with('success', 'Page deleted successfully.');
@@ -426,6 +472,9 @@ class PageController extends Controller
     {
         $page->publish();
 
+        // ⭐ Clear menu cache setelah publish agar status menu langsung sinkron
+        \App\Providers\MenuServiceProvider::clearMenuCache($page->theme);
+
         return redirect()->back()
             ->with('success', 'Page published successfully.');
     }
@@ -436,6 +485,9 @@ class PageController extends Controller
     public function unpublish(Page $page)
     {
         $page->unpublish();
+
+        // ⭐ Clear menu cache setelah unpublish agar status menu langsung sinkron
+        \App\Providers\MenuServiceProvider::clearMenuCache($page->theme);
 
         return redirect()->back()
             ->with('success', 'Page unpublished successfully.');
@@ -448,13 +500,48 @@ class PageController extends Controller
     {
         $newPage = $page->replicate();
         $newPage->title = $page->title . ' (Copy)';
-        $newPage->slug = Str::slug($newPage->title);
+        // ⭐ Slug unik — hindari 500 jika 'X (Copy)' sudah pernah di-duplicate
+        [$newSlug] = $this->generateUniqueSlug($newPage->title);
+        $newPage->slug = $newSlug;
         $newPage->status = 'draft';
         $newPage->published_at = null;
         $newPage->save();
 
         return redirect()->route('admin.pages.edit', $newPage)
             ->with('success', 'Page duplicated successfully.');
+    }
+
+    /**
+     * ⭐ Generate slug unik dari title.
+     * Jika slug sudah dipakai page lain, tambahkan suffix -2, -3, dst.
+     *
+     * @param  string  $title      Judul halaman
+     * @param  int|null  $ignoreId  ID page yang diabaikan (untuk update — agar slug sendiri tidak dianggap bentrok)
+     * @return array{0: string, 1: string} [slug final, slug dasar tanpa suffix]
+     */
+    private function generateUniqueSlug(string $title, ?int $ignoreId = null): array
+    {
+        $base = Str::slug($title);
+
+        if ($base === '') {
+            $base = 'page-' . Str::random(8);
+        }
+
+        $slug = $base;
+        $suffix = 1;
+
+        while (
+            Page::where('slug', $slug)
+                ->when($ignoreId !== null, function ($query) use ($ignoreId) {
+                    $query->where('id', '!=', $ignoreId);
+                })
+                ->exists()
+        ) {
+            $suffix++;
+            $slug = "{$base}-{$suffix}";
+        }
+
+        return [$slug, $base];
     }
 
     /**

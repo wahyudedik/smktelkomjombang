@@ -58,16 +58,21 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
                 }
             }
 
-            // Handle status conversion
-            $status = 'active';
+            // Handle status conversion (schema enum: belum_memilih / sudah_memilih)
+            $status = 'belum_memilih';
             if (!empty($row['status'])) {
                 $statusInput = strtolower(trim($row['status']));
-                if (in_array($statusInput, ['active', 'aktif', '1', 'yes'])) {
-                    $status = 'active';
-                } elseif (in_array($statusInput, ['inactive', 'tidak_aktif', 'tidak aktif', '0', 'no'])) {
-                    $status = 'inactive';
+                if (in_array($statusInput, ['sudah_memilih', 'sudah memilih', 'active', 'aktif', 'ya', 'yes', '1'], true)) {
+                    $status = 'sudah_memilih';
+                } elseif (in_array($statusInput, ['belum_memilih', 'belum memilih', 'inactive', 'tidak_aktif', 'tidak aktif', 'tidak', 'no', '0'], true)) {
+                    $status = 'belum_memilih';
                 }
             }
+
+            // Accept both 'kelas' and legacy 'kelas_jabatan' headings
+            $kelas = !empty($row['kelas'])
+                ? trim($row['kelas'])
+                : (!empty($row['kelas_jabatan']) ? trim($row['kelas_jabatan']) : '-');
 
             $this->rowCount++;
 
@@ -79,9 +84,8 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
                 'email' => trim($row['email']),
                 'user_type' => !empty($row['user_type']) ? trim($row['user_type']) : 'siswa',
                 'jenis_kelamin' => $jenisKelamin,
-                'kelas_jabatan' => !empty($row['kelas_jabatan']) ? trim($row['kelas_jabatan']) : null,
+                'kelas' => $kelas, // kelas column is NOT NULL
                 'status' => $status,
-                'has_voted' => false, // Default belum memilih
             ]);
         } catch (\Exception $e) {
             Log::error("Error creating pemilih", [
@@ -105,8 +109,9 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
             '*.email' => 'required|email|max:255',
             '*.user_type' => 'nullable|in:guru,siswa',
             '*.jenis_kelamin' => 'nullable|in:L,P,Laki-laki,Perempuan,laki-laki,perempuan,l,p',
-            '*.kelas_jabatan' => 'nullable|string|max:100',
-            '*.status' => 'nullable|in:active,inactive,aktif,tidak_aktif,yes,no,1,0',
+            '*.kelas' => 'nullable|string|max:100',
+            '*.kelas_jabatan' => 'nullable|string|max:100', // legacy heading support
+            '*.status' => 'nullable|in:active,inactive,aktif,tidak_aktif,yes,no,1,0,sudah_memilih,belum_memilih,ya,tidak',
         ];
     }
 

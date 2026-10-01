@@ -26,9 +26,9 @@ class MenuSeeder extends Seeder
         $theme = current_theme();
 
         // Create main menu items
-        $profilMenu = Page::create([
+        // ⭐ Idempotent: firstOrCreate by slug — aman di-run berulang tanpa duplikat/unique violation
+        $profilMenu = Page::firstOrCreate(['slug' => 'profil-sekolah'], [
             'title' => 'Profil Sekolah',
-            'slug' => 'profil-sekolah',
             'content' => 'Halaman profil sekolah yang berisi informasi lengkap tentang sejarah, visi, misi, dan tujuan sekolah.',
             'excerpt' => 'Informasi lengkap tentang profil sekolah kami.',
             'category' => 'profil',
@@ -44,9 +44,8 @@ class MenuSeeder extends Seeder
             'user_id' => $superadmin->id,
         ]);
 
-        $akademikMenu = Page::create([
+        $akademikMenu = Page::firstOrCreate(['slug' => 'akademik'], [
             'title' => 'Akademik',
-            'slug' => 'akademik',
             'content' => 'Informasi tentang program akademik, kurikulum, dan kegiatan pembelajaran.',
             'excerpt' => 'Program akademik dan kurikulum sekolah.',
             'category' => 'akademik',
@@ -62,9 +61,8 @@ class MenuSeeder extends Seeder
             'user_id' => $superadmin->id,
         ]);
 
-        $layananMenu = Page::create([
+        $layananMenu = Page::firstOrCreate(['slug' => 'layanan-digital'], [
             'title' => 'Layanan Digital',
-            'slug' => 'layanan-digital',
             'content' => 'Kumpulan layanan digital yang tersedia untuk siswa, orang tua, dan masyarakat.',
             'excerpt' => 'Layanan digital sekolah untuk kemudahan akses informasi.',
             'category' => 'layanan',
@@ -81,9 +79,8 @@ class MenuSeeder extends Seeder
         ]);
 
         // Create submenu items for PROFIL
-        Page::create([
+        Page::firstOrCreate(['slug' => 'sejarah-sekolah'], [
             'title' => 'Sejarah Sekolah',
-            'slug' => 'sejarah-sekolah',
             'content' => 'Sejarah berdirinya sekolah dan perjalanan panjang dalam dunia pendidikan.',
             'excerpt' => 'Sejarah dan perjalanan sekolah dalam dunia pendidikan.',
             'category' => 'profil',
@@ -100,9 +97,8 @@ class MenuSeeder extends Seeder
             'user_id' => $superadmin->id,
         ]);
 
-        Page::create([
+        Page::firstOrCreate(['slug' => 'visi-misi'], [
             'title' => 'Visi & Misi',
-            'slug' => 'visi-misi',
             'content' => 'Visi, misi, dan tujuan sekolah dalam membentuk generasi yang berkualitas.',
             'excerpt' => 'Visi, misi, dan tujuan sekolah.',
             'category' => 'profil',
@@ -119,9 +115,8 @@ class MenuSeeder extends Seeder
             'user_id' => $superadmin->id,
         ]);
 
-        Page::create([
+        Page::firstOrCreate(['slug' => 'struktur-organisasi'], [
             'title' => 'Struktur Organisasi',
-            'slug' => 'struktur-organisasi',
             'content' => 'Struktur organisasi sekolah dan susunan kepemimpinan.',
             'excerpt' => 'Struktur organisasi dan kepemimpinan sekolah.',
             'category' => 'profil',
@@ -139,9 +134,8 @@ class MenuSeeder extends Seeder
         ]);
 
         // Create submenu items for AKADEMIK
-        Page::create([
+        Page::firstOrCreate(['slug' => 'kurikulum'], [
             'title' => 'Kurikulum',
-            'slug' => 'kurikulum',
             'content' => 'Informasi tentang kurikulum yang digunakan dan mata pelajaran yang diajarkan.',
             'excerpt' => 'Kurikulum dan mata pelajaran yang diajarkan.',
             'category' => 'akademik',
@@ -158,9 +152,8 @@ class MenuSeeder extends Seeder
             'user_id' => $superadmin->id,
         ]);
 
-        Page::create([
+        Page::firstOrCreate(['slug' => 'program-unggulan'], [
             'title' => 'Program Unggulan',
-            'slug' => 'program-unggulan',
             'content' => 'Program-program unggulan sekolah yang membedakan dengan sekolah lain.',
             'excerpt' => 'Program unggulan sekolah.',
             'category' => 'akademik',
@@ -178,9 +171,8 @@ class MenuSeeder extends Seeder
         ]);
 
         // Create submenu items for LAYANAN DIGITAL
-        Page::create([
+        Page::firstOrCreate(['slug' => 'e-learning'], [
             'title' => 'E-Learning',
-            'slug' => 'e-learning',
             'content' => 'Platform pembelajaran online untuk siswa dan guru.',
             'excerpt' => 'Platform pembelajaran online.',
             'category' => 'layanan',
@@ -197,9 +189,8 @@ class MenuSeeder extends Seeder
             'user_id' => $superadmin->id,
         ]);
 
-        Page::create([
+        Page::firstOrCreate(['slug' => 'portal-orang-tua'], [
             'title' => 'Portal Orang Tua',
-            'slug' => 'portal-orang-tua',
             'content' => 'Portal khusus untuk orang tua siswa untuk mengakses informasi akademik anak.',
             'excerpt' => 'Portal untuk orang tua siswa.',
             'category' => 'layanan',
@@ -217,9 +208,8 @@ class MenuSeeder extends Seeder
         ]);
 
         // Create footer menu items
-        Page::create([
+        Page::firstOrCreate(['slug' => 'kebijakan-privasi'], [
             'title' => 'Kebijakan Privasi',
-            'slug' => 'kebijakan-privasi',
             'content' => 'Kebijakan privasi dan perlindungan data pengguna website sekolah.',
             'excerpt' => 'Kebijakan privasi dan perlindungan data.',
             'category' => 'legal',
@@ -235,9 +225,8 @@ class MenuSeeder extends Seeder
             'user_id' => $superadmin->id,
         ]);
 
-        Page::create([
+        Page::firstOrCreate(['slug' => 'syarat-ketentuan'], [
             'title' => 'Syarat & Ketentuan',
-            'slug' => 'syarat-ketentuan',
             'content' => 'Syarat dan ketentuan penggunaan website sekolah.',
             'excerpt' => 'Syarat dan ketentuan penggunaan website.',
             'category' => 'legal',
@@ -253,9 +242,8 @@ class MenuSeeder extends Seeder
             'user_id' => $superadmin->id,
         ]);
 
-        Page::create([
+        Page::firstOrCreate(['slug' => 'kontak-kami'], [
             'title' => 'Kontak Kami',
-            'slug' => 'kontak-kami',
             'content' => 'Informasi kontak sekolah untuk keperluan komunikasi dan informasi.',
             'excerpt' => 'Informasi kontak sekolah.',
             'category' => 'kontak',

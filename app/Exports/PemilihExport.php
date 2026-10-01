@@ -38,8 +38,8 @@ class PemilihExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'User Type',
             'Jenis Kelamin',
             'Status',
-            'Kelas/Jabatan',
-            'Has Voted',
+            'Kelas',
+            'Waktu Memilih',
             'Created At',
             'Updated At',
         ];
@@ -54,11 +54,11 @@ class PemilihExport implements FromCollection, WithHeadings, WithMapping, WithSt
         return [
             $pemilih->nama,
             $pemilih->email,
-            $pemilih->user_type_display,
+            $pemilih->user_type ?? '-',
             $pemilih->gender_display ?? '-',
             $pemilih->status_display,
-            $pemilih->kelas_jabatan ?? '-',
-            $pemilih->has_voted ? 'Sudah' : 'Belum',
+            $pemilih->kelas ?? '-',
+            $pemilih->voting_time_formatted ?? '-',
             $pemilih->created_at?->format('Y-m-d H:i:s'),
             $pemilih->updated_at?->format('Y-m-d H:i:s'),
         ];

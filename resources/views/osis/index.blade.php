@@ -24,11 +24,37 @@
                         {{ __('common.export_pemilih') }}
                     </a>
                 @endcan
-                <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    <span class="w-2 h-2 bg-blue-400 rounded-full mr-1.5"></span>
-                    {{ __('common.voting_active') }}
-                </span>
+                @if(($electionStatus ?? null) === 'active')
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
+                        {{ __('common.voting_active') }}
+                    </span>
+                @elseif(($electionStatus ?? null) === 'upcoming')
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        <span class="w-2 h-2 bg-yellow-400 rounded-full mr-1.5"></span>
+                        Akan Datang
+                    </span>
+                @elseif(($electionStatus ?? null) === 'ended')
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full mr-1.5"></span>
+                        Selesai
+                    </span>
+                @elseif(($electionStatus ?? null) === 'locked')
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        <span class="w-2 h-2 bg-red-400 rounded-full mr-1.5"></span>
+                        Dikunci
+                    </span>
+                @else
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full mr-1.5"></span>
+                        Tidak Ada Pemilihan
+                    </span>
+                @endif
             </div>
         </div>
     </x-slot>

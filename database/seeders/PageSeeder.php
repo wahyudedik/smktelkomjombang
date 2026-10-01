@@ -164,10 +164,13 @@ class PageSeeder extends Seeder
             $pageData['slug'] = \Illuminate\Support\Str::slug($pageData['title']);
             $pageData['sort_order'] = $index + 1; // Add sort_order
 
-            $page = Page::create($pageData);
+            // ⭐ Idempotent: firstOrCreate by slug agar tidak error duplikat saat re-run
+            $page = Page::firstOrCreate(['slug' => $pageData['slug']], $pageData);
 
-            // Create initial version for each page
-            \App\Models\PageVersion::createFromPage($page, 'Initial version');
+            // Create initial version only for newly created pages (idempotent)
+            if ($page->wasRecentlyCreated) {
+                \App\Models\PageVersion::createFromPage($page, 'Initial version');
+            }
         }
 
         $this->command->info('Page seeder completed successfully!');

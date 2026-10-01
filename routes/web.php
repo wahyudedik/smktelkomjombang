@@ -523,11 +523,8 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('a
     Route::put('/pemilih/{pemilih}', [OSISController::class, 'updatePemilih'])->name('pemilih.update')->middleware('permission:osis.edit');
     Route::delete('/pemilih/{pemilih}', [OSISController::class, 'destroyPemilih'])->name('pemilih.destroy')->middleware('permission:osis.delete');
 
-    Route::get('/voting', [OSISController::class, 'voting'])->name('voting');
-    Route::post('/vote', [OSISController::class, 'processVote'])
-        ->middleware('throttle:voting') // Max 5 votes per minute (anti-fraud)
-        ->name('vote');
-    Route::get('/results', [OSISController::class, 'results'])->name('results')->middleware('permission:osis.results');
+    // Voting/vote/results routes are registered in the siswa group below (unique route names).
+    // Admin group keeps only results exports, analytics, and teacher-view.
     Route::get('/results/export/pdf', [OSISController::class, 'exportVotingResultsPdf'])->name('results.export.pdf')->middleware('permission:osis.results');
     Route::get('/results/export/json', [OSISController::class, 'exportVotingResultsJson'])->name('results.export.json')->middleware('permission:osis.results');
     Route::get('/results/export/xml', [OSISController::class, 'exportVotingResultsXml'])->name('results.export.xml')->middleware('permission:osis.results');

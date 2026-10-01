@@ -65,7 +65,7 @@ class MenuServiceProvider extends ServiceProvider
      */
     private function getHeaderMenus(string $theme): Collection
     {
-        return Page::menu()
+        $menus = Page::menu()
             ->where(function ($query) use ($theme) {
                 $query->where('theme', $theme)
                       ->orWhereNull('theme')
@@ -76,6 +76,30 @@ class MenuServiceProvider extends ServiceProvider
             ->orderBy('menu_sort_order')
             ->with('children')
             ->get();
+
+        // ⭐ Dedup per menu_title: jika ada baris global (theme NULL/'') DAN baris
+        // theme-specific dengan menu_title yang sama, tampilkan hanya SATU —
+        // prioritaskan baris theme-specific. Ini mencegah menu header tampil double.
+        // Item tanpa menu_title tidak di-dedup (ditampilkan apa adanya).
+        // Urutan tetap mengikuti menu_sort_order.
+        return $menus
+            ->groupBy(fn ($menu) => strtolower(trim((string) $menu->menu_title)))
+            ->map(function ($group, $key) use ($theme) {
+                // Jangan dedup item tanpa judul — biarkan tampil apa adanya
+                if ($key === '') {
+                    return $group;
+                }
+
+                // Prioritaskan baris theme-specific, fallback ke baris global
+                $preferred = $group->first(fn ($menu) => $menu->theme === $theme)
+                    ?? $group->first();
+
+                return collect([$preferred]);
+            })
+            ->flatten()
+            ->filter()
+            ->sortBy(fn ($menu) => (int) $menu->menu_sort_order)
+            ->values();
     }
 
     /**

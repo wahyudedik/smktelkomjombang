@@ -19,6 +19,22 @@ class StaticPageGenerator
         $created = 0;
         $updated = 0;
 
+        // ⭐ Field menu TIDAK boleh ditimpa oleh generator.
+        // Sebelumnya updateOrCreate menimpa is_menu/menu_title/menu_position setiap
+        // deploy (update.sh) → menu header yang sudah dikustomisasi admin hilang/reset.
+        // Sekarang: page baru dibuat non-menu; page existing hanya konten yang diperbarui.
+        $menuFields = [
+            'is_menu',
+            'menu_title',
+            'menu_position',
+            'menu_sort_order',
+            'menu_url',
+            'menu_icon',
+            'menu_target_blank',
+            'parent_id',
+            'slug', // slug existing dipertahankan agar URL lama tidak 404
+        ];
+
         foreach ($pages as $pageData) {
             $pageData['user_id'] = $adminUserId;
             $pageData['published_at'] = now();
@@ -30,16 +46,25 @@ class StaticPageGenerator
             // causing duplicate UniqueConstraintViolationException on subsequent runs.
             $title = $pageData['title'];
 
-            $result = Page::updateOrCreate(
-                ['title' => $title],
-                $pageData
-            );
+            $existing = Page::where('title', $title)->first();
 
-            if ($result->wasRecentlyCreated) {
-                $created++;
-            } else {
+            if ($existing) {
+                // Page existing: perbarui konten saja — JANGAN timpa field menu/slug
+                // (biarkan kustomisasi menu admin tetap utuh).
+                $existing->fill(collect($pageData)->except($menuFields)->all());
+                $existing->save();
                 $updated++;
+                continue;
             }
+
+            // Page baru: buat sebagai non-menu agar tidak ikut tampil di header
+            $pageData['is_menu'] = false;
+            $pageData['menu_title'] = null;
+            $pageData['menu_position'] = null;
+            $pageData['menu_sort_order'] = 0;
+
+            Page::create($pageData);
+            $created++;
         }
 
         return "Selesai! Dibuat: {$created} halaman baru, Diperbarui: {$updated} halaman yang sudah ada.";
@@ -72,9 +97,8 @@ class StaticPageGenerator
                 'excerpt' => 'Tentang Pondok Pesantren Darul Ulum Jombang',
                 'content' => $this->renderPpDarulUlam(),
                 'status' => 'published',
-                'is_menu' => true,
-                'menu_title' => 'PP. Darul Ulum',
-                'menu_sort_order' => 1,
+                // ⭐ Non-menu: page statis tidak boleh otomatis jadi item header
+                'is_menu' => false,
             ],
             [
                 'title' => 'Visi & Misi SMK',
@@ -84,9 +108,8 @@ class StaticPageGenerator
                 'excerpt' => 'Visi dan Misi SMK Telekomunikasi Darul Ulum',
                 'content' => $this->renderVisiMisi(),
                 'status' => 'published',
-                'is_menu' => true,
-                'menu_title' => 'Visi & Misi',
-                'menu_sort_order' => 2,
+                // ⭐ Non-menu: page statis tidak boleh otomatis jadi item header
+                'is_menu' => false,
             ],
             [
                 'title' => 'Struktur Organisasi SMK',
@@ -96,9 +119,8 @@ class StaticPageGenerator
                 'excerpt' => 'Struktur organisasi SMK Telekomunikasi Darul Ulum',
                 'content' => $this->renderStrukturOrganisasi(),
                 'status' => 'published',
-                'is_menu' => true,
-                'menu_title' => 'Struktur Organisasi',
-                'menu_sort_order' => 3,
+                // ⭐ Non-menu: page statis tidak boleh otomatis jadi item header
+                'is_menu' => false,
             ],
             [
                 'title' => 'Tenaga Pendidik',
@@ -108,9 +130,8 @@ class StaticPageGenerator
                 'excerpt' => 'Daftar guru dan tenaga pendidik SMK Telekomunikasi Darul Ulum',
                 'content' => $this->renderTenagaPendidik(),
                 'status' => 'published',
-                'is_menu' => true,
-                'menu_title' => 'Tenaga Pendidik',
-                'menu_sort_order' => 4,
+                // ⭐ Non-menu: page statis tidak boleh otomatis jadi item header
+                'is_menu' => false,
             ],
             [
                 'title' => 'Staf & Karyawan',
@@ -120,9 +141,8 @@ class StaticPageGenerator
                 'excerpt' => 'Daftar staf dan karyawan SMK Telekomunikasi Darul Ulum',
                 'content' => $this->renderStafKaryawan(),
                 'status' => 'published',
-                'is_menu' => true,
-                'menu_title' => 'Staf & Karyawan',
-                'menu_sort_order' => 5,
+                // ⭐ Non-menu: page statis tidak boleh otomatis jadi item header
+                'is_menu' => false,
             ],
         ];
     }

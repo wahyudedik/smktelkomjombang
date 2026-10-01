@@ -255,9 +255,14 @@ fi
 info "Seed theme settings..."
 $PHP_BIN artisan db:seed --class=ThemeSettingsSeeder 2>/dev/null || warn "ThemeSettingsSeeder dilewati."
 
-# 12. Seed static pages (jika ada perubahan theme)
-info "Seed static pages..."
-$PHP_BIN artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()" 2>/dev/null || warn "Static page generator dilewati."
+# 12. Seed static pages — DINONAKTIFKAN saat deploy.
+# Alasan: StaticPageGenerator sebelumnya menimpa field menu (is_menu/menu_title/menu_position)
+# setiap deploy → menu header yang sudah dikustomisasi admin hilang/reset.
+# Jalankan manual hanya jika memang diperlukan:
+#   php artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()"
+# (Generator versi terbaru sudah aman: page baru non-menu, page existing tidak menimpa field menu.)
+# info "Seed static pages..."
+# $PHP_BIN artisan tinker --execute="app(\App\Services\StaticPageGenerator::class)->generate()" 2>/dev/null || warn "Static page generator dilewati."
 
 # 13. Restart queue worker
 info "Merestart queue worker..."

@@ -123,6 +123,10 @@
             @if (session('error'))
                 window.showError && window.showError('Gagal', @json(session('error')));
             @endif
+
+            @if (session('info'))
+                window.showAlert && window.showAlert('Info', @json(session('info')), 'info');
+            @endif
         });
     </script>
 

@@ -43,7 +43,11 @@ class OSISController extends Controller
             ->limit(10)
             ->get();
 
-        return view('osis.index', compact('stats', 'calons', 'recentVotes'));
+        // Active election for status badge (fallback: latest election)
+        $election = OsisElection::active()->first() ?? OsisElection::query()->latest()->first();
+        $electionStatus = $election?->status;
+
+        return view('osis.index', compact('stats', 'calons', 'recentVotes', 'electionStatus'));
     }
 
     /**
@@ -317,6 +321,9 @@ class OSISController extends Controller
 
         Pemilih::create($data);
 
+        // Invalidate cached dashboard stats so totals stay fresh
+        cache()->forget('osis_dashboard_stats');
+
         return redirect()->route('admin.osis.pemilih.index')
             ->with('success', 'Pemilih berhasil ditambahkan.');
     }
@@ -368,6 +375,9 @@ class OSISController extends Controller
 
         $pemilih->update($data);
 
+        // Invalidate cached dashboard stats so totals stay fresh
+        cache()->forget('osis_dashboard_stats');
+
         return redirect()->route('admin.osis.pemilih.index')
             ->with('success', 'Pemilih berhasil diperbarui.');
     }
@@ -378,6 +388,9 @@ class OSISController extends Controller
     public function destroyPemilih(Pemilih $pemilih)
     {
         $pemilih->delete();
+
+        // Invalidate cached dashboard stats so totals stay fresh
+        cache()->forget('osis_dashboard_stats');
 
         return redirect()->route('admin.osis.pemilih.index')
             ->with('success', 'Pemilih berhasil dihapus.');
@@ -471,13 +484,13 @@ class OSISController extends Controller
                 ->with('error', 'Anda hanya dapat memilih calon yang sesuai dengan jenis kelamin Anda.');
         }
 
-        // Create vote record
+        // Create vote record (pemilih_id is nullable; vote tracked via siswa_id)
         Voting::create([
             'calon_id' => $calon->id,
-            'pemilih_id' => null, // We'll use student ID instead
+            'pemilih_id' => null,
             'siswa_id' => $siswa->id,
             'election_id' => $election->id,
-            'voted_at' => now(),
+            'waktu_voting' => now(),
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'is_valid' => true,
@@ -485,6 +498,9 @@ class OSISController extends Controller
 
         // Mark student as voted
         $siswa->markAsVoted($request->ip(), $request->userAgent());
+
+        // Invalidate cached dashboard stats so the new vote is reflected
+        cache()->forget('osis_dashboard_stats');
 
         return redirect()->route('admin.osis.results')
             ->with('success', 'Terima kasih! Suara Anda telah tercatat.');
@@ -747,6 +763,8 @@ class OSISController extends Controller
                 $message .= " (" . implode(', ', $details) . ")";
             }
 
+            cache()->forget('osis_dashboard_stats');
+
             return redirect()->route('admin.osis.calon.index')
                 ->with('success', $message);
         } catch (\Exception $e) {
@@ -873,6 +891,8 @@ class OSISController extends Controller
                 }
             }
 
+            cache()->forget('osis_dashboard_stats');
+
             return redirect()->route('admin.osis.pemilih.index')
                 ->with('success', "Pemilih berhasil dibuat otomatis! Dibuat: {$createdCount}, Diupdate: {$updatedCount}");
         } catch (\Exception $e) {
@@ -902,24 +922,24 @@ class OSISController extends Controller
                 'email' => 'ahmad.rizki@email.com',
                 'user_type' => 'siswa', // Keep user_type in pemilihs table for tracking
                 'jenis_kelamin' => 'L',
-                'kelas_jabatan' => 'XII IPA 1',
-                'status' => 'active',
+                'kelas' => 'XII IPA 1',
+                'status' => 'belum_memilih',
             ],
             [
                 'nama' => 'Siti Nurhaliza',
                 'email' => 'siti.nurhaliza@email.com',
                 'user_type' => 'siswa', // Keep user_type in pemilihs table for tracking
                 'jenis_kelamin' => 'P',
-                'kelas_jabatan' => 'XI IPS 2',
-                'status' => 'active',
+                'kelas' => 'XI IPS 2',
+                'status' => 'belum_memilih',
             ],
             [
                 'nama' => 'Dr. Budi Santoso, S.Pd',
                 'email' => 'budi.santoso@email.com',
                 'user_type' => 'guru', // Keep user_type in pemilihs table for tracking
                 'jenis_kelamin' => 'L',
-                'kelas_jabatan' => 'Wali Kelas XII',
-                'status' => 'active',
+                'kelas' => 'Guru',
+                'status' => 'belum_memilih',
             ],
         ];
 
@@ -943,7 +963,7 @@ class OSISController extends Controller
                     'email',
                     'user_type',
                     'jenis_kelamin',
-                    'kelas_jabatan',
+                    'kelas',
                     'status'
                 ];
             }
@@ -1029,6 +1049,8 @@ class OSISController extends Controller
                 $message .= " (" . implode(', ', $details) . ")";
             }
 
+            cache()->forget('osis_dashboard_stats');
+
             return redirect()->route('admin.osis.pemilih.index')
                 ->with('success', $message);
         } catch (\Exception $e) {
@@ -1061,7 +1083,7 @@ class OSISController extends Controller
 
         if ($request->has('has_voted') && $request->has_voted !== '') {
             $hasVoted = $request->has_voted === '1' || $request->has_voted === 'yes';
-            $query->where('has_voted', $hasVoted);
+            $query->where('status', $hasVoted ? 'sudah_memilih' : 'belum_memilih');
         }
 
         $pemilihs = $query->get();

@@ -103,8 +103,10 @@ class Page extends Model
         });
 
         static::updating(function ($page) {
-            // If title changed, regenerate slug
-            if ($page->isDirty('title') && !empty($page->title)) {
+            // If title changed AND slug was NOT explicitly set by the caller,
+            // regenerate slug from title (fallback only — PageController handles explicit slugs
+            // with uniqueness check + auto-suffix, so avoid overwriting them here).
+            if ($page->isDirty('title') && !$page->isDirty('slug') && !empty($page->title)) {
                 $page->slug = Str::slug($page->title);
             }
             // Always sanitize slug to ensure no invalid characters (spaces, special chars)

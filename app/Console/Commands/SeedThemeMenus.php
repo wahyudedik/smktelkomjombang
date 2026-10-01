@@ -48,9 +48,14 @@ class SeedThemeMenus extends Command
             $targetBlank = ($item['target'] ?? '') === '_blank';
             $slug = $this->makeSlug($label, $theme, $sortOrder);
 
-            // Cek apakah sudah ada menu dengan label + theme yang sama
+            // Cek apakah sudah ada menu dengan label yang sama — untuk theme ini
+            // ATAU baris global (theme NULL/'') agar tidak membuat menu double.
             $existing = Page::where('menu_title', $label)
-                ->where('theme', $theme)
+                ->where(function ($query) use ($theme) {
+                    $query->where('theme', $theme)
+                          ->orWhereNull('theme')
+                          ->orWhere('theme', '');
+                })
                 ->where('menu_position', 'header')
                 ->first();
 
@@ -110,7 +115,11 @@ class SeedThemeMenus extends Command
                     $childSlug = $this->makeSlug($childLabel, $theme, $sortOrder * 100 + $childIdx);
 
                     $childExisting = Page::where('menu_title', $childLabel)
-                        ->where('theme', $theme)
+                        ->where(function ($query) use ($theme) {
+                            $query->where('theme', $theme)
+                                  ->orWhereNull('theme')
+                                  ->orWhere('theme', '');
+                        })
                         ->where('menu_position', 'header')
                         ->where('parent_id', $parentPage->id)
                         ->first();
@@ -166,8 +175,13 @@ class SeedThemeMenus extends Command
             $url = $this->resolveUrl($link['url'] ?? '#');
             $slug = $this->makeSlug("footer-{$label}", $theme, $sortOrder);
 
+            // Cek label yang sama — theme ini ATAU baris global (theme NULL/'')
             $existing = Page::where('menu_title', $label)
-                ->where('theme', $theme)
+                ->where(function ($query) use ($theme) {
+                    $query->where('theme', $theme)
+                          ->orWhereNull('theme')
+                          ->orWhere('theme', '');
+                })
                 ->where('menu_position', 'footer')
                 ->first();
 
