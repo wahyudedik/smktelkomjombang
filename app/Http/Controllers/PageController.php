@@ -56,7 +56,11 @@ class PageController extends Controller
         $query = Page::with('user');
 
         // Sembunyikan pages dengan kategori 'berita' (berita sudah punya halaman sendiri di /admin/berita)
-        $query->whereRaw('LOWER(category) != ?', ['berita']);
+        // NULL-safe: tampilkan category NULL (halaman menu: ePerpus, E-Administrasi, dll) & kategori lain, kecuali 'berita'
+        $query->where(function ($q) {
+            $q->whereNull('category')
+              ->orWhereRaw('LOWER(category) != ?', ['berita']);
+        });
 
         // Filter by status (lebih robust: check filled)
         if ($request->filled('status')) {
@@ -594,6 +598,18 @@ class PageController extends Controller
     {
         $query = Page::where('status', 'published')
             ->orderBy('published_at', 'desc');
+
+        // Sembunyikan pages dengan kategori 'berita' (berita sudah punya halaman sendiri di /berita)
+        // NULL-safe: tampilkan category NULL & kategori lain, kecuali 'berita'
+        // Kecuali user secara eksplisit meminta ?category=berita via query string
+        $explicitCategory = $request->filled('category') ? strtolower(trim((string) $request->category)) : null;
+
+        if ($explicitCategory !== 'berita') {
+            $query->where(function ($q) {
+                $q->whereNull('category')
+                  ->orWhereRaw('LOWER(category) != ?', ['berita']);
+            });
+        }
 
         // Filter by category
         if ($request->has('category') && $request->category !== '') {
