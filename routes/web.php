@@ -267,7 +267,7 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
     Route::get('/report/daily', [App\Http\Controllers\AttendanceReportController::class, 'daily'])->name('report.daily');
     Route::get('/report/weekly', [App\Http\Controllers\AttendanceReportController::class, 'weekly'])->name('report.weekly');
     Route::get('/report/monthly', [App\Http\Controllers\AttendanceReportController::class, 'monthly'])->name('report.monthly');
-    Route::get('/report/user/{identity}', [App\Http\Controllers\AttendanceReportController::class, 'userDetail'])->name('report.user');
+    Route::get('/report/user/{identity}', [App\Http\Controllers\AttendanceReportController::class, 'userDetail'])->name('report.user-detail');
     Route::get('/report/latecomers', [App\Http\Controllers\AttendanceReportController::class, 'latecomers'])->name('report.latecomers');
 
     // Izin/Sakit/Alpha (rate limited: max 10 per minute)
