@@ -321,9 +321,15 @@
                     const data = new FormData();
                     data.append('upload', this.loader.file);
 
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    if (!csrfMeta || !csrfMeta.content) {
+                        reject(new Error('CSRF token tidak ditemukan (meta csrf-token kosong). Muat ulang halaman.'));
+                        return;
+                    }
+
                     this.xhr = new XMLHttpRequest();
                     this.xhr.open('POST', '{{ route("admin.pages.upload-image") }}', true);
-                    this.xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
+                    this.xhr.setRequestHeader('X-CSRF-TOKEN', csrfMeta.content);
                     this.xhr.setRequestHeader('Accept', 'application/json');
 
                     this.xhr.onload = () => {
@@ -387,8 +393,21 @@
                     window.contentEditor = editor;
 
                     // Daftarkan upload adapter ke FileRepository CKEditor
-                    // (build CDN classic tidak menyertakan SimpleUploadAdapter)
-                    editor.plugins.get('FileRepository').createAdapter = loader => new LaravelUploadAdapter(loader);
+                    // (build CDN classic tidak menyertakan SimpleUploadAdapter).
+                    // Pakai Object.defineProperty agar assignment menjadi own
+                    // property yang men-shadow prototype method dengan pasti.
+                    try {
+                        const fileRepository = editor.plugins.get('FileRepository');
+                        Object.defineProperty(fileRepository, 'createAdapter', {
+                            value: (loader) => new LaravelUploadAdapter(loader),
+                            writable: true,
+                            configurable: true,
+                            enumerable: false
+                        });
+                        console.warn('[CKEditor] Upload adapter registered:', '{{ route("admin.pages.upload-image") }}');
+                    } catch (adapterError) {
+                        console.error('[CKEditor] Gagal mendaftarkan upload adapter:', adapterError);
+                    }
 
                     // Listen for content changes
                     editor.model.document.on('change:data', () => {

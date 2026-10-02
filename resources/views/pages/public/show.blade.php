@@ -31,7 +31,7 @@
     </section>
 
     <!-- Page Content -->
-    <section style="padding: 80px 0; background: #f8f9fa;">
+    <section class="page-content-section" style="padding: 80px 0; background: #f8f9fa; position: relative; z-index: 1;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 offset-lg-2">
@@ -255,8 +255,13 @@
             color: #444;
         }
 
-        .page-content-body img {
-            max-width: 100%;
+        /* ⭐ Constrain gambar content — cegah gambar CKEditor (figure.image_resized
+           dengan inline width, atau img tanpa class) overflow menimpa footer.
+           !important diperlukan karena CKEditor menulis inline style width. */
+        .page-content-body img,
+        .page-template img,
+        .page-template .prose img {
+            max-width: 100% !important;
             height: auto;
             border-radius: 10px;
             margin: 1rem 0;
@@ -264,12 +269,19 @@
             display: block;
         }
 
-        .page-content-body figure.image {
+        .page-content-body figure.image,
+        .page-content-body figure.image_resized,
+        .page-template figure.image,
+        .page-template figure.image_resized {
+            max-width: 100% !important;
             margin: 1.5rem 0;
             padding: 0;
         }
 
-        .page-content-body figure.image img {
+        .page-content-body figure.image img,
+        .page-content-body figure.image_resized img,
+        .page-template figure.image img,
+        .page-template figure.image_resized img {
             display: block;
             margin: 0 auto;
         }
