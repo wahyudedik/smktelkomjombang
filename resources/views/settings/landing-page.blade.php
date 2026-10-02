@@ -1170,6 +1170,101 @@
                     </template>
                 </div>
 
+                <!-- Jurusan Footer (widget footer tema telkom) — pola sama dengan Link Terkait -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Jurusan (Footer)</h2>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Daftar jurusan yang tampil di widget <strong>Jurusan</strong> pada footer (tema telkom).
+                        URL dapat menunjuk ke halaman yang dibuat di Pages Management (<code class="bg-gray-100 px-1 rounded">/admin/pages</code>)
+                        dengan format <code class="bg-gray-100 px-1 rounded">/pages/slug</code> atau
+                        <code class="bg-gray-100 px-1 rounded">route:pages.public.show,slug</code>;
+                        selain itu juga mendukung <code class="bg-gray-100 px-1 rounded">https://...</code> dan
+                        <code class="bg-gray-100 px-1 rounded">#anchor</code>.
+                        Hapus semua baris untuk mengosongkan widget jurusan di footer.
+                    </p>
+
+                    @php
+                        // Prefill: old() saat validasi gagal, else nilai tersimpan (DB → map default config `jurusan`)
+                        $jurusanLinksPrefill = old('jurusan_links', $jurusanLinks ?? []);
+                        if (!is_array($jurusanLinksPrefill)) {
+                            $jurusanLinksPrefill = [];
+                        }
+                        $jurusanLinksPrefill = array_values(array_filter($jurusanLinksPrefill, 'is_array'));
+                        $jurusanLinksPrefill = array_map(static fn (array $item): array => [
+                            'label' => is_array($item['label'] ?? null) ? '' : (string) ($item['label'] ?? ''),
+                            'url' => is_array($item['url'] ?? null) ? '' : (string) ($item['url'] ?? ''),
+                        ], $jurusanLinksPrefill);
+                    @endphp
+
+                    <div id="jurusan-links-rows" class="space-y-3">
+                        @if (count($jurusanLinksPrefill) > 0)
+                            @foreach ($jurusanLinksPrefill as $index => $item)
+                                <div data-jurusan-link-row class="flex items-start gap-2">
+                                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        <input type="text" data-field="label"
+                                            name="jurusan_links[{{ $index }}][label]"
+                                            value="{{ $item['label'] }}"
+                                            placeholder="Label (mis. Teknik Komputer dan Jaringan)"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <input type="text" data-field="url"
+                                            name="jurusan_links[{{ $index }}][url]"
+                                            value="{{ $item['url'] }}"
+                                            placeholder="URL (https://..., /pages/slug, #anchor, route:nama.route)"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <button type="button" data-jurusan-link-remove
+                                        class="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                                        Hapus
+                                    </button>
+                                </div>
+                            @endforeach
+                        @else
+                            {{-- Belum ada data: tampilkan 1 baris kosong --}}
+                            <div data-jurusan-link-row class="flex items-start gap-2">
+                                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <input type="text" data-field="label"
+                                        name="jurusan_links[0][label]" value=""
+                                        placeholder="Label (mis. Teknik Komputer dan Jaringan)"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <input type="text" data-field="url"
+                                        name="jurusan_links[0][url]" value=""
+                                        placeholder="URL (https://..., /pages/slug, #anchor, route:nama.route)"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <button type="button" data-jurusan-link-remove
+                                    class="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                                    Hapus
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+
+                    <button type="button" id="jurusan-links-add"
+                        class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        + Tambah Jurusan
+                    </button>
+
+                    {{-- Template baris kosong untuk JS (clone) --}}
+                    <template id="jurusan-links-row-template">
+                        <div data-jurusan-link-row class="flex items-start gap-2">
+                            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <input type="text" data-field="label"
+                                    name="jurusan_links[__INDEX__][label]" value=""
+                                    placeholder="Label (mis. Teknik Komputer dan Jaringan)"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" data-field="url"
+                                    name="jurusan_links[__INDEX__][url]" value=""
+                                    placeholder="URL (https://..., /pages/slug, #anchor, route:nama.route)"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <button type="button" data-jurusan-link-remove
+                                class="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                                Hapus
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
                 {{-- Menu Management dipindah ke Quick Menu Manager setelah form utama (menghindari nested form) --}}
 
                 <!-- Submit Buttons -->
@@ -1525,6 +1620,52 @@
                 if (row) {
                     row.remove();
                     reindexRelatedLinks();
+                }
+            });
+        })();
+
+        // ── Jurusan Footer repeater (widget footer tema telkom) ──
+        // Pola sama dengan Link Terkait: baris awal via Blade (prefill/old()), JS untuk tambah/hapus + reindex.
+        (function () {
+            const jurusanLinksContainer = document.getElementById('jurusan-links-rows');
+            const jurusanLinksAddBtn = document.getElementById('jurusan-links-add');
+            const jurusanLinksTemplate = document.getElementById('jurusan-links-row-template');
+            if (!jurusanLinksContainer || !jurusanLinksAddBtn || !jurusanLinksTemplate) {
+                return;
+            }
+
+            function reindexJurusanLinks() {
+                const rows = jurusanLinksContainer.querySelectorAll('[data-jurusan-link-row]');
+                rows.forEach(function (row, i) {
+                    const labelInput = row.querySelector('[data-field="label"]');
+                    const urlInput = row.querySelector('[data-field="url"]');
+                    if (labelInput) {
+                        labelInput.name = 'jurusan_links[' + i + '][label]';
+                    }
+                    if (urlInput) {
+                        urlInput.name = 'jurusan_links[' + i + '][url]';
+                    }
+                });
+            }
+
+            jurusanLinksAddBtn.addEventListener('click', function () {
+                jurusanLinksContainer.appendChild(jurusanLinksTemplate.content.cloneNode(true));
+                reindexJurusanLinks();
+            });
+
+            // Event delegation untuk tombol hapus per baris
+            jurusanLinksContainer.addEventListener('click', function (e) {
+                if (!e.target || typeof e.target.closest !== 'function') {
+                    return;
+                }
+                const removeBtn = e.target.closest('[data-jurusan-link-remove]');
+                if (!removeBtn) {
+                    return;
+                }
+                const row = removeBtn.closest('[data-jurusan-link-row]');
+                if (row) {
+                    row.remove();
+                    reindexJurusanLinks();
                 }
             });
         })();

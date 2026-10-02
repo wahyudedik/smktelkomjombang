@@ -122,6 +122,7 @@ class ThemeSetting extends Model
                 'working_hours',
                 'kepala_sekolah',
                 'jurusan',
+                'jurusan_links',
             ])) {
                 $type = 'json';
                 if (is_array($value)) {
@@ -425,6 +426,7 @@ class ThemeSetting extends Model
             // ═══ Menu ═══
             'menu' => 'menu',
             'related_links' => 'menu',
+            'jurusan_links' => 'menu',
         ];
     }
 }

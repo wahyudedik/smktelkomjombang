@@ -103,10 +103,34 @@ class SettingsController extends Controller
             'url' => (string) ($link['url'] ?? ''),
         ], $relatedLinks);
 
+        // ⭐ Jurusan Footer — prefill repeater (DB key `jurusan_links`; fallback map dari config `jurusan` lama).
+        // Struktur per item: {label, url}. Fallback mempertahankan tampilan default
+        // (label = full_name/name, url = '#rs-services', urutan tampilan footer saat ini).
+        $jurusanLinks = theme_config('jurusan_links', null);
+        if (is_string($jurusanLinks)) {
+            $jurusanLinksDecoded = json_decode($jurusanLinks, true);
+            $jurusanLinks = is_array($jurusanLinksDecoded) ? $jurusanLinksDecoded : null;
+        }
+        if (!is_array($jurusanLinks)) {
+            // Belum pernah disimpan via admin → tampilkan data default config `jurusan`
+            $jurusanLinks = array_map(
+                static fn (array $j): array => [
+                    'label' => (string) ($j['full_name'] ?? $j['name'] ?? ''),
+                    'url' => '#rs-services',
+                ],
+                array_reverse(theme_config('jurusan', []))
+            );
+        }
+        $jurusanLinks = array_values(array_filter($jurusanLinks, 'is_array'));
+        $jurusanLinks = array_map(static fn (array $item): array => [
+            'label' => is_array($item['label'] ?? null) ? '' : (string) ($item['label'] ?? $item['full_name'] ?? $item['name'] ?? ''),
+            'url' => is_array($item['url'] ?? null) ? '' : (string) ($item['url'] ?? ''),
+        ], $jurusanLinks);
+
         return view('settings.landing-page', compact(
             'pages', 'headerMenus', 'footerMenus',
             'adminHeaderMenus', 'adminFooterMenus', 'menuAddablePages',
-            'settings', 'availableThemes', 'relatedLinks'
+            'settings', 'availableThemes', 'relatedLinks', 'jurusanLinks'
         ));
     }
 
@@ -222,6 +246,10 @@ class SettingsController extends Controller
             'related_links' => ['nullable', 'array'],
             'related_links.*.label' => ['required_with:related_links', 'string', 'max:255'],
             'related_links.*.url' => ['required_with:related_links', 'string', 'max:500'],
+            // ⭐ Jurusan Footer (repeater) — pola sama dengan Link Terkait
+            'jurusan_links' => ['nullable', 'array'],
+            'jurusan_links.*.label' => ['required_with:jurusan_links', 'string', 'max:255'],
+            'jurusan_links.*.url' => ['required_with:jurusan_links', 'string', 'max:500'],
         ]);
 
         // Update site settings (you can create a settings table or use config)
@@ -331,6 +359,14 @@ class SettingsController extends Controller
                     'url' => trim((string) data_get($item, 'url', '')),
                 ],
                 is_array($request->input('related_links')) ? $request->input('related_links') : []
+            ), static fn (array $item): bool => $item['label'] !== '' || $item['url'] !== '')),
+            // ⭐ Jurusan Footer (repeater label+URL) — key SELALU terkirim; 0 baris = simpan [] (kosongkan widget)
+            'jurusan_links' => array_values(array_filter(array_map(
+                static fn ($item): array => [
+                    'label' => trim((string) data_get($item, 'label', '')),
+                    'url' => trim((string) data_get($item, 'url', '')),
+                ],
+                is_array($request->input('jurusan_links')) ? $request->input('jurusan_links') : []
             ), static fn (array $item): bool => $item['label'] !== '' || $item['url'] !== '')),
         ];
 
@@ -603,6 +639,7 @@ class SettingsController extends Controller
             'twitter_url', 'tiktok_url', 'pinterest_url', 'google_maps_url',
             'video_url', 'video_thumbnail',
             'related_links',
+            'jurusan_links',
         ];
 
         foreach ($landingPageKeys as $key) {

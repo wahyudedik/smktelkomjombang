@@ -5,9 +5,29 @@
             <div class="row">
                 <div class="col-lg-4 col-md-12 col-sm-12 footer-widget md-mb-50">
                     <h4 class="widget-title">Jurusan</h4>
+                    @php
+                        // ⭐ Jurusan footer — DB key `jurusan_links` (admin: Settings → Landing Page → Jurusan Footer).
+                        // Fallback: map config `jurusan` lama {name, full_name, desc, icon} → {label, url:'#rs-services'}
+                        // (pertahankan tampilan default bila admin belum pernah menyimpan key ini).
+                        $jurusanFooterLinks = theme_config('jurusan_links', null);
+                        if (is_string($jurusanFooterLinks)) {
+                            $jurusanFooterDecoded = json_decode($jurusanFooterLinks, true);
+                            $jurusanFooterLinks = is_array($jurusanFooterDecoded) ? $jurusanFooterDecoded : null;
+                        }
+                        if (!is_array($jurusanFooterLinks)) {
+                            $jurusanFooterLinks = array_map(
+                                static fn ($j): array => [
+                                    'label' => (string) ($j['full_name'] ?? $j['name'] ?? ''),
+                                    'url' => '#rs-services',
+                                ],
+                                array_reverse(theme_config('jurusan', []))
+                            );
+                        }
+                        $jurusanFooterLinks = array_values(array_filter($jurusanFooterLinks, 'is_array'));
+                    @endphp
                     <ul class="site-map">
-                        @foreach(array_reverse(theme_config('jurusan', [])) as $j)
-                            <li><a href="#rs-services">{{ strtoupper($j['full_name'] ?? $j['name'] ?? '') }}</a></li>
+                        @foreach ($jurusanFooterLinks as $j)
+                            <li><a href="{{ resolve_theme_url(($j['url'] ?? '') !== '' ? (string) $j['url'] : '#') }}">{{ strtoupper($j['label'] ?? $j['full_name'] ?? $j['name'] ?? '') }}</a></li>
                         @endforeach
                     </ul>
                 </div>
