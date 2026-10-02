@@ -22,6 +22,7 @@ return [
     'submit' => 'إرسال',
     'reset' => 'إعادة تعيين',
     'filter' => 'تصفية',
+    'clear' => 'مسح',
     'export' => 'تصدير',
     'import' => 'استيراد',
     'actions' => 'الإجراءات',
@@ -693,7 +694,7 @@ return [
     'total_value' => 'القيمة الإجمالية',
     'total_asset_value' => 'إجمالي قيمة الأصول',
     'maintenance' => 'الصيانة',
-    
+
     // Guru Management
     'teacher_data' => 'بيانات المعلمين',
     'add_teacher' => 'إضافة معلم',
@@ -704,7 +705,7 @@ return [
     'search_name_or_nip' => 'الاسم أو الرقم التعريفي...',
     'no_teacher_data_found' => 'لم يتم العثور على بيانات المعلمين.',
     'delete_teacher_confirmation' => 'هل أنت متأكد أنك تريد حذف بيانات المعلم :name?',
-    
+
     // Siswa Management
     'student_data' => 'بيانات الطلاب',
     'add_student' => 'إضافة طالب',
@@ -715,7 +716,7 @@ return [
     'search_name_nis_nisn' => 'الاسم، الرقم التعريفي، أو الرقم الوطني...',
     'no_student_data_found' => 'لم يتم العثور على بيانات الطلاب.',
     'delete_student_confirmation' => 'هل أنت متأكد أنك تريد حذف بيانات الطالب :name?',
-    
+
     // Lulus Management
     'e_graduation_data' => 'التخرج الإلكتروني - بيانات التخرج',
     'add_graduation_data' => 'إضافة بيانات التخرج',
@@ -734,7 +735,7 @@ return [
     'add_first_data' => 'إضافة البيانات الأولى',
     'delete_data_confirmation' => 'هل أنت متأكد أنك تريد حذف هذه البيانات؟',
     'search_label' => 'بحث',
-    
+
     // Jadwal Pelajaran
     'lesson_schedule' => 'جدول الدروس',
     'calendar_view' => 'عرض التقويم',
@@ -746,7 +747,7 @@ return [
     'semester' => 'الفصل الدراسي',
     'all_semesters' => 'جميع الفصول',
     'no_schedule_found' => 'لم يتم العثور على جدول.',
-    
+
     // SARPRAS
     'sarpras_items_list' => 'قائمة عناصر المرافق',
     'manage_sarpras_items' => 'إدارة بيانات عناصر مرافق وبنية المدرسة التحتية',
@@ -813,7 +814,7 @@ return [
     'edit_category' => 'تعديل الفئة',
     'delete_category_confirmation' => 'هل أنت متأكد أنك تريد حذف الفئة :name?',
     'no_category_data' => 'لا توجد بيانات فئة',
-    
+
     // SARPRAS Ruang
     'sarpras_rooms_list' => 'قائمة غرف المرافق',
     'manage_sarpras_rooms' => 'إدارة بيانات الغرف والمواقع للمرافق والبنية التحتية للمدرسة',
@@ -828,7 +829,7 @@ return [
     'capacity' => 'السعة',
     'no_rooms_data' => 'لا توجد بيانات غرف',
     'delete_room_confirmation' => 'هل أنت متأكد أنك تريد حذف الغرفة :name?',
-    
+
     // SARPRAS Maintenance
     'sarpras_maintenance_list' => 'قائمة صيانة المرافق',
     'manage_sarpras_maintenance' => 'إدارة بيانات الصيانة والإصلاح للمرافق والبنية التحتية للمدرسة',
@@ -845,7 +846,7 @@ return [
     'technician' => 'الفني',
     'no_maintenance_data' => 'لا توجد بيانات صيانة',
     'delete_maintenance_confirmation' => 'هل أنت متأكد أنك تريد حذف الصيانة :name?',
-    
+
     // Siswa Edit
     'edit_student_data' => 'تعديل بيانات الطالب',
     'personal_information' => 'المعلومات الشخصية',

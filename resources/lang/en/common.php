@@ -22,6 +22,7 @@ return [
     'submit' => 'Submit',
     'reset' => 'Reset',
     'filter' => 'Filter',
+    'clear' => 'Clear',
     'export' => 'Export',
     'import' => 'Import',
     'actions' => 'Actions',
@@ -72,7 +73,7 @@ return [
     'system_settings' => 'System Settings',
     'instagram_settings' => 'Instagram Settings',
     'view_website' => 'View Website',
-    
+
     // Dashboard
     'superadmin_dashboard' => 'Superadmin Dashboard',
     'admin_dashboard' => 'Admin Dashboard',
@@ -83,7 +84,7 @@ return [
     'total_siswa' => 'Total Students',
     'total_guru' => 'Total Teachers',
     'active_users' => 'Active Users',
-    
+
     // Dashboard Details
     'profile_status' => 'Profile Status',
     'academic_progress' => 'Academic Progress',
@@ -98,7 +99,7 @@ return [
     'learning_progress' => 'Learning progress',
     'this_month' => 'This month',
     'complete' => 'Complete',
-    
+
     // Actions & Buttons
     'add_new_user' => 'Add New User',
     'add_new_teacher' => 'Add New Teacher',
@@ -108,7 +109,7 @@ return [
     'save_student_data' => 'Save Student Data',
     'save_teacher_data' => 'Save Teacher Data',
     'add_subject' => 'Add Subject',
-    
+
     // Forms & Inputs
     'personal_info' => 'Personal Information',
     'select_student_from_list' => 'Select Student from List',
@@ -125,7 +126,7 @@ return [
     'laki_laki' => 'Male',
     'perempuan' => 'Female',
     'pilih_user_account' => 'Select User Account (Optional)',
-    
+
     // Import & Export
     'import_osis_voters' => 'Import OSIS Voters Data',
     'import_voters_description' => 'Import voter data from Excel file',
@@ -144,7 +145,7 @@ return [
     'sistem_akan_validasi' => 'System will validate and import data',
     'atau_drag_drop' => 'or drag and drop',
     'excel_format_info' => 'Excel (.xlsx, .xls) or CSV up to 2MB',
-    
+
     // Student & Academic
     'student_profile' => 'Student Profile',
     'academic_info' => 'Academic Information',
@@ -156,7 +157,7 @@ return [
     'science_fair' => 'Science Fair',
     'no_new_notifications' => 'No new notifications',
     'tahun_ajaran' => 'Academic Year',
-    
+
     // OSIS
     'election_results' => 'OSIS Election Results',
     'election_results_description' => 'Statistics and results of OSIS chairman and vice chairman election',
@@ -180,7 +181,7 @@ return [
     'select_best_candidate' => 'Choose the best candidate for OSIS chairman and vice chairman to lead the organization.',
     'you_viewing_candidates' => 'You are viewing',
     'no_election_results' => 'No election results data yet',
-    
+
     // Settings
     'system_settings' => 'System Settings',
     'manage_system_settings' => 'Manage system settings and application data',
@@ -204,7 +205,7 @@ return [
     'edit_item' => 'Edit :item',
     'add_item' => 'Add :item',
     'update' => 'Update',
-    
+
     // OSIS Additional
     'e_osis_dashboard' => 'E-OSIS Dashboard',
     'digital_election_system' => 'Digital OSIS Election System',
@@ -258,7 +259,7 @@ return [
     'candidate_list' => 'Candidate List',
     'status_active' => 'Active',
     'status_inactive' => 'Inactive',
-    
+
     // OSIS Detail & Edit
     'detail_calon_osis' => 'OSIS Candidate Details',
     'edit_calon_osis' => 'Edit OSIS Candidate',
@@ -310,7 +311,7 @@ return [
     'last_voted' => 'Last Voted',
     'status_settings' => 'Status Settings',
     'enter_vision_mission' => 'Enter vision and mission of candidate',
-    
+
     // OSIS Teacher View
     'osis_teacher_view_title' => 'OSIS Election - Teacher View',
     'teacher_view_description' => 'View all OSIS candidates (no gender filter)',
@@ -320,7 +321,7 @@ return [
     'active_candidates' => 'Active Candidates',
     'no_candidates_message' => 'No candidates have been registered for the OSIS election yet.',
     'add_first_candidate' => 'Add First Candidate',
-    
+
     // OSIS Analytics
     'osis_analytics' => 'OSIS Analytics',
     'voting_statistics_insights' => 'Voting statistics and insights',
@@ -330,7 +331,7 @@ return [
     'no_candidates_found' => 'No candidates found',
     'no_votes_recorded' => 'No votes recorded yet',
     'voted_for' => 'voted for',
-    
+
     // OSIS Import Calon
     'import_calon_osis' => 'Import OSIS Candidate Data',
     'import_calon_description' => 'Import candidate data from Excel file',
@@ -342,7 +343,7 @@ return [
     'file_ready_upload' => 'File ready to upload',
     'file_must_excel' => 'File must be Excel (.xlsx, .xls) or CSV',
     'file_too_large' => 'File too large. Maximum 2MB',
-    
+
     // Settings
     'landing_page' => 'Landing Page',
     'manage_landing_page_description' => 'Manage logo, hero, menu, and website appearance',
@@ -350,7 +351,7 @@ return [
     'manage_seo_description' => 'Manage meta tags and SEO optimization',
     'profile_settings' => 'Profile Settings',
     'manage_profile_description' => 'Manage profile and account settings',
-    
+
     // SEO Settings
     'landing_page_settings' => 'Landing Page Settings',
     'manage_landing_page_settings_description' => 'Manage appearance, logo, hero section, and website menu',
@@ -375,7 +376,7 @@ return [
     'separate_keywords_commas' => 'Separate keywords with commas',
     'reset_to_default' => 'Reset to Default',
     'save_settings' => 'Save Settings',
-    
+
     // Profile
     'profile_information' => 'Profile Information',
     'update_profile_information_description' => 'Update your account\'s profile information and email address.',
@@ -397,7 +398,7 @@ return [
     'delete_account_confirmation' => 'Are you sure you want to delete your account?',
     'delete_account_warning' => 'Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
     'password' => 'Password',
-    
+
     // Auth
     'welcome' => 'Welcome',
     'login_to_your_account' => 'Login to your account',
@@ -434,7 +435,7 @@ return [
     'data_security_guaranteed' => 'Data security guaranteed',
     'user_friendly_interface' => 'User-friendly interface',
     'support_24_7' => '24/7 Support',
-    
+
     // Role Management
     'role_management' => 'Role Management',
     'manage_roles_description' => 'Manage roles comprehensively: name, description, permissions, and assign users',
@@ -472,7 +473,7 @@ return [
     'failed_create_role' => 'Failed to create role',
     'failed_update_role' => 'Failed to update role',
     'error_occurred' => 'An error occurred while :action role',
-    
+
     // Permissions
     'permission_management' => 'Permission Management',
     'manage_permissions_description' => 'Manage permissions and system access',
@@ -498,7 +499,7 @@ return [
     'no_permissions_found' => 'No permissions found',
     'get_started_permission' => 'Get started by creating a new permission.',
     'delete_permission_confirmation' => 'Are you sure you want to delete this permission?',
-    
+
     // User Management
     'user_management' => 'User Management',
     'manage_users_description' => 'Manage system users and permissions',
@@ -545,7 +546,7 @@ return [
     'role' => 'Role',
     'status' => 'Status',
     'assign_roles' => 'Assign Roles',
-    
+
     // Pages Management
     'pages_management' => 'Pages Management',
     'manage_website_pages' => 'Manage website pages and menus',
@@ -607,7 +608,7 @@ return [
     'current_image' => 'Current image',
     'content_required' => 'Content is required',
     'please_enter_content' => 'Please enter some content for this page.',
-    
+
     // Instagram Management
     'instagram_analytics' => 'Instagram Analytics',
     'instagram_analytics_description' => 'Analyze performance and engagement of school Instagram',
@@ -646,7 +647,7 @@ return [
     'data_update_failed' => 'Failed to update data',
     'perbarui_data' => 'Update Data',
     'recently' => 'Recently',
-    
+
     // Testimonials Management
     'manage_testimonials' => 'Manage Testimonials',
     'total_testimonials' => 'Total Testimonials',
@@ -671,7 +672,7 @@ return [
     'no_testimonials_matching' => 'There are no testimonials matching your criteria.',
     'showing_results' => 'Showing :first to :last of :total results',
     'view' => 'View',
-    
+
     // SARPRAS Management
     'sarpras_dashboard' => 'Sarpras Dashboard',
     'manage_school_facilities' => 'Manage school facilities and infrastructure',
@@ -697,7 +698,7 @@ return [
     'total_value' => 'Total Value',
     'total_asset_value' => 'Total asset value',
     'maintenance' => 'Maintenance',
-    
+
     // Guru Management
     'teacher_data' => 'Teacher Data',
     'add_teacher' => 'Add Teacher',
@@ -708,7 +709,7 @@ return [
     'search_name_or_nip' => 'Name or NIP...',
     'no_teacher_data_found' => 'No teacher data found.',
     'delete_teacher_confirmation' => 'Are you sure you want to delete teacher data :name?',
-    
+
     // Siswa Management
     'student_data' => 'Student Data',
     'add_student' => 'Add Student',
@@ -719,7 +720,7 @@ return [
     'search_name_nis_nisn' => 'Name, NIS, or NISN...',
     'no_student_data_found' => 'No student data found.',
     'delete_student_confirmation' => 'Are you sure you want to delete student data :name?',
-    
+
     // Lulus Management
     'e_graduation_data' => 'E-Graduation - Graduation Data',
     'add_graduation_data' => 'Add Graduation Data',
@@ -738,7 +739,7 @@ return [
     'add_first_data' => 'Add First Data',
     'delete_data_confirmation' => 'Are you sure you want to delete this data?',
     'search_label' => 'Search',
-    
+
     // Jadwal Pelajaran
     'lesson_schedule' => 'Lesson Schedule',
     'calendar_view' => 'Calendar View',
@@ -750,7 +751,7 @@ return [
     'semester' => 'Semester',
     'all_semesters' => 'All Semesters',
     'no_schedule_found' => 'No schedule found.',
-    
+
     // SARPRAS
     'sarpras_items_list' => 'SARPRAS Items List',
     'manage_sarpras_items' => 'Manage school facilities and infrastructure items data',
@@ -817,7 +818,7 @@ return [
     'edit_category' => 'Edit Category',
     'delete_category_confirmation' => 'Are you sure you want to delete category :name?',
     'no_category_data' => 'No category data',
-    
+
     // SARPRAS Ruang
     'sarpras_rooms_list' => 'SARPRAS Rooms List',
     'manage_sarpras_rooms' => 'Manage rooms and location data for school facilities and infrastructure',
@@ -832,7 +833,7 @@ return [
     'capacity' => 'Capacity',
     'no_rooms_data' => 'No rooms data',
     'delete_room_confirmation' => 'Are you sure you want to delete room :name?',
-    
+
     // SARPRAS Maintenance
     'sarpras_maintenance_list' => 'SARPRAS Maintenance List',
     'manage_sarpras_maintenance' => 'Manage maintenance and repair data for school facilities and infrastructure',
@@ -849,7 +850,7 @@ return [
     'technician' => 'Technician',
     'no_maintenance_data' => 'No maintenance data',
     'delete_maintenance_confirmation' => 'Are you sure you want to delete maintenance :name?',
-    
+
     // Siswa Edit
     'edit_student_data' => 'Edit Student Data',
     'personal_information' => 'Personal Information',

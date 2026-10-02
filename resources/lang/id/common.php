@@ -22,6 +22,7 @@ return [
     'submit' => 'Kirim',
     'reset' => 'Reset',
     'filter' => 'Filter',
+    'clear' => 'Bersihkan',
     'export' => 'Ekspor',
     'import' => 'Impor',
     'actions' => 'Aksi',
@@ -72,7 +73,7 @@ return [
     'system_settings' => 'Pengaturan Sistem',
     'instagram_settings' => 'Pengaturan Instagram',
     'view_website' => 'Lihat Website',
-    
+
     // Dashboard
     'superadmin_dashboard' => 'Dashboard Superadmin',
     'admin_dashboard' => 'Dashboard Admin',
@@ -83,7 +84,7 @@ return [
     'total_siswa' => 'Total Siswa',
     'total_guru' => 'Total Guru',
     'active_users' => 'Pengguna Aktif',
-    
+
     // Dashboard Details
     'profile_status' => 'Status Profil',
     'academic_progress' => 'Progress Akademik',
@@ -98,7 +99,7 @@ return [
     'learning_progress' => 'Progress pembelajaran',
     'this_month' => 'Bulan ini',
     'complete' => 'Lengkap',
-    
+
     // Actions & Buttons
     'add_new_user' => 'Tambah User Baru',
     'add_new_teacher' => 'Tambah Guru Baru',
@@ -108,7 +109,7 @@ return [
     'save_student_data' => 'Simpan Data Siswa',
     'save_teacher_data' => 'Simpan Data Guru',
     'add_subject' => 'Tambah Mata Pelajaran',
-    
+
     // Forms & Inputs
     'personal_info' => 'Informasi Personal',
     'select_student_from_list' => 'Pilih Siswa dari Daftar',
@@ -125,7 +126,7 @@ return [
     'laki_laki' => 'Laki-laki',
     'perempuan' => 'Perempuan',
     'pilih_user_account' => 'Pilih User Account (Opsional)',
-    
+
     // Import & Export
     'import_osis_voters' => 'Import Data Pemilih OSIS',
     'import_voters_description' => 'Import data pemilih dari file Excel',
@@ -144,7 +145,7 @@ return [
     'sistem_akan_validasi' => 'Sistem akan memvalidasi dan mengimpor data',
     'atau_drag_drop' => 'atau drag and drop',
     'excel_format_info' => 'Excel (.xlsx, .xls) atau CSV hingga 2MB',
-    
+
     // Student & Academic
     'student_profile' => 'Profil Siswa',
     'academic_info' => 'Informasi Akademik',
@@ -156,7 +157,7 @@ return [
     'science_fair' => 'Pameran Sains',
     'no_new_notifications' => 'Tidak ada notifikasi baru',
     'tahun_ajaran' => 'Tahun Ajaran',
-    
+
     // OSIS
     'election_results' => 'Hasil Pemilihan OSIS',
     'election_results_description' => 'Statistik dan hasil pemilihan ketua dan wakil ketua OSIS',
@@ -180,7 +181,7 @@ return [
     'select_best_candidate' => 'Pilih calon ketua dan wakil ketua OSIS yang menurut Anda terbaik untuk memimpin organisasi.',
     'you_viewing_candidates' => 'Anda melihat calon',
     'no_election_results' => 'Belum ada data hasil pemilihan',
-    
+
     // Settings
     'system_settings' => 'System Settings',
     'manage_system_settings' => 'Kelola pengaturan sistem dan data aplikasi',
@@ -204,7 +205,7 @@ return [
     'edit_item' => 'Edit :item',
     'add_item' => 'Tambah :item',
     'update' => 'Update',
-    
+
     // OSIS Additional
     'e_osis_dashboard' => 'E-OSIS Dashboard',
     'digital_election_system' => 'Sistem Pemilihan OSIS Digital',
@@ -258,7 +259,7 @@ return [
     'candidate_list' => 'Daftar Calon',
     'status_active' => 'Aktif',
     'status_inactive' => 'Tidak Aktif',
-    
+
     // OSIS Detail & Edit
     'detail_calon_osis' => 'Detail Calon OSIS',
     'edit_calon_osis' => 'Edit Calon OSIS',
@@ -310,7 +311,7 @@ return [
     'last_voted' => 'Terakhir Memilih',
     'status_settings' => 'Pengaturan Status',
     'enter_vision_mission' => 'Masukkan visi dan misi calon',
-    
+
     // OSIS Teacher View
     'osis_teacher_view_title' => 'Pemilihan OSIS - Guru View',
     'teacher_view_description' => 'Lihat semua calon OSIS (tanpa filter gender)',
@@ -320,7 +321,7 @@ return [
     'active_candidates' => 'Calon Aktif',
     'no_candidates_message' => 'Belum ada calon yang terdaftar untuk pemilihan OSIS saat ini.',
     'add_first_candidate' => 'Tambah Calon Pertama',
-    
+
     // OSIS Analytics
     'osis_analytics' => 'OSIS Analytics',
     'voting_statistics_insights' => 'Statistik dan wawasan voting',
@@ -330,7 +331,7 @@ return [
     'no_candidates_found' => 'Tidak ada calon ditemukan',
     'no_votes_recorded' => 'Belum ada suara yang tercatat',
     'voted_for' => 'memilih untuk',
-    
+
     // OSIS Import Calon
     'import_calon_osis' => 'Import Data Calon OSIS',
     'import_calon_description' => 'Import data calon dari file Excel',
@@ -342,7 +343,7 @@ return [
     'file_ready_upload' => 'File siap diupload',
     'file_must_excel' => 'File harus berupa Excel (.xlsx, .xls) atau CSV',
     'file_too_large' => 'File terlalu besar. Maksimal 2MB',
-    
+
     // Settings
     'landing_page' => 'Landing Page',
     'manage_landing_page_description' => 'Kelola logo, hero, menu, dan tampilan website',
@@ -350,7 +351,7 @@ return [
     'manage_seo_description' => 'Kelola meta tags dan optimasi SEO',
     'profile_settings' => 'Profile Settings',
     'manage_profile_description' => 'Kelola profil dan pengaturan akun',
-    
+
     // SEO Settings
     'landing_page_settings' => 'Landing Page Settings',
     'manage_landing_page_settings_description' => 'Kelola tampilan, logo, hero section, dan menu website',
@@ -375,7 +376,7 @@ return [
     'separate_keywords_commas' => 'Separate keywords with commas',
     'reset_to_default' => 'Reset to Default',
     'save_settings' => 'Save Settings',
-    
+
     // Profile
     'profile_information' => 'Informasi Profil',
     'update_profile_information_description' => 'Perbarui informasi profil dan alamat email akun Anda.',
@@ -397,7 +398,7 @@ return [
     'delete_account_confirmation' => 'Apakah Anda yakin ingin menghapus akun Anda?',
     'delete_account_warning' => 'Setelah akun Anda dihapus, semua sumber daya dan datanya akan dihapus secara permanen. Silakan masukkan kata sandi Anda untuk mengonfirmasi bahwa Anda ingin menghapus akun secara permanen.',
     'password' => 'Kata Sandi',
-    
+
     // Auth
     'welcome' => 'Selamat Datang',
     'login_to_your_account' => 'Masuk ke akun Anda',
@@ -434,7 +435,7 @@ return [
     'data_security_guaranteed' => 'Keamanan data terjamin',
     'user_friendly_interface' => 'Interface yang user-friendly',
     'support_24_7' => 'Support 24/7',
-    
+
     // Role Management
     'role_management' => 'Role Management',
     'manage_roles_description' => 'Kelola roles dengan lengkap: nama, deskripsi, permissions, dan assign users',
@@ -472,7 +473,7 @@ return [
     'failed_create_role' => 'Gagal membuat role',
     'failed_update_role' => 'Gagal mengupdate role',
     'error_occurred' => 'Terjadi kesalahan saat :action role',
-    
+
     // Permissions
     'permission_management' => 'Permission Management',
     'manage_permissions_description' => 'Kelola permissions dan akses sistem',
@@ -498,7 +499,7 @@ return [
     'no_permissions_found' => 'No permissions found',
     'get_started_permission' => 'Get started by creating a new permission.',
     'delete_permission_confirmation' => 'Apakah Anda yakin ingin menghapus permission ini?',
-    
+
     // User Management
     'user_management' => 'User Management',
     'manage_users_description' => 'Manage system users and permissions',
@@ -545,7 +546,7 @@ return [
     'role' => 'Role',
     'status' => 'Status',
     'assign_roles' => 'Assign Roles',
-    
+
     // Pages Management
     'pages_management' => 'Pages Management',
     'manage_website_pages' => 'Manage website pages and menus',
@@ -607,7 +608,7 @@ return [
     'current_image' => 'Current image',
     'content_required' => 'Content is required',
     'please_enter_content' => 'Please enter some content for this page.',
-    
+
     // Instagram Management
     'instagram_analytics' => 'Instagram Analytics',
     'instagram_analytics_description' => 'Analisis performa dan engagement Instagram sekolah',
@@ -646,7 +647,7 @@ return [
     'data_update_failed' => 'Gagal memperbarui data',
     'perbarui_data' => 'Perbarui Data',
     'recently' => 'Recently',
-    
+
     // Testimonials Management
     'manage_testimonials' => 'Manage Testimonials',
     'total_testimonials' => 'Total Testimonials',
@@ -671,7 +672,7 @@ return [
     'no_testimonials_matching' => 'There are no testimonials matching your criteria.',
     'showing_results' => 'Showing :first to :last of :total results',
     'view' => 'View',
-    
+
     // SARPRAS Management
     'sarpras_dashboard' => 'Sarpras Dashboard',
     'manage_school_facilities' => 'Manage school facilities and infrastructure',
@@ -697,7 +698,7 @@ return [
     'total_value' => 'Total Value',
     'total_asset_value' => 'Total asset value',
     'maintenance' => 'Maintenance',
-    
+
     // Guru Management
     'teacher_data' => 'Data Tenaga Pendidik (Guru)',
     'add_teacher' => 'Tambah Guru',
@@ -708,7 +709,7 @@ return [
     'search_name_or_nip' => 'Nama atau NIP...',
     'no_teacher_data_found' => 'Tidak ada data guru ditemukan.',
     'delete_teacher_confirmation' => 'Apakah Anda yakin ingin menghapus data guru :name?',
-    
+
     // Siswa Management
     'student_data' => 'Data Siswa',
     'add_student' => 'Tambah Siswa',
@@ -719,7 +720,7 @@ return [
     'search_name_nis_nisn' => 'Nama, NIS, atau NISN...',
     'no_student_data_found' => 'Tidak ada data siswa ditemukan.',
     'delete_student_confirmation' => 'Apakah Anda yakin ingin menghapus data siswa :name?',
-    
+
     // Lulus Management
     'e_graduation_data' => 'E-Lulus - Data Kelulusan',
     'add_graduation_data' => 'Tambah Data Kelulusan',
@@ -738,7 +739,7 @@ return [
     'add_first_data' => 'Tambah Data Pertama',
     'delete_data_confirmation' => 'Apakah Anda yakin ingin menghapus data ini?',
     'search_label' => 'Cari',
-    
+
     // Jadwal Pelajaran
     'lesson_schedule' => 'Jadwal Pelajaran',
     'calendar_view' => 'Calendar View',
@@ -750,7 +751,7 @@ return [
     'semester' => 'Semester',
     'all_semesters' => 'Semua Semester',
     'no_schedule_found' => 'Tidak ada jadwal ditemukan.',
-    
+
     // SARPRAS
     'sarpras_items_list' => 'Daftar Barang Sarpras',
     'manage_sarpras_items' => 'Kelola data barang sarana dan prasarana sekolah',
@@ -817,7 +818,7 @@ return [
     'edit_category' => 'Edit Kategori',
     'delete_category_confirmation' => 'Apakah Anda yakin ingin menghapus kategori :name?',
     'no_category_data' => 'Belum ada data kategori',
-    
+
     // SARPRAS Ruang
     'sarpras_rooms_list' => 'Daftar Ruang Sarpras',
     'manage_sarpras_rooms' => 'Kelola data ruang dan lokasi sarana prasarana sekolah',
@@ -832,7 +833,7 @@ return [
     'capacity' => 'Kapasitas',
     'no_rooms_data' => 'Belum ada data ruang',
     'delete_room_confirmation' => 'Apakah Anda yakin ingin menghapus ruang :name?',
-    
+
     // SARPRAS Maintenance
     'sarpras_maintenance_list' => 'Daftar Maintenance Sarpras',
     'manage_sarpras_maintenance' => 'Kelola data maintenance dan perawatan sarana prasarana sekolah',
@@ -849,7 +850,7 @@ return [
     'technician' => 'Teknisi',
     'no_maintenance_data' => 'Belum ada data maintenance',
     'delete_maintenance_confirmation' => 'Apakah Anda yakin ingin menghapus maintenance :name?',
-    
+
     // Siswa Edit
     'edit_student_data' => 'Edit Data Siswa',
     'personal_information' => 'Informasi Personal',
