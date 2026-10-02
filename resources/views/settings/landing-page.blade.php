@@ -1076,78 +1076,7 @@
                     </div>
                 </div>
 
-                <!-- Menu Management -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Menu Management</h2>
-
-                    <!-- Header Menus -->
-                    <div class="mb-6">
-                        <h3 class="text-lg font-medium text-gray-800 mb-3">Header Menus</h3>
-                        @if ($headerMenus->count() > 0)
-                            <div class="space-y-2">
-                                @foreach ($headerMenus as $menu)
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div>
-                                            <span class="font-medium">{{ $menu->title }}</span>
-                                            <span class="text-sm text-gray-500 ml-2">({{ $menu->slug }})</span>
-                                        </div>
-                                        <div class="flex space-x-2">
-                                            <a href="{{ route('admin.pages.edit', $menu->id) }}"
-                                                class="text-blue-600 hover:text-blue-800 text-sm">Edit</a>
-                                            <span class="text-gray-300">|</span>
-                                            <span class="text-sm text-gray-500">Order:
-                                                {{ $menu->menu_sort_order }}</span>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-gray-500">No header menus found. <a
-                                    href="{{ route('admin.pages.create') }}"
-                                    class="text-blue-600 hover:text-blue-800">Create a new page</a></p>
-                        @endif
-                    </div>
-
-                    <!-- Footer Menus -->
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-800 mb-3">Footer Menus</h3>
-                        @if ($footerMenus->count() > 0)
-                            <div class="space-y-2">
-                                @foreach ($footerMenus as $menu)
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div>
-                                            <span class="font-medium">{{ $menu->title }}</span>
-                                            <span class="text-sm text-gray-500 ml-2">({{ $menu->slug }})</span>
-                                        </div>
-                                        <div class="flex space-x-2">
-                                            <a href="{{ route('admin.pages.edit', $menu->id) }}"
-                                                class="text-blue-600 hover:text-blue-800 text-sm">Edit</a>
-                                            <span class="text-gray-300">|</span>
-                                            <span class="text-sm text-gray-500">Order:
-                                                {{ $menu->menu_sort_order }}</span>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-gray-500">No footer menus found. <a
-                                    href="{{ route('admin.pages.create') }}"
-                                    class="text-blue-600 hover:text-blue-800">Create a new page</a></p>
-                        @endif
-                    </div>
-
-                    <div class="mt-4">
-                        <a href="{{ route('admin.pages.create') }}"
-                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4">
-                                </path>
-                            </svg>
-                            Create New Page/Menu
-                        </a>
-                    </div>
-                </div>
+                {{-- Menu Management dipindah ke Quick Menu Manager setelah form utama (menghindari nested form) --}}
 
                 <!-- Submit Buttons -->
                 <div class="flex justify-between">
@@ -1176,6 +1105,203 @@
                     </button>
                 </div>
             </form>
+
+            <!-- ⭐ Quick Menu Manager — form PATCH/DELETE berdiri sendiri di luar form utama (hindari nested form) -->
+            <div class="mt-8 bg-white rounded-lg shadow p-6 space-y-8" id="quick-menu-manager">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">Menu Management</h2>
+                        <p class="text-sm text-gray-500 mt-1">Kelola menu header & footer: ganti judul, tampilkan/sembunyikan,
+                            atur urutan, jadikan halaman yang sudah ada sebagai menu.</p>
+                    </div>
+                    <a href="{{ route('admin.pages.create') }}"
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Create New Page/Menu
+                    </a>
+                </div>
+
+                @foreach ([
+                    ['label' => 'Header Menus', 'menus' => $adminHeaderMenus, 'position' => 'header'],
+                    ['label' => 'Footer Menus', 'menus' => $adminFooterMenus, 'position' => 'footer'],
+                ] as $section)
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-800 mb-3">{{ $section['label'] }}</h3>
+
+                        @if ($section['menus']->count() > 0)
+                            <div class="space-y-3">
+                                @foreach ($section['menus'] as $menu)
+                                    <div class="border rounded-lg overflow-hidden {{ $menu->is_menu ? 'bg-white' : 'bg-gray-50' }}">
+                                        {{-- Baris menu utama --}}
+                                        <div class="p-3 flex flex-wrap items-center gap-2">
+                                            <div class="flex-1 min-w-[220px]">
+                                                <span class="font-medium text-gray-900">{{ $menu->menu_title }}</span>
+                                                <span class="text-sm text-gray-500 ml-2">({{ $menu->slug }})</span>
+                                                @if ($menu->status !== 'published')
+                                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Belum publish</span>
+                                                @endif
+                                                @if (! $menu->is_menu)
+                                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-200 text-gray-700">Hidden</span>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex items-center gap-1">
+                                                {{-- Toggle Show/Hide --}}
+                                                <form action="{{ route('admin.settings.landing-page.menu.toggle', $menu) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit"
+                                                        class="px-2.5 py-1 text-xs font-medium rounded-md {{ $menu->is_menu ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-200 text-gray-600 hover:bg-gray-300' }}">
+                                                        {{ $menu->is_menu ? 'Hide' : 'Show' }}
+                                                    </button>
+                                                </form>
+
+                                                {{-- Naik --}}
+                                                <form action="{{ route('admin.settings.landing-page.menu.move', $menu) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="direction" value="up">
+                                                    <button type="submit" title="Naik"
+                                                        class="px-2 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">↑</button>
+                                                </form>
+
+                                                {{-- Turun --}}
+                                                <form action="{{ route('admin.settings.landing-page.menu.move', $menu) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="direction" value="down">
+                                                    <button type="submit" title="Turun"
+                                                        class="px-2 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">↓</button>
+                                                </form>
+
+                                                {{-- Edit --}}
+                                                <a href="{{ route('admin.pages.edit', $menu->id) }}"
+                                                    class="px-2.5 py-1 text-xs font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200">Edit</a>
+
+                                                {{-- Hapus permanen --}}
+                                                <form action="{{ route('admin.pages.destroy', $menu) }}" method="POST"
+                                                    data-confirm="Hapus permanen menu "{{ $menu->menu_title }}" beserta halaman/kontennya? Tindakan ini tidak dapat dibatalkan.">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="px-2.5 py-1 text-xs font-medium rounded-md bg-red-100 text-red-700 hover:bg-red-200">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        {{-- Rename inline --}}
+                                        <form action="{{ route('admin.settings.landing-page.menu.title', $menu) }}" method="POST"
+                                            class="px-3 pb-3 flex flex-wrap items-center gap-2">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="text" name="menu_title" value="{{ $menu->menu_title }}" maxlength="255"
+                                                class="flex-1 min-w-[200px] max-w-md px-2.5 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Judul menu (kosongkan untuk memakai judul halaman)">
+                                            <button type="submit"
+                                                class="px-3 py-1.5 text-xs font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700">Simpan Judul</button>
+                                        </form>
+
+                                        {{-- Submenu (anak) --}}
+                                        @if ($menu->children->count() > 0)
+                                            <div class="border-t border-gray-100 bg-gray-50/60 px-3 py-2 space-y-2">
+                                                @foreach ($menu->children as $child)
+                                                    <div class="pl-6 border-l-2 border-gray-200 ml-2">
+                                                        <div class="p-2 flex flex-wrap items-center gap-2">
+                                                            <div class="flex-1 min-w-[180px]">
+                                                                <span class="text-sm font-medium text-gray-800">{{ $child->menu_title }}</span>
+                                                                <span class="text-xs text-gray-500 ml-1">({{ $child->slug }})</span>
+                                                                @if ($child->status !== 'published')
+                                                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Belum publish</span>
+                                                                @endif
+                                                            </div>
+                                                            <div class="flex items-center gap-1">
+                                                                {{-- Toggle --}}
+                                                                <form action="{{ route('admin.settings.landing-page.menu.toggle', $child) }}" method="POST">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <button type="submit"
+                                                                        class="px-2 py-1 text-xs font-medium rounded-md {{ $child->is_menu ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-200 text-gray-600 hover:bg-gray-300' }}">
+                                                                        {{ $child->is_menu ? 'Hide' : 'Show' }}
+                                                                    </button>
+                                                                </form>
+                                                                {{-- Naik --}}
+                                                                <form action="{{ route('admin.settings.landing-page.menu.move', $child) }}" method="POST">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="direction" value="up">
+                                                                    <button type="submit" title="Naik"
+                                                                        class="px-2 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">↑</button>
+                                                                </form>
+                                                                {{-- Turun --}}
+                                                                <form action="{{ route('admin.settings.landing-page.menu.move', $child) }}" method="POST">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="direction" value="down">
+                                                                    <button type="submit" title="Turun"
+                                                                        class="px-2 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">↓</button>
+                                                                </form>
+                                                                {{-- Edit --}}
+                                                                <a href="{{ route('admin.pages.edit', $child->id) }}"
+                                                                    class="px-2 py-1 text-xs font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200">Edit</a>
+                                                                {{-- Hapus permanen --}}
+                                                                <form action="{{ route('admin.pages.destroy', $child) }}" method="POST"
+                                                                    data-confirm="Hapus permanen submenu "{{ $child->menu_title }}"? Tindakan ini tidak dapat dibatalkan.">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="px-2 py-1 text-xs font-medium rounded-md bg-red-100 text-red-700 hover:bg-red-200">Delete</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                        {{-- Rename inline submenu --}}
+                                                        <form action="{{ route('admin.settings.landing-page.menu.title', $child) }}" method="POST"
+                                                            class="px-2 pb-2 flex flex-wrap items-center gap-2">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="text" name="menu_title" value="{{ $child->menu_title }}" maxlength="255"
+                                                                class="flex-1 min-w-[160px] max-w-sm px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                placeholder="Judul submenu (kosongkan untuk memakai judul halaman)">
+                                                            <button type="submit"
+                                                                class="px-2.5 py-1 text-xs font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700">Simpan</button>
+                                                        </form>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 mb-3">Belum ada menu. Buat halaman baru atau jadikan halaman yang sudah
+                                ada melalui dropdown di bawah.</p>
+                        @endif
+
+                        {{-- Tambah menu dari halaman yang sudah ada (is_menu=false & published) --}}
+                        @if ($menuAddablePages->count() > 0)
+                            <form action="{{ route('admin.settings.landing-page.menu.add', ['page' => $menuAddablePages->first()->id]) }}" method="POST"
+                                class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100"
+                                onchange="this.action='{{ route('admin.settings.landing-page.menu.add', ['page' => '__PAGE__']) }}'.replace('__PAGE__', this.menu_page.value);">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="menu_position" value="{{ $section['position'] }}">
+                                <label class="block text-xs font-medium text-blue-800 mb-1">Tambah menu dari halaman yang sudah ada</label>
+                                <div class="flex items-center gap-2">
+                                    <select name="menu_page"
+                                        class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        @foreach ($menuAddablePages as $pageOption)
+                                            <option value="{{ $pageOption->id }}">{{ $pageOption->title }} ({{ $pageOption->slug }}) — {{ $pageOption->theme ?? 'global' }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="submit"
+                                        class="px-4 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 whitespace-nowrap">Jadikan Menu</button>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
         </div>
     </div>
 

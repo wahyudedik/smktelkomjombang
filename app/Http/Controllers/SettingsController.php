@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Services\ContentSanitizer;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\Page;
+use App\Providers\MenuServiceProvider;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\ThemeSetting;
@@ -71,11 +73,24 @@ class SettingsController extends Controller
         $headerMenus = $pages->where('menu_position', 'header')->whereNull('parent_id');
         $footerMenus = $pages->where('menu_position', 'footer')->whereNull('parent_id');
 
+        // ⭐ Quick Menu Manager — nama variabel dibedakan dari $headerMenus/$footerMenus karena
+        // View::composer (MenuServiceProvider) menimpa key tersebut saat render (hanya data published).
+        $adminHeaderMenus = $headerMenus;
+        $adminFooterMenus = $footerMenus;
+
+        // Halaman yang bisa dijadikan menu (is_menu=false, published) — maks 200, urut judul
+        $menuAddablePages = Page::where('is_menu', false)
+            ->where('status', 'published')
+            ->orderBy('title')
+            ->limit(200)
+            ->get();
+
         // ⭐ Load settings per active theme from theme_config()
         $settings = theme_config() ?: [];
 
         return view('settings.landing-page', compact(
             'pages', 'headerMenus', 'footerMenus',
+            'adminHeaderMenus', 'adminFooterMenus', 'menuAddablePages',
             'settings', 'availableThemes'
         ));
     }
@@ -569,5 +584,205 @@ class SettingsController extends Controller
         ThemeSetting::clearCache($theme);
 
         return redirect()->back()->with('success', "Settings tema [{$theme}] berhasil direset ke default!");
+    }
+
+    // ========================================
+    // Quick Menu Manager — CRUD menu dari landing-page settings
+    // ========================================
+
+    /**
+     * Update judul menu (inline rename). menu_title kosong = fallback ke title halaman.
+     */
+    public function updateMenuTitle(Request $request, Page $page): RedirectResponse
+    {
+        $request->validate([
+            'menu_title' => 'nullable|string|max:255',
+        ]);
+
+        $menuTitle = $request->input('menu_title');
+        $page->update([
+            'menu_title' => ($menuTitle === null || trim((string) $menuTitle) === '') ? null : $menuTitle,
+        ]);
+
+        MenuServiceProvider::clearMenuCache(current_theme());
+
+        return redirect()->back()->with('success', 'Judul menu berhasil diperbarui.');
+    }
+
+    /**
+     * Toggle visibilitas menu (show/hide).
+     * REVERSIBLE: saat menyembunyikan, field menu lain TIDAK direset
+     * (berbeda dari PageController::update) agar mudah di-enable lagi.
+     */
+    public function toggleMenuVisibility(Page $page): RedirectResponse
+    {
+        $theme = current_theme();
+
+        if ($page->is_menu) {
+            // Sembunyikan — pertahankan menu_position, menu_sort_order, parent_id, dll
+            $page->update(['is_menu' => false]);
+            MenuServiceProvider::clearMenuCache($theme);
+
+            return redirect()->back()->with('success', "Menu \"{$page->menu_title}\" disembunyikan.");
+        }
+
+        // Tampilkan — lengkapi field menu yang belum terisi
+        $updates = ['is_menu' => true];
+
+        if ($page->theme === null || $page->theme === '') {
+            $updates['theme'] = $theme;
+        }
+
+        $position = $page->menu_position ?: 'header';
+        if ($page->menu_position === null || $page->menu_position === '') {
+            $updates['menu_position'] = $position;
+        }
+
+        if ($page->menu_sort_order === null) {
+            $updates['menu_sort_order'] = $this->nextMenuSortOrder($page, $position);
+        }
+
+        $page->update($updates);
+        MenuServiceProvider::clearMenuCache($theme);
+
+        if ($page->status !== 'published') {
+            return redirect()->back()->with('info', 'Halaman belum dipublish — menu tidak tampil sampai dipublish.');
+        }
+
+        return redirect()->back()->with('success', "Menu \"{$page->menu_title}\" ditampilkan.");
+    }
+
+    /**
+     * Geser posisi menu (up/down) dengan menu saudara
+     * (menu_position sama + parent_id sama, lintas theme).
+     */
+    public function moveMenu(Request $request, Page $page): RedirectResponse
+    {
+        $request->validate([
+            'direction' => 'required|in:up,down',
+        ]);
+
+        $theme = current_theme();
+        $direction = $request->input('direction');
+        $mutated = false;
+
+        // Scope saudara: menu_position sama + parent_id sama (NULL untuk main menu), lintas theme
+        $siblings = Page::where('menu_position', $page->menu_position)
+            ->where(function ($query) use ($page) {
+                if ($page->parent_id === null) {
+                    $query->whereNull('parent_id');
+                } else {
+                    $query->where('parent_id', $page->parent_id);
+                }
+            })
+            ->orderBy('menu_sort_order')
+            ->orderBy('id') // tiebreaker
+            ->get();
+
+        // Normalisasi: beri urutan inkremental 1..n ke semua sibling jika ada nilai null/0 campur
+        $needsNormalization = $siblings->contains(
+            fn ($sibling) => $sibling->menu_sort_order === null || (int) $sibling->menu_sort_order === 0
+        );
+
+        if ($needsNormalization) {
+            foreach ($siblings->values() as $index => $sibling) {
+                $newOrder = $index + 1;
+                if ((int) $sibling->menu_sort_order !== $newOrder) {
+                    Page::whereKey($sibling->id)->update(['menu_sort_order' => $newOrder]);
+                    $sibling->menu_sort_order = $newOrder;
+                    $mutated = true;
+                }
+            }
+        }
+
+        $currentIndex = $siblings->search(fn ($sibling) => $sibling->id === $page->id);
+
+        if ($currentIndex === false) {
+            if ($mutated) {
+                MenuServiceProvider::clearMenuCache($theme);
+            }
+
+            return redirect()->back()->with('error', 'Menu tidak ditemukan dalam daftar saudara.');
+        }
+
+        $neighborIndex = $direction === 'up' ? $currentIndex - 1 : $currentIndex + 1;
+
+        if ($neighborIndex < 0 || $neighborIndex >= $siblings->count()) {
+            if ($mutated) {
+                MenuServiceProvider::clearMenuCache($theme);
+            }
+
+            return redirect()->back()->with(
+                'info',
+                $direction === 'up' ? 'Sudah di posisi teratas.' : 'Sudah di posisi terbawah.'
+            );
+        }
+
+        // Tukar posisi dengan tetangga
+        $current = $siblings[$currentIndex];
+        $neighbor = $siblings[$neighborIndex];
+
+        $currentOrder = $current->menu_sort_order;
+        $neighborOrder = $neighbor->menu_sort_order;
+
+        $current->update(['menu_sort_order' => $neighborOrder]);
+        $neighbor->update(['menu_sort_order' => $currentOrder]);
+
+        MenuServiceProvider::clearMenuCache($theme);
+
+        return redirect()->back()->with('success', 'Urutan menu diperbarui.');
+    }
+
+    /**
+     * Jadikan halaman yang belum jadi menu (is_menu=false) sebagai menu.
+     */
+    public function addPageToMenu(Request $request, Page $page): RedirectResponse
+    {
+        $request->validate([
+            'menu_position' => 'nullable|in:header,footer',
+        ]);
+
+        $theme = current_theme();
+
+        if ($page->is_menu) {
+            return redirect()->back()->with('info', 'Halaman sudah menjadi menu.');
+        }
+
+        $position = $request->input('menu_position') ?: 'header';
+
+        $page->update([
+            'is_menu' => true,
+            'menu_position' => $position,
+            'theme' => $page->theme ?: $theme,
+            'menu_sort_order' => $this->nextMenuSortOrder($page, $position),
+            // menu_title biarkan null → fallback ke title halaman
+        ]);
+
+        MenuServiceProvider::clearMenuCache($theme);
+
+        if ($page->status !== 'published') {
+            return redirect()->back()->with('info', 'Halaman belum dipublish — menu tidak tampil sampai dipublish.');
+        }
+
+        return redirect()->back()->with('success', "Halaman \"{$page->title}\" dijadikan menu {$position}.");
+    }
+
+    /**
+     * Hitung menu_sort_order berikutnya untuk sibling
+     * (menu_position + parent_id sama, boleh lintas theme).
+     */
+    private function nextMenuSortOrder(Page $page, string $menuPosition): int
+    {
+        $maxOrder = Page::where('menu_position', $menuPosition)
+            ->where(function ($query) use ($page) {
+                if ($page->parent_id === null) {
+                    $query->whereNull('parent_id');
+                } else {
+                    $query->where('parent_id', $page->parent_id);
+                }
+            })
+            ->max('menu_sort_order');
+
+        return ((int) $maxOrder) + 1;
     }
 }

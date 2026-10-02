@@ -836,6 +836,16 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin', 'permission:sett
     Route::get('/settings/landing-page', [SettingsController::class, 'landingPage'])->name('settings.landing-page')->middleware('permission:settings.manage|settings.landing-page');
     Route::post('/settings/landing-page', [SettingsController::class, 'updateLandingPage'])->name('settings.landing-page.update')->middleware('permission:settings.manage|settings.landing-page');
     Route::post('/settings/landing-page/reset', [SettingsController::class, 'resetLandingPage'])->name('settings.landing-page.reset')->middleware('permission:settings.manage|settings.landing-page');
+
+    // Quick Menu Manager — CRUD menu langsung dari landing-page settings (tanpa buka Pages Management per item)
+    Route::patch('/settings/landing-page/menu/{page}/title', [SettingsController::class, 'updateMenuTitle'])
+        ->name('settings.landing-page.menu.title')->middleware('permission:settings.manage|settings.landing-page');
+    Route::patch('/settings/landing-page/menu/{page}/toggle', [SettingsController::class, 'toggleMenuVisibility'])
+        ->name('settings.landing-page.menu.toggle')->middleware('permission:settings.manage|settings.landing-page');
+    Route::patch('/settings/landing-page/menu/{page}/move', [SettingsController::class, 'moveMenu'])
+        ->name('settings.landing-page.menu.move')->middleware('permission:settings.manage|settings.landing-page');
+    Route::patch('/settings/landing-page/menu/{page}/add', [SettingsController::class, 'addPageToMenu'])
+        ->name('settings.landing-page.menu.add')->middleware('permission:settings.manage|settings.landing-page');
     Route::get('/settings/seo', [SettingsController::class, 'seoSettings'])->name('settings.seo')->middleware('permission:settings.manage');
     Route::post('/settings/seo', [SettingsController::class, 'updateSeoSettings'])->name('settings.seo.update')->middleware('permission:settings.manage');
 
