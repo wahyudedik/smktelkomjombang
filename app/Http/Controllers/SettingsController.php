@@ -88,10 +88,25 @@ class SettingsController extends Controller
         // ⭐ Load settings per active theme from theme_config()
         $settings = theme_config() ?: [];
 
+        // ⭐ Link Terkait — prefill repeater (DB → config default). Selalu array of {label, url}.
+        $relatedLinks = theme_config('related_links', []);
+        if (is_string($relatedLinks)) {
+            $decoded = json_decode($relatedLinks, true);
+            $relatedLinks = is_array($decoded) ? $decoded : [];
+        }
+        if (!is_array($relatedLinks)) {
+            $relatedLinks = [];
+        }
+        $relatedLinks = array_values(array_filter($relatedLinks, 'is_array'));
+        $relatedLinks = array_map(static fn (array $link): array => [
+            'label' => (string) ($link['label'] ?? ''),
+            'url' => (string) ($link['url'] ?? ''),
+        ], $relatedLinks);
+
         return view('settings.landing-page', compact(
             'pages', 'headerMenus', 'footerMenus',
             'adminHeaderMenus', 'adminFooterMenus', 'menuAddablePages',
-            'settings', 'availableThemes'
+            'settings', 'availableThemes', 'relatedLinks'
         ));
     }
 
@@ -203,6 +218,10 @@ class SettingsController extends Controller
             'contact_section_subtitle' => 'nullable|string|max:255',
             'contact_section_title' => 'nullable|string|max:255',
             'contact_section_description' => 'nullable|string|max:500',
+            // ⭐ Link Terkait (repeater) — tanpa rule 'url' ketat agar sintaks route:/#anchor//path diterima
+            'related_links' => ['nullable', 'array'],
+            'related_links.*.label' => ['required_with:related_links', 'string', 'max:255'],
+            'related_links.*.url' => ['required_with:related_links', 'string', 'max:500'],
         ]);
 
         // Update site settings (you can create a settings table or use config)
@@ -305,6 +324,14 @@ class SettingsController extends Controller
             'contact_section_subtitle' => $request->contact_section_subtitle,
             'contact_section_title' => $request->contact_section_title,
             'contact_section_description' => $request->contact_section_description,
+            // ⭐ Link Terkait (repeater label+URL) — key SELALU terkirim; 0 baris = simpan [] (kosongkan semua link)
+            'related_links' => array_values(array_filter(array_map(
+                static fn ($item): array => [
+                    'label' => trim((string) data_get($item, 'label', '')),
+                    'url' => trim((string) data_get($item, 'url', '')),
+                ],
+                is_array($request->input('related_links')) ? $request->input('related_links') : []
+            ), static fn (array $item): bool => $item['label'] !== '' || $item['url'] !== '')),
         ];
 
         // Sanitize HTML fields yang ditampilkan dengan {!! !!} di Blade templates
@@ -575,6 +602,7 @@ class SettingsController extends Controller
             'facebook_url', 'instagram_url', 'youtube_url', 'whatsapp_url',
             'twitter_url', 'tiktok_url', 'pinterest_url', 'google_maps_url',
             'video_url', 'video_thumbnail',
+            'related_links',
         ];
 
         foreach ($landingPageKeys as $key) {

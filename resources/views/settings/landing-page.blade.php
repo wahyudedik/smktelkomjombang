@@ -1076,6 +1076,100 @@
                     </div>
                 </div>
 
+                <!-- Link Terkait (dropdown header + widget footer) -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Link Terkait</h2>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Link yang tampil di dropdown header (tema telkom) dan widget footer.
+                        Format URL: <code class="bg-gray-100 px-1 rounded">https://...</code>,
+                        <code class="bg-gray-100 px-1 rounded">/path</code>,
+                        <code class="bg-gray-100 px-1 rounded">#anchor</code>, atau
+                        <code class="bg-gray-100 px-1 rounded">route:nama.route</code>.
+                        Hapus semua baris untuk mengosongkan link terkait.
+                    </p>
+
+                    @php
+                        // Prefill: old() saat validasi gagal, else nilai tersimpan (DB → config default)
+                        $relatedLinksPrefill = old('related_links', $relatedLinks ?? []);
+                        if (!is_array($relatedLinksPrefill)) {
+                            $relatedLinksPrefill = [];
+                        }
+                        $relatedLinksPrefill = array_values(array_filter($relatedLinksPrefill, 'is_array'));
+                        $relatedLinksPrefill = array_map(static fn (array $link): array => [
+                            'label' => is_array($link['label'] ?? null) ? '' : (string) ($link['label'] ?? ''),
+                            'url' => is_array($link['url'] ?? null) ? '' : (string) ($link['url'] ?? ''),
+                        ], $relatedLinksPrefill);
+                    @endphp
+
+                    <div id="related-links-rows" class="space-y-3">
+                        @if (count($relatedLinksPrefill) > 0)
+                            @foreach ($relatedLinksPrefill as $index => $link)
+                                <div data-related-link-row class="flex items-start gap-2">
+                                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        <input type="text" data-field="label"
+                                            name="related_links[{{ $index }}][label]"
+                                            value="{{ $link['label'] }}"
+                                            placeholder="Label (mis. E-Rapor)"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <input type="text" data-field="url"
+                                            name="related_links[{{ $index }}][url]"
+                                            value="{{ $link['url'] }}"
+                                            placeholder="URL (https://..., /path, #anchor, route:nama.route)"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <button type="button" data-related-link-remove
+                                        class="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                                        Hapus
+                                    </button>
+                                </div>
+                            @endforeach
+                        @else
+                            {{-- Belum ada data: tampilkan 1 baris kosong --}}
+                            <div data-related-link-row class="flex items-start gap-2">
+                                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <input type="text" data-field="label"
+                                        name="related_links[0][label]" value=""
+                                        placeholder="Label (mis. E-Rapor)"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <input type="text" data-field="url"
+                                        name="related_links[0][url]" value=""
+                                        placeholder="URL (https://..., /path, #anchor, route:nama.route)"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <button type="button" data-related-link-remove
+                                    class="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                                    Hapus
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+
+                    <button type="button" id="related-links-add"
+                        class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        + Tambah Link
+                    </button>
+
+                    {{-- Template baris kosong untuk JS (clone) --}}
+                    <template id="related-links-row-template">
+                        <div data-related-link-row class="flex items-start gap-2">
+                            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <input type="text" data-field="label"
+                                    name="related_links[__INDEX__][label]" value=""
+                                    placeholder="Label (mis. E-Rapor)"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" data-field="url"
+                                    name="related_links[__INDEX__][url]" value=""
+                                    placeholder="URL (https://..., /path, #anchor, route:nama.route)"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <button type="button" data-related-link-remove
+                                class="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-medium">
+                                Hapus
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
                 {{-- Menu Management dipindah ke Quick Menu Manager setelah form utama (menghindari nested form) --}}
 
                 <!-- Submit Buttons -->
@@ -1387,6 +1481,53 @@
                 });
             });
         }
+
+        // ── Link Terkait repeater (dropdown header + widget footer) ──
+        // Baris awal dirender via Blade (prefill/old()); JS hanya untuk tambah/hapus + reindex nama input.
+        // Boleh 0 baris = kosongkan semua link terkait (disimpan sebagai array kosong).
+        (function () {
+            const relatedLinksContainer = document.getElementById('related-links-rows');
+            const relatedLinksAddBtn = document.getElementById('related-links-add');
+            const relatedLinksTemplate = document.getElementById('related-links-row-template');
+            if (!relatedLinksContainer || !relatedLinksAddBtn || !relatedLinksTemplate) {
+                return;
+            }
+
+            function reindexRelatedLinks() {
+                const rows = relatedLinksContainer.querySelectorAll('[data-related-link-row]');
+                rows.forEach(function (row, i) {
+                    const labelInput = row.querySelector('[data-field="label"]');
+                    const urlInput = row.querySelector('[data-field="url"]');
+                    if (labelInput) {
+                        labelInput.name = 'related_links[' + i + '][label]';
+                    }
+                    if (urlInput) {
+                        urlInput.name = 'related_links[' + i + '][url]';
+                    }
+                });
+            }
+
+            relatedLinksAddBtn.addEventListener('click', function () {
+                relatedLinksContainer.appendChild(relatedLinksTemplate.content.cloneNode(true));
+                reindexRelatedLinks();
+            });
+
+            // Event delegation untuk tombol hapus per baris
+            relatedLinksContainer.addEventListener('click', function (e) {
+                if (!e.target || typeof e.target.closest !== 'function') {
+                    return;
+                }
+                const removeBtn = e.target.closest('[data-related-link-remove]');
+                if (!removeBtn) {
+                    return;
+                }
+                const row = removeBtn.closest('[data-related-link-row]');
+                if (row) {
+                    row.remove();
+                    reindexRelatedLinks();
+                }
+            });
+        })();
 
         // Handle form reset confirmation with SweetAlert
         const resetForm = document.querySelector('form[action*="reset"]');
