@@ -430,6 +430,10 @@ class PageController extends Controller
     /**
      * Handle image upload from CKEditor content editor.
      *
+     * Dipanggil oleh custom LaravelUploadAdapter di views pages
+     * (create/edit) — build CDN CKEditor classic tidak menyertakan
+     * SimpleUploadAdapter, sehingga adapter didaftarkan manual.
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function uploadImage(Request $request)
@@ -439,10 +443,14 @@ class PageController extends Controller
         ]);
 
         $path = $request->file('upload')->store('pages/content', 'public');
+        $url = Storage::url($path);
 
         return response()->json([
+            // Format yang dibaca LaravelUploadAdapter / SimpleUploadAdapter CKEditor
+            'url' => $url,
+            // Format legacy tetap dipertahankan untuk kompatibilitas
             'urls' => [
-                'default' => Storage::url($path),
+                'default' => $url,
             ],
         ]);
     }

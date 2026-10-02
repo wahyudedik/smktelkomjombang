@@ -98,7 +98,7 @@ class SecurityHeaders
                 "default-src 'self'",
                 // 'unsafe-inline' diperlukan untuk inline scripts di Blade templates
                 // 'unsafe-eval' diperlukan untuk beberapa library JS (Chart.js, Alpine.js)
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net https://code.jquery.com https://cdn.quilljs.com",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net https://code.jquery.com https://cdn.quilljs.com https://cdn.ckeditor.com",
                 // 'unsafe-inline' diperlukan untuk inline styles di Blade templates
                 "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.bunny.net https://cdn.quilljs.com",
                 // blob: diperlukan untuk image generation (canvas), data: untuk inline images

@@ -327,6 +327,56 @@
     <!-- CKEditor 5 (Rich Text Editor - No API key required) -->
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script>
+        // ============================================================
+        // Laravel upload adapter untuk toolbar CKEditor (imageUpload)
+        // Build CDN "classic" TIDAK menyertakan SimpleUploadAdapter,
+        // sehingga tombol upload butuh adapter custom yang mendaftar
+        // ke FileRepository. Endpoint: admin.pages.upload-image
+        // ============================================================
+        class LaravelUploadAdapter {
+            constructor(loader) {
+                this.loader = loader;
+                this.xhr = null;
+            }
+
+            upload() {
+                return new Promise((resolve, reject) => {
+                    const data = new FormData();
+                    data.append('upload', this.loader.file);
+
+                    this.xhr = new XMLHttpRequest();
+                    this.xhr.open('POST', '{{ route("admin.pages.upload-image") }}', true);
+                    this.xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
+                    this.xhr.setRequestHeader('Accept', 'application/json');
+
+                    this.xhr.onload = () => {
+                        let response = {};
+                        try { response = JSON.parse(this.xhr.responseText || '{}'); } catch (e) { /* response bukan JSON */ }
+
+                        if (this.xhr.status >= 200 && this.xhr.status < 300) {
+                            const url = response.url || (response.urls && response.urls.default);
+                            if (url) {
+                                resolve({ default: url });
+                            } else {
+                                reject(new Error('URL gambar tidak ditemukan pada response server.'));
+                            }
+                        } else {
+                            reject(new Error(response.message || ('Upload gagal (HTTP ' + this.xhr.status + ').')));
+                        }
+                    };
+
+                    this.xhr.onerror = () => reject(new Error('Koneksi gagal saat upload gambar.'));
+                    this.xhr.send(data);
+                });
+            }
+
+            abort() {
+                if (this.xhr) {
+                    this.xhr.abort();
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             let contentEditor = null;
 
@@ -352,15 +402,16 @@
                             'imageStyle:inline', 'imageStyle:block', 'imageStyle:side'
                         ]
                     },
-                    simpleUpload: {
-                        uploadUrl: '{{ route("admin.pages.upload-image") }}'
-                    },
                     height: 400,
                     language: '{{ app()->getLocale() }}'
                 })
                 .then(editor => {
                     contentEditor = editor;
                     window.contentEditor = editor;
+
+                    // Daftarkan upload adapter ke FileRepository CKEditor
+                    // (build CDN classic tidak menyertakan SimpleUploadAdapter)
+                    editor.plugins.get('FileRepository').createAdapter = loader => new LaravelUploadAdapter(loader);
 
                     // Listen for content changes
                     editor.model.document.on('change:data', () => {
