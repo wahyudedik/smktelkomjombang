@@ -6,6 +6,15 @@
                 <p class="text-slate-600 mt-1">{{ __('common.teacher_view_description') }}</p>
             </div>
             <div class="flex items-center space-x-3">
+                @if (Auth::user()->hasRole('guru'))
+                    <a href="{{ route('admin.osis.voting') }}" class="btn btn-primary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Vote Sekarang
+                    </a>
+                @endif
                 <a href="{{ route('admin.osis.results') }}" class="btn btn-secondary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

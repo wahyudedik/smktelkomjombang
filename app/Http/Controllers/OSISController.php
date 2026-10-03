@@ -402,22 +402,37 @@ class OSISController extends Controller
      */
     public function voting()
     {
-        // Check if user is a student
         $user = Auth::user();
-        if (!$user->hasRole('siswa')) {
+
+        // Allow siswa and guru to access voting
+        if (!$user->hasRole('siswa') && !$user->hasRole('guru')) {
             return redirect()->route('admin.osis.index')
-                ->with('error', 'Hanya siswa yang dapat memilih. Silakan login sebagai siswa untuk melakukan voting.');
+                ->with('error', 'Hanya siswa dan guru yang dapat memilih. Silakan login dengan role yang sesuai untuk melakukan voting.');
         }
 
-        // Get student data
-        $siswa = Siswa::where('user_id', $user->id)->first();
-        if (!$siswa) {
-            return redirect()->route('admin.osis.index')
-                ->with('error', 'Data siswa tidak ditemukan. Silakan hubungi administrator.');
+        $isGuru = $user->hasRole('guru');
+
+        if ($isGuru) {
+            // Resolve guru voter record
+            $pemilihData = Pemilih::where('user_id', $user->id)->where('user_type', 'guru')->first();
+            if (!$pemilihData) {
+                return redirect()->route('admin.dashboard')
+                    ->with('error', 'Data pemilih guru belum tersedia. Hubungi admin untuk generate data pemilih.');
+            }
+            $hasVoted = $pemilihData->hasVoted();
+        } else {
+            // Resolve student record
+            $siswa = Siswa::where('user_id', $user->id)->first();
+            if (!$siswa) {
+                return redirect()->route('admin.osis.index')
+                    ->with('error', 'Data siswa tidak ditemukan. Silakan hubungi administrator.');
+            }
+            $pemilihData = $siswa;
+            $hasVoted = $siswa->hasVotedOsis();
         }
 
-        // Check if student has already voted
-        if ($siswa->hasVotedOsis()) {
+        // Check if user has already voted
+        if ($hasVoted) {
             return redirect()->route('admin.osis.results')
                 ->with('info', 'Anda sudah memilih dalam pemilihan OSIS ini.');
         }
@@ -429,23 +444,27 @@ class OSISController extends Controller
                 ->with('error', 'Tidak ada pemilihan OSIS yang sedang berlangsung.');
         }
 
-        // Check if student's class is allowed to vote
-        if ($election->allowed_classes && !in_array($siswa->kelas, $election->allowed_classes)) {
+        // Check if student's class is allowed to vote (students only)
+        if (!$isGuru && $election->allowed_classes && !in_array($pemilihData->kelas, $election->allowed_classes)) {
             return redirect()->route('admin.osis.index')
                 ->with('error', 'Kelas Anda tidak diizinkan untuk memilih dalam pemilihan ini.');
         }
 
-        // Filter candidates based on student's gender
+        // Filter candidates based on student's gender (guru sees all candidates)
         $query = $election->candidates()->active()->ordered();
 
         // For students, filter by gender (calon cewek tampil untuk siswa cewek, calon cowok untuk siswa cowok)
-        if ($siswa->jenis_kelamin) {
-            $calons = $query->byGender($siswa->jenis_kelamin)->get();
+        // Guru bypass gender filter — tampilkan semua calon
+        if (!$isGuru && $pemilihData->jenis_kelamin) {
+            $calons = $query->byGender($pemilihData->jenis_kelamin)->get();
         } else {
             $calons = $query->get();
         }
 
-        return view('osis.voting', compact('calons', 'siswa', 'election'));
+        // $siswa can be a Siswa object (siswa) or Pemilih object (guru) — kept for view compatibility
+        $siswa = $pemilihData;
+
+        return view('osis.voting', compact('calons', 'siswa', 'election', 'hasVoted', 'isGuru'));
     }
 
     /**
@@ -458,16 +477,40 @@ class OSISController extends Controller
         ]);
 
         $user = Auth::user();
-        $siswa = Siswa::where('user_id', $user->id)->first();
 
-        if (!$siswa) {
+        if (!$user->hasRole('siswa') && !$user->hasRole('guru')) {
             return redirect()->route('admin.dashboard')
-                ->with('error', 'Data siswa tidak ditemukan.');
+                ->with('error', 'Hanya siswa dan guru yang dapat melakukan voting.');
         }
 
-        if ($siswa->hasVotedOsis()) {
-            return redirect()->route('admin.osis.voting')
-                ->with('error', 'Anda sudah memilih dalam pemilihan OSIS ini.');
+        $isGuru = $user->hasRole('guru');
+        $siswa = null;
+        $pemilih = null;
+
+        if ($isGuru) {
+            // Resolve guru voter record
+            $pemilih = Pemilih::where('user_id', $user->id)->where('user_type', 'guru')->first();
+            if (!$pemilih) {
+                return redirect()->route('admin.dashboard')
+                    ->with('error', 'Data pemilih guru tidak ditemukan.');
+            }
+
+            if ($pemilih->hasVoted()) {
+                return redirect()->route('admin.osis.voting')
+                    ->with('error', 'Anda sudah melakukan voting');
+            }
+        } else {
+            // Resolve student record
+            $siswa = Siswa::where('user_id', $user->id)->first();
+            if (!$siswa) {
+                return redirect()->route('admin.dashboard')
+                    ->with('error', 'Data siswa tidak ditemukan.');
+            }
+
+            if ($siswa->hasVotedOsis()) {
+                return redirect()->route('admin.osis.voting')
+                    ->with('error', 'Anda sudah memilih dalam pemilihan OSIS ini.');
+            }
         }
 
         // Get active election
@@ -480,64 +523,109 @@ class OSISController extends Controller
         $calon = Calon::findOrFail($request->calon_id);
 
         // Validate gender for students (guru can vote for any candidate, siswa can only vote for same gender)
-        if ($user->hasRole('siswa') && $calon->jenis_kelamin && $siswa->jenis_kelamin !== $calon->jenis_kelamin) {
+        if (!$isGuru && $calon->jenis_kelamin && $siswa->jenis_kelamin !== $calon->jenis_kelamin) {
             return redirect()->route('admin.osis.voting')
                 ->with('error', 'Anda hanya dapat memilih calon yang sesuai dengan jenis kelamin Anda.');
         }
 
-        // Bug 1 & 2 fix: wrap the whole voting process in a DB transaction with a
-        // double-check pattern (lockForUpdate) to prevent concurrent double-votes,
-        // and update BOTH vote markers (siswas.has_voted_osis + pemilihs.status)
-        // atomically so the dual-tracking state never diverges.
-        $voteRecorded = DB::transaction(function () use ($request, $siswa, $calon, $election) {
-            // Lock the siswa row so concurrent requests queue up instead of racing
-            $lockedSiswa = Siswa::whereKey($siswa->id)->lockForUpdate()->first();
+        if ($isGuru) {
+            // Guru voting path: record vote via pemilih_id (siswa_id stays null)
+            // Wrap in DB transaction with double-check pattern (lockForUpdate)
+            // to prevent concurrent double-votes.
+            $voteRecorded = DB::transaction(function () use ($request, $pemilih, $calon, $election) {
+                // Lock the pemilih row so concurrent requests queue up instead of racing
+                $lockedPemilih = Pemilih::whereKey($pemilih->id)->lockForUpdate()->first();
 
-            // Double-check inside the transaction (another request may have voted first)
-            if (!$lockedSiswa || $lockedSiswa->hasVotedOsis()) {
-                return false;
-            }
+                // Double-check inside the transaction (another request may have voted first)
+                if (!$lockedPemilih || $lockedPemilih->hasVoted()) {
+                    return false;
+                }
 
-            // Also check for an existing valid voting record (belt & suspenders)
-            $alreadyVoted = Voting::where('siswa_id', $lockedSiswa->id)
-                ->where('election_id', $election->id)
-                ->where('is_valid', true)
-                ->exists();
+                // Also check for an existing valid voting record (belt & suspenders)
+                $alreadyVoted = Voting::where('pemilih_id', $lockedPemilih->id)
+                    ->where('election_id', $election->id)
+                    ->where('is_valid', true)
+                    ->exists();
 
-            if ($alreadyVoted) {
-                // Sync the siswa flag if it diverged from the voting table
+                if ($alreadyVoted) {
+                    // Sync the pemilih flag if it diverged from the voting table
+                    $lockedPemilih->markAsVoted($request->ip(), $request->userAgent());
+                    return false;
+                }
+
+                // Create vote record (siswa_id is null for guru votes; vote tracked via pemilih_id)
+                Voting::create([
+                    'calon_id' => $calon->id,
+                    'pemilih_id' => $lockedPemilih->id,
+                    'siswa_id' => null,
+                    'election_id' => $election->id,
+                    'waktu_voting' => now(),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'is_valid' => true,
+                ]);
+
+                // Mark pemilih as voted (sets status = 'sudah_memilih')
+                $lockedPemilih->markAsVoted($request->ip(), $request->userAgent());
+
+                return true;
+            });
+        } else {
+            // Siswa voting path: record vote via siswa_id (existing logic)
+            // Bug 1 & 2 fix: wrap the whole voting process in a DB transaction with a
+            // double-check pattern (lockForUpdate) to prevent concurrent double-votes,
+            // and update BOTH vote markers (siswas.has_voted_osis + pemilihs.status)
+            // atomically so the dual-tracking state never diverges.
+            $voteRecorded = DB::transaction(function () use ($request, $siswa, $calon, $election) {
+                // Lock the siswa row so concurrent requests queue up instead of racing
+                $lockedSiswa = Siswa::whereKey($siswa->id)->lockForUpdate()->first();
+
+                // Double-check inside the transaction (another request may have voted first)
+                if (!$lockedSiswa || $lockedSiswa->hasVotedOsis()) {
+                    return false;
+                }
+
+                // Also check for an existing valid voting record (belt & suspenders)
+                $alreadyVoted = Voting::where('siswa_id', $lockedSiswa->id)
+                    ->where('election_id', $election->id)
+                    ->where('is_valid', true)
+                    ->exists();
+
+                if ($alreadyVoted) {
+                    // Sync the siswa flag if it diverged from the voting table
+                    $lockedSiswa->markAsVoted($request->ip(), $request->userAgent());
+                    return false;
+                }
+
+                // Create vote record (pemilih_id is nullable; vote tracked via siswa_id)
+                Voting::create([
+                    'calon_id' => $calon->id,
+                    'pemilih_id' => null,
+                    'siswa_id' => $lockedSiswa->id,
+                    'election_id' => $election->id,
+                    'waktu_voting' => now(),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'is_valid' => true,
+                ]);
+
+                // Marker 1: mark siswa as voted
                 $lockedSiswa->markAsVoted($request->ip(), $request->userAgent());
-                return false;
-            }
 
-            // Create vote record (pemilih_id is nullable; vote tracked via siswa_id)
-            Voting::create([
-                'calon_id' => $calon->id,
-                'pemilih_id' => null,
-                'siswa_id' => $lockedSiswa->id,
-                'election_id' => $election->id,
-                'waktu_voting' => now(),
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'is_valid' => true,
-            ]);
+                // Marker 2: mark related pemilih record as sudah_memilih (if any exists)
+                Pemilih::where('user_id', $lockedSiswa->user_id)
+                    ->where(function ($query) {
+                        $query->where('user_type', 'siswa')->orWhereNull('user_type');
+                    })
+                    ->where('status', '!=', 'sudah_memilih')
+                    ->get()
+                    ->each(function (Pemilih $pemilih) use ($request) {
+                        $pemilih->markAsVoted($request->ip(), $request->userAgent());
+                    });
 
-            // Marker 1: mark siswa as voted
-            $lockedSiswa->markAsVoted($request->ip(), $request->userAgent());
-
-            // Marker 2: mark related pemilih record as sudah_memilih (if any exists)
-            Pemilih::where('user_id', $lockedSiswa->user_id)
-                ->where(function ($query) {
-                    $query->where('user_type', 'siswa')->orWhereNull('user_type');
-                })
-                ->where('status', '!=', 'sudah_memilih')
-                ->get()
-                ->each(function (Pemilih $pemilih) use ($request) {
-                    $pemilih->markAsVoted($request->ip(), $request->userAgent());
-                });
-
-            return true;
-        });
+                return true;
+            });
+        }
 
         if (!$voteRecorded) {
             return redirect()->route('admin.osis.voting')

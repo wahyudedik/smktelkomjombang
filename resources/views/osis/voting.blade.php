@@ -20,7 +20,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Voting Status -->
         <div class="mb-8">
-            @if ($pemilih->has_voted)
+            @if ($hasVoted)
                 <div class="bg-green-50 border border-green-200 rounded-xl p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -48,7 +48,18 @@
                         <div class="ml-4">
                             <h3 class="text-lg font-semibold text-blue-900">{{ __('common.please_select_candidate') }}</h3>
                             <p class="text-blue-700">{{ __('common.select_best_candidate') }}</p>
-                            @if ($siswa->jenis_kelamin)
+                            @if ($isGuru)
+                                <div class="mt-2 text-sm text-blue-600">
+                                    <span class="inline-flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Anda melihat semua calon
+                                    </span>
+                                </div>
+                            @elseif ($siswa->jenis_kelamin)
                                 <div class="mt-2 text-sm text-blue-600">
                                     <span class="inline-flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
@@ -66,7 +77,7 @@
             @endif
         </div>
 
-        @if (!$pemilih->has_voted)
+        @if (!$hasVoted)
             <!-- Voting Form -->
             <form method="POST" action="{{ route('admin.osis.vote') }}" class="space-y-8">
                 @csrf

@@ -531,8 +531,8 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('a
     Route::get('/teacher-view', [OSISController::class, 'teacherView'])->name('teacher-view')->middleware('permission:osis.view');
 });
 
-// OSIS Student Routes (Access: siswa) - Voting and Results
-Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('admin/osis')->name('admin.osis.')->group(function () {
+// OSIS Voting Routes (Access: siswa, guru) - Voting and Results
+Route::middleware(['auth', 'verified', 'role:siswa|guru'])->prefix('admin/osis')->name('admin.osis.')->group(function () {
     Route::get('/voting', [OSISController::class, 'voting'])->name('voting');
     Route::post('/vote', [OSISController::class, 'processVote'])
         ->middleware('throttle:voting') // Max 5 votes per minute (anti-fraud)
