@@ -24,7 +24,7 @@
                     @if ($berita->featured_image)
                         <div class="bs-img mb-35">
                             <img src="{{ Storage::url($berita->featured_image) }}" alt="{{ $berita->title }}"
-                                style="width: 100%; border-radius: 10px; max-height: 450px; object-fit: cover;">
+                                style="width: 100%; height: auto; border-radius: 10px; display: block;">
                         </div>
                     @endif
 
