@@ -3,7 +3,7 @@
 
 ---
 
-## 🔥 QUICK DIAGNOSIS (5 MENIT)
+## ðŸ”¥ QUICK DIAGNOSIS (5 MENIT)
 
 ### Step 1: Cek Token di .env
 ```bash
@@ -11,26 +11,28 @@ grep ATTENDANCE_ICLOCK_SECRET /var/www/telkom/.env
 ```
 **Harus ada dan tidak kosong.**
 
+> ⚠️ **KEAMANAN**: Nilai token di dokumentasi ini sudah diganti placeholder `YOUR_TOKEN_HERE`. Jika token asli pernah dibagikan/publik, segera **ROTASI token** di device & `.env` (buat baru: `openssl rand -hex 32`).
+
 ### Step 2: Test Endpoint HTTP
 ```bash
-curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara"
+curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST&token=YOUR_TOKEN_HERE"
 ```
 **Harus return 200 OK + config lines.**
 
 ### Step 3: Cek Device Setting
 ```
-Menu → Communication → ADMS / Cloud Server
+Menu â†’ Communication â†’ ADMS / Cloud Server
 ```
 **Harus:**
 - Server Address: `smktelekomunikasidu.sch.id` (tanpa http://)
 - Port: `80`
-- Token: `iloveSMKkuYangIndahTelkomJayaAbadinusantara`
+- Token: `YOUR_TOKEN_HERE`
 - Push Interval: `60`
 - Enable Push: `ON`
 
 ### Step 4: Restart Device
 ```
-Menu → System → Restart
+Menu â†’ System â†’ Restart
 ```
 **Tunggu 2 menit.**
 
@@ -42,16 +44,16 @@ mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_devices;"
 
 ---
 
-## ❌ Jika Masih Tidak Connect
+## âŒ Jika Masih Tidak Connect
 
 ### Cek 1: Endpoint Accessible?
 ```bash
-curl -I "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara"
+curl -I "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST&token=YOUR_TOKEN_HERE"
 ```
-- ✅ 200 OK → Endpoint OK
-- ❌ 403 Forbidden → Token salah
-- ❌ 404 Not Found → Route tidak ada
-- ❌ Connection refused → Server down
+- âœ… 200 OK â†’ Endpoint OK
+- âŒ 403 Forbidden â†’ Token salah
+- âŒ 404 Not Found â†’ Route tidak ada
+- âŒ Connection refused â†’ Server down
 
 ### Cek 2: Laravel Log
 ```bash
@@ -86,7 +88,7 @@ PHP-FPM harus running.
 
 ---
 
-## 🎯 COMMON ISSUES & FIXES
+## ðŸŽ¯ COMMON ISSUES & FIXES
 
 ### Issue 1: Device tidak muncul di admin
 
@@ -101,10 +103,10 @@ grep ATTENDANCE_ICLOCK_SECRET /var/www/telkom/.env
 curl -v "http://domain.com/iclock/getrequest?SN=TEST&token=..."
 
 # 3. Cek device setting
-# Menu → Communication → ADMS / Cloud Server
+# Menu â†’ Communication â†’ ADMS / Cloud Server
 
 # 4. Restart device
-# Menu → System → Restart
+# Menu â†’ System â†’ Restart
 
 # 5. Cek database
 mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_devices;"
@@ -120,13 +122,13 @@ mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_devices;"
 mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_identities LIMIT 5;"
 
 # 2. Sync user ke device
-# Admin → Absensi → Users → Sync Semua User ke Device
+# Admin â†’ Absensi â†’ Users â†’ Sync Semua User ke Device
 
 # 3. Enroll biometric
-# Device → Menu → Users → Pilih user → Fingerprint
+# Device â†’ Menu â†’ Users â†’ Pilih user â†’ Fingerprint
 
 # 4. Test scan
-# Scan di device → cek admin /admin/absensi/logs
+# Scan di device â†’ cek admin /admin/absensi/logs
 ```
 
 ### Issue 3: Error 403 Forbidden
@@ -139,7 +141,7 @@ mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_identities LIMIT 
 grep ATTENDANCE_ICLOCK_SECRET /var/www/telkom/.env
 
 # 2. Cek token di device setting
-# Menu → Communication → ADMS / Cloud Server
+# Menu â†’ Communication â†’ ADMS / Cloud Server
 
 # 3. Pastikan sama persis (case-sensitive)
 
@@ -173,20 +175,20 @@ supervisorctl restart telkom-worker:*
 **Fix:**
 ```bash
 # 1. Cek device setting
-# Menu → Communication → ADMS / Cloud Server
+# Menu â†’ Communication â†’ ADMS / Cloud Server
 # Push Interval: 60
 # Enable Push: ON
 
 # 2. Restart device
-# Menu → System → Restart
+# Menu â†’ System â†’ Restart
 
 # 3. Cek device internet connection
-# Menu → Network → Test Connection
+# Menu â†’ Network â†’ Test Connection
 ```
 
 ---
 
-## 🚀 QUICK COMMANDS
+## ðŸš€ QUICK COMMANDS
 
 ### Restart Everything
 ```bash
@@ -243,7 +245,7 @@ mysql -u telkom_user -p telkom_db -e "SELECT COUNT(*) FROM attendance_logs WHERE
 
 ---
 
-## 📞 ESCALATION PATH
+## ðŸ“ž ESCALATION PATH
 
 1. **Device tidak connect?**
    - Cek endpoint HTTP

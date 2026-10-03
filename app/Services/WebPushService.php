@@ -63,14 +63,20 @@ class WebPushService
 
     /**
      * Send push notification with retry mechanism.
+     *
+     * The synchronous path no longer sleeps between retries — sleep() blocked
+     * web requests for 5-10s per failure. Delivery retries are delegated to the
+     * queue layer (SendNotificationJob implements $tries=3 with $backoff=60).
+     * Pass $options['sync_retry'] = true to opt into immediate in-process
+     * retries (still without any sleep).
      */
     protected function sendNotificationWithRetry(PushSubscription $subscription, string $title, string $body, array $options = [], int $attempt = 1)
     {
         $result = $this->sendNotification($subscription, $title, $body, $options);
 
-        if (!$result['success'] && $attempt < $this->maxRetries) {
-            // Wait before retry (exponential backoff: 5s, 15s, etc.)
-            sleep(5 * $attempt);
+        $allowSyncRetry = (bool) ($options['sync_retry'] ?? false);
+
+        if (!$result['success'] && $allowSyncRetry && $attempt < $this->maxRetries) {
             Log::info("Push notification retry #{$attempt} for subscription {$subscription->id}");
             return $this->sendNotificationWithRetry($subscription, $title, $body, $options, $attempt + 1);
         }

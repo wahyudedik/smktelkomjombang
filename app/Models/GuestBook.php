@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Traits\Auditable;
 
 class GuestBook extends Model
@@ -87,15 +89,53 @@ class GuestBook extends Model
 
         static::creating(function (GuestBook $guest): void {
             if (empty($guest->ticket_number)) {
-                $date = now()->format('Ymd');
-                $lastTicket = static::whereDate('check_in_at', today())->count() + 1;
-                $guest->ticket_number = 'BT-' . $date . '-' . str_pad((string) $lastTicket, 4, '0', STR_PAD_LEFT);
+                $guest->ticket_number = static::generateTicketNumber();
             }
 
             if (is_null($guest->check_in_at)) {
                 $guest->check_in_at = now();
             }
         });
+    }
+
+    /**
+     * Generate a unique ticket number (race-safe).
+     *
+     * The count query runs inside a transaction with lockForUpdate so concurrent
+     * check-ins serialize on the count. The guest_books.ticket_number column has a
+     * DB-level unique constraint; on a duplicate-key collision (still possible for
+     * the very first guest of the day, when no rows exist to lock) we regenerate
+     * and retry.
+     *
+     * Format: BT-YYYYMMDD-XXXX (unchanged).
+     */
+    protected static function generateTicketNumber(): string
+    {
+        $maxAttempts = 3;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                return DB::transaction(function () {
+                    $date = now()->format('Ymd');
+                    $lastTicket = static::query()
+                        ->whereDate('check_in_at', today())
+                        ->lockForUpdate()
+                        ->count();
+
+                    return 'BT-' . $date . '-' . str_pad((string) ($lastTicket + 1), 4, '0', STR_PAD_LEFT);
+                });
+            } catch (\Illuminate\Database\QueryException $e) {
+                // 23000 = integrity constraint violation (duplicate ticket_number)
+                if ($attempt === $maxAttempts || (string) $e->getCode() !== '23000') {
+                    throw $e;
+                }
+
+                Log::warning("GuestBook ticket number collision on attempt {$attempt}, regenerating...");
+            }
+        }
+
+        // Unreachable in practice; satisfies static analysis.
+        throw new \RuntimeException('Failed to generate unique guest book ticket number');
     }
 
     /**

@@ -160,16 +160,25 @@ class AttendanceExportController extends BaseController
 
         $date = Carbon::createFromFormat('Y-m-d', $validated['date'])->startOfDay();
 
+        // Ambil SEMUA data untuk export (bukan paginate) agar PDF berisi
+        // seluruh hari, bukan hanya 50 baris pertama.
         $attendances = \App\Models\Attendance::query()
             ->with(['identity.guru', 'identity.siswa', 'identity.user'])
             ->whereDate('date', $date)
             ->orderBy('first_in_at')
-            ->paginate(50);
+            ->get();
+
+        // Statistik dihitung dari query agregat terpisah atas SELURUH data hari.
+        $statusCounts = \App\Models\Attendance::query()
+            ->whereDate('date', $date)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
         $stats = [
-            'total' => $attendances->total(),
-            'present' => $attendances->getCollection()->where('status', 'present')->count(),
-            'absent' => $attendances->getCollection()->where('status', 'absent')->count(),
+            'total' => (int) $statusCounts->sum(),
+            'present' => (int) $statusCounts->get('present', 0),
+            'absent' => (int) $statusCounts->get('absent', 0),
         ];
 
         $pdf = Pdf::loadView('attendance.pdf.daily', compact('attendances', 'date', 'stats'));

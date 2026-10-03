@@ -47,8 +47,24 @@ if (!function_exists('theme_config')) {
         // 2. Merge with config file (config file = fallback defaults)
         $fileConfig = config("themes.{$theme}", []);
 
+        // Deep-merge: array asosiatif di-merge per-key anak; array numerik (list)
+        // di-replace oleh DB (behavior yang diinginkan untuk hero_slides, menu, dll).
+        $deepMergeArrays = static function (array $base, array $override) use (&$deepMergeArrays): array {
+            foreach ($override as $k => $v) {
+                if (array_key_exists($k, $base)
+                    && is_array($base[$k]) && is_array($v)
+                    && !array_is_list($base[$k]) && !array_is_list($v)
+                ) {
+                    $base[$k] = $deepMergeArrays($base[$k], $v);
+                } else {
+                    $base[$k] = $v;
+                }
+            }
+            return $base;
+        };
+
         // Database values override config file values
-        $merged = array_merge($fileConfig, $dbConfig);
+        $merged = $deepMergeArrays($fileConfig, $dbConfig);
 
         if ($key === null) {
             return $merged;
@@ -56,24 +72,6 @@ if (!function_exists('theme_config')) {
 
         // Support dot-notation
         return data_get($merged, $key, $default);
-    }
-}
-
-if (!function_exists('theme_config_db_only')) {
-    /**
-     * Get theme config from database only (no file fallback).
-     * Useful for admin settings form.
-     *
-     * @param string $theme
-     * @return array
-     */
-    function theme_config_db_only(string $theme): array
-    {
-        $dbConfig = cache()->remember("theme_settings_{$theme}", 3600, function () use ($theme) {
-            return ThemeSetting::getThemeConfig($theme);
-        });
-
-        return $dbConfig;
     }
 }
 
@@ -118,47 +116,6 @@ if (!function_exists('current_theme')) {
     }
 }
 
-// ─── Theme Checks ───────────────────────────────────────────
-
-if (!function_exists('is_theme')) {
-    /**
-     * Generic theme check — replaces is_telkom(), is_maudu(), etc.
-     *
-     * @param string $theme Theme name to check against
-     * @return bool
-     */
-    function is_theme(string $theme): bool
-    {
-        return current_theme() === $theme;
-    }
-}
-
-if (!function_exists('is_telkom')) {
-    /**
-     * Check if current theme is Telkom.
-     *
-     * @deprecated Use is_theme('telkom') instead
-     * @return bool
-     */
-    function is_telkom(): bool
-    {
-        return current_theme() === 'telkom';
-    }
-}
-
-if (!function_exists('is_maudu')) {
-    /**
-     * Check if current theme is MAUDU.
-     *
-     * @deprecated Use is_theme('maudu') instead
-     * @return bool
-     */
-    function is_maudu(): bool
-    {
-        return current_theme() === 'maudu';
-    }
-}
-
 // ─── Theme Registry (config/themes.php) ─────────────────────
 
 if (!function_exists('theme_info')) {
@@ -195,23 +152,6 @@ if (!function_exists('available_themes')) {
     function available_themes(): array
     {
         return array_keys(config('themes.available', []));
-    }
-}
-
-// ─── Theme Assets ───────────────────────────────────────────
-
-if (!function_exists('theme_asset')) {
-    /**
-     * Generate asset URL for current theme.
-     * Auto-resolves from theme_info registry with fallback to theme_config.
-     *
-     * @param string $path Asset path relative to theme directory
-     * @return string
-     */
-    function theme_asset(string $path): string
-    {
-        $assetsPath = theme_info('assets_path') ?? theme_config('assets_path', 'assets_telkom');
-        return asset("{$assetsPath}/{$path}");
     }
 }
 
@@ -324,8 +264,16 @@ if (!function_exists('resolve_theme_url')) {
      * Resolve URL from config — supports 'route:name' syntax.
      *
      * Used in theme config menus where route() helper is not available.
-     * Example: 'url' => 'route:berita.public.index' → route('berita.public.index')
-     *          'url' => '/some/path' → '/some/path'
+     *
+     * Formats:
+     *   - 'route:berita.public.index'  → route('berita.public.index')
+     *   - 'route:pages.public.show|slug' → route('pages.public.show', ['slug']) (pipe, preferred)
+     *   - 'route:pages.public.show,slug' → route('pages.public.show', ['slug']) (legacy comma)
+     *   - '/some/path'                 → '/some/path'
+     *
+     * Pipe (|) is the preferred delimiter for route parameters because it safely
+     * handles parameter values that contain commas (e.g. dates, addresses).
+     * Legacy comma format remains supported for backward compatibility.
      *
      * @param string $url URL or route reference
      * @return string Resolved URL
@@ -334,9 +282,20 @@ if (!function_exists('resolve_theme_url')) {
     {
         if (str_starts_with($url, 'route:')) {
             $routeParts = substr($url, 6);
-            $parts = explode(',', $routeParts, 2);
-            $routeName = trim($parts[0]);
-            $params = isset($parts[1]) ? array_map('trim', explode(',', $parts[1])) : [];
+
+            if (str_contains($routeParts, '|')) {
+                // Pipe format (preferred): route:name|param1|param2
+                $parts = explode('|', $routeParts);
+                $routeName = trim(array_shift($parts));
+                $params = array_map('trim', $parts);
+            } else {
+                // Legacy comma format: route:name,param1[,param2,...]
+                $parts = explode(',', $routeParts, 2);
+                $routeName = trim($parts[0]);
+                $params = isset($parts[1])
+                    ? array_map('trim', explode(',', $parts[1]))
+                    : [];
+            }
 
             try {
                 return route($routeName, $params);

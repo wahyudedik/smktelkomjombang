@@ -44,10 +44,21 @@ class AttendanceReportController extends BaseController
             ->orderBy('first_in_at')
             ->paginate(50);
 
+        // Statistik dihitung dari query agregat TERPISAH atas SELURUH data hari
+        // tersebut (bukan koleksi paginator yang hanya berisi halaman aktif).
+        $statusCounts = Attendance::query()
+            ->whereDate('date', $date)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
         $stats = [
-            'total' => $attendances->total(),
-            'present' => $attendances->where('status', 'present')->count(),
-            'absent' => $attendances->where('status', 'absent')->count(),
+            'total' => (int) $statusCounts->sum(),
+            'present' => (int) $statusCounts->get('present', 0),
+            'absent' => (int) $statusCounts->get('absent', 0),
+            'late' => (int) $statusCounts->get('late', 0),
+            'excused' => (int) $statusCounts->get('excused', 0),
+            'alpha' => (int) $statusCounts->get('alpha', 0),
         ];
 
         return view('attendance.report.daily', compact('attendances', 'date', 'stats'));

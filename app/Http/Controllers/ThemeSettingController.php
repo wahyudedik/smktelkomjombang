@@ -162,12 +162,8 @@ class ThemeSettingController extends Controller
             return response()->json(['error' => "Tema [{$theme}] tidak ditemukan."], 404);
         }
 
-        // Map theme to its direct route URL
-        $previewUrl = match ($theme) {
-            'telkom' => route('telkom'),
-            'maudu' => route('maudu'),
-            default => url("/{$theme}"),
-        };
+        // Use the dynamic theme route (generic — works for any registered theme)
+        $previewUrl = route('landing.theme', $theme);
 
         return response()->json([
             'success' => true,

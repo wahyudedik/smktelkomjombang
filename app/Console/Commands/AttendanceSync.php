@@ -117,13 +117,6 @@ class AttendanceSync extends Command
                     'status' => $status,
                 ])->save();
 
-                // Store overtime info in notes if we have overtime
-                if ($overtimeMinutes > 0 && method_exists($attendance, 'notes')) {
-                    $attendance->forceFill([
-                        'notes' => "Overtime: {$overtimeMinutes} menit",
-                    ])->save();
-                }
-
                 $log->forceFill(['processed_at' => now()])->save();
 
                 $deviceIds[$log->attendance_device_id] = true;

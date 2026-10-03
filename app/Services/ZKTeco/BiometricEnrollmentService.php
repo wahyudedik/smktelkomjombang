@@ -261,23 +261,60 @@ class BiometricEnrollmentService
 
     /**
      * Delete fingerprint user via command queue
+     *
+     * Hanya menghapus template fingerprint user, BUKAN user-nya.
+     * Format command konsisten dengan method enroll di file ini
+     * (DATA UPDATE USERINFO ... EnrollFP=1).
+     *
+     * @param string $pin         PIN user di device
+     * @param int    $fingerIndex Index jari (0-9), atau -1 untuk hapus semua fingerprint user
      */
     public function deleteFingerprint(string $pin, int $fingerIndex = -1): array
     {
         try {
+            $devices = AttendanceDevice::query()
+                ->where('is_active', true)
+                ->get();
+
+            if ($devices->isEmpty()) {
+                return [
+                    'success' => false,
+                    'message' => 'Tidak ada device aktif yang ditemukan',
+                ];
+            }
+
+            // Format perintah ADMS/iClock protocol (konsisten dengan method enroll):
+            // - FingerIdx tertentu → hapus 1 template fingerprint (DelFP=1)
+            // - FingerIdx = -1      → hapus semua fingerprint user (ClearAllFingerPrint=1)
             $command = $fingerIndex === -1
-                ? "DATA DELETE USER PIN={$pin} ENROLLFP=1"
-                : "DATA DELETE USER PIN={$pin} ENROLLFP=1 FingerIdx={$fingerIndex}";
+                ? "DATA UPDATE USERINFO PIN={$pin} ClearAllFingerPrint=1"
+                : "DATA UPDATE USERINFO PIN={$pin} FingerIdx={$fingerIndex} DelFP=1";
 
-            // Use the existing IClockCommandQueue for delete
-            $queuedCount = $this->commandQueue->enqueueDeleteUserByPin($pin);
+            $queuedCount = 0;
+            foreach ($devices as $device) {
+                DB::table('attendance_commands')->insert([
+                    'attendance_device_id' => $device->id,
+                    'kind' => 'delete_fingerprint',
+                    'device_pin' => $pin,
+                    'command' => $command,
+                    'status' => 'pending',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
-            Log::info("Fingerprint deletion queued for PIN {$pin}");
+                $queuedCount++;
+            }
+
+            Log::info("Fingerprint deletion queued for PIN {$pin} on {$queuedCount} device(s)", [
+                'finger_index' => $fingerIndex,
+                'command' => $command,
+            ]);
 
             return [
                 'success' => true,
-                'message' => "Fingerprint untuk PIN {$pin} berhasil di-queue untuk penghapusan",
+                'message' => "Fingerprint deletion untuk PIN {$pin} di-queue ke {$queuedCount} device",
                 'pin' => $pin,
+                'finger_index' => $fingerIndex,
                 'queued_devices' => $queuedCount,
             ];
         } catch (\Exception $e) {

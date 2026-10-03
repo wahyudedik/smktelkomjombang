@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Helpers;
-
 use App\Models\AttendanceSetting;
 use Illuminate\Support\Facades\Cache;
 

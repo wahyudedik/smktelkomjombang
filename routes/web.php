@@ -45,7 +45,6 @@ Route::get('/theme/{theme}', function (string $theme) {
         abort(404, 'Theme tidak ditemukan.');
     }
     config(['app.theme_override' => $theme]);
-    app()->bind('current_theme_override', fn() => $theme);
     return app(\App\Http\Controllers\LandingController::class)->index();
 })->name('landing.theme');
 

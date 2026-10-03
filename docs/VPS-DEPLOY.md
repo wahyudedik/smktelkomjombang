@@ -1,5 +1,5 @@
 # VPS DEPLOYMENT GUIDE
-# SMK Telekomunikasi Darul Ulum — Laravel App + Absensi ZKTeco
+# SMK Telekomunikasi Darul Ulum â€” Laravel App + Absensi ZKTeco
 # From zero to production, step by step.
 
 ---
@@ -13,7 +13,7 @@
 
 ---
 
-## STEP 1 — LOGIN & UPDATE SERVER
+## STEP 1 â€” LOGIN & UPDATE SERVER
 
 ```bash
 ssh root@YOUR_VPS_IP
@@ -24,7 +24,7 @@ apt install -y software-properties-common curl wget git unzip zip
 
 ---
 
-## STEP 2 — FIREWALL
+## STEP 2 â€” FIREWALL
 
 ```bash
 ufw enable
@@ -36,7 +36,7 @@ ufw status
 
 ---
 
-## STEP 3 — INSTALL PHP 8.3
+## STEP 3 â€” INSTALL PHP 8.3
 
 ```bash
 add-apt-repository ppa:ondrej/php -y
@@ -69,7 +69,7 @@ systemctl restart php8.3-fpm
 
 ---
 
-## STEP 4 — INSTALL COMPOSER
+## STEP 4 â€” INSTALL COMPOSER
 
 ```bash
 curl -sS https://getcomposer.org/installer | php
@@ -79,7 +79,7 @@ composer --version
 
 ---
 
-## STEP 5 — INSTALL NODE.JS 18
+## STEP 5 â€” INSTALL NODE.JS 18
 
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
@@ -90,7 +90,7 @@ npm --version
 
 ---
 
-## STEP 6 — INSTALL MYSQL 8
+## STEP 6 â€” INSTALL MYSQL 8
 
 ```bash
 apt install mysql-server -y
@@ -109,11 +109,18 @@ mysql -u root -p
 
 ```sql
 CREATE DATABASE telkom_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'telkom_user'@'localhost' IDENTIFIED BY 'fsdfsfsfs4354WED';
+CREATE USER 'telkom_user'@'localhost' IDENTIFIED BY '[REDACTED - ganti dengan password DB asli di .env]';
 GRANT ALL PRIVILEGES ON telkom_db.* TO 'telkom_user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
+
+> ⚠️ **KEAMANAN — ROTASI CREDENTIAL**: Nilai password DB di dokumentasi ini sengaja diganti dengan placeholder. Jika password asli pernah dibagikan/publik, segera **ROTASI password**:
+> 1. Login MySQL: `mysql -u root -p`
+> 2. Jalankan: `ALTER USER 'telkom_user'@'localhost' IDENTIFIED BY 'PASSWORD_BARU_YANG_KUAT';`
+> 3. Update `DB_PASSWORD` di `.env` dengan nilai baru
+> 4. Update `INSTAGRAM_APP_SECRET` & token lainnya di `.env` jika pernah terpapar
+> 5. Jalankan: `php artisan config:clear`
 
 Optimasi MySQL:
 ```bash
@@ -133,7 +140,7 @@ systemctl restart mysql
 
 ---
 
-## STEP 7 — INSTALL NGINX
+## STEP 7 â€” INSTALL NGINX
 
 ```bash
 apt install nginx -y
@@ -144,7 +151,7 @@ systemctl status nginx
 
 ---
 
-## STEP 8 — INSTALL SSL (LET'S ENCRYPT)
+## STEP 8 â€” INSTALL SSL (LET'S ENCRYPT)
 
 ```bash
 apt install certbot python3-certbot-nginx -y
@@ -154,7 +161,7 @@ certbot renew --dry-run
 
 ---
 
-## STEP 9 — CLONE PROJECT DARI GITHUB
+## STEP 9 â€” CLONE PROJECT DARI GITHUB
 
 ```bash
 mkdir -p /var/www/telkom
@@ -167,7 +174,7 @@ cd telkom
 
 ---
 
-## STEP 10 — INSTALL DEPENDENCIES
+## STEP 10 â€” INSTALL DEPENDENCIES
 
 ```bash
 # PHP dependencies
@@ -180,7 +187,7 @@ npm run build
 
 ---
 
-## STEP 11 — SETUP .ENV
+## STEP 11 â€” SETUP .ENV
 
 ```bash
 cp .env.example .env
@@ -246,7 +253,7 @@ INSTAGRAM_REDIRECT_URI=https://yourdomain.com/instagram/callback
 INSTAGRAM_WEBHOOK_URI=https://yourdomain.com/instagram/webhook
 INSTAGRAM_WEBHOOK_TOKEN=
 
-# Push Notification (VAPID) — generate with: php artisan push:vapid-keys --generate
+# Push Notification (VAPID) â€” generate with: php artisan push:vapid-keys --generate
 VAPID_PUBLIC_KEY=
 VAPID_PRIVATE_KEY=
 VAPID_SUBJECT=https://yourdomain.com
@@ -262,7 +269,7 @@ DEFAULT_THEME=telkom
 
 ---
 
-## STEP 12 — MIGRATE & SEED DATABASE
+## STEP 12 â€” MIGRATE & SEED DATABASE
 
 ```bash
 php artisan migrate --force
@@ -272,7 +279,7 @@ php artisan storage:link
 
 ---
 
-## STEP 13 — SET PERMISSIONS
+## STEP 13 â€” SET PERMISSIONS
 
 ```bash
 chown -R www-data:www-data /var/www/telkom
@@ -283,7 +290,7 @@ chmod -R 775 /var/www/telkom/bootstrap/cache
 
 ---
 
-## STEP 14 — KONFIGURASI NGINX
+## STEP 14 â€” KONFIGURASI NGINX
 
 ```bash
 nano /etc/nginx/sites-available/telkom
@@ -360,7 +367,7 @@ systemctl reload nginx
 
 ---
 
-## STEP 15 — OPTIMIZE UNTUK PRODUCTION
+## STEP 15 â€” OPTIMIZE UNTUK PRODUCTION
 
 ```bash
 cd /var/www/telkom
@@ -375,7 +382,7 @@ php artisan optimize
 
 ---
 
-## STEP 16 — SETUP QUEUE WORKER DENGAN SUPERVISOR
+## STEP 16 â€” SETUP QUEUE WORKER DENGAN SUPERVISOR
 
 Install Supervisor:
 ```bash
@@ -413,7 +420,7 @@ supervisorctl status
 
 ---
 
-## STEP 17 — SETUP SCHEDULER (CRON JOB)
+## STEP 17 â€” SETUP SCHEDULER (CRON JOB)
 
 ```bash
 crontab -u www-data -e
@@ -436,16 +443,16 @@ sudo -u www-data php /var/www/telkom/artisan schedule:run
 
 ---
 
-## STEP 18 — SETUP ABSENSI ZKTECO
+## STEP 18 â€” SETUP ABSENSI ZKTECO
 
-⚠️ **PENTING: Baca ini dulu sebelum setup device!**
+âš ï¸ **PENTING: Baca ini dulu sebelum setup device!**
 
 ### 18.0 Penjelasan Protokol ZKTeco (WAJIB TAHU)
 
 Device ZKTeco **TIDAK fleksibel** seperti REST API biasa. Dia hanya ngerti 3 endpoint:
-- `/iclock/getrequest` — Device minta perintah dari server
-- `/iclock/cdata` — Device kirim data absensi
-- `/iclock/devicecmd` — Device kirim hasil command
+- `/iclock/getrequest` â€” Device minta perintah dari server
+- `/iclock/cdata` â€” Device kirim data absensi
+- `/iclock/devicecmd` â€” Device kirim hasil command
 
 **Format request dari device:**
 ```
@@ -454,14 +461,14 @@ POST /iclock/cdata?SN=SERIAL_NUMBER&table=rtlog
 ```
 
 **Token handling:**
-- ❌ Token BUKAN di URL (`?token=...`)
-- ✅ Token dikirim di **query parameter** atau **header**
+- âŒ Token BUKAN di URL (`?token=...`)
+- âœ… Token dikirim di **query parameter** atau **header**
 - Controller kita sudah handle ini di `requireToken()`
 
 **HTTPS vs HTTP:**
-- ⚠️ Banyak device ZKTeco lama gagal konek ke HTTPS
-- ✅ Gunakan **HTTP** untuk testing awal
-- ✅ Setelah stabil, bisa upgrade ke HTTPS dengan certificate yang valid
+- âš ï¸ Banyak device ZKTeco lama gagal konek ke HTTPS
+- âœ… Gunakan **HTTP** untuk testing awal
+- âœ… Setelah stabil, bisa upgrade ke HTTPS dengan certificate yang valid
 
 ---
 
@@ -469,12 +476,18 @@ POST /iclock/cdata?SN=SERIAL_NUMBER&table=rtlog
 
 Pastikan di `.env` sudah ada:
 ```env
-ATTENDANCE_ICLOCK_SECRET=iloveSMKkuYangIndahTelkomJayaAbadinusantara
+ATTENDANCE_ICLOCK_SECRET=YOUR_TOKEN_HERE
 ATTENDANCE_REQUIRE_USER_IDENTITY=true
 ATTENDANCE_REQUIRE_USER_VERIFIED=false
 ```
 
 Token ini akan divalidasi di setiap request dari device.
+
+> ⚠️ **KEAMANAN — ROTASI TOKEN**: Nilai token di dokumentasi ini sengaja diganti dengan placeholder `YOUR_TOKEN_HERE`. Jika token asli pernah dibagikan/publik, segera **ROTASI token** di device & `.env`:
+> 1. Buat token baru: `openssl rand -hex 32`
+> 2. Update `ATTENDANCE_ICLOCK_SECRET` di `.env`
+> 3. Update field **Token** di device menu (`Menu → Communication → ADMS / Cloud Server`)
+> 4. Restart device, lalu `php artisan config:clear`
 
 ---
 
@@ -483,11 +496,11 @@ Token ini akan divalidasi di setiap request dari device.
 **Test via curl (HTTP dulu):**
 ```bash
 # Test getrequest
-curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST123&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara"
+curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST123&token=YOUR_TOKEN_HERE"
 # Harus return: 200 OK + beberapa baris config
 
 # Test cdata
-curl -X POST "http://smktelekomunikasidu.sch.id/iclock/cdata?SN=TEST123&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara" \
+curl -X POST "http://smktelekomunikasidu.sch.id/iclock/cdata?SN=TEST123&token=YOUR_TOKEN_HERE" \
   -d "test data"
 # Harus return: 200 OK
 ```
@@ -503,7 +516,7 @@ tail -f /var/www/telkom/storage/logs/laravel.log | grep -i attendance
 
 **STEP 1: Masuk ke menu device**
 ```
-Menu → Communication → ADMS / Cloud Server
+Menu â†’ Communication â†’ ADMS / Cloud Server
 ```
 
 **STEP 2: Isi konfigurasi (PERHATIAN FORMAT INI):**
@@ -514,18 +527,18 @@ Menu → Communication → ADMS / Cloud Server
 | **Port** | `80` (HTTP) atau `443` (HTTPS) |
 | **Protocol** | HTTP atau HTTPS |
 | **Path** | `/iclock/cdata` |
-| **Token** | `iloveSMKkuYangIndahTelkomJayaAbadinusantara` |
+| **Token** | `YOUR_TOKEN_HERE` |
 | **Push Interval** | `60` (detik) |
 | **Enable Push** | `ON` |
 
 **ATAU jika device support URL lengkap:**
 ```
-Server URL: http://smktelekomunikasidu.sch.id/iclock/cdata?token=iloveSMKkuYangIndahTelkomJayaAbadinusantara
+Server URL: http://smktelekomunikasidu.sch.id/iclock/cdata?token=YOUR_TOKEN_HERE
 ```
 
 **STEP 3: Simpan & Restart device**
 ```
-Tekan: Save → Restart
+Tekan: Save â†’ Restart
 ```
 
 ---
@@ -570,19 +583,19 @@ tail -f /var/www/telkom/storage/logs/laravel.log | grep -i "sync\|user"
 
 **Fingerprint:**
 ```
-Menu → Users → Pilih user → Fingerprint
+Menu â†’ Users â†’ Pilih user â†’ Fingerprint
 Ikuti instruksi: Letakkan jari 3-4 kali
 ```
 
 **Face Recognition:**
 ```
-Menu → Users → Pilih user → Face
+Menu â†’ Users â†’ Pilih user â†’ Face
 Ikuti instruksi: Hadap ke kamera, gerakkan kepala
 ```
 
 **Card / Badge:**
 ```
-Menu → Users → Pilih user → Card
+Menu â†’ Users â†’ Pilih user â†’ Card
 Tempelkan kartu ke reader
 ```
 
@@ -608,7 +621,7 @@ curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=DEVICE_SERIAL&to
 
 ---
 
-## STEP 19 — VERIFIKASI AKHIR
+## STEP 19 â€” VERIFIKASI AKHIR
 
 ```bash
 # Website
@@ -734,7 +747,7 @@ tail -f /var/www/telkom/storage/logs/worker.log
 
 5. **Restart device**
    ```
-   Menu → System → Restart
+   Menu â†’ System â†’ Restart
    ```
 
 6. **Cek database (device sudah terdaftar?)**
@@ -762,7 +775,7 @@ tail -f /var/www/telkom/storage/logs/worker.log
 
 3. **Cek log scan di device**
    ```
-   Menu → Logs → Attendance
+   Menu â†’ Logs â†’ Attendance
    ```
    Harus ada record scan.
 
@@ -841,8 +854,8 @@ apt update && apt upgrade -y
 
 ## DOKUMENTASI TAMBAHAN
 
-- **[ZKTECO-SETUP.md](./ZKTECO-SETUP.md)** — Panduan lengkap setup ZKTeco iClock (troubleshooting, testing, monitoring)
-- **[ZKTECO-CORRECTIONS.md](./ZKTECO-CORRECTIONS.md)** — Koreksi penting dari feedback GPT (HTTP vs HTTPS, format endpoint, token placement)
+- **[ZKTECO-SETUP.md](./ZKTECO-SETUP.md)** â€” Panduan lengkap setup ZKTeco iClock (troubleshooting, testing, monitoring)
+- **[ZKTECO-CORRECTIONS.md](./ZKTECO-CORRECTIONS.md)** â€” Koreksi penting dari feedback GPT (HTTP vs HTTPS, format endpoint, token placement)
 
 ---
 

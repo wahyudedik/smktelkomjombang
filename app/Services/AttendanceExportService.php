@@ -42,9 +42,9 @@ class AttendanceExportService
         // Data
         foreach ($attendances as $attendance) {
             $identity = $attendance->identity;
-            $nama = $identity->user?->name 
-                ?? $identity->guru?->nama_lengkap 
-                ?? $identity->siswa?->nama_lengkap 
+            $nama = $identity->user?->name
+                ?? $identity->guru?->nama_lengkap
+                ?? $identity->siswa?->nama_lengkap
                 ?? '-';
 
             $firstIn = $attendance->first_in_at?->format('H:i:s') ?? '-';
@@ -105,9 +105,9 @@ class AttendanceExportService
         // Data
         foreach ($attendances as $attendance) {
             $identity = $attendance->identity;
-            $nama = $identity->user?->name 
-                ?? $identity->guru?->nama_lengkap 
-                ?? $identity->siswa?->nama_lengkap 
+            $nama = $identity->user?->name
+                ?? $identity->guru?->nama_lengkap
+                ?? $identity->siswa?->nama_lengkap
                 ?? '-';
 
             $firstIn = $attendance->first_in_at?->format('H:i:s') ?? '-';
@@ -149,6 +149,14 @@ class AttendanceExportService
             ->where('is_active', true)
             ->get();
 
+        // Ambil SEMUA attendance untuk seluruh identitas dalam SATU query
+        // (hindari N+1), lalu group by identity_id di memory.
+        $attendancesByIdentity = Attendance::query()
+            ->whereIn('attendance_identity_id', $identities->pluck('id'))
+            ->whereBetween('date', [$start, $end])
+            ->get()
+            ->groupBy('attendance_identity_id');
+
         $data = [];
 
         // Header
@@ -166,15 +174,12 @@ class AttendanceExportService
 
         // Data
         foreach ($identities as $identity) {
-            $nama = $identity->user?->name 
-                ?? $identity->guru?->nama_lengkap 
-                ?? $identity->siswa?->nama_lengkap 
+            $nama = $identity->user?->name
+                ?? $identity->guru?->nama_lengkap
+                ?? $identity->siswa?->nama_lengkap
                 ?? '-';
 
-            $attendances = Attendance::query()
-                ->where('attendance_identity_id', $identity->id)
-                ->whereBetween('date', [$start, $end])
-                ->get();
+            $attendances = $attendancesByIdentity->get($identity->id, collect());
 
             $totalDays = $end->diffInDays($start) + 1;
             $hadir = $attendances->count();
@@ -229,9 +234,9 @@ class AttendanceExportService
             ->orderBy('date')
             ->get();
 
-        $nama = $identity->user?->name 
-            ?? $identity->guru?->nama_lengkap 
-            ?? $identity->siswa?->nama_lengkap 
+        $nama = $identity->user?->name
+            ?? $identity->guru?->nama_lengkap
+            ?? $identity->siswa?->nama_lengkap
             ?? '-';
 
         $data = [];

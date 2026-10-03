@@ -1,13 +1,13 @@
-# ZKTeco iClock Setup Guide
+﻿# ZKTeco iClock Setup Guide
 ## SMK Telekomunikasi Darul Ulum
 
 ---
 
-## 🔥 KESIMPULAN PENTING (BACA INI DULU!)
+## ðŸ”¥ KESIMPULAN PENTING (BACA INI DULU!)
 
 Banyak yang gagal setup ZKTeco karena 3 kesalahan umum:
 
-| ❌ Salah | ✅ Benar |
+| âŒ Salah | âœ… Benar |
 |---------|---------|
 | Pakai HTTPS | Pakai HTTP dulu (testing) |
 | Token di URL: `?token=...` | Token di query param atau header |
@@ -20,20 +20,20 @@ Banyak yang gagal setup ZKTeco karena 3 kesalahan umum:
 
 Device ZKTeco **TIDAK fleksibel**. Dia hanya ngerti 3 endpoint:
 
-### 1. `/iclock/getrequest` — Device minta perintah
+### 1. `/iclock/getrequest` â€” Device minta perintah
 ```
 GET /iclock/getrequest?SN=SERIAL_NUMBER&token=TOKEN
 ```
 Server balas dengan config + command queue.
 
-### 2. `/iclock/cdata` — Device kirim data absensi
+### 2. `/iclock/cdata` â€” Device kirim data absensi
 ```
 POST /iclock/cdata?SN=SERIAL_NUMBER&token=TOKEN
 [binary attendance data]
 ```
 Server balas: `OK`
 
-### 3. `/iclock/devicecmd` — Device kirim hasil command
+### 3. `/iclock/devicecmd` â€” Device kirim hasil command
 ```
 POST /iclock/devicecmd?SN=SERIAL_NUMBER&ID=CMD_ID&Return=RESULT&token=TOKEN
 ```
@@ -51,19 +51,26 @@ grep ATTENDANCE_ICLOCK_SECRET /var/www/telkom/.env
 
 Harus ada:
 ```env
-ATTENDANCE_ICLOCK_SECRET=iloveSMKkuYangIndahTelkomJayaAbadinusantara
+ATTENDANCE_ICLOCK_SECRET=YOUR_TOKEN_HERE
 ```
 
 Jika belum ada, tambahkan ke `.env`:
 ```bash
-echo "ATTENDANCE_ICLOCK_SECRET=iloveSMKkuYangIndahTelkomJayaAbadinusantara" >> /var/www/telkom/.env
+echo "ATTENDANCE_ICLOCK_SECRET=YOUR_TOKEN_HERE" >> /var/www/telkom/.env
 ```
+
+> ⚠️ **KEAMANAN — ROTASI TOKEN**: Nilai token di dokumentasi ini sengaja diganti dengan placeholder `YOUR_TOKEN_HERE`. Jika token asli pernah dibagikan/publik (mis. hardcoded di dokumentasi, chat, screenshot), segera **ROTASI token** di device & `.env` dengan perintah berikut:
+> 1. Buat token baru (random, minimal 32 karakter): `openssl rand -hex 32`
+> 2. Update `ATTENDANCE_ICLOCK_SECRET` di `.env` dengan nilai baru
+> 3. Update field **Token** di device menu: `Menu → Communication → ADMS / Cloud Server`
+> 4. Restart device: `Menu → System → Restart`
+> 5. Clear config cache: `php artisan config:clear`
 
 ### Step 2: Test Endpoint (HTTP)
 
 **Test getrequest:**
 ```bash
-curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST123&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara"
+curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST123&token=YOUR_TOKEN_HERE"
 ```
 
 Expected response:
@@ -84,7 +91,7 @@ Realtime=1
 
 **Test cdata:**
 ```bash
-curl -X POST "http://smktelekomunikasidu.sch.id/iclock/cdata?SN=TEST123&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara" \
+curl -X POST "http://smktelekomunikasidu.sch.id/iclock/cdata?SN=TEST123&token=YOUR_TOKEN_HERE" \
   -d "test"
 ```
 
@@ -98,7 +105,7 @@ OK
 
 **Masuk menu:**
 ```
-Menu → Communication → ADMS / Cloud Server
+Menu â†’ Communication â†’ ADMS / Cloud Server
 ```
 
 **Isi setting:**
@@ -109,18 +116,18 @@ Menu → Communication → ADMS / Cloud Server
 | Port | `80` |
 | Protocol | `HTTP` |
 | Path | `/iclock/cdata` |
-| Token | `iloveSMKkuYangIndahTelkomJayaAbadinusantara` |
+| Token | `YOUR_TOKEN_HERE` |
 | Push Interval | `60` |
 | Enable Push | `ON` |
 
 **Atau jika device support URL lengkap:**
 ```
-Server URL: http://smktelekomunikasidu.sch.id/iclock/cdata?token=iloveSMKkuYangIndahTelkomJayaAbadinusantara
+Server URL: http://smktelekomunikasidu.sch.id/iclock/cdata?token=YOUR_TOKEN_HERE
 ```
 
 **Simpan & Restart:**
 ```
-Save → Restart
+Save â†’ Restart
 ```
 
 ### Step 4: Verifikasi Device Terhubung
@@ -162,7 +169,7 @@ tail -f /var/www/telkom/storage/logs/laravel.log | grep -i "sync\|user"
 
 **Di device:**
 ```
-Menu → Users → Pilih user (PIN 1001) → Fingerprint
+Menu â†’ Users â†’ Pilih user (PIN 1001) â†’ Fingerprint
 ```
 
 Ikuti instruksi:
@@ -172,7 +179,7 @@ Ikuti instruksi:
 
 **Atau gunakan Face:**
 ```
-Menu → Users → Pilih user → Face
+Menu â†’ Users â†’ Pilih user â†’ Face
 ```
 
 ### Step 7: Test Scan
@@ -185,7 +192,7 @@ Menu → Users → Pilih user → Face
 
 ## Troubleshooting
 
-### ❌ Device tidak muncul di admin
+### âŒ Device tidak muncul di admin
 
 **Checklist:**
 
@@ -196,7 +203,7 @@ Menu → Users → Pilih user → Face
 
 2. **Cek endpoint bisa diakses**
    ```bash
-   curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST&token=iloveSMKkuYangIndahTelkomJayaAbadinusantara"
+   curl -v "http://smktelekomunikasidu.sch.id/iclock/getrequest?SN=TEST&token=YOUR_TOKEN_HERE"
    ```
    Harus return `200 OK`.
 
@@ -213,7 +220,7 @@ Menu → Users → Pilih user → Face
 
 5. **Restart device**
    ```
-   Menu → System → Restart
+   Menu â†’ System â†’ Restart
    ```
 
 6. **Cek database**
@@ -221,7 +228,7 @@ Menu → Users → Pilih user → Face
    mysql -u telkom_user -p telkom_db -e "SELECT * FROM attendance_devices;"
    ```
 
-### ❌ Device connect tapi data tidak masuk
+### âŒ Device connect tapi data tidak masuk
 
 **Checklist:**
 
@@ -232,7 +239,7 @@ Menu → Users → Pilih user → Face
 
 2. **Biometric sudah enrolled?**
    ```
-   Menu → Users → Pilih user → Cek fingerprint/face
+   Menu â†’ Users â†’ Pilih user â†’ Cek fingerprint/face
    ```
 
 3. **Cek log saat scan**
@@ -251,7 +258,7 @@ Menu → Users → Pilih user → Face
    supervisorctl status telkom-worker:*
    ```
 
-### ❌ Error 403 Forbidden
+### âŒ Error 403 Forbidden
 
 **Penyebab:** Token salah atau tidak dikirim.
 
@@ -260,7 +267,7 @@ Menu → Users → Pilih user → Face
 2. Cek device setting: Token field terisi
 3. Restart device
 
-### ❌ Error 500 Internal Server Error
+### âŒ Error 500 Internal Server Error
 
 **Cek log:**
 ```bash
@@ -272,7 +279,7 @@ Cari error message, biasanya:
 - Missing column di table
 - Service error
 
-### ❌ Device connect tapi "Last Seen" tidak update
+### âŒ Device connect tapi "Last Seen" tidak update
 
 **Penyebab:** Device tidak push data secara berkala.
 
@@ -291,7 +298,7 @@ Setelah setup stabil dengan HTTP, bisa upgrade ke HTTPS:
 ### Step 1: Update device setting
 
 ```
-Menu → Communication → ADMS / Cloud Server
+Menu â†’ Communication â†’ ADMS / Cloud Server
 ```
 
 Ubah:
@@ -309,7 +316,7 @@ Harus return `200 OK` (bukan SSL error).
 ### Step 3: Restart device
 
 ```
-Menu → System → Restart
+Menu â†’ System â†’ Restart
 ```
 
 ### Step 4: Monitor
@@ -372,7 +379,7 @@ ping -c 4 DEVICE_IP_ADDRESS
 
 Biasanya tercetak di:
 - Belakang device
-- Menu → System → Device Info
+- Menu â†’ System â†’ Device Info
 
 ---
 

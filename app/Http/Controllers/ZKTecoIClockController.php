@@ -158,7 +158,23 @@ class ZKTecoIClockController extends BaseController
     {
         $expected = (string) attendance_config('iclock_secret', '');
         if ($expected === '') {
-            Log::warning('ZKTeco token validation skipped: no secret configured');
+            // Fail-closed: jika secret belum dikonfigurasi, request DITOLAK.
+            // Mode tanpa token hanya bisa diaktifkan eksplisit via env
+            // ATTENDANCE_ICLOCK_ALLOW_NO_TOKEN=true (untuk development/testing).
+            $allowNoToken = filter_var(
+                config('attendance.iclock_allow_no_token', env('ATTENDANCE_ICLOCK_ALLOW_NO_TOKEN', false)),
+                FILTER_VALIDATE_BOOL
+            );
+
+            if (!$allowNoToken) {
+                Log::warning('ZKTeco token validation rejected: no secret configured and ATTENDANCE_ICLOCK_ALLOW_NO_TOKEN is not enabled', [
+                    'ip' => $request->ip(),
+                    'path' => $request->path(),
+                ]);
+                abort(403, 'iClock token is not configured on the server');
+            }
+
+            Log::warning('ZKTeco token validation skipped: no secret configured (ATTENDANCE_ICLOCK_ALLOW_NO_TOKEN=true)');
             return;
         }
 

@@ -1,7 +1,7 @@
 # 🚀 Roadmap Pengembangan — SMK Telekomunikasi Darul Ulum
 
 > Dokumen ini mencatat seluruh rencana pengembangan proyek, status implementasi, dan prioritas.
-> Diperbarui: 2026-08-21
+> Diperbarui: 2026-10-03
 
 ---
 
@@ -205,6 +205,11 @@ _(Kosong — semua tahap sudah selesai)_
 ---
 
 ## 📝 Changelog / Recent Updates
+
+### 2026-10-03
+- ✅ **Security & Quality Fixes batch**: ZKTeco (token fail-closed, deleteFingerprint, race dedup, command queue retry/timeout), Theme (route preview, penghapusan file lama, deep-merge config), OSIS (transaction anti double-vote), Instagram (hapus webhook token hardcoded, hash_equals), ContentSanitizer (escape atribut, allow_iframes), WebPush (hapus sleep blocking), GuestBook (ticket race-safe), Attendance (fix statistik harian, export N+1)
+- 🔐 **Dokumentasi**: sanitasi credentials di file dokumentasi (token ZKTeco & password DB diganti placeholder + catatan rotasi), update status `plans/landing-page-settings-per-theme.md` → Implemented
+- ⬜ **Sisa backlog**: view legacy `landing.welcome` masih baca cache `site_setting_*` (belum diperbaiki)
 
 ### 2026-08-21
 - ✅ **Tahap 11 selesai**: MAUDU Theme Polish — breadcrumb, component review, dual-theme testing

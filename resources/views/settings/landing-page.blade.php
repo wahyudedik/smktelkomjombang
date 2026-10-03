@@ -141,14 +141,14 @@
                             <input type="text" id="hero_title" name="hero_title"
                                 value="{{ $settings['hero_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Selamat Datang di MAUDU REJOSO">
+                                placeholder="Masukkan judul hero">
                         </div>
                         <div>
                             <label for="hero_subtitle" class="block text-sm font-medium text-gray-700 mb-2">Hero
                                 Subtitle</label>
                             <textarea id="hero_subtitle" name="hero_subtitle" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Membangun generasi yang berakhlak mulia dan berprestasi">{{ $settings['hero_subtitle'] ?? '' }}</textarea>
+                                placeholder="Masukkan subtitle hero">{{ $settings['hero_subtitle'] ?? '' }}</textarea>
                         </div>
 
                         <!-- Hero Slide 1 Settings -->
@@ -161,7 +161,7 @@
                                     <input type="text" id="hero_slide1_subtitle" name="hero_slide1_subtitle"
                                         value="{{ $settings['hero_slide1_subtitle'] ?? 'Welcome To MAUDU Library' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Welcome To MAUDU Library">
+                                        placeholder="Masukkan subtitle slide 1">
                                 </div>
                                 <div>
                                     <label for="hero_slide1_title"
@@ -169,7 +169,7 @@
                                     <input type="text" id="hero_slide1_title" name="hero_slide1_title"
                                         value="{{ $settings['hero_slide1_title'] ?? 'Grand Opening MAUDU Library' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Grand Opening MAUDU Library">
+                                        placeholder="Masukkan judul slide 1">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label for="hero_slide1_description"
@@ -177,7 +177,7 @@
                                         Description</label>
                                     <textarea id="hero_slide1_description" name="hero_slide1_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Acara Grandopening Dihadiri oleh Majelis Pimpinan Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang">{{ $settings['hero_slide1_description'] ?? 'Acara Grandopening Dihadiri oleh Majelis Pimpinan Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang' }}</textarea>
+                                        placeholder="Masukkan deskripsi slide 1">{{ $settings['hero_slide1_description'] ?? 'Acara Grandopening Dihadiri oleh Majelis Pimpinan Pondok Pesantren Darul Ulum Rejoso Peterongan Jombang' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -192,7 +192,7 @@
                                     <input type="text" id="hero_slide2_subtitle" name="hero_slide2_subtitle"
                                         value="{{ $settings['hero_slide2_subtitle'] ?? 'Studi Edukasi Sosial' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Studi Edukasi Sosial">
+                                        placeholder="Masukkan subtitle slide 2">
                                 </div>
                                 <div>
                                     <label for="hero_slide2_title"
@@ -200,7 +200,7 @@
                                     <input type="text" id="hero_slide2_title" name="hero_slide2_title"
                                         value="{{ $settings['hero_slide2_title'] ?? 'Gedung DPRD Kabupaten Jombang' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Gedung DPRD Kabupaten Jombang">
+                                        placeholder="Masukkan judul slide 2">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label for="hero_slide2_description"
@@ -223,7 +223,7 @@
                                     <input type="text" id="hero_slide3_subtitle" name="hero_slide3_subtitle"
                                         value="{{ $settings['hero_slide3_subtitle'] ?? 'Event KOMPASS' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Event KOMPASS">
+                                        placeholder="Masukkan subtitle slide 3">
                                 </div>
                                 <div>
                                     <label for="hero_slide3_title"
@@ -231,7 +231,7 @@
                                     <input type="text" id="hero_slide3_title" name="hero_slide3_title"
                                         value="{{ $settings['hero_slide3_title'] ?? 'Kompetisi Agama, Sains, dan Seni 2024' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Kompetisi Agama, Sains, dan Seni 2024">
+                                        placeholder="Masukkan judul slide 3">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label for="hero_slide3_description"
@@ -294,7 +294,7 @@
                                     <input type="text" id="feature1_title" name="feature1_title"
                                         value="{{ $settings['feature1_title'] ?? 'E-LIBRARY' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="E-LIBRARY">
+                                        placeholder="Masukkan judul fitur">
                                 </div>
                                 <div>
                                     <label for="feature1_description"
@@ -302,7 +302,7 @@
                                         Description</label>
                                     <textarea id="feature1_description" name="feature1_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Perpustakaan digital berisi Koleksi materi dalam format elektronik">{{ $settings['feature1_description'] ?? 'Perpustakaan digital berisi Koleksi materi dalam format elektronik' }}</textarea>
+                                        placeholder="Masukkan deskripsi fitur">{{ $settings['feature1_description'] ?? 'Perpustakaan digital berisi Koleksi materi dalam format elektronik' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -317,7 +317,7 @@
                                     <input type="text" id="feature2_title" name="feature2_title"
                                         value="{{ $settings['feature2_title'] ?? 'SERTIFIKASI KOMPETENSI' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="SERTIFIKASI KOMPETENSI">
+                                        placeholder="Masukkan judul fitur">
                                 </div>
                                 <div>
                                     <label for="feature2_description"
@@ -325,7 +325,7 @@
                                         Description</label>
                                     <textarea id="feature2_description" name="feature2_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Uji kompetensi yang sistematis dan objektif">{{ $settings['feature2_description'] ?? 'Uji kompetensi yang sistematis dan objektif' }}</textarea>
+                                        placeholder="Masukkan deskripsi fitur">{{ $settings['feature2_description'] ?? 'Uji kompetensi yang sistematis dan objektif' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -340,7 +340,7 @@
                                     <input type="text" id="feature3_title" name="feature3_title"
                                         value="{{ $settings['feature3_title'] ?? 'KARYA LITERASI' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="KARYA LITERASI">
+                                        placeholder="Masukkan judul fitur">
                                 </div>
                                 <div>
                                     <label for="feature3_description"
@@ -348,7 +348,7 @@
                                         Description</label>
                                     <textarea id="feature3_description" name="feature3_description" rows="2"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Penelitian di Bidang Keislaman, Sains, Teknologi, dan Sosial.">{{ $settings['feature3_description'] ?? 'Penelitian di Bidang Keislaman, Sains, Teknologi, dan Sosial.' }}</textarea>
+                                        placeholder="Masukkan deskripsi fitur">{{ $settings['feature3_description'] ?? 'Penelitian di Bidang Keislaman, Sains, Teknologi, dan Sosial.' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -440,7 +440,7 @@
                             <input type="text" id="gallery_title" name="gallery_title"
                                 value="{{ $settings['gallery_title'] ?? 'Kegiatan Madrasah' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Kegiatan Madrasah">
+                                placeholder="Masukkan judul galeri">
                         </div>
                         <div>
                             <label for="gallery_subtitle" class="block text-sm font-medium text-gray-700 mb-2">Gallery
@@ -448,7 +448,7 @@
                             <input type="text" id="gallery_subtitle" name="gallery_subtitle"
                                 value="{{ $settings['gallery_subtitle'] ?? 'Ket// programmer : ambil data dari dari IG' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Ket// programmer : ambil data dari dari IG">
+                                placeholder="Masukkan subtitle galeri">
                         </div>
                     </div>
                 </div>
@@ -552,7 +552,7 @@
                                     <input type="text" id="contact_phone_secondary" name="contact_phone_secondary"
                                         value="{{ $settings['contact_phone_secondary'] ?? '' }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="(0321) 868188">
+                                        placeholder="Masukkan nomor telepon">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label for="contact_address"
@@ -592,21 +592,21 @@
                                 <input type="text" id="cta_title" name="cta_title"
                                     value="{{ $settings['cta_title'] ?? '' }}"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Pendaftaran Siswa Baru 2026">
+                                    placeholder="Masukkan judul CTA">
                             </div>
                             <div>
                                 <label for="cta_video_title" class="block text-sm font-medium text-gray-700 mb-2">Judul Video CTA</label>
                                 <input type="text" id="cta_video_title" name="cta_video_title"
                                     value="{{ $settings['cta_video_title'] ?? '' }}"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Profil SMK Telekomunikasi DU">
+                                    placeholder="Masukkan judul video">
                             </div>
                         </div>
                         <div>
                             <label for="cta_description" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi CTA</label>
                             <textarea id="cta_description" name="cta_description" rows="4"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Tempat Pendaftaran&#10;1. Online mandiri (24 jam)...">{{ $settings['cta_description'] ?? '' }}</textarea>
+                                placeholder="Masukkan deskripsi CTA">{{ $settings['cta_description'] ?? '' }}</textarea>
                             <p class="text-sm text-gray-500 mt-1">Gunakan enter untuk baris baru</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -671,21 +671,21 @@
                             <input type="text" id="headmaster_name" name="headmaster_name"
                                 value="{{ $settings['headmaster_name'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Khoiruddinul Qoyyum, S.S., M.Pd">
+                                placeholder="Masukkan nama kepala sekolah">
                         </div>
                         <div>
                             <label for="headmaster_description"
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Kepala Sekolah</label>
                             <textarea id="headmaster_description" name="headmaster_description" rows="4"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Sebagai kepala madrasah yang berpengalaman, kami berkomitmen untuk memberikan pendidikan terbaik...">{{ $settings['headmaster_description'] ?? '' }}</textarea>
+                                placeholder="Masukkan deskripsi kepala sekolah">{{ $settings['headmaster_description'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="headmaster_vision" class="block text-sm font-medium text-gray-700 mb-2">Visi
                                 Kepala Sekolah</label>
                             <textarea id="headmaster_vision" name="headmaster_vision" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Visi kami adalah menciptakan generasi yang unggul dalam akademik...">{{ $settings['headmaster_vision'] ?? '' }}</textarea>
+                                placeholder="Masukkan visi kepala sekolah">{{ $settings['headmaster_vision'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="headmaster_photo" class="block text-sm font-medium text-gray-700 mb-2">Foto
@@ -717,7 +717,7 @@
                             <input type="text" id="program_section_title" name="program_section_title"
                                 value="{{ $settings['program_section_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="3 Program Peminatan">
+                                placeholder="Masukkan judul program">
                         </div>
                         <div>
                             <label for="program_section_subtitle"
@@ -734,14 +734,14 @@
                             <input type="text" id="program_ipa_title" name="program_ipa_title"
                                 value="{{ $settings['program_ipa_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="PEMINATAN ILMU PENGETAHUAN ALAM (IPA)">
+                                placeholder="Masukkan judul program">
                         </div>
                         <div>
                             <label for="program_ipa_description"
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Program IPA</label>
                             <textarea id="program_ipa_description" name="program_ipa_description" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Menyiapkan peserta didik yang handal dalam kajian ilmiah dan alamiah...">{{ $settings['program_ipa_description'] ?? '' }}</textarea>
+                                placeholder="Masukkan deskripsi program">{{ $settings['program_ipa_description'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="program_ips_title" class="block text-sm font-medium text-gray-700 mb-2">Judul
@@ -749,14 +749,14 @@
                             <input type="text" id="program_ips_title" name="program_ips_title"
                                 value="{{ $settings['program_ips_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="PEMINATAN ILMU PENGETAHUAN SOSIAL (IPS)">
+                                placeholder="Masukkan judul program">
                         </div>
                         <div>
                             <label for="program_ips_description"
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Program IPS</label>
                             <textarea id="program_ips_description" name="program_ips_description" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Menyiapkan peserta didik yang dapat menguasai ilmu-ilmu sosial...">{{ $settings['program_ips_description'] ?? '' }}</textarea>
+                                placeholder="Masukkan deskripsi program">{{ $settings['program_ips_description'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="program_religion_title"
@@ -764,7 +764,7 @@
                             <input type="text" id="program_religion_title" name="program_religion_title"
                                 value="{{ $settings['program_religion_title'] ?? '' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="PEMINATAN KEAGAMAAN">
+                                placeholder="Masukkan judul program">
                         </div>
                         <div>
                             <label for="program_religion_description"
@@ -772,7 +772,7 @@
                                 Keagamaan</label>
                             <textarea id="program_religion_description" name="program_religion_description" rows="3"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Menyiapkan peserta didik yang lebih mampu menguasai ilmu-ilmu agama...">{{ $settings['program_religion_description'] ?? '' }}</textarea>
+                                placeholder="Masukkan deskripsi program">{{ $settings['program_religion_description'] ?? '' }}</textarea>
                         </div>
                         <div>
                             <label for="program_section_image"
@@ -811,7 +811,7 @@
                             <input type="text" id="about_section_subtitle" name="about_section_subtitle"
                                 value="{{ $settings['about_section_subtitle'] ?? 'TENTANG KAMI' }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="TENTANG KAMI">
+                                placeholder="Masukkan subtitle tentang">
                         </div>
 
                         <div>
@@ -819,7 +819,7 @@
                                 class="block text-sm font-medium text-gray-700 mb-2">Deskripsi About</label>
                             <textarea id="about_section_description" name="about_section_description" rows="4"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Website sekolah yang mengintegrasikan semua layanan pendidikan dalam satu platform digital yang modern dan efisien. Memudahkan akses informasi dan layanan untuk seluruh civitas akademika.">{{ $settings['about_section_description'] ?? 'Website sekolah yang mengintegrasikan semua layanan pendidikan dalam satu platform digital yang modern dan efisien. Memudahkan akses informasi dan layanan untuk seluruh civitas akademika.' }}</textarea>
+                                placeholder="Masukkan deskripsi tentang">{{ $settings['about_section_description'] ?? 'Website sekolah yang mengintegrasikan semua layanan pendidikan dalam satu platform digital yang modern dan efisien. Memudahkan akses informasi dan layanan untuk seluruh civitas akademika.' }}</textarea>
                         </div>
 
                         <!-- About Images -->
@@ -1072,7 +1072,7 @@
                             Text</label>
                         <textarea id="footer_text" name="footer_text" rows="3"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="© 2024 MAUDU REJOSO. All rights reserved.">{{ $settings['footer_text'] ?? '' }}</textarea>
+                            placeholder="Masukkan teks footer">{{ $settings['footer_text'] ?? '' }}</textarea>
                     </div>
                 </div>
 

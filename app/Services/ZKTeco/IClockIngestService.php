@@ -5,6 +5,7 @@ namespace App\Services\ZKTeco;
 use App\Models\AttendanceDevice;
 use App\Models\AttendanceIdentity;
 use App\Models\AttendanceLog;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -88,18 +89,35 @@ class IClockIngestService
             $inserted = 0;
 
             foreach ($events as $event) {
-                $created = AttendanceLog::firstOrCreate(
-                    [
-                        'attendance_device_id' => $device->id,
-                        'device_pin' => $event['device_pin'],
-                        'log_time' => $event['log_time'],
-                    ],
-                    [
-                        'verify_mode' => $event['verify_mode'],
-                        'in_out_mode' => $event['in_out_mode'],
-                        'raw' => $event['raw'],
-                    ]
-                );
+                try {
+                    $created = AttendanceLog::firstOrCreate(
+                        [
+                            'attendance_device_id' => $device->id,
+                            'device_pin' => $event['device_pin'],
+                            'log_time' => $event['log_time'],
+                        ],
+                        [
+                            'verify_mode' => $event['verify_mode'],
+                            'in_out_mode' => $event['in_out_mode'],
+                            'raw' => $event['raw'],
+                        ]
+                    );
+                } catch (QueryException $e) {
+                    // Race condition: dua request simultan mencoba insert log yang sama
+                    // (unique constraint attendance_device_id + device_pin + log_time).
+                    // Duplicate entry berarti log sudah tersimpan — abaikan diam-diam.
+                    // Error lain tetap di-rethrow agar tidak hilang diam-diam.
+                    if ($this->isDuplicateEntryException($e)) {
+                        Log::info('IClockIngestService: duplicate log ignored (race condition)', [
+                            'serial_number' => $serialNumber,
+                            'device_pin' => $event['device_pin'],
+                            'log_time' => $event['log_time'],
+                        ]);
+                        continue;
+                    }
+
+                    throw $e;
+                }
 
                 if ($created->wasRecentlyCreated) {
                     $inserted++;
@@ -114,6 +132,25 @@ class IClockIngestService
 
             return $inserted;
         });
+    }
+
+    /**
+     * Deteksi apakah exception adalah duplicate entry (race condition dedup).
+     *
+     * Mendukung MySQL (SQLSTATE 23000 / error 1062 "Duplicate entry")
+     * dan SQLite (SQLSTATE 23000 / "UNIQUE constraint failed") untuk environment testing.
+     */
+    private function isDuplicateEntryException(QueryException $e): bool
+    {
+        $sqlState = (string) $e->getCode();
+        $message = strtolower($e->getMessage());
+        $errorInfo = $e->errorInfo ?? [];
+
+        return $sqlState === '23000'
+            || $sqlState === '23505'
+            || str_contains($message, 'duplicate')
+            || str_contains($message, 'unique constraint')
+            || (isset($errorInfo[1]) && (int) $errorInfo[1] === 1062);
     }
 
     private function touchDevice(string $serialNumber, ?string $ipAddress): void

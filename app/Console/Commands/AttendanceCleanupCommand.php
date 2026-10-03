@@ -5,13 +5,12 @@ namespace App\Console\Commands;
 use App\Models\Attendance;
 use App\Models\AttendanceLog;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 
 class AttendanceCleanupCommand extends Command
 {
     protected $signature = 'attendance:cleanup';
 
-    protected $description = 'Hapus attendance_logs (>90 hari) dan attendances (>180 hari) yang sudah tidak aktif';
+    protected $description = 'Hapus attendance_logs dan attendances yang melebihi retention config (cleanup_retention_days) serta raw log ZKTeco yang kadaluarsa';
 
     public function handle(): int
     {
@@ -21,25 +20,39 @@ class AttendanceCleanupCommand extends Command
             return 0;
         }
 
+        // Retention dari config attendance.cleanup_retention_days (default 365 hari).
+        // 0 = jangan pernah hapus record.
+        $retentionDays = (int) attendance_config('cleanup_retention_days', 365);
+
         $deletedLogs = 0;
         $deletedAttendances = 0;
 
-        // Hapus attendance_logs yang processed_at > 90 hari
-        $deletedLogs = AttendanceLog::where('processed_at', '<', now()->subDays(90))
-            ->delete();
+        if ($retentionDays > 0) {
+            $cutoff = now()->subDays($retentionDays);
 
-        // Hapus attendances yang date > 180 hari
-        $deletedAttendances = Attendance::where('date', '<', now()->subDays(180))
-            ->delete();
+            // Hapus attendance_logs yang processed_at lebih tua dari retention
+            $deletedLogs = AttendanceLog::where('processed_at', '<', $cutoff)
+                ->delete();
+
+            // Hapus attendances yang date lebih tua dari retention
+            $deletedAttendances = Attendance::where('date', '<', $cutoff)
+                ->delete();
+        }
 
         $this->info('Attendance cleanup selesai:');
-        $this->info("  - attendance_logs dihapus: {$deletedLogs} record (>90 hari)");
-        $this->info("  - attendances dihapus: {$deletedAttendances} record (>180 hari)");
+        $this->info("  - retention days: {$retentionDays}");
+        $this->info("  - attendance_logs dihapus: {$deletedLogs} record");
+        $this->info("  - attendances dihapus: {$deletedAttendances} record");
 
         // Cleanup raw ZKTeco log files > 30 hari
+        // (file disimpan sebagai .log oleh ZKTecoIClockController::saveRawLog,
+        //  glob *.txt tetap dicakup untuk kompatibilitas dengan file lama)
         $rawDir = storage_path('app/zkteco-raw');
         if (is_dir($rawDir)) {
-            $files = glob($rawDir . '/*.txt');
+            $files = array_merge(
+                glob($rawDir . '/*.log') ?: [],
+                glob($rawDir . '/*.txt') ?: []
+            );
             $deletedFiles = 0;
             foreach ($files as $file) {
                 if (filemtime($file) < now()->subDays(30)->timestamp) {

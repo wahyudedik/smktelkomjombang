@@ -9,6 +9,7 @@ use App\Models\Siswa;
 use App\Models\OsisElection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
@@ -484,20 +485,64 @@ class OSISController extends Controller
                 ->with('error', 'Anda hanya dapat memilih calon yang sesuai dengan jenis kelamin Anda.');
         }
 
-        // Create vote record (pemilih_id is nullable; vote tracked via siswa_id)
-        Voting::create([
-            'calon_id' => $calon->id,
-            'pemilih_id' => null,
-            'siswa_id' => $siswa->id,
-            'election_id' => $election->id,
-            'waktu_voting' => now(),
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'is_valid' => true,
-        ]);
+        // Bug 1 & 2 fix: wrap the whole voting process in a DB transaction with a
+        // double-check pattern (lockForUpdate) to prevent concurrent double-votes,
+        // and update BOTH vote markers (siswas.has_voted_osis + pemilihs.status)
+        // atomically so the dual-tracking state never diverges.
+        $voteRecorded = DB::transaction(function () use ($request, $siswa, $calon, $election) {
+            // Lock the siswa row so concurrent requests queue up instead of racing
+            $lockedSiswa = Siswa::whereKey($siswa->id)->lockForUpdate()->first();
 
-        // Mark student as voted
-        $siswa->markAsVoted($request->ip(), $request->userAgent());
+            // Double-check inside the transaction (another request may have voted first)
+            if (!$lockedSiswa || $lockedSiswa->hasVotedOsis()) {
+                return false;
+            }
+
+            // Also check for an existing valid voting record (belt & suspenders)
+            $alreadyVoted = Voting::where('siswa_id', $lockedSiswa->id)
+                ->where('election_id', $election->id)
+                ->where('is_valid', true)
+                ->exists();
+
+            if ($alreadyVoted) {
+                // Sync the siswa flag if it diverged from the voting table
+                $lockedSiswa->markAsVoted($request->ip(), $request->userAgent());
+                return false;
+            }
+
+            // Create vote record (pemilih_id is nullable; vote tracked via siswa_id)
+            Voting::create([
+                'calon_id' => $calon->id,
+                'pemilih_id' => null,
+                'siswa_id' => $lockedSiswa->id,
+                'election_id' => $election->id,
+                'waktu_voting' => now(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'is_valid' => true,
+            ]);
+
+            // Marker 1: mark siswa as voted
+            $lockedSiswa->markAsVoted($request->ip(), $request->userAgent());
+
+            // Marker 2: mark related pemilih record as sudah_memilih (if any exists)
+            Pemilih::where('user_id', $lockedSiswa->user_id)
+                ->where(function ($query) {
+                    $query->where('user_type', 'siswa')->orWhereNull('user_type');
+                })
+                ->where('status', '!=', 'sudah_memilih')
+                ->get()
+                ->each(function (Pemilih $pemilih) use ($request) {
+                    $pemilih->markAsVoted($request->ip(), $request->userAgent());
+                });
+
+            return true;
+        });
+
+        if (!$voteRecorded) {
+            return redirect()->route('admin.osis.voting')
+                ->with('error', 'Anda sudah memilih dalam pemilihan OSIS ini.');
+        }
 
         // Invalidate cached dashboard stats so the new vote is reflected
         cache()->forget('osis_dashboard_stats');

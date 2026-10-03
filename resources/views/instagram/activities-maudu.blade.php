@@ -173,6 +173,9 @@
                             <div style="position: relative;">
                                 <img src="{{ $post['media_url'] }}" class="card-img-top" alt="Kegiatan Sekolah"
                                     style="height: 250px; object-fit: cover;">
+                                @if (!empty($post['is_mock']))
+                                    <span style="position: absolute; top: 12px; left: 12px; background: #f39c12; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">Demo</span>
+                                @endif
                                 <div style="position: absolute; top: 12px; right: 12px;">
                                     <a href="{{ $post['permalink'] }}" target="_blank" class="btn btn-sm btn-dark"
                                         style="border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">

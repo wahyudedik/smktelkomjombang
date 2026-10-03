@@ -1,7 +1,7 @@
 # 📋 Daftar Lengkap Fitur — SMK Telekomunikasi Darul Ulum
 
 > Dokumentasi lengkap semua fitur yang tersedia di sistem informasi SMK Telekomunikasi.
-> Diperbarui: 2026-09-21
+> Diperbarui: 2026-10-03
 
 ---
 
@@ -13,6 +13,20 @@
 - `✅ Selesai` — Fitur sudah selesai dan production-ready
 - `🔄 Dalam Pengembangan` — Fitur sedang dalam pengembangan/polynomial
 - `⬜ Belum Dikerjakan` — Fitur belum dikerjakan
+
+---
+
+## 📝 Changelog
+
+### 2026-10-03 — Security & Quality Fixes
+- ZKTeco: token iClock fail-closed, perbaiki deleteFingerprint, race dedup, command queue retry/timeout
+- Theme: perbaiki route preview, penghapusan file lama, deep-merge config, hapus dead code
+- OSIS: transaction + unique constraint anti double-vote
+- Instagram: hapus webhook token hardcoded, hash_equals, mock data transparan
+- ContentSanitizer: escape atribut HTML, implementasi allow_iframes
+- WebPush: hapus sleep blocking; GuestBook: ticket number race-safe
+- Attendance: fix statistik harian (paginator bug), export N+1, PDF semua baris
+- Dokumentasi: sanitasi credentials (placeholder + catatan rotasi), update status plan landing-page settings per-theme
 
 ---
 

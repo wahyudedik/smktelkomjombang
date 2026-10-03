@@ -16,6 +16,7 @@ class AttendanceCommand extends Model
         'device_pin',
         'command',
         'status',
+        'retry_count',
         'sent_at',
         'executed_at',
         'result_code',

@@ -35,7 +35,8 @@ return [
         'app_id' => env('INSTAGRAM_APP_ID'),
         'app_secret' => env('INSTAGRAM_APP_SECRET'),
         'redirect_uri' => env('INSTAGRAM_REDIRECT_URI'),
-        'webhook_token' => env('INSTAGRAM_WEBHOOK_TOKEN', 'mySchoolWebhook2025'),
+        // No hardcoded default: webhook verification fails when env is not set
+        'webhook_token' => env('INSTAGRAM_WEBHOOK_TOKEN'),
     ],
 
     'vapid' => [

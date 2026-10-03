@@ -275,7 +275,7 @@ class LandingController extends Controller
 
             // Headmaster — theme-aware defaults (?: agar empty string jg fallback)
             'headmaster_name' => theme_config('headmaster_name') ?: ($themeData['kepala_sekolah']['name'] ?? 'NUR LAILA,S.Pd'),
-            'headmaster_school_name' => theme_config('headmaster_school_name') ?: 'SMK TELEKOMUNIKASI DARUL ULUM JOMBANG',
+            'headmaster_school_name' => theme_config('headmaster_school_name') ?: ($themeConfig['name'] ?? config('app.name')),
             'headmaster_description' => theme_config('headmaster_description') ?: ($themeData['kepala_sekolah']['description'] ?? 'Selamat datang di website resmi <b>SMK Telekomunikasi Darul Ulum Jombang.</b> Website ini menjadi sarana informasi bagi siswa, orang tua, alumni, dan masyarakat untuk mengetahui berbagai kegiatan serta perkembangan sekolah.'),
             'headmaster_vision' => theme_config('headmaster_vision') ?: ($themeData['kepala_sekolah']['description_2'] ?? ''),
             'headmaster_photo' => theme_config('headmaster_photo') ?: ($themeData['kepala_sekolah']['photo'] ?? null),

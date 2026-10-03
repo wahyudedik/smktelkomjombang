@@ -76,3 +76,17 @@ Schedule::call(function () {
 })->name('cleanup-old-jobs')
     ->dailyAt('03:00')
     ->withoutOverlapping();
+
+// Recover stale iClock device commands (every 10 minutes)
+// Mengembalikan command 'sent' yang tidak pernah dilaporkan hasilnya oleh device
+// (timeout) dan command 'failed' yang masih memiliki sisa retry ke status 'pending'
+// agar bisa diambil ulang oleh device saat poll /iclock/getrequest.
+Schedule::call(function () {
+    $result = app(\App\Services\ZKTeco\IClockCommandQueue::class)->recoverStaleCommands(60);
+
+    if (($result['stale_sent'] ?? 0) > 0 || ($result['stale_sent_exhausted'] ?? 0) > 0 || ($result['failed_retried'] ?? 0) > 0) {
+        \Illuminate\Support\Facades\Log::info('iClock command queue recovery', $result);
+    }
+})->name('iclock-command-queue-recovery')
+    ->everyTenMinutes()
+    ->withoutOverlapping();

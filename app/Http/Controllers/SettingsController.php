@@ -52,11 +52,7 @@ class SettingsController extends Controller
      */
     public function landingPage(Request $request)
     {
-        // Support theme switching via query parameter
         $availableThemes = ThemeSetting::getRegisteredThemes();
-        if ($request->has('theme') && array_key_exists($request->theme, $availableThemes)) {
-            session(['admin_theme_override' => $request->theme]);
-        }
 
         $theme = current_theme();
 
@@ -391,11 +387,12 @@ class SettingsController extends Controller
         }
 
         // Handle file uploads with old file deletion
+        // ⭐ Old-file path resolution via theme_config() — cache('site_setting_*') sudah tidak diisi
+        //    (data pindah ke tabel theme_settings), sehingga pembacaan cache menyebabkan file lama bocor.
         try {
             if ($request->hasFile('logo')) {
-                // Delete old logo if exists
-                $oldLogo = cache('site_setting_logo');
-                if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
+                $oldLogo = theme_config('logo');
+                if (is_string($oldLogo) && $oldLogo !== '' && Storage::disk('public')->exists($oldLogo)) {
                     Storage::disk('public')->delete($oldLogo);
                 }
                 $logoPath = $request->file('logo')->store('site-assets', 'public');
@@ -403,9 +400,8 @@ class SettingsController extends Controller
             }
 
             if ($request->hasFile('program_section_image')) {
-                // Delete old image if exists
-                $oldImage = cache('site_setting_program_section_image');
-                if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                $oldImage = theme_config('program_section_image');
+                if (is_string($oldImage) && $oldImage !== '' && Storage::disk('public')->exists($oldImage)) {
                     Storage::disk('public')->delete($oldImage);
                 }
                 $programImagePath = $request->file('program_section_image')->store('site-assets/program', 'public');
@@ -413,9 +409,8 @@ class SettingsController extends Controller
             }
 
             if ($request->hasFile('favicon')) {
-                // Delete old favicon if exists
-                $oldFavicon = cache('site_setting_favicon');
-                if ($oldFavicon && Storage::disk('public')->exists($oldFavicon)) {
+                $oldFavicon = theme_config('favicon');
+                if (is_string($oldFavicon) && $oldFavicon !== '' && Storage::disk('public')->exists($oldFavicon)) {
                     Storage::disk('public')->delete($oldFavicon);
                 }
                 $faviconPath = $request->file('favicon')->store('site-assets', 'public');
@@ -423,13 +418,14 @@ class SettingsController extends Controller
             }
 
             if ($request->hasFile('hero_images')) {
-                // Delete old hero images if exists
-                $oldHeroImages = cache('site_setting_hero_images');
-                if ($oldHeroImages) {
-                    $oldImagesArray = json_decode($oldHeroImages, true);
+                $oldHeroImages = theme_config('hero_images');
+                if ($oldHeroImages !== null && $oldHeroImages !== '') {
+                    $oldImagesArray = is_array($oldHeroImages)
+                        ? $oldHeroImages
+                        : json_decode((string) $oldHeroImages, true);
                     if (is_array($oldImagesArray)) {
                         foreach ($oldImagesArray as $oldImage) {
-                            if (Storage::disk('public')->exists($oldImage)) {
+                            if (is_string($oldImage) && Storage::disk('public')->exists($oldImage)) {
                                 Storage::disk('public')->delete($oldImage);
                             }
                         }
@@ -455,9 +451,8 @@ class SettingsController extends Controller
             }
 
             if ($request->hasFile('video_thumbnail')) {
-                // Delete old thumbnail if exists
-                $oldThumbnail = cache('site_setting_video_thumbnail');
-                if ($oldThumbnail && Storage::disk('public')->exists($oldThumbnail)) {
+                $oldThumbnail = theme_config('video_thumbnail');
+                if (is_string($oldThumbnail) && $oldThumbnail !== '' && Storage::disk('public')->exists($oldThumbnail)) {
                     Storage::disk('public')->delete($oldThumbnail);
                 }
                 $videoThumbnailPath = $request->file('video_thumbnail')->store('site-assets/video', 'public');
@@ -465,9 +460,8 @@ class SettingsController extends Controller
             }
 
             if ($request->hasFile('headmaster_photo')) {
-                // Delete old photo if exists
-                $oldPhoto = cache('site_setting_headmaster_photo');
-                if ($oldPhoto && Storage::disk('public')->exists($oldPhoto)) {
+                $oldPhoto = theme_config('headmaster_photo');
+                if (is_string($oldPhoto) && $oldPhoto !== '' && Storage::disk('public')->exists($oldPhoto)) {
                     Storage::disk('public')->delete($oldPhoto);
                 }
                 $headmasterPhotoPath = $request->file('headmaster_photo')->store('site-assets/headmaster', 'public');
@@ -475,9 +469,8 @@ class SettingsController extends Controller
             }
 
             if ($request->hasFile('campus_life_headmaster_photo')) {
-                // Delete old photo if exists
-                $oldPhoto = cache('site_setting_campus_life_headmaster_photo');
-                if ($oldPhoto && Storage::disk('public')->exists($oldPhoto)) {
+                $oldPhoto = theme_config('campus_life_headmaster_photo');
+                if (is_string($oldPhoto) && $oldPhoto !== '' && Storage::disk('public')->exists($oldPhoto)) {
                     Storage::disk('public')->delete($oldPhoto);
                 }
                 $campusLifePhotoPath = $request->file('campus_life_headmaster_photo')->store('site-assets/headmaster', 'public');
@@ -486,8 +479,8 @@ class SettingsController extends Controller
 
             // Handle About Section Images
             if ($request->hasFile('about_image_1')) {
-                $oldImage = cache('site_setting_about_image_1');
-                if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                $oldImage = theme_config('about_image_1');
+                if (is_string($oldImage) && $oldImage !== '' && Storage::disk('public')->exists($oldImage)) {
                     Storage::disk('public')->delete($oldImage);
                 }
                 $aboutImage1Path = $request->file('about_image_1')->store('site-assets/about', 'public');
@@ -495,8 +488,8 @@ class SettingsController extends Controller
             }
 
             if ($request->hasFile('about_image_2')) {
-                $oldImage = cache('site_setting_about_image_2');
-                if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                $oldImage = theme_config('about_image_2');
+                if (is_string($oldImage) && $oldImage !== '' && Storage::disk('public')->exists($oldImage)) {
                     Storage::disk('public')->delete($oldImage);
                 }
                 $aboutImage2Path = $request->file('about_image_2')->store('site-assets/about', 'public');
@@ -504,8 +497,8 @@ class SettingsController extends Controller
             }
 
             if ($request->hasFile('about_image_3')) {
-                $oldImage = cache('site_setting_about_image_3');
-                if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                $oldImage = theme_config('about_image_3');
+                if (is_string($oldImage) && $oldImage !== '' && Storage::disk('public')->exists($oldImage)) {
                     Storage::disk('public')->delete($oldImage);
                 }
                 $aboutImage3Path = $request->file('about_image_3')->store('site-assets/about', 'public');

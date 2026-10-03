@@ -260,29 +260,42 @@ class InstagramController extends Controller
         $token = $request->input('hub_verify_token');
         $challenge = $request->input('hub_challenge');
 
-        // Get verify token from settings or config
+        // Get verify token from settings or config.
+        // No hardcoded fallback: when no token is configured, verification MUST fail.
         $settings = InstagramSetting::where('is_active', true)->first();
-        $verifyToken = $settings->webhook_verify_token ??
-            config('services.instagram.webhook_verify_token', 'mySchoolWebhook2025');
+        $verifyToken = $settings->webhook_verify_token
+            ?: config('services.instagram.webhook_token', '');
+
+        // Redact tokens for logging — never log the full token (leak risk).
+        $redact = static fn (?string $value): ?string => filled($value)
+            ? substr($value, 0, 4) . '****'
+            : null;
 
         Log::info('Instagram Webhook Verification Attempt', [
             'mode' => $mode,
-            'token_received' => $token,
-            'token_expected' => $verifyToken,
+            'token_received' => $redact(is_string($token) ? $token : null),
+            'token_expected' => $redact($verifyToken),
             'challenge' => $challenge,
             'ip' => $request->ip()
         ]);
 
-        // Meta expects exactly this response for successful verification
-        if ($mode === 'subscribe' && $token === $verifyToken) {
+        // Fail verification when no token is configured (must not fall back to a default)
+        if (!is_string($verifyToken) || $verifyToken === '') {
+            Log::error('❌ Webhook verification failed: webhook token not configured');
+            return response('Forbidden', 403);
+        }
+
+        // Meta expects exactly this response for successful verification.
+        // hash_equals() provides constant-time comparison (timing-attack safe).
+        if ($mode === 'subscribe' && is_string($token) && hash_equals($verifyToken, $token)) {
             Log::info('✅ Webhook verified successfully');
             return response($challenge, 200)
                 ->header('Content-Type', 'text/plain');
         }
 
         Log::error('❌ Webhook verification failed', [
-            'expected_token' => $verifyToken,
-            'received_token' => $token
+            'expected_token' => $redact($verifyToken),
+            'received_token' => $redact(is_string($token) ? $token : null),
         ]);
 
         return response('Forbidden', 403);

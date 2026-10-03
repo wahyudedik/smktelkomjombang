@@ -197,6 +197,9 @@
                             <div class="position-relative">
                                 <img src="{{ $post['media_url'] }}" class="card-img-top" alt="Kegiatan Sekolah"
                                     style="height: 250px; object-fit: cover;">
+                                @if (!empty($post['is_mock']))
+                                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Demo</span>
+                                @endif
                                 <div class="position-absolute top-0 end-0 m-2">
                                     <a href="{{ $post['permalink'] }}" target="_blank" class="btn btn-sm btn-dark">
                                         <i class="fab fa-instagram"></i>

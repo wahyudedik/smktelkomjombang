@@ -65,6 +65,8 @@ class InstagramService
                         'like_count' => $post['like_count'] ?? 0,
                         'comment_count' => $post['comments_count'] ?? 0, // Transform comments_count -> comment_count
                         'children' => $post['children'] ?? null,
+                        'is_mock' => false,
+                        'source' => 'api',
                     ];
                 })->toArray();
 
@@ -131,7 +133,9 @@ class InstagramService
                 'permalink' => 'https://www.instagram.com/p/example1/',
                 'timestamp' => now()->subHours(2),
                 'like_count' => 45,
-                'comment_count' => 12
+                'comment_count' => 12,
+                'is_mock' => true,
+                'source' => 'mock',
             ],
             [
                 'id' => 2,
@@ -141,7 +145,9 @@ class InstagramService
                 'permalink' => 'https://www.instagram.com/p/example2/',
                 'timestamp' => now()->subHours(5),
                 'like_count' => 78,
-                'comment_count' => 23
+                'comment_count' => 23,
+                'is_mock' => true,
+                'source' => 'mock',
             ],
             [
                 'id' => 3,
@@ -151,7 +157,9 @@ class InstagramService
                 'permalink' => 'https://www.instagram.com/p/example3/',
                 'timestamp' => now()->subDay(),
                 'like_count' => 92,
-                'comment_count' => 34
+                'comment_count' => 34,
+                'is_mock' => true,
+                'source' => 'mock',
             ],
             [
                 'id' => 4,
@@ -161,7 +169,9 @@ class InstagramService
                 'permalink' => 'https://www.instagram.com/p/example4/',
                 'timestamp' => now()->subDays(2),
                 'like_count' => 156,
-                'comment_count' => 28
+                'comment_count' => 28,
+                'is_mock' => true,
+                'source' => 'mock',
             ],
             [
                 'id' => 5,
@@ -171,7 +181,9 @@ class InstagramService
                 'permalink' => 'https://www.instagram.com/p/example5/',
                 'timestamp' => now()->subDays(3),
                 'like_count' => 203,
-                'comment_count' => 45
+                'comment_count' => 45,
+                'is_mock' => true,
+                'source' => 'mock',
             ],
             [
                 'id' => 6,
@@ -181,7 +193,9 @@ class InstagramService
                 'permalink' => 'https://www.instagram.com/p/example6/',
                 'timestamp' => now()->subDays(4),
                 'like_count' => 187,
-                'comment_count' => 56
+                'comment_count' => 56,
+                'is_mock' => true,
+                'source' => 'mock',
             ],
             [
                 'id' => 7,
@@ -191,7 +205,9 @@ class InstagramService
                 'permalink' => 'https://www.instagram.com/p/example7/',
                 'timestamp' => now()->subDays(5),
                 'like_count' => 134,
-                'comment_count' => 31
+                'comment_count' => 31,
+                'is_mock' => true,
+                'source' => 'mock',
             ],
             [
                 'id' => 8,
@@ -201,7 +217,9 @@ class InstagramService
                 'permalink' => 'https://www.instagram.com/p/example8/',
                 'timestamp' => now()->subDays(6),
                 'like_count' => 98,
-                'comment_count' => 22
+                'comment_count' => 22,
+                'is_mock' => true,
+                'source' => 'mock',
             ]
         ];
     }
@@ -323,7 +341,7 @@ class InstagramService
     /**
      * Refresh long-lived access token
      * Instagram Platform API: Tokens expire in 60 days and can be refreshed
-     * 
+     *
      * @see https://developers.facebook.com/docs/instagram-platform/instagram-api-with-facebook-login/get-started#step-5--get-a-long-lived-token
      */
     public function refreshLongLivedToken()
@@ -374,16 +392,16 @@ class InstagramService
 
     /**
      * STEP 1: Generate Instagram Business Login Authorization URL
-     * 
+     *
      * IMPORTANT: New scopes required by January 27, 2025
      * Old scopes (business_basic, etc.) will be deprecated!
-     * 
+     *
      * New scopes:
      * - instagram_business_basic (required)
      * - instagram_business_content_publish
      * - instagram_business_manage_messages
      * - instagram_business_manage_comments
-     * 
+     *
      * @param array $scopes List of permissions to request
      * @param string|null $state Optional CSRF protection state
      * @return string|false Authorization URL or false on failure
@@ -438,10 +456,10 @@ class InstagramService
 
     /**
      * STEP 2: Exchange authorization code for short-lived access token
-     * 
+     *
      * Called after user authorizes and Meta redirects with code
      * Authorization code is valid for 1 hour and can only be used once
-     * 
+     *
      * @param string $code Authorization code from redirect
      * @return array|false Token data or false on failure
      */
@@ -501,11 +519,11 @@ class InstagramService
 
     /**
      * STEP 3: Exchange short-lived token for long-lived token
-     * 
+     *
      * Short-lived token: Valid for 1 hour
      * Long-lived token: Valid for 60 days
      * Initial token exchange (1 hour -> 60 days)
-     * 
+     *
      * @param string $shortLivedToken Short-lived access token
      * @return array|null Token data or null on failure
      */
@@ -556,7 +574,7 @@ class InstagramService
     /**
      * Publish single photo to Instagram
      * Requires instagram_content_publish permission
-     * 
+     *
      * @param string $imageUrl Public image URL
      * @param string $caption Post caption
      * @return array|null Media creation result
@@ -707,7 +725,7 @@ class InstagramService
     /**
      * Check rate limit status
      * Instagram Platform: Calls within 24 hours = 4800 * Number of Impressions
-     * 
+     *
      * @return array Rate limit info
      */
     public function getRateLimitStatus()

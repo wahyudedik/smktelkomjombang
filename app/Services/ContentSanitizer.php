@@ -29,8 +29,11 @@ class ContentSanitizer
         'caption', 'colgroup', 'col',
         // Layout
         'div', 'span', 'pre', 'code', 'abbr', 'address',
-        // Embedded content
-        'iframe', 'video', 'source', 'audio',
+        // Embedded content.
+        // NOTE: 'iframe' is intentionally NOT listed — iframes are stripped by
+        // default and only preserved (then sandboxed) when $options['allow_iframes']
+        // is true in sanitize(). See stripDisallowedTags()/sandboxIframes().
+        'video', 'source', 'audio',
     ];
 
     /**
@@ -69,6 +72,10 @@ class ContentSanitizer
             return '';
         }
 
+        // Opsi allow_iframes: jika true, iframe TIDAK di-strip tapi di-sandbox.
+        // Default false mempertahankan perilaku lama (strip semua iframe).
+        $allowIframes = (bool) ($options['allow_iframes'] ?? false);
+
         // Step 1: Decode HTML entities untuk memproses tags
         $decoded = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
@@ -76,7 +83,7 @@ class ContentSanitizer
         $cleaned = preg_replace('/<!--.*?-->/s', '', $decoded);
 
         // Step 3: Hapus tags yang tidak diizinkan (preserve content)
-        $cleaned = $this->stripDisallowedTags($cleaned);
+        $cleaned = $this->stripDisallowedTags($cleaned, $allowIframes);
 
         // Step 4: Hapus atribut yang tidak diizinkan
         $cleaned = $this->stripDisallowedAttributes($cleaned);
@@ -84,8 +91,10 @@ class ContentSanitizer
         // Step 5: Sanitize URLs (hapus javascript: protocol, dll)
         $cleaned = $this->sanitizeUrls($cleaned);
 
-        // Step 6: Sandbox iframe embeds
-        $cleaned = $this->sandboxIframes($cleaned);
+        // Step 6: Sandbox iframe embeds (hanya jika iframe diizinkan)
+        if ($allowIframes) {
+            $cleaned = $this->sandboxIframes($cleaned);
+        }
 
         // Step 7: Hapus event handlers (onclick, onerror, dll)
         $cleaned = $this->stripEventHandlers($cleaned);
@@ -121,7 +130,7 @@ class ContentSanitizer
     /**
      * Strip tags yang tidak diizinkan, pertahankan kontennya.
      */
-    private function stripDisallowedTags(string $html): string
+    private function stripDisallowedTags(string $html, bool $allowIframes = false): string
     {
         // Hapus self-closing tags yang tidak diizinkan (script, style, dll)
         $html = preg_replace(
@@ -137,9 +146,11 @@ class ContentSanitizer
             $html
         );
 
-        // Hapus iframe jika tidak diizinkan
-        $html = preg_replace('/<\s*iframe\b[^>]*>.*?<\s*\/\s*iframe\s*>/is', '', $html);
-        $html = preg_replace('/<\s*iframe\b[^>]*\/?>/is', '', $html);
+        // Hapus iframe jika tidak diizinkan (default: selalu strip)
+        if (!$allowIframes) {
+            $html = preg_replace('/<\s*iframe\b[^>]*>.*?<\s*\/\s*iframe\s*>/is', '', $html);
+            $html = preg_replace('/<\s*iframe\b[^>]*\/?>/is', '', $html);
+        }
 
         return $html;
     }
@@ -185,6 +196,9 @@ class ContentSanitizer
 
                 if (in_array($attrName, $allowedAttributes, true)) {
                     $value = $match[2] ?? $match[3] ?? $match[4] ?? $attrName;
+                    // Escape nilai atribut saat menyusun ulang tag — mencegah XSS
+                    // lewat nilai atribut (mis. breakout via quote di value).
+                    $value = htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
                     $result .= " {$attrName}=\"{$value}\"";
                 }
             }
@@ -226,17 +240,28 @@ class ContentSanitizer
      */
     private function sandboxIframes(string $html): string
     {
-        // Tambah sandbox attribute ke iframe yang belum punya
+        // Tambah sandbox, loading, dan referrerpolicy ke iframe yang belum punya
         $html = preg_replace_callback(
             '/<iframe\b([^>]*)>/i',
             function ($matches) {
                 $attrs = $matches[1];
+                $prefix = '';
 
-                if (preg_match('/\bsandbox\s*=/i', $attrs)) {
+                if (!preg_match('/\bsandbox\s*=/i', $attrs)) {
+                    $prefix .= ' sandbox="' . self::IFRAME_SANDBOX . '"';
+                }
+                if (!preg_match('/\bloading\s*=/i', $attrs)) {
+                    $prefix .= ' loading="lazy"';
+                }
+                if (!preg_match('/\breferrerpolicy\s*=/i', $attrs)) {
+                    $prefix .= ' referrerpolicy="strict-origin-when-cross-origin"';
+                }
+
+                if ($prefix === '') {
                     return $matches[0];
                 }
 
-                return '<iframe sandbox="' . self::IFRAME_SANDBOX . '"' . $attrs . '>';
+                return '<iframe' . $prefix . $attrs . '>';
             },
             $html
         );

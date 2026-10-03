@@ -1,8 +1,29 @@
 # 🎨 Plan: Landing Page Settings — Per-Theme Refactoring
 
-> **Status**: Draft — Menunggu approval
+> **Status**: ✅ Implemented — 2026-10-03
 > **Tanggal**: 2026-08-16
 > **Masalah**: Landing Page Settings bersifat GLOBAL (cache), bukan per-theme. Admin yang mengisi "MAUDU REJOSO" akan mengalahkan fallback theme_config() untuk Telkom.
+
+---
+
+## 📌 Status Implementasi (Update: 2026-10-03)
+
+Fitur inti **SUDAH terimplementasi** di kode (bukan lagi draft):
+
+- [`SettingsController::updateLandingPage()`](app/Http/Controllers/SettingsController.php) — menyimpan per-tema ke `theme_settings` via `ThemeSetting::saveThemeConfig($theme, $settings)` + `clearCache($theme)`
+- [`SettingsController::resetLandingPage()`](app/Http/Controllers/SettingsController.php) — reset per-tema (hapus key per tema saja, bukan semua tema)
+- [`SettingsController::landingPage()`](app/Http/Controllers/SettingsController.php) — membaca data via `theme_config()` per tema
+- Migrasi data **`2026_08_16_010000`** — memindahkan cache global `site_setting_*` → tabel `theme_settings`
+
+### Sisa Pekerjaan (dari analisis terakhir)
+
+| # | Item | Status |
+|---|------|--------|
+| 1 | Penghapusan file lama di SettingsController diperbaiki (baca `theme_config()` alih-alih cache global) | ✅ Selesai — 2026-10-03 |
+| 2 | View legacy route `landing.welcome` + `components/landing/*` masih membaca `cache('site_setting_*')` yang sudah mati — opsi: migrasikan ke `theme_config()` atau hapus route legacy | ⬜ BELUM diperbaiki |
+| 3 | `theme_image()` tier 2 masih mengecek `site_setting_{key}` (legacy, hampir mati) — dapat dipertahankan (backward compat) atau dihapus | ⚪ Opsi — dipertahankan sementara |
+
+> Catatan: konten plan di bawah tetap dipertahankan sebagai referensi desain awal.
 
 ---
 

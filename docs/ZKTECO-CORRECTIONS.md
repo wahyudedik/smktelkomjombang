@@ -3,9 +3,9 @@
 
 ---
 
-## 🔥 MASALAH YANG DITEMUKAN
+## ðŸ”¥ MASALAH YANG DITEMUKAN
 
-### 1. ❌ Format Endpoint Kurang Tepat
+### 1. âŒ Format Endpoint Kurang Tepat
 
 **Sebelumnya (SALAH):**
 ```
@@ -24,7 +24,7 @@ http://smktelekomunikasidu.sch.id/iclock/cdata?SN=SERIAL&token=TOKEN
 
 ---
 
-### 2. ❌ Pakai HTTPS (Penyebab Utama Gagal)
+### 2. âŒ Pakai HTTPS (Penyebab Utama Gagal)
 
 **Masalah:**
 - Banyak device ZKTeco lama gagal konek ke HTTPS
@@ -32,13 +32,13 @@ http://smktelekomunikasidu.sch.id/iclock/cdata?SN=SERIAL&token=TOKEN
 - Device tidak support SSL/TLS dengan baik
 
 **Solusi:**
-- ✅ Gunakan **HTTP** untuk testing awal (port 80)
-- ✅ Setelah stabil, upgrade ke HTTPS dengan certificate valid
-- ✅ Pastikan certificate chain lengkap
+- âœ… Gunakan **HTTP** untuk testing awal (port 80)
+- âœ… Setelah stabil, upgrade ke HTTPS dengan certificate valid
+- âœ… Pastikan certificate chain lengkap
 
 ---
 
-### 3. ❌ Token Penempatan Salah
+### 3. âŒ Token Penempatan Salah
 
 **Sebelumnya (SALAH):**
 ```
@@ -63,54 +63,54 @@ Server URL: http://domain.com/iclock/cdata?token=TOKEN&SN=SERIAL
 
 ---
 
-## ✅ IMPLEMENTASI FIX
+## âœ… IMPLEMENTASI FIX
 
 ### File yang Diupdate
 
 1. **docs/VPS-DEPLOY.md**
-   - ✅ STEP 18 diperbaharui dengan protokol ZKTeco yang benar
-   - ✅ Penjelasan HTTP vs HTTPS
-   - ✅ Format device setting yang benar
-   - ✅ Troubleshooting lebih detail
+   - âœ… STEP 18 diperbaharui dengan protokol ZKTeco yang benar
+   - âœ… Penjelasan HTTP vs HTTPS
+   - âœ… Format device setting yang benar
+   - âœ… Troubleshooting lebih detail
 
 2. **docs/ZKTECO-SETUP.md** (BARU)
-   - ✅ Panduan lengkap setup ZKTeco
-   - ✅ Testing endpoint step-by-step
-   - ✅ Device configuration yang benar
-   - ✅ Troubleshooting komprehensif
-   - ✅ Monitoring & maintenance
+   - âœ… Panduan lengkap setup ZKTeco
+   - âœ… Testing endpoint step-by-step
+   - âœ… Device configuration yang benar
+   - âœ… Troubleshooting komprehensif
+   - âœ… Monitoring & maintenance
 
 ### Code yang Sudah Benar
 
 **app/Http/Controllers/ZKTecoIClockController.php**
-- ✅ Sudah handle token dari query param
-- ✅ Sudah handle SN (serial number) dari query
-- ✅ Sudah return format yang benar
+- âœ… Sudah handle token dari query param
+- âœ… Sudah handle SN (serial number) dari query
+- âœ… Sudah return format yang benar
 
 **routes/web.php**
-- ✅ Route `/iclock/getrequest` ✅
-- ✅ Route `/iclock/cdata` ✅
-- ✅ Route `/iclock/devicecmd` ✅
+- âœ… Route `/iclock/getrequest` âœ…
+- âœ… Route `/iclock/cdata` âœ…
+- âœ… Route `/iclock/devicecmd` âœ…
 
 ---
 
-## 🎯 ALUR YANG BENAR (SEKARANG)
+## ðŸŽ¯ ALUR YANG BENAR (SEKARANG)
 
 ### Device Request Flow
 
 ```
 1. Device startup
-   ↓
+   â†“
 2. Device GET /iclock/getrequest?SN=SERIAL&token=TOKEN
-   ↓
+   â†“
 3. Server return config + command queue
-   ↓
+   â†“
 4. Device POST /iclock/cdata?SN=SERIAL&token=TOKEN [attendance data]
-   ↓
+   â†“
 5. Server return OK
-   ↓
+   â†“
 6. Device POST /iclock/devicecmd?SN=SERIAL&ID=CMD_ID&Return=RESULT&token=TOKEN
-   ↓
+   â†“
 7. Server return OK
 ```
 
@@ -122,13 +122,15 @@ Server URL: http://domain.com/iclock/cdata?token=TOKEN&SN=SERIAL
 | Port | `80` (HTTP) atau `443` (HTTPS) |
 | Protocol | `HTTP` atau `HTTPS` |
 | Path | `/iclock/cdata` |
-| Token | `iloveSMKkuYangIndahTelkomJayaAbadinusantara` |
+| Token | `YOUR_TOKEN_HERE` |
 | Push Interval | `60` |
 | Enable Push | `ON` |
 
+> ⚠️ **KEAMANAN**: Nilai token di dokumentasi ini sudah diganti placeholder `YOUR_TOKEN_HERE`. Jika token asli pernah dibagikan/publik, segera **ROTASI token** di device & `.env` (buat baru: `openssl rand -hex 32`).
+
 ---
 
-## 📋 TESTING CHECKLIST
+## ðŸ“‹ TESTING CHECKLIST
 
 ### Pre-Setup Testing
 
@@ -152,12 +154,12 @@ Server URL: http://domain.com/iclock/cdata?token=TOKEN&SN=SERIAL
 - [ ] Device `last_seen_at` update setiap 1-2 menit
 - [ ] User ditambahkan & sync ke device
 - [ ] Biometric enrolled (fingerprint/face/card)
-- [ ] Test scan → data muncul di `/admin/absensi/logs`
+- [ ] Test scan â†’ data muncul di `/admin/absensi/logs`
 - [ ] Database `attendance_logs` terisi
 
 ---
 
-## 🚀 NEXT STEPS
+## ðŸš€ NEXT STEPS
 
 ### Immediate (Testing)
 
@@ -185,7 +187,7 @@ Server URL: http://domain.com/iclock/cdata?token=TOKEN&SN=SERIAL
 
 ---
 
-## 📞 SUPPORT
+## ðŸ“ž SUPPORT
 
 Jika masih ada masalah:
 
@@ -206,12 +208,12 @@ Jika masih ada masalah:
 
 4. **Cek device setting:**
    ```
-   Menu → Communication → ADMS / Cloud Server
+   Menu â†’ Communication â†’ ADMS / Cloud Server
    ```
 
 5. **Restart device:**
    ```
-   Menu → System → Restart
+   Menu â†’ System â†’ Restart
    ```
 
 ---
