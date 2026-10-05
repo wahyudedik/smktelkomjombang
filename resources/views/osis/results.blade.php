@@ -165,7 +165,6 @@
                                     <div>
                                         <h4 class="font-medium text-slate-900">{{ $candidate->nama_ketua }}</h4>
                                         <p class="text-sm text-slate-600">{{ __('common.ketua_osis') }}</p>
-                                        <p class="text-xs text-slate-500">{{ $candidate->kelas_ketua }}</p>
                                     </div>
                                 </div>
 
@@ -187,7 +186,6 @@
                                     <div>
                                         <h4 class="font-medium text-slate-900">{{ $candidate->nama_wakil }}</h4>
                                         <p class="text-sm text-slate-600">{{ __('common.wakil_ketua_osis') }}</p>
-                                        <p class="text-xs text-slate-500">{{ $candidate->kelas_wakil }}</p>
                                     </div>
                                 </div>
                             </div>

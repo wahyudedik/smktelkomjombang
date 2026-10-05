@@ -466,18 +466,11 @@ class OSISController extends Controller
                 ->with('error', 'Kelas Anda tidak diizinkan untuk memilih dalam pemilihan ini.');
         }
 
-        // Filter candidates based on student's gender (guru sees all candidates)
+        // Voting menampilkan SEMUA kandidat aktif (pasangan ketua+wakil) untuk semua pemilih
+        // (siswa maupun guru), tanpa filter gender.
         // NOTE: calons table has NO election_id column (schema is global, not per-election),
         // so query Calon directly instead of $election->candidates() to avoid SQL error.
-        $query = Calon::active()->ordered();
-
-        // For students, filter by gender (calon cewek tampil untuk siswa cewek, calon cowok untuk siswa cowok)
-        // Guru bypass gender filter — tampilkan semua calon
-        if (!$isGuru && $pemilihData->jenis_kelamin) {
-            $calons = $query->byGender($pemilihData->jenis_kelamin)->get();
-        } else {
-            $calons = $query->get();
-        }
+        $calons = Calon::active()->ordered()->get();
 
         // $siswa can be a Siswa object (siswa) or Pemilih object (guru) — kept for view compatibility
         $siswa = $pemilihData;

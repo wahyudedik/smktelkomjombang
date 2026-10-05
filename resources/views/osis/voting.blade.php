@@ -48,29 +48,16 @@
                         <div class="ml-4">
                             <h3 class="text-lg font-semibold text-blue-900">{{ __('common.please_select_candidate') }}</h3>
                             <p class="text-blue-700">{{ __('common.select_best_candidate') }}</p>
-                            @if ($isGuru)
-                                <div class="mt-2 text-sm text-blue-600">
-                                    <span class="inline-flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Anda melihat semua calon
-                                    </span>
-                                </div>
-                            @elseif ($siswa->jenis_kelamin)
-                                <div class="mt-2 text-sm text-blue-600">
-                                    <span class="inline-flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        {{ __('common.you_viewing_candidates') }} {{ $siswa->jenis_kelamin === 'L' ? __('common.laki_laki') : __('common.perempuan') }}
-                                    </span>
-                                </div>
-                            @endif
+                            <div class="mt-2 text-sm text-blue-600">
+                                <span class="inline-flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Anda melihat semua calon
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -87,7 +74,7 @@
                     <h2 class="text-xl font-semibold text-slate-900">{{ __('common.candidate_list') }}</h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        @forelse($calon as $candidate)
+                        @forelse($calons as $candidate)
                             <div
                                 class="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-shadow">
                                 <div class="flex items-center space-x-4 mb-4">
@@ -122,7 +109,6 @@
                                         </div>
                                         <h4 class="font-medium text-slate-900">{{ $candidate->nama_ketua }}</h4>
                                         <p class="text-sm text-slate-600">{{ __('common.ketua_osis') }}</p>
-                                        <p class="text-xs text-slate-500">{{ $candidate->kelas_ketua }}</p>
                                     </div>
 
                                     <!-- Wakil -->
@@ -144,7 +130,6 @@
                                         </div>
                                         <h4 class="font-medium text-slate-900">{{ $candidate->nama_wakil }}</h4>
                                         <p class="text-sm text-slate-600">{{ __('common.wakil_ketua_osis') }}</p>
-                                        <p class="text-xs text-slate-500">{{ $candidate->kelas_wakil }}</p>
                                     </div>
                                 </div>
 
@@ -171,7 +156,7 @@
                 </div>
 
                 <!-- Submit Button -->
-                @if ($calon->count() > 0)
+                @if ($calons->count() > 0)
                     <div class="flex items-center justify-center pt-6 border-t border-slate-200">
                         <button type="button" class="btn btn-primary btn-lg" onclick="confirmVote()">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
