@@ -1,5 +1,10 @@
 @extends('layouts.landing')
 
+@php
+    $pageTitle       = 'Kegiatan - ' . theme_config('name', config('app.name'));
+    $metaDescription = 'Kegiatan dan program unggulan sekolah.';
+@endphp
+
 @section('content')
     <!-- breadcrumb -->
     <div class="site-breadcrumb" style="background: url({{ asset('assets/img/breadcrumb/01.jpg') }})">

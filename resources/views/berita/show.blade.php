@@ -21,7 +21,7 @@
             <div class="card-body">
 
                 @if ($berita->featured_image)
-                    <img src="{{ Storage::url($berita->featured_image) }}" alt="{{ $berita->title }}"
+                    <img src="{{ asset('storage/' . $berita->featured_image) }}" alt="{{ $berita->title }}"
                         class="w-full h-64 object-cover rounded-xl mb-6 border border-slate-200">
                 @endif
 

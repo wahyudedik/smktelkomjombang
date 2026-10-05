@@ -130,9 +130,17 @@ class OSISController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $data = $request->all();
+        // Whitelist: hanya field yang divalidasi yang boleh ter-assign (hindari mass assignment)
+        $data = $request->only([
+            'nama_ketua',
+            'nama_wakil',
+            'jenis_kelamin',
+            'visi_misi',
+            'jenis_pencalonan',
+            'is_active',
+        ]);
 
-        // Handle photo uploads
+        // Handle photo uploads (path hanya diset jika benar-benar ada file baru)
         if ($request->hasFile('foto_ketua')) {
             $data['foto_ketua'] = $request->file('foto_ketua')->store('osis/calon', 'public');
         }
@@ -201,9 +209,17 @@ class OSISController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $data = $request->all();
+        // Whitelist: hanya field yang divalidasi yang boleh ter-assign (hindari mass assignment)
+        $data = $request->only([
+            'nama_ketua',
+            'nama_wakil',
+            'jenis_kelamin',
+            'visi_misi',
+            'jenis_pencalonan',
+            'is_active',
+        ]);
 
-        // Handle photo uploads
+        // Handle photo uploads (hapus foto lama hanya jika ada file baru yang diunggah)
         if ($request->hasFile('foto_ketua')) {
             if ($calon->foto_ketua) {
                 Storage::disk('public')->delete($calon->foto_ketua);
@@ -451,7 +467,9 @@ class OSISController extends Controller
         }
 
         // Filter candidates based on student's gender (guru sees all candidates)
-        $query = $election->candidates()->active()->ordered();
+        // NOTE: calons table has NO election_id column (schema is global, not per-election),
+        // so query Calon directly instead of $election->candidates() to avoid SQL error.
+        $query = Calon::active()->ordered();
 
         // For students, filter by gender (calon cewek tampil untuk siswa cewek, calon cowok untuk siswa cowok)
         // Guru bypass gender filter — tampilkan semua calon
@@ -679,7 +697,8 @@ class OSISController extends Controller
         }
 
         // Get all candidates (no gender filter for teachers and admins)
-        $calons = $election->candidates()->active()->ordered()->get();
+        // NOTE: calons table has NO election_id column — query Calon directly.
+        $calons = Calon::active()->ordered()->get();
 
         return view('osis.teacher-view', compact('calons', 'election'));
     }

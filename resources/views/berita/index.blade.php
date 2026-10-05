@@ -82,7 +82,7 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         @if ($berita->featured_image)
-                                            <img src="{{ Storage::url($berita->featured_image) }}" alt="{{ $berita->title }}"
+                                            <img src="{{ asset('storage/' . $berita->featured_image) }}" alt="{{ $berita->title }}"
                                                 class="w-16 h-12 object-cover rounded-lg">
                                         @else
                                             <div class="w-16 h-12 bg-slate-100 rounded-lg flex items-center justify-center">

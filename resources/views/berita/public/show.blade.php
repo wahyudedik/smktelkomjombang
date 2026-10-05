@@ -36,7 +36,7 @@
 
                     @if ($berita->featured_image)
                         <div class="bs-img mb-35">
-                            <img src="{{ Storage::url($berita->featured_image) }}" alt="{{ $berita->title }}"
+                            <img src="{{ asset('storage/' . $berita->featured_image) }}" alt="{{ $berita->title }}"
                                 style="width: 100%; height: auto; border-radius: 10px; display: block;">
                         </div>
                     @endif
@@ -111,7 +111,7 @@
                                 <div style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
                                     <div style="flex: 0 0 80px;">
                                         @if ($item->featured_image)
-                                            <img src="{{ Storage::url($item->featured_image) }}" alt="{{ $item->title }}"
+                                            <img src="{{ asset('storage/' . $item->featured_image) }}" alt="{{ $item->title }}"
                                                 style="width: 80px; height: 60px; object-fit: cover; border-radius: 5px;">
                                         @else
                                             <div style="width: 80px; height: 60px; background: #e8eaf6; border-radius: 5px; display: flex; align-items: center; justify-content: center;">

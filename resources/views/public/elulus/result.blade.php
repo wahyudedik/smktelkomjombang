@@ -1,5 +1,10 @@
 @extends('layouts.telkom')
 
+@php
+    $pageTitle       = 'Hasil Kelulusan - ' . theme_config('name', config('app.name'));
+    $metaDescription = 'Hasil pengecekan status kelulusan melalui layanan E-Lulus.';
+@endphp
+
 @section('content')
 
     {{-- Breadcrumb --}}

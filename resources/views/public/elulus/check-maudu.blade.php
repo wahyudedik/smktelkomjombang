@@ -1,5 +1,10 @@
 @extends('layouts.maudu')
 
+@php
+    $pageTitle       = 'Cek Kelulusan - ' . theme_config('name', config('app.name'));
+    $metaDescription = 'Cek status kelulusan siswa secara online melalui layanan E-Lulus.';
+@endphp
+
 @section('content')
     {{-- Breadcrumb --}}
     <x-maudu.breadcrumb title="E-Lulus" :items="[

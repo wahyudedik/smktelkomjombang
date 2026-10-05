@@ -66,7 +66,7 @@
                             @if ($berita->featured_image)
                                 <div class="mb-2">
                                     <p class="text-xs text-slate-500 mb-1">Gambar saat ini:</p>
-                                    <img src="{{ Storage::url($berita->featured_image) }}" alt="{{ $berita->title }}"
+                                    <img src="{{ asset('storage/' . $berita->featured_image) }}" alt="{{ $berita->title }}"
                                         class="w-full h-32 object-cover rounded-lg border border-slate-200">
                                 </div>
                             @endif

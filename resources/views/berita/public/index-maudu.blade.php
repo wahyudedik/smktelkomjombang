@@ -49,7 +49,7 @@
                             <div class="row g-0">
                                 <div class="col-md-5">
                                     @if ($featured->featured_image)
-                                        <img src="{{ Storage::url($featured->featured_image) }}"
+                                        <img src="{{ asset('storage/' . $featured->featured_image) }}"
                                             alt="{{ $featured->title }}"
                                             style="width: 100%; height: 100%; object-fit: cover; min-height: 250px;">
                                     @else
@@ -101,7 +101,7 @@
                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)'">
                                 <div class="blog-img" style="position: relative; height: 200px; overflow: hidden;">
                                     @if ($berita->featured_image)
-                                        <img src="{{ Storage::url($berita->featured_image) }}" alt="{{ $berita->title }}"
+                                        <img src="{{ asset('storage/' . $berita->featured_image) }}" alt="{{ $berita->title }}"
                                             style="width: 100%; height: 100%; object-fit: cover;">
                                     @else
                                         <div

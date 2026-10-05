@@ -114,37 +114,45 @@ class RolePermissionController extends Controller
             // Check if it's a core role
             $isCoreRole = RoleHelper::isCoreRole($role->name);
 
-            // Normalize role name: lowercase, no spaces, only alphanumeric and hyphens
-            $roleName = strtolower(str_replace(' ', '', $request->name));
-            $roleName = preg_replace('/[^a-z0-9-]/', '', $roleName);
+            // Name is optional: core-role edit forms omit 'name' when the input is
+            // disabled (permissions-only update from the UI). Only process the name
+            // when it is actually present in the request.
+            $rawName = $request->input('name');
+            $nameProvided = $rawName !== null && $rawName !== '';
 
-            // Prevent changing core roles name (but allow updating permissions)
-            if ($isCoreRole && $roleName !== $role->name) {
-                if ($request->expectsJson() || $request->ajax()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Cannot change name of core system role. You can only update permissions.'
-                    ], 403);
+            if ($nameProvided) {
+                // Normalize role name: lowercase, no spaces, only alphanumeric and hyphens
+                $roleName = strtolower(str_replace(' ', '', $rawName));
+                $roleName = preg_replace('/[^a-z0-9-]/', '', $roleName);
+
+                // Prevent changing core roles name (but allow updating permissions)
+                if ($isCoreRole && $roleName !== $role->name) {
+                    if ($request->expectsJson() || $request->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Cannot change name of core system role. You can only update permissions.'
+                        ], 403);
+                    }
+                    return redirect()->back()->with('error', 'Cannot change name of core system role');
                 }
-                return redirect()->back()->with('error', 'Cannot change name of core system role');
+
+                // Only validate and update name if it's changed or not a core role
+                if (!$isCoreRole || $roleName !== $role->name) {
+                    $request->merge(['name' => $roleName]);
+
+                    $request->validate([
+                        'name' => 'required|string|max:255|unique:roles,name,' . $role->id . '|regex:/^[a-z0-9-]+$/',
+                        'permissions' => 'array'
+                    ]);
+
+                    $role->update(['name' => $roleName]);
+                }
             }
 
-            // Only validate and update name if it's changed or not a core role
-            if (!$isCoreRole || $roleName !== $role->name) {
-                $request->merge(['name' => $roleName]);
-
-                $request->validate([
-                    'name' => 'required|string|max:255|unique:roles,name,' . $role->id . '|regex:/^[a-z0-9-]+$/',
-                    'permissions' => 'array'
-                ]);
-
-                $role->update(['name' => $roleName]);
-            } else {
-                // For core roles, only validate permissions
-                $request->validate([
-                    'permissions' => 'array'
-                ]);
-            }
+            // Validate permissions (always allowed, including core roles)
+            $request->validate([
+                'permissions' => 'array'
+            ]);
 
             // Always allow updating permissions (even for core roles)
             $role->syncPermissions($request->permissions ?? []);

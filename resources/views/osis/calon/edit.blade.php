@@ -57,20 +57,18 @@
                         </div>
 
                         <div>
+                            {{-- disabled: kelas melekat di data siswa, tidak ada kolom kelas_ketua di tabel calons (field display-only, JS auto-fill via id) --}}
                             <label for="kelas_ketua" class="form-label">{{ __('common.select_class') }} {{ __('common.ketua') }}</label>
-                            <select name="kelas_ketua" id="kelas_ketua" required
-                                class="form-input @error('kelas_ketua') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
+                            <select name="kelas_ketua" id="kelas_ketua" disabled
+                                class="form-input">
                                 <option value="">{{ __('common.select_class') }}</option>
                                 @foreach ($kelas ?? [] as $k)
                                     <option value="{{ $k }}"
-                                        {{ old('kelas_ketua', $calon->kelas_ketua) == $k ? 'selected' : '' }}>
+                                        {{ old('kelas_ketua') == $k ? 'selected' : '' }}>
                                         {{ $k }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('kelas_ketua')
-                                <p class="form-error">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -115,20 +113,18 @@
                         </div>
 
                         <div>
+                            {{-- disabled: kelas melekat di data siswa, tidak ada kolom kelas_wakil di tabel calons (field display-only, JS auto-fill via id) --}}
                             <label for="kelas_wakil" class="form-label">{{ __('common.vice_chairman_class') }}</label>
-                            <select name="kelas_wakil" id="kelas_wakil" required
-                                class="form-input @error('kelas_wakil') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
+                            <select name="kelas_wakil" id="kelas_wakil" disabled
+                                class="form-input">
                                 <option value="">{{ __('common.select_class') }}</option>
                                 @foreach ($kelas ?? [] as $k)
                                     <option value="{{ $k }}"
-                                        {{ old('kelas_wakil', $calon->kelas_wakil) == $k ? 'selected' : '' }}>
+                                        {{ old('kelas_wakil') == $k ? 'selected' : '' }}>
                                         {{ $k }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('kelas_wakil')
-                                <p class="form-error">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -271,37 +267,39 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-fill kelas when nama_ketua is selected
-            const namaKetuaSelect = document.getElementById('nama_ketua');
-            const kelasKetuaSelect = document.getElementById('kelas_ketua');
-
-            if (namaKetuaSelect && kelasKetuaSelect) {
-                namaKetuaSelect.addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    if (selectedOption && selectedOption.value) {
-                        const kelas = selectedOption.getAttribute('data-kelas');
-                        if (kelas) {
-                            kelasKetuaSelect.value = kelas;
-                        }
+            // Sync display-only kelas field from the selected student's data-kelas attribute.
+            // Field kelas_* tidak disubmit ke server (tidak ada kolom di tabel calons).
+            function syncKelas(namaSelect, kelasSelect) {
+                if (!namaSelect || !kelasSelect) return;
+                const selectedOption = namaSelect.options[namaSelect.selectedIndex];
+                if (selectedOption && selectedOption.value) {
+                    const kelas = selectedOption.getAttribute('data-kelas');
+                    if (kelas) {
+                        kelasSelect.value = kelas;
                     }
-                });
+                }
             }
 
-            // Auto-fill kelas when nama_wakil is selected
+            const namaKetuaSelect = document.getElementById('nama_ketua');
+            const kelasKetuaSelect = document.getElementById('kelas_ketua');
             const namaWakilSelect = document.getElementById('nama_wakil');
             const kelasWakilSelect = document.getElementById('kelas_wakil');
 
-            if (namaWakilSelect && kelasWakilSelect) {
-                namaWakilSelect.addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    if (selectedOption && selectedOption.value) {
-                        const kelas = selectedOption.getAttribute('data-kelas');
-                        if (kelas) {
-                            kelasWakilSelect.value = kelas;
-                        }
-                    }
+            // Auto-fill kelas when nama is selected
+            if (namaKetuaSelect && kelasKetuaSelect) {
+                namaKetuaSelect.addEventListener('change', function() {
+                    syncKelas(namaKetuaSelect, kelasKetuaSelect);
                 });
             }
+            if (namaWakilSelect && kelasWakilSelect) {
+                namaWakilSelect.addEventListener('change', function() {
+                    syncKelas(namaWakilSelect, kelasWakilSelect);
+                });
+            }
+
+            // Sync saat halaman dimuat (agar nilai tampil langsung, bukan kosong)
+            syncKelas(namaKetuaSelect, kelasKetuaSelect);
+            syncKelas(namaWakilSelect, kelasWakilSelect);
         });
     </script>
 </x-app-layout>

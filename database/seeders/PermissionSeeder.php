@@ -1186,6 +1186,22 @@ class PermissionSeeder extends Seeder
             $this->command->info('Assigned buku-tamu permissions to satpam role');
         }
 
+        // Default permission assignment untuk role siswa (core role).
+        // Tanpa ini, menu "OSIS Voting" (visibility: hasRole('siswa') || can('osis.vote'))
+        // dan route /admin/osis/voting (role:siswa|guru + rolePermissionMap fallback
+        // 'siswa' => ['osis.vote', 'osis.results', ...]) bisa gagal bila permission
+        // tidak ter-assign ke role siswa di database production.
+        $siswaRole = Role::where('name', 'siswa')->first();
+        if ($siswaRole) {
+            $siswaOsPermissions = Permission::whereIn('name', [
+                'osis.vote',
+                'osis.results',
+            ])->pluck('id');
+            $siswaRole->syncPermissions($siswaOsPermissions);
+
+            $this->command->info('Assigned osis.vote/osis.results to siswa role');
+        }
+
         // Other roles are created dynamically by superadmin
         // No default role assignments - superadmin will create custom roles as needed
     }

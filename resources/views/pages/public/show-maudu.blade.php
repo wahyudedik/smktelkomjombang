@@ -1,8 +1,21 @@
 @extends('layouts.maudu')
 
 @php
-    $pageTitle = $page->title;
+    $seo            = is_array($page->seo_meta ?? null) ? $page->seo_meta : [];
+    $pageTitle      = $seo['title'] ?? $page->title;
+    $metaDescription = $seo['description'] ?? ($page->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($page->content), 160));
+    $metaImage      = $page->featured_image ? asset('storage/' . $page->featured_image) : null;
+    $ogType         = ($page->category === 'berita' || $page->template === 'blog') ? 'article' : 'website';
 @endphp
+
+@push('meta')
+    @if (!empty($seo['keywords']))
+        <meta name="keywords" content="{{ $seo['keywords'] }}">
+    @endif
+    @if ($ogType === 'article' && $page->published_at)
+        <meta property="article:published_time" content="{{ optional($page->published_at)->toIso8601String() }}">
+    @endif
+@endpush
 
 @section('content')
 
@@ -45,7 +58,7 @@
                         <!-- Featured Image -->
                         @if ($page->featured_image)
                             <div style="width: 100%; max-height: 450px; overflow: hidden;">
-                                <img src="{{ Storage::url($page->featured_image) }}" alt="{{ $page->title }}"
+                                <img src="{{ asset('storage/' . $page->featured_image) }}" alt="{{ $page->title }}"
                                     style="width: 100%; height: auto; object-fit: cover; display: block;">
                             </div>
                         @endif
@@ -186,7 +199,7 @@
                                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)'">
                                             @if ($relatedPage->featured_image)
                                                 <div style="height: 160px; overflow: hidden;">
-                                                    <img src="{{ Storage::url($relatedPage->featured_image) }}"
+                                                    <img src="{{ asset('storage/' . $relatedPage->featured_image) }}"
                                                         alt="{{ $relatedPage->title }}"
                                                         style="width: 100%; height: 100%; object-fit: cover;">
                                                 </div>

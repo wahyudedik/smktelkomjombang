@@ -1,5 +1,10 @@
 @extends('layouts.maudu')
 
+@php
+    $pageTitle       = 'Semua Halaman';
+    $metaDescription = 'Daftar halaman publik dari ' . theme_config('name', config('app.name')) . '.';
+@endphp
+
 @section('content')
 
     <!-- Breadcrumb -->
@@ -75,7 +80,7 @@
                                 <!-- Image -->
                                 <div style="position: relative; height: 200px; overflow: hidden;">
                                     @if ($page->featured_image)
-                                        <img src="{{ Storage::url($page->featured_image) }}" alt="{{ $page->title }}"
+                                        <img src="{{ asset('storage/' . $page->featured_image) }}" alt="{{ $page->title }}"
                                             style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
                                             onmouseover="this.style.transform='scale(1.08)'"
                                             onmouseout="this.style.transform='scale(1)'">

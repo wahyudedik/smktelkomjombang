@@ -69,11 +69,12 @@ class PageCategory extends Model
     }
 
     /**
-     * Get the category URL.
+     * Get the category URL (public pages index, filtered by category).
+     * Route 'pages.index' tidak ada — gunakan 'pages.public.index' (mendukung ?category=).
      */
     public function getUrlAttribute(): string
     {
-        return route('pages.index', ['category' => $this->name]);
+        return route('pages.public.index', ['category' => $this->name]);
     }
 
     /**

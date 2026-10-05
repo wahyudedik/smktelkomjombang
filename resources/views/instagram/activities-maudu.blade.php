@@ -1,5 +1,10 @@
 @extends('layouts.maudu')
 
+@php
+    $pageTitle       = 'Kegiatan - ' . theme_config('name', config('app.name'));
+    $metaDescription = 'Kegiatan dan program unggulan sekolah.';
+@endphp
+
 @section('content')
     {{-- Breadcrumb --}}
     <x-maudu.breadcrumb title="Kegiatan" :items="[

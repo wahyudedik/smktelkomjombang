@@ -72,7 +72,7 @@
                     <div class="blog-item featured-blog-item" style="display: flex; flex-wrap: wrap; background: #f8f9fa; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
                         <div class="featured-blog-image" style="flex: 0 0 45%; max-width: 45%;">
                             @if ($featured->featured_image)
-                                <img src="{{ Storage::url($featured->featured_image) }}" alt="{{ $featured->title }}"
+                                <img src="{{ asset('storage/' . $featured->featured_image) }}" alt="{{ $featured->title }}"
                                     style="width: 100%; height: 320px; object-fit: cover; display: block;">
                             @else
                                 <div style="width: 100%; height: 320px; background: linear-gradient(135deg, #1c3988 0%, #3a5fc8 100%); display: flex; align-items: center; justify-content: center;">
@@ -118,7 +118,7 @@
                         <div class="blog-item">
                             <div class="image-part">
                                 @if ($berita->featured_image)
-                                    <img src="{{ Storage::url($berita->featured_image) }}" alt="{{ $berita->title }}">
+                                    <img src="{{ asset('storage/' . $berita->featured_image) }}" alt="{{ $berita->title }}">
                                 @else
                                     <img src="{{ asset('assets_telkom/assets/images/blog/style2/' . (($loop->index % 3) + 1) . '.jpg') }}"
                                         alt="{{ $berita->title }}">
