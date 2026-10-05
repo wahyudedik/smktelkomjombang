@@ -1,5 +1,18 @@
 @extends('layouts.telkom')
 
+@php
+    $pageTitle       = $berita->title;
+    $metaDescription = $berita->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($berita->content), 160);
+    $metaImage       = $berita->featured_image
+        ? asset('storage/' . $berita->featured_image)
+        : url(theme_image('logo', theme_info('defaults.logo')));
+    $ogType = 'article';
+@endphp
+
+@push('meta')
+    <meta property="article:published_time" content="{{ optional($berita->published_at)->toIso8601String() }}">
+@endpush
+
 @section('content')
 <!-- Breadcrumb Start -->
 <x-telkom.breadcrumb

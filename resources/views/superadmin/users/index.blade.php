@@ -32,6 +32,81 @@
     </x-slot>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Import Status Card (queue background) -->
+        @if (!empty($latestImport))
+            <div class="card mb-6"
+                @if ($latestImport->isActive()) x-data="{ reloading: false }"
+                    x-init="setTimeout(() => { reloading = true; window.location.reload(); }, 5000)" @endif>
+                <div class="card-body">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900">Status Import Terakhir</h3>
+                            <p class="text-sm text-slate-600 mt-1">
+                                {{ $latestImport->file_name }}
+                                &middot; {{ $latestImport->created_at->diffForHumans() }}
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            @if ($latestImport->status === \App\Models\UserImport::STATUS_PENDING)
+                                <span class="badge badge-warning">Menunggu diproses</span>
+                            @elseif ($latestImport->status === \App\Models\UserImport::STATUS_PROCESSING)
+                                <span class="badge badge-warning">Sedang diproses&hellip;</span>
+                            @elseif ($latestImport->status === \App\Models\UserImport::STATUS_COMPLETED)
+                                <span class="badge badge-success">Selesai</span>
+                            @else
+                                <span class="badge badge-danger">Gagal</span>
+                            @endif
+
+                            @if ($latestImport->isActive())
+                                <span class="text-xs text-slate-500">Halaman muat ulang otomatis tiap 5 detik</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    @if (
+                        $latestImport->status === \App\Models\UserImport::STATUS_COMPLETED ||
+                            $latestImport->status === \App\Models\UserImport::STATUS_FAILED)
+                        <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                            <div class="bg-slate-50 rounded-lg p-3">
+                                <p class="text-2xl font-bold text-slate-900">{{ $latestImport->total_rows ?? 0 }}</p>
+                                <p class="text-xs text-slate-500">Total Baris</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-3">
+                                <p class="text-2xl font-bold text-green-700">{{ $latestImport->created_count ?? 0 }}
+                                </p>
+                                <p class="text-xs text-slate-500">Dibuat</p>
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-3">
+                                <p class="text-2xl font-bold text-blue-700">{{ $latestImport->updated_count ?? 0 }}</p>
+                                <p class="text-xs text-slate-500">Diperbarui</p>
+                            </div>
+                            <div class="bg-red-50 rounded-lg p-3">
+                                <p class="text-2xl font-bold text-red-700">{{ $latestImport->failed_count ?? 0 }}</p>
+                                <p class="text-xs text-slate-500">Gagal</p>
+                            </div>
+                        </div>
+
+                        @if ($latestImport->finished_at)
+                            <p class="text-xs text-slate-400 mt-2">
+                                Selesai {{ $latestImport->finished_at->diffForHumans() }}
+                            </p>
+                        @endif
+                    @endif
+
+                    @if (!empty($latestImport->errors) && count($latestImport->errors) > 0)
+                        <div class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-sm font-medium text-red-800 mb-2">Detail error:</p>
+                            <ul class="text-sm text-red-700 space-y-1 list-disc list-inside max-h-40 overflow-y-auto">
+                                @foreach ($latestImport->errors as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @endif
+
         <!-- Users Table -->
         <div class="card">
             <div class="card-header">

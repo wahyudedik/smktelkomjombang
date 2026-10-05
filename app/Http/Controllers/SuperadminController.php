@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Role;
-use App\Models\Permission;
+use App\Exports\UserExport;
+use App\Jobs\ImportUsersJob;
 use App\Models\AuditLog;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\UserImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\UserImport;
-use App\Exports\UserExport;
 
 class SuperadminController extends Controller
 {
@@ -57,7 +60,7 @@ class SuperadminController extends Controller
             $roleName = $request->role;
             // Handle if role is array (parameter pollution)
             if (is_array($roleName)) {
-                $roleName = !empty($roleName) ? $roleName[0] : null;
+                $roleName = ! empty($roleName) ? $roleName[0] : null;
             }
 
             if ($roleName) {
@@ -72,15 +75,15 @@ class SuperadminController extends Controller
             $search = $request->search;
             // Handle if search is array (parameter pollution)
             if (is_array($search)) {
-                $search = !empty($search) ? trim($search[0]) : '';
+                $search = ! empty($search) ? trim($search[0]) : '';
             } else {
                 $search = trim($search);
             }
 
             if ($search !== '') {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('email', 'like', '%' . $search . '%');
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
                 });
             }
         }
@@ -90,7 +93,15 @@ class SuperadminController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('superadmin.users.index', compact('users'));
+        // Record import terakhir admin ini (untuk kartu status di halaman user)
+        $latestImport = null;
+        if (Schema::hasTable('user_imports')) {
+            $latestImport = UserImport::where('user_id', Auth::id())
+                ->latest('id')
+                ->first();
+        }
+
+        return view('superadmin.users.index', compact('users', 'latestImport'));
     }
 
     /**
@@ -99,6 +110,7 @@ class SuperadminController extends Controller
     public function showUser(User $user)
     {
         $user->load('roles', 'auditLogs');
+
         return view('superadmin.users.show', compact('user'));
     }
 
@@ -108,6 +120,7 @@ class SuperadminController extends Controller
     public function createUser()
     {
         $roles = Role::where('is_active', true)->get();
+
         return view('superadmin.users.create', compact('roles'));
     }
 
@@ -132,10 +145,10 @@ class SuperadminController extends Controller
         // Use transaction for user creation with roles and audit log
         $user = DB::transaction(function () use ($request) {
             // Get roles for validation
-            if ($request->has('roles') && !empty($request->roles)) {
+            if ($request->has('roles') && ! empty($request->roles)) {
                 $roleIds = $request->roles;
                 $roleNames = Role::whereIn('id', $roleIds)->pluck('name')->toArray();
-                
+
                 // Validate that all roles exist
                 if (count($roleIds) !== count($roleNames)) {
                     throw new \InvalidArgumentException('One or more selected roles not found.');
@@ -150,7 +163,7 @@ class SuperadminController extends Controller
                 'is_verified_by_admin' => true, // Mark as verified by admin
             ]);
 
-            if ($request->has('roles') && !empty($request->roles)) {
+            if ($request->has('roles') && ! empty($request->roles)) {
                 $roleIds = $request->roles;
                 $roleNames = Role::whereIn('id', $roleIds)->pluck('name')->toArray();
 
@@ -179,7 +192,7 @@ class SuperadminController extends Controller
 
             // Clear dashboard cache
             cache()->forget('superadmin_dashboard_stats');
-            cache()->forget('dashboard_stats_' . Auth::id());
+            cache()->forget('dashboard_stats_'.Auth::id());
             cache()->forget('module_usage_counts');
 
             return $user;
@@ -195,7 +208,7 @@ class SuperadminController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'roles' => $user->roles->pluck('name')->toArray(),
-                ]
+                ],
             ]);
         }
 
@@ -210,6 +223,7 @@ class SuperadminController extends Controller
     {
         $roles = Role::where('is_active', true)->get();
         $user->load('roles');
+
         return view('superadmin.users.edit', compact('user', 'roles'));
     }
 
@@ -247,7 +261,7 @@ class SuperadminController extends Controller
             // But we need to check: if roles key exists in request, update it (even if empty)
             if ($request->has('roles')) {
                 $roleIds = $request->roles ?? [];
-                if (!empty($roleIds)) {
+                if (! empty($roleIds)) {
                     $roleNames = Role::whereIn('id', $roleIds)->pluck('name')->toArray();
 
                     // Validate that all roles exist
@@ -279,7 +293,7 @@ class SuperadminController extends Controller
 
             // Clear dashboard cache
             cache()->forget('superadmin_dashboard_stats');
-            cache()->forget('dashboard_stats_' . Auth::id());
+            cache()->forget('dashboard_stats_'.Auth::id());
             cache()->forget('module_usage_counts');
         });
 
@@ -315,7 +329,7 @@ class SuperadminController extends Controller
 
         // Clear dashboard cache
         cache()->forget('superadmin_dashboard_stats');
-        cache()->forget('dashboard_stats_' . Auth::id());
+        cache()->forget('dashboard_stats_'.Auth::id());
         cache()->forget('module_usage_counts');
         cache()->forget('count_siswa');
         cache()->forget('count_guru');
@@ -345,7 +359,7 @@ class SuperadminController extends Controller
                 'role' => 'admin',
                 'password' => 'password123',
                 'email_verified_at' => '2024-01-01 00:00:00',
-                'is_verified_by_admin' => 'yes'
+                'is_verified_by_admin' => 'yes',
             ],
             [
                 'name' => 'Guru Matematika',
@@ -353,7 +367,7 @@ class SuperadminController extends Controller
                 'role' => 'guru',
                 'password' => 'password123',
                 'email_verified_at' => '2024-01-01 00:00:00',
-                'is_verified_by_admin' => 'yes'
+                'is_verified_by_admin' => 'yes',
             ],
             [
                 'name' => 'Siswa Contoh',
@@ -361,12 +375,13 @@ class SuperadminController extends Controller
                 'role' => 'siswa',
                 'password' => 'password123',
                 'email_verified_at' => '',
-                'is_verified_by_admin' => 'no'
-            ]
+                'is_verified_by_admin' => 'no',
+            ],
         ];
 
         // Create a new export class for template
-        $templateExport = new class($sampleData) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithHeadings, \Maatwebsite\Excel\Concerns\WithStyles, \Maatwebsite\Excel\Concerns\WithColumnWidths {
+        $templateExport = new class($sampleData) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithColumnWidths, \Maatwebsite\Excel\Concerns\WithHeadings, \Maatwebsite\Excel\Concerns\WithStyles
+        {
             protected $data;
 
             public function __construct($data)
@@ -387,7 +402,7 @@ class SuperadminController extends Controller
                     'role',
                     'password',
                     'email_verified_at',
-                    'is_verified_by_admin'
+                    'is_verified_by_admin',
                 ];
             }
 
@@ -415,7 +430,11 @@ class SuperadminController extends Controller
     }
 
     /**
-     * Process user import.
+     * Process user import via queue background.
+     *
+     * File disimpan ke storage non-public, record user_imports dibuat (pending),
+     * lalu ImportUsersJob di-dispatch. Route, URI, nama route, dan middleware
+     * (role:superadmin, throttle:10,1) TIDAK berubah.
      */
     public function processUserImport(Request $request)
     {
@@ -424,65 +443,45 @@ class SuperadminController extends Controller
         ]);
 
         try {
-            // Get file info for logging
             $file = $request->file('file');
             $fileName = $file->getClientOriginalName();
-            $fileSize = $file->getSize();
 
-            Log::info("Starting user import process", [
+            // Simpan file ke disk lokal (non-public) — jangan langsung diproses di request
+            $storedPath = $file->storeAs(
+                'imports',
+                'users-'.uniqid().'-'.now()->format('YmdHis').'.'.$file->getClientOriginalExtension(),
+                'local'
+            );
+
+            if (! $storedPath) {
+                return redirect()->back()
+                    ->with('error', 'Gagal menyimpan file import. Silakan coba lagi.');
+            }
+
+            $record = UserImport::create([
+                'user_id' => Auth::id(),
                 'file_name' => $fileName,
-                'file_size' => $fileSize,
-                'user_id' => Auth::id()
+                'file_path' => $storedPath,
+                'status' => UserImport::STATUS_PENDING,
             ]);
 
-            // Create import instance
-            $import = new UserImport();
+            ImportUsersJob::dispatch($record);
 
-            // Import the file
-            Excel::import($import, $file);
-
-            // Get import results
-            $importedCount = $import->getRowCount() ?? 0;
-            $errors = $import->errors();
-            $failures = $import->failures();
-
-            Log::info("User import completed", [
-                'imported_count' => $importedCount,
-                'errors_count' => count($errors),
-                'failures_count' => count($failures)
+            Log::info('User import dikirim ke queue', [
+                'user_import_id' => $record->id,
+                'file_name' => $fileName,
+                'user_id' => Auth::id(),
             ]);
-
-            // Prepare success message with details
-            $message = "Data user berhasil diimpor!";
-            $details = [];
-
-            if ($importedCount > 0) {
-                $details[] = "Berhasil mengimpor {$importedCount} user";
-            }
-
-            if (count($failures) > 0) {
-                $details[] = count($failures) . " user gagal diimpor (cek log untuk detail)";
-            }
-
-            if (count($errors) > 0) {
-                $details[] = count($errors) . " user memiliki error validasi";
-            }
-
-            if (!empty($details)) {
-                $message .= " (" . implode(', ', $details) . ")";
-            }
 
             return redirect()->route('admin.superadmin.users')
-                ->with('success', $message);
+                ->with('success', 'File diterima, sedang diproses di background. Halaman akan diperbarui otomatis.');
         } catch (\Exception $e) {
-            Log::error("User import failed", [
+            Log::error('User import gagal dikirim', [
                 'error' => $e->getMessage(),
-                'file' => $request->file('file')->getClientOriginalName(),
-                'trace' => $e->getTraceAsString()
             ]);
 
             return redirect()->back()
-                ->with('error', 'Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat mengimpor data: '.$e->getMessage());
         }
     }
 
@@ -506,6 +505,6 @@ class SuperadminController extends Controller
 
         $users = $query->get();
 
-        return Excel::download(new UserExport($users), 'users-' . date('Y-m-d') . '.xlsx');
+        return Excel::download(new UserExport($users), 'users-'.date('Y-m-d').'.xlsx');
     }
 }

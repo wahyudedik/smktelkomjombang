@@ -67,7 +67,19 @@
             overflow-x: clip !important;
         }
     </style>
-    @stack('styles')
+
+    <!-- Open Graph / Twitter Card defaults -->
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
+    <meta property="og:site_name" content="{{ theme_config('name', config('app.name')) }}">
+    <meta property="og:title" content="{{ $pageTitle ?? ($siteSettings['site_name'] ?? theme_config('name', config('app.name'))) }}">
+    <meta property="og:description" content="{{ $metaDescription ?? ($siteSettings['site_description'] ?? '') }}">
+    <meta property="og:image" content="{{ $metaImage ?? url(theme_image('logo', theme_info('defaults.logo'))) }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $pageTitle ?? ($siteSettings['site_name'] ?? theme_config('name', config('app.name'))) }}">
+    <meta name="twitter:description" content="{{ $metaDescription ?? ($siteSettings['site_description'] ?? '') }}">
+    <meta name="twitter:image" content="{{ $metaImage ?? url(theme_image('logo', theme_info('defaults.logo'))) }}">
+    @stack('meta')
 </head>
 
 <body>

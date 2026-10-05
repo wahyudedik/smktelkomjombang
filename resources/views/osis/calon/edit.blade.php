@@ -74,10 +74,10 @@
                         </div>
 
                         <div>
-                            <label for="ketua_photo" class="form-label">{{ __('common.chairman_photo') }}</label>
-                            <input type="file" id="ketua_photo" name="ketua_photo" accept="image/*"
-                                class="form-input @error('ketua_photo') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
-                            @error('ketua_photo')
+                            <label for="foto_ketua" class="form-label">{{ __('common.chairman_photo') }}</label>
+                            <input type="file" id="foto_ketua" name="foto_ketua" accept="image/*"
+                                class="form-input @error('foto_ketua') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
+                            @error('foto_ketua')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
                             @if ($calon->ketua_photo_url)
@@ -132,10 +132,10 @@
                         </div>
 
                         <div>
-                            <label for="wakil_photo" class="form-label">{{ __('common.vice_chairman_photo') }}</label>
-                            <input type="file" id="wakil_photo" name="wakil_photo" accept="image/*"
-                                class="form-input @error('wakil_photo') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
-                            @error('wakil_photo')
+                            <label for="foto_wakil" class="form-label">{{ __('common.vice_chairman_photo') }}</label>
+                            <input type="file" id="foto_wakil" name="foto_wakil" accept="image/*"
+                                class="form-input @error('foto_wakil') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
+                            @error('foto_wakil')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
                             @if ($calon->wakil_photo_url)
@@ -186,17 +186,17 @@
                         </div>
 
                         <div>
-                            <label for="pencalonan_type" class="form-label">{{ __('common.jenis_pencalonan') }}</label>
-                            <select id="pencalonan_type" name="pencalonan_type"
-                                class="form-input @error('pencalonan_type') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
-                                <option value="individu"
-                                    {{ old('pencalonan_type', $calon->pencalonan_type) == 'individu' ? 'selected' : '' }}>
-                                    {{ __('common.individual') }}</option>
-                                <option value="pasangan"
-                                    {{ old('pencalonan_type', $calon->pencalonan_type) == 'pasangan' ? 'selected' : '' }}>
-                                    {{ __('common.pasangan') }}</option>
+                            <label for="jenis_pencalonan" class="form-label">{{ __('common.jenis_pencalonan') }}</label>
+                            <select id="jenis_pencalonan" name="jenis_pencalonan" required
+                                class="form-input @error('jenis_pencalonan') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
+                                <option value="">{{ __('common.select_status') }}</option>
+                                <option value="ketua" {{ old('jenis_pencalonan', $calon->jenis_pencalonan) === 'ketua' ? 'selected' : '' }}>{{ __('common.ketua_osis') }}
+                                </option>
+                                <option value="wakil" {{ old('jenis_pencalonan', $calon->jenis_pencalonan) === 'wakil' ? 'selected' : '' }}>{{ __('common.wakil_ketua_osis') }}
+                                </option>
+                                <option value="pasangan" {{ old('jenis_pencalonan', $calon->jenis_pencalonan) === 'pasangan' ? 'selected' : '' }}>{{ __('common.pasangan_ketua_wakil') }}</option>
                             </select>
-                            @error('pencalonan_type')
+                            @error('jenis_pencalonan')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
                         </div>

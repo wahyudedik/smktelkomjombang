@@ -220,7 +220,9 @@ class Page extends Model
             return '#';
         }
 
-        return route('pages.public.show', $this->slug);
+        return $this->category === 'berita'
+            ? route('berita.public.show', $this->slug)
+            : route('pages.public.show', $this->slug);
     }
 
     /**
