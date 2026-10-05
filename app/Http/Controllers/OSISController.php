@@ -517,35 +517,41 @@ class OSISController extends Controller
         $pemilih = null;
 
         if ($isGuru) {
-            // Resolve guru voter record
+            // Resolve guru voter record (user_type='guru')
             $pemilih = Pemilih::where('user_id', $user->id)->where('user_type', 'guru')->first();
             if (!$pemilih) {
+                // Pesan jelas: jangan auto-generate pemilih (implikasi anti-fraud);
+                // serahkan ke admin lewat generatePemilihFromUsers().
                 return redirect()->route('admin.dashboard')
-                    ->with('error', 'Data pemilih guru tidak ditemukan.');
+                    ->with('error', 'Data pemilih belum tersedia, hubungi admin untuk generate data pemilih.');
             }
 
             if ($pemilih->hasVoted()) {
-                return redirect()->route('admin.osis.voting')
-                    ->with('error', 'Anda sudah melakukan voting');
+                // Double-vote → redirect ke hasil voting dengan pesan info (bukan fake success)
+                return redirect()->route('admin.osis.results')
+                    ->with('info', 'Anda sudah melakukan voting. Berikut hasil pemilihan OSIS.');
             }
         } else {
             // Resolve student record
             $siswa = Siswa::where('user_id', $user->id)->first();
             if (!$siswa) {
+                // Pesan jelas: data siswa belum terdaftar sebagai pemilih
                 return redirect()->route('admin.dashboard')
-                    ->with('error', 'Data siswa tidak ditemukan.');
+                    ->with('error', 'Data pemilih belum tersedia, hubungi admin untuk mendaftarkan Anda sebagai pemilih.');
             }
 
             if ($siswa->hasVotedOsis()) {
-                return redirect()->route('admin.osis.voting')
-                    ->with('error', 'Anda sudah memilih dalam pemilihan OSIS ini.');
+                // Double-vote → redirect ke hasil voting dengan pesan info (bukan fake success)
+                return redirect()->route('admin.osis.results')
+                    ->with('info', 'Anda sudah memilih dalam pemilihan OSIS ini. Berikut hasil pemilihan.');
             }
         }
 
-        // Get active election
+        // Get active election (scopeActive: is_active + start<=now<=end + belum locked)
         $election = OsisElection::active()->first();
         if (!$election) {
-            return redirect()->route('admin.osis.index')
+            // Redirect ke dashboard (bukan admin.osis.index yang 403 untuk siswa/guru)
+            return redirect()->route('admin.dashboard')
                 ->with('error', 'Tidak ada pemilihan OSIS yang sedang berlangsung.');
         }
 
@@ -662,13 +668,16 @@ class OSISController extends Controller
         }
 
         if (!$voteRecorded) {
-            return redirect()->route('admin.osis.voting')
-                ->with('error', 'Anda sudah memilih dalam pemilihan OSIS ini.');
+            // Race condition: request lain mencatat vote lebih dulu (lockForUpdate double-check).
+            // Redirect ke hasil voting dengan pesan info — jangan tampilkan fake "Berhasil".
+            return redirect()->route('admin.osis.results')
+                ->with('info', 'Anda sudah memilih dalam pemilihan OSIS ini. Berikut hasil pemilihan.');
         }
 
         // Invalidate cached dashboard stats so the new vote is reflected
         cache()->forget('osis_dashboard_stats');
 
+        // Toast sukses memakai pesan voting yang benar (bukan "Updated successfully" generic CRUD)
         return redirect()->route('admin.osis.results')
             ->with('success', 'Terima kasih! Suara Anda telah tercatat.');
     }
