@@ -4,22 +4,29 @@ namespace Tests\Feature;
 
 use App\Models\Calon;
 use App\Models\OsisElection;
+use App\Models\Pemilih;
 use App\Models\Siswa;
 use App\Models\User;
+use App\Models\Voting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Test render halaman voting OSIS (route admin.osis.voting).
+ * Test render halaman voting OSIS (route admin.osis.voting) + aturan filter gender.
  *
- * Reproduksi bug production 500 "Undefined variable $calon" di
- * resources/views/osis/voting.blade.php — controller mengirim $calons
- * (plural) sementara view memakai $calon (singular).
+ * Aturan bisnis (dikonfirmasi user):
+ * - Siswa L → hanya kandidat L; Siswi P → hanya kandidat P
+ * - Guru → semua kandidat aktif
+ * - Fallback: row siswa tidak ada / jenis_kelamin null atau kosong → semua kandidat (200, bukan 500).
+ *   CATATAN: `siswas.jenis_kelamin` = enum NOT NULL CHECK ('L','P') (migration
+ *   2025_09_26_093230_create_siswas_table.php), sehingga gender null/kosong tidak
+ *   bisa direpresentasikan lewat insert di test database. Guard controller
+ *   ($gender === 'L' || $gender === 'P' → selain itu SEMUA kandidat, termasuk
+ *   null-safety `$pemilihData?->jenis_kelamin`) berbagi cabang yang sama dengan
+ *   "row siswa tidak ada" — jalur fallback itu yang diuji di test di bawah.
  *
- * Skenario data lokal sesuai production:
- * - Election aktif (is_active, rentang tanggal mencakup now, tidak locked)
- * - ≥2 kandidat aktif dengan gender berbeda (P + L)
- * - User siswa dengan baris Siswa ter-link via user_id
+ * Reproduksi bug production 500 "Undefined variable $calon": controller mengirim $calons
+ * (plural) — view harus memakai $calons (plural) dan PERTAHANKAN rename tersebut.
  */
 class OSISVotingPageRenderTest extends TestCase
 {
@@ -30,6 +37,12 @@ class OSISVotingPageRenderTest extends TestCase
     protected Siswa $siswa;
 
     protected OsisElection $election;
+
+    protected Calon $calonL;
+
+    protected Calon $calonP;
+
+    protected Calon $calonInactive;
 
     protected function setUp(): void
     {
@@ -65,53 +78,123 @@ class OSISVotingPageRenderTest extends TestCase
             'allowed_classes' => null,
         ]);
 
-        // ≥2 kandidat aktif, gender berbeda — membuktikan tidak ada filter gender
-        Calon::factory()->create([
-            'nama_ketua' => 'Ketua A',
-            'nama_wakil' => 'Wakil A',
-            'jenis_kelamin' => 'P',
+        // Kandidat campuran: L & P aktif + 1 nonaktif (nonaktif tidak boleh tampil)
+        $this->calonL = Calon::factory()->create([
+            'nama_ketua' => 'Ketua Laki',
+            'nama_wakil' => 'Wakil Laki',
+            'jenis_kelamin' => 'L',
             'is_active' => true,
             'sort_order' => 1,
         ]);
-        Calon::factory()->create([
-            'nama_ketua' => 'Ketua B',
-            'nama_wakil' => 'Wakil B',
-            'jenis_kelamin' => 'L',
+        $this->calonP = Calon::factory()->create([
+            'nama_ketua' => 'Ketua Perempuan',
+            'nama_wakil' => 'Wakil Perempuan',
+            'jenis_kelamin' => 'P',
             'is_active' => true,
             'sort_order' => 2,
         ]);
-        // Kandidat nonaktif tidak boleh tampil
-        Calon::factory()->create([
+        $this->calonInactive = Calon::factory()->create([
             'nama_ketua' => 'Ketua Nonaktif',
             'nama_wakil' => 'Wakil Nonaktif',
+            'jenis_kelamin' => 'L',
             'is_active' => false,
             'sort_order' => 3,
         ]);
     }
 
     /** @test */
-    public function siswa_with_active_election_sees_all_active_candidates()
+    public function siswa_perempuan_hanya_melihat_kandidat_perempuan()
     {
         $response = $this->actingAs($this->siswaUser)
             ->get(route('admin.osis.voting'));
 
         // Harus 200, bukan 500 "Undefined variable $calon"
         $response->assertStatus(200);
-        $response->assertSee('Ketua A');
-        $response->assertSee('Ketua B');
+        // Kandidat P tampil
+        $response->assertSee('Ketua Perempuan');
+        // Kandidat L dan nonaktif TIDAK tampil
+        $response->assertDontSee('Ketua Laki');
         $response->assertDontSee('Ketua Nonaktif');
+        // Notice kondisional: siswa terfilter — notice "semua calon" tidak boleh muncul
+        $response->assertSee('Anda melihat kandidat sesuai jenis kelamin Anda');
+        $response->assertDontSee('Anda melihat semua calon');
     }
 
     /** @test */
-    public function voting_page_shows_candidates_of_all_genders()
+    public function siswa_laki_laki_hanya_melihat_kandidat_laki_laki()
     {
-        $response = $this->actingAs($this->siswaUser)
+        $siswaLUser = User::factory()->create(['email' => 'siswa.l@test.com']);
+        $siswaLUser->syncRoles([$this->getOrCreateRole('siswa')]);
+        $siswaLUser->updateQuietly(['user_type' => 'siswa']);
+
+        Siswa::factory()->create([
+            'user_id' => $siswaLUser->id,
+            'nama_lengkap' => 'Siswa Laki Test',
+            'kelas' => 'X IPA 2',
+            'status' => 'aktif',
+            'jenis_kelamin' => 'L',
+            'has_voted_osis' => false,
+        ]);
+
+        $response = $this->actingAs($siswaLUser)
             ->get(route('admin.osis.voting'));
 
         $response->assertStatus(200);
-        // Siswa berjenis_kelamin=P; kandidat L harus tetap tampil (tanpa filter byGender)
-        $response->assertSee('Ketua B');
-        $response->assertSee('Ketua A');
+        $response->assertSee('Ketua Laki');
+        $response->assertDontSee('Ketua Perempuan');
+        $response->assertDontSee('Ketua Nonaktif');
+        $response->assertSee('Anda melihat kandidat sesuai jenis kelamin Anda');
+        $response->assertDontSee('Anda melihat semua calon');
+    }
+
+    /** @test */
+    public function guru_melihat_semua_kandidat_aktif()
+    {
+        $guruUser = User::factory()->create(['email' => 'guru.voting@test.com']);
+        $guruUser->syncRoles([$this->getOrCreateRole('guru')]);
+        $guruUser->updateQuietly(['user_type' => 'guru']);
+
+        // voting() mensyaratkan row Pemilih guru
+        Pemilih::factory()->create([
+            'user_id' => $guruUser->id,
+            'user_type' => 'guru',
+            'status' => 'belum_memilih',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($guruUser)
+            ->get(route('admin.osis.voting'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Ketua Laki');
+        $response->assertSee('Ketua Perempuan');
+        $response->assertDontSee('Ketua Nonaktif');
+        // Notice kondisional: guru melihat semua
+        $response->assertSee('Anda melihat semua calon');
+    }
+
+    /** @test */
+    public function siswa_tanpa_row_siswa_fallback_ke_semua_kandidat()
+    {
+        // Mewakili jalur fallback guard "$gender === 'L' || $gender === 'P' → semua
+        // kandidat": row siswa tidak ada sehingga gender tidak ter-resolve (pada
+        // schema test ini gender null/kosong tidak bisa di-insert — lihat catatan
+        // di doc-block class). Halaman harus tetap render dengan SEMUA kandidat.
+        $orphanUser = User::factory()->create(['email' => 'siswa.orphan@test.com']);
+        $orphanUser->syncRoles([$this->getOrCreateRole('siswa')]);
+        $orphanUser->updateQuietly(['user_type' => 'siswa']);
+        // Tidak membuat baris Siswa untuk user ini
+
+        $response = $this->actingAs($orphanUser)
+            ->get(route('admin.osis.voting'));
+
+        // Fallback aman: 200 + semua kandidat tampil, bukan 500
+        $response->assertStatus(200);
+        $response->assertSee('Ketua Laki');
+        $response->assertSee('Ketua Perempuan');
+        $response->assertDontSee('Ketua Nonaktif');
+        // Notice kondisional fallback: showAll = true
+        $response->assertSee('Anda melihat semua calon');
     }
 
     /** @test */
@@ -125,5 +208,49 @@ class OSISVotingPageRenderTest extends TestCase
         // Collection kosong harus aman (pesan "belum ada kandidat"), bukan 500
         $response->assertStatus(200);
         $response->assertSee(__('common.no_candidates'));
+    }
+
+    /** @test */
+    public function siswa_ditolak_saat_memilih_kandidat_lawan_jenis_kelamin()
+    {
+        // Siswa berjenis kelamin P mencoba vote kandidat L via request langsung (manipulasi UI)
+        $response = $this->actingAs($this->siswaUser)
+            ->post(route('admin.osis.vote'), [
+                'calon_id' => $this->calonL->id,
+            ]);
+
+        // Ditolak dengan redirect + session error (bukan 500, vote tidak tersimpan)
+        $response->assertRedirect(route('admin.osis.voting'));
+        $response->assertSessionHas('error');
+
+        $this->assertSame(0, Voting::count(), 'Vote kandidat lawan gender tidak boleh tersimpan');
+        $this->assertFalse($this->siswa->fresh()->has_voted_osis);
+    }
+
+    /** @test */
+    public function guru_dapat_memilih_kandidat_gender_apapun()
+    {
+        $guruUser = User::factory()->create(['email' => 'guru.vote@test.com']);
+        $guruUser->syncRoles([$this->getOrCreateRole('guru')]);
+        $guruUser->updateQuietly(['user_type' => 'guru']);
+
+        // voting()/processVote() mensyaratkan row Pemilih guru
+        Pemilih::factory()->create([
+            'user_id' => $guruUser->id,
+            'user_type' => 'guru',
+            'status' => 'belum_memilih',
+            'is_active' => true,
+        ]);
+
+        // Guru memilih kandidat L — diizinkan (guru bebas memilih kandidat mana pun)
+        $response = $this->actingAs($guruUser)
+            ->post(route('admin.osis.vote'), [
+                'calon_id' => $this->calonL->id,
+            ]);
+
+        $response->assertRedirect(route('admin.osis.results'));
+        $response->assertSessionHas('success');
+        $this->assertSame(1, Voting::count());
+        $this->assertSame($this->calonL->id, Voting::first()->calon_id);
     }
 }

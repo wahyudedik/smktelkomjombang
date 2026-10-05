@@ -437,14 +437,12 @@ class OSISController extends Controller
             }
             $hasVoted = $pemilihData->hasVoted();
         } else {
-            // Resolve student record
+            // Resolve student record.
+            // Fallback aman: row siswa tidak ada → tetap render halaman dengan SEMUA kandidat
+            // (jangan blokir voting); validasi submit vote tetap di-enforce server-side di processVote().
             $siswa = Siswa::where('user_id', $user->id)->first();
-            if (!$siswa) {
-                return redirect()->route('admin.osis.index')
-                    ->with('error', 'Data siswa tidak ditemukan. Silakan hubungi administrator.');
-            }
             $pemilihData = $siswa;
-            $hasVoted = $siswa->hasVotedOsis();
+            $hasVoted = $siswa?->hasVotedOsis() ?? false;
         }
 
         // Check if user has already voted
@@ -461,21 +459,40 @@ class OSISController extends Controller
         }
 
         // Check if student's class is allowed to vote (students only)
-        if (!$isGuru && $election->allowed_classes && !in_array($pemilihData->kelas, $election->allowed_classes)) {
+        if (!$isGuru && $pemilihData && $election->allowed_classes && !in_array($pemilihData->kelas, $election->allowed_classes)) {
             return redirect()->route('admin.osis.index')
                 ->with('error', 'Kelas Anda tidak diizinkan untuk memilih dalam pemilihan ini.');
         }
 
-        // Voting menampilkan SEMUA kandidat aktif (pasangan ketua+wakil) untuk semua pemilih
-        // (siswa maupun guru), tanpa filter gender.
+        // Aturan bisnis filter gender kandidat:
+        // - Guru → melihat SEMUA kandidat aktif
+        // - Siswa L → hanya kandidat L; Siswi P → hanya kandidat P
+        // - Fallback aman: row siswa tidak ada / jenis_kelamin null atau kosong → SEMUA kandidat
         // NOTE: calons table has NO election_id column (schema is global, not per-election),
         // so query Calon directly instead of $election->candidates() to avoid SQL error.
-        $calons = Calon::active()->ordered()->get();
+        $showAll = true;
+        $genderLabel = null;
 
-        // $siswa can be a Siswa object (siswa) or Pemilih object (guru) — kept for view compatibility
+        if ($isGuru) {
+            $calons = Calon::active()->ordered()->get();
+        } else {
+            $gender = $pemilihData?->jenis_kelamin;
+
+            if ($gender === 'L' || $gender === 'P') {
+                $calons = Calon::active()->ordered()->byGender($gender)->get();
+                $showAll = false;
+                $genderLabel = $gender === 'L' ? 'Laki-laki' : 'Perempuan';
+            } else {
+                // Fallback aman: tampilkan semua kandidat aktif (jangan blokir voting)
+                $calons = Calon::active()->ordered()->get();
+            }
+        }
+
+        // $siswa can be a Siswa object (siswa), Pemilih object (guru), or null (siswa tanpa row)
+        // — kept for view compatibility
         $siswa = $pemilihData;
 
-        return view('osis.voting', compact('calons', 'siswa', 'election', 'hasVoted', 'isGuru'));
+        return view('osis.voting', compact('calons', 'siswa', 'election', 'hasVoted', 'isGuru', 'showAll', 'genderLabel'));
     }
 
     /**
@@ -533,8 +550,13 @@ class OSISController extends Controller
 
         $calon = Calon::findOrFail($request->calon_id);
 
-        // Validate gender for students (guru can vote for any candidate, siswa can only vote for same gender)
-        if (!$isGuru && $calon->jenis_kelamin && $siswa->jenis_kelamin !== $calon->jenis_kelamin) {
+        // Server-side gender enforcement (mencegah manipulasi request di luar UI):
+        // siswa hanya boleh memilih kandidat segender. Tolak hanya jika keduanya non-null dan
+        // berbeda; gender null (fallback: semua kandidat tampil) → vote tetap diterima.
+        if (!$isGuru
+            && $calon->jenis_kelamin
+            && $siswa->jenis_kelamin
+            && $siswa->jenis_kelamin !== $calon->jenis_kelamin) {
             return redirect()->route('admin.osis.voting')
                 ->with('error', 'Anda hanya dapat memilih calon yang sesuai dengan jenis kelamin Anda.');
         }
