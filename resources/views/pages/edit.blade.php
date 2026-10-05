@@ -201,6 +201,19 @@
                                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
+
+                                    <!-- SEO Image (og:image) -->
+                                    <div class="mb-4">
+                                        <label for="seo_image" class="block text-sm font-medium text-gray-700 mb-1">SEO Image (og:image)</label>
+                                        <input type="text" name="seo_image" id="seo_image"
+                                            value="{{ old('seo_image', $page->seo_meta['image'] ?? '') }}"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('seo_image') border-red-500 @enderror"
+                                            placeholder="https://example.com/images/og.jpg atau pages/images/og.jpg">
+                                        <p class="text-gray-500 text-xs mt-1">Gambar untuk share media sosial (og:image). Kosongkan untuk memakai gambar utama halaman.</p>
+                                        @error('seo_image')
+                                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 <!-- Menu Settings -->

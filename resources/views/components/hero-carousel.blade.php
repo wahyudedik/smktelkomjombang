@@ -44,7 +44,7 @@
                 @php
                     $slide = $defaultSlides[$index] ?? $defaultSlides[0];
                 @endphp
-                <div class="hero-single" style="background: url({{ Storage::url($image) }})">
+                <div class="hero-single" style="background: url({{ $image ? Storage::url($image) : ($slide['image'] ?? '') }})">
                     <div class="container">
                         <div class="row align-items-center">
                             <div class="col-md-12 col-lg-7">

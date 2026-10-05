@@ -565,13 +565,6 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|guru'])->prefix('a
     Route::get('/{kelulusan}/certificate/download', [KelulusanController::class, 'downloadCertificate'])->name('certificate.download')->middleware('permission:kelulusan.certificate');
 });
 
-// E-Lulus Student Routes (Access: siswa) - View only
-Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('admin/lulus')->name('admin.lulus.')->group(function () {
-    Route::get('/', [KelulusanController::class, 'index'])->name('index');
-    Route::get('/check', [KelulusanController::class, 'checkStatus'])->name('check');
-    Route::post('/check', [KelulusanController::class, 'processCheck'])->name('check.process');
-});
-
 // Jadwal Pelajaran Management (Access: guru, admin, superadmin)
 Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('admin/jadwal-pelajaran')->name('admin.jadwal-pelajaran.')->group(function () {
     // Import/Export routes (must be before resource routes)

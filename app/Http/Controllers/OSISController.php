@@ -468,8 +468,9 @@ class OSISController extends Controller
         // - Guru → melihat SEMUA kandidat aktif
         // - Siswa L → hanya kandidat L; Siswi P → hanya kandidat P
         // - Fallback aman: row siswa tidak ada / jenis_kelamin null atau kosong → SEMUA kandidat
-        // NOTE: calons table has NO election_id column (schema is global, not per-election),
-        // so query Calon directly instead of $election->candidates() to avoid SQL error.
+        // NOTE: calons table has NO election_id column (schema is global, not per-election).
+        // Ballot must show ALL active calons (incl. those with zero votes in this election),
+        // so query Calon directly instead of $election->candidates() (resolves via votes pivot).
         $showAll = true;
         $genderLabel = null;
 
@@ -1259,22 +1260,50 @@ class OSISController extends Controller
     }
 
     /**
+     * Build election-scoped voting results for the export endpoints.
+     *
+     * NOTE: calons & pemilihs tables have NO election_id column (calons schema is
+     * global, not per-election). Votes are linked to elections via votings.election_id:
+     *  - Per-candidate totals → constrain Calon's votings relation by election_id + valid
+     *  - Total voters        → Pemilih::active() (consistent with results())
+     *  - Total votes         → Voting for this election (valid only)
+     *
+     * @return array{results: \Illuminate\Support\Collection, totalVoters: int, totalVoted: int, votePercentage: float}
+     */
+    private function buildVotingResultsForElection(OsisElection $election): array
+    {
+        $electionId = $election->id;
+
+        $results = Calon::active()
+            ->ordered()
+            ->withCount(['votings' => function ($query) use ($electionId) {
+                $query->where('election_id', $electionId)->valid();
+            }])
+            ->orderByDesc('votings_count')
+            ->get();
+
+        $totalVoters = Pemilih::active()->count();
+        $totalVoted = Voting::where('election_id', $electionId)->valid()->count();
+        $votePercentage = $totalVoters > 0 ? round(($totalVoted / $totalVoters) * 100, 2) : 0;
+
+        return [
+            'results' => $results,
+            'totalVoters' => $totalVoters,
+            'totalVoted' => $totalVoted,
+            'votePercentage' => $votePercentage,
+        ];
+    }
+
+    /**
      * Export voting results to PDF.
      */
     public function exportVotingResultsPdf(Request $request)
     {
-        $electionId = $request->election_id;
+        // Fallback ke election aktif jika election_id tidak dikirim (URL langsung tanpa query param)
+        $election = OsisElection::findOrFail($request->election_id ?? OsisElection::active()->value('id'));
 
-        $election = OsisElection::findOrFail($electionId);
-
-        $results = Calon::where('election_id', $electionId)
-            ->withCount('votings')
-            ->orderBy('votings_count', 'desc')
-            ->get();
-
-        $totalVoters = Pemilih::where('election_id', $electionId)->count();
-        $totalVoted = Voting::where('election_id', $electionId)->count();
-        $votePercentage = $totalVoters > 0 ? ($totalVoted / $totalVoters) * 100 : 0;
+        ['results' => $results, 'totalVoters' => $totalVoters, 'totalVoted' => $totalVoted, 'votePercentage' => $votePercentage] =
+            $this->buildVotingResultsForElection($election);
 
         $pdf = Pdf::loadView('osis.voting-results-pdf', compact('election', 'results', 'totalVoters', 'totalVoted', 'votePercentage'));
         $pdf->setPaper('a4', 'portrait');
@@ -1287,43 +1316,40 @@ class OSISController extends Controller
      */
     public function exportVotingResultsJson(Request $request)
     {
-        $electionId = $request->election_id;
+        // Fallback ke election aktif jika election_id tidak dikirim (URL langsung tanpa query param)
+        $election = OsisElection::findOrFail($request->election_id ?? OsisElection::active()->value('id'));
 
-        $election = OsisElection::findOrFail($electionId);
-
-        $results = Calon::where('election_id', $electionId)
-            ->withCount('votings')
-            ->with(['siswa'])
-            ->orderBy('votings_count', 'desc')
-            ->get();
-
-        $totalVoters = Pemilih::where('election_id', $electionId)->count();
-        $totalVoted = Voting::where('election_id', $electionId)->count();
+        ['results' => $results, 'totalVoters' => $totalVoters, 'totalVoted' => $totalVoted, 'votePercentage' => $votePercentage] =
+            $this->buildVotingResultsForElection($election);
 
         return response()->json([
             'success' => true,
             'election' => [
                 'id' => $election->id,
-                'nama' => $election->nama,
-                'tahun' => $election->tahun,
-                'status' => $election->status
+                'title' => $election->title,
+                'year' => $election->start_date?->format('Y'),
+                'status' => $election->status,
             ],
             'statistics' => [
                 'total_voters' => $totalVoters,
                 'total_voted' => $totalVoted,
-                'vote_percentage' => $totalVoters > 0 ? round(($totalVoted / $totalVoters) * 100, 2) : 0
+                'vote_percentage' => $votePercentage,
             ],
-            'results' => $results->map(function ($calon) {
+            'results' => $results->map(function (Calon $calon) use ($totalVoted) {
                 return [
                     'id' => $calon->id,
-                    'nama' => $calon->siswa->nama_lengkap ?? $calon->nama,
-                    'visi' => $calon->visi,
-                    'misi' => $calon->misi,
+                    'nama' => $calon->full_candidate_name,
+                    'nama_ketua' => $calon->nama_ketua,
+                    'nama_wakil' => $calon->nama_wakil,
+                    'jenis_pencalonan' => $calon->pencalonan_type_display,
+                    'visi_misi' => $calon->visi_misi,
+                    'program_kerja' => $calon->program_kerja,
+                    'motivasi' => $calon->motivasi,
                     'total_votes' => $calon->votings_count,
-                    'vote_percentage' => Voting::where('calon_id', $calon->id)->count()
+                    'vote_percentage' => $totalVoted > 0 ? round(($calon->votings_count / $totalVoted) * 100, 2) : 0,
                 ];
             }),
-            'exported_at' => now()->toIso8601String()
+            'exported_at' => now()->toIso8601String(),
         ]);
     }
 
@@ -1332,38 +1358,32 @@ class OSISController extends Controller
      */
     public function exportVotingResultsXml(Request $request)
     {
-        $electionId = $request->election_id;
+        // Fallback ke election aktif jika election_id tidak dikirim (URL langsung tanpa query param)
+        $election = OsisElection::findOrFail($request->election_id ?? OsisElection::active()->value('id'));
 
-        $election = OsisElection::findOrFail($electionId);
-
-        $results = Calon::where('election_id', $electionId)
-            ->withCount('votings')
-            ->with(['siswa'])
-            ->orderBy('votings_count', 'desc')
-            ->get();
-
-        $totalVoters = Pemilih::where('election_id', $electionId)->count();
-        $totalVoted = Voting::where('election_id', $electionId)->count();
+        ['results' => $results, 'totalVoters' => $totalVoters, 'totalVoted' => $totalVoted, 'votePercentage' => $votePercentage] =
+            $this->buildVotingResultsForElection($election);
 
         $xml = new \SimpleXMLElement('<voting_results/>');
         $xml->addAttribute('exported_at', now()->toIso8601String());
 
         $electionNode = $xml->addChild('election');
         $electionNode->addChild('id', $election->id);
-        $electionNode->addChild('nama', htmlspecialchars($election->nama));
-        $electionNode->addChild('tahun', $election->tahun);
+        $electionNode->addChild('title', htmlspecialchars((string) $election->title));
+        $electionNode->addChild('year', $election->start_date?->format('Y') ?? '');
         $electionNode->addChild('status', $election->status);
 
         $statsNode = $xml->addChild('statistics');
         $statsNode->addChild('total_voters', $totalVoters);
         $statsNode->addChild('total_voted', $totalVoted);
-        $statsNode->addChild('vote_percentage', $totalVoters > 0 ? round(($totalVoted / $totalVoters) * 100, 2) : 0);
+        $statsNode->addChild('vote_percentage', $votePercentage);
 
         $resultsNode = $xml->addChild('results');
         foreach ($results as $calon) {
             $calonNode = $resultsNode->addChild('candidate');
             $calonNode->addChild('id', $calon->id);
-            $calonNode->addChild('nama', htmlspecialchars($calon->siswa->nama_lengkap ?? $calon->nama));
+            $calonNode->addChild('nama', htmlspecialchars($calon->full_candidate_name));
+            $calonNode->addChild('jenis_pencalonan', htmlspecialchars($calon->pencalonan_type_display));
             $calonNode->addChild('total_votes', $calon->votings_count);
         }
 

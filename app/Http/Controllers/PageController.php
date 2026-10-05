@@ -117,6 +117,7 @@ class PageController extends Controller
             'seo_title' => 'nullable|string|max:60',
             'seo_description' => 'nullable|string|max:160',
             'seo_keywords' => 'nullable|string|max:255',
+            'seo_image' => 'nullable|string|max:500',
             'is_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
             'menu_position' => 'nullable|in:header,footer',
@@ -149,11 +150,12 @@ class PageController extends Controller
             $data['featured_image'] = $request->file('featured_image')->store('pages/images', 'public');
         }
 
-        // Handle SEO meta
+        // Handle SEO meta (image = og:image per halaman; fallback ke featured_image di view)
         $data['seo_meta'] = [
             'title' => $request->seo_title,
             'description' => $request->seo_description,
             'keywords' => $request->seo_keywords,
+            'image' => $request->seo_image,
         ];
 
         // Handle menu settings
@@ -312,6 +314,7 @@ class PageController extends Controller
             'seo_title' => 'nullable|string|max:60',
             'seo_description' => 'nullable|string|max:160',
             'seo_keywords' => 'nullable|string|max:255',
+            'seo_image' => 'nullable|string|max:500',
             'is_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
             'menu_position' => 'nullable|in:header,footer',
@@ -344,11 +347,12 @@ class PageController extends Controller
             $data['featured_image'] = $request->file('featured_image')->store('pages/images', 'public');
         }
 
-        // Handle SEO meta
+        // Handle SEO meta (image = og:image per halaman; fallback ke featured_image di view)
         $data['seo_meta'] = [
             'title' => $request->seo_title,
             'description' => $request->seo_description,
             'keywords' => $request->seo_keywords,
+            'image' => $request->seo_image,
         ];
 
         // Handle menu settings

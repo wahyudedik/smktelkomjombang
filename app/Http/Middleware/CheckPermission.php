@@ -30,7 +30,13 @@ class CheckPermission
         }
 
         // Check if user has permission using Spatie (also supports custom permissions)
-        if (!$user->hasPermissionTo($permission)) {
+        // ⚠️ hasPermissionTo() throws PermissionDoesNotExist when the permission is not
+        // seeded yet — catch it and deny (403) instead of letting it bubble into a 500.
+        try {
+            if (!$user->hasPermissionTo($permission)) {
+                abort(403, 'Insufficient permissions.');
+            }
+        } catch (\Spatie\Permission\Exceptions\PermissionDoesNotExist) {
             abort(403, 'Insufficient permissions.');
         }
 

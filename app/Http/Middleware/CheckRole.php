@@ -78,8 +78,13 @@ class CheckRole
         foreach ($allowedRoles as $allowedRole) {
             $mappedPermissions = $this->rolePermissionMap[$allowedRole] ?? [];
             foreach ($mappedPermissions as $permission) {
-                if ($user->hasPermissionTo($permission)) {
-                    return $next($request);
+                try {
+                    if ($user->hasPermissionTo($permission)) {
+                        return $next($request);
+                    }
+                } catch (\Spatie\Permission\Exceptions\PermissionDoesNotExist) {
+                    // Permission belum di-seed → anggap tidak diberikan (deny), jangan 500
+                    continue;
                 }
             }
         }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 
@@ -30,11 +31,16 @@ class OsisElection extends Model
     ];
 
     /**
-     * Get the candidates for this election
+     * Get the candidates that received votes in this election.
+     *
+     * calons table has NO election_id column — votes (votings) link calon ↔ election,
+     * so candidates are resolved through the votes pivot table.
      */
-    public function candidates(): HasMany
+    public function candidates(): BelongsToMany
     {
-        return $this->hasMany(Calon::class, 'election_id');
+        return $this->belongsToMany(Calon::class, 'votings', 'election_id', 'calon_id')
+            ->withPivot(['waktu_voting', 'is_valid'])
+            ->distinct();
     }
 
     /**

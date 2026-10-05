@@ -12,6 +12,13 @@ class Calon extends Model
 {
     use HasFactory, Auditable;
 
+    /**
+     * ⚠️ Security note: semua write HTTP WAJIB whitelist field eksplisit
+     * (lihat OSISController::storeCalon/updateCalon memakai $request->only([...])).
+     * program_kerja/motivasi/sort_order adalah kolom DB nyata yang dipakai oleh
+     * factory, seeder, dan CalonImport (tervalidasi via WithValidation) —
+     * tetap fillable untuk writer internal tersebut saja.
+     */
     protected $fillable = [
         'nama_ketua',
         'foto_ketua',

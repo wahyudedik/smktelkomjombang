@@ -239,12 +239,6 @@
                                             <i class="fas fa-calendar-alt mr-2"></i>Jadwal Pelajaran
                                         </a>
                                     @endif
-                                    @if (Auth::check() && (Auth::user()->hasRole('siswa') || Auth::user()->can('lulus.read')))
-                                        <a href="{{ route('admin.lulus.index') }}"
-                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                                            <i class="fas fa-graduation-cap mr-2"></i>Kelulusan
-                                        </a>
-                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -911,12 +905,6 @@
                                     <a href="{{ route('admin.jadwal-pelajaran.index') }}"
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-calendar-alt mr-2"></i>Jadwal Pelajaran
-                                    </a>
-                                @endif
-                                @if (Auth::user()->hasRole('siswa') || Auth::user()->can('lulus.read'))
-                                    <a href="{{ route('admin.lulus.index') }}"
-                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
-                                        <i class="fas fa-graduation-cap mr-2"></i>Kelulusan
                                     </a>
                                 @endif
                             </div>

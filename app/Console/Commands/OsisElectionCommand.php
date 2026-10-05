@@ -3,7 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\OsisElection;
+use App\Models\Pemilih;
+use App\Models\Siswa;
+use App\Models\Voting;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Command untuk membuat/mengelola election OSIS voting.
@@ -17,19 +21,25 @@ use Illuminate\Console\Command;
  *   php artisan osis:manage status
  *   php artisan osis:manage close
  *   php artisan osis:manage close --id=3
+ *   php artisan osis:manage reset-vote --id=1 --user=661   # reset vote test 1 user
+ *   php artisan osis:manage reset-vote --id=1 --siswa=12  # reset vote test via Siswa ID
+ *   php artisan osis:manage reset-vote --id=1 --all       # reset semua vote (testing penuh)
  */
 class OsisElectionCommand extends Command
 {
     protected $signature = 'osis:manage
-                            {action : Aksi yang akan dilakukan (create|close|status)}
+                            {action : Aksi yang akan dilakukan (create|close|status|reset-vote)}
                             {--title= : Judul election (wajib untuk create)}
                             {--description= : Deskripsi election}
                             {--days=7 : Durasi election dalam hari (create)}
                             {--classes= : Kelas yang diizinkan vote, pisahkan koma (opsional, contoh: "X-1,X-2")}
                             {--max-votes=1 : Maksimal vote per siswa}
-                            {--id= : ID election tertentu (opsional, untuk close)}';
+                            {--id= : ID election (wajib untuk reset-vote, opsional untuk close)}
+                            {--user= : ID user untuk reset vote test (reset-vote)}
+                            {--siswa= : ID siswa untuk reset vote test (reset-vote)}
+                            {--all : Reset SEMUA vote di election untuk testing penuh (reset-vote)}';
 
-    protected $description = 'Buat dan kelola election OSIS (create|close|status) — tanpa UI CRUD';
+    protected $description = 'Buat dan kelola election OSIS (create|close|status|reset-vote) — tanpa UI CRUD';
 
     public function handle(): int
     {
@@ -39,6 +49,7 @@ class OsisElectionCommand extends Command
             'create' => $this->handleCreate(),
             'close' => $this->handleClose(),
             'status' => $this->handleStatus(),
+            'reset-vote' => $this->handleResetVote(),
             default => $this->handleInvalidAction($action),
         };
     }
@@ -49,10 +60,11 @@ class OsisElectionCommand extends Command
     private function handleInvalidAction(string $action): int
     {
         $this->error("❌ Action tidak dikenal: \"{$action}\"");
-        $this->line('   Action yang tersedia: create | close | status');
+        $this->line('   Action yang tersedia: create | close | status | reset-vote');
         $this->line('   Contoh: php artisan osis:manage create --title="Pemilihan OSIS 2026"');
         $this->line('           php artisan osis:manage status');
         $this->line('           php artisan osis:manage close');
+        $this->line('           php artisan osis:manage reset-vote --id=1 --user=661');
 
         return self::FAILURE;
     }
@@ -265,5 +277,309 @@ class OsisElectionCommand extends Command
             ->all();
 
         return $classes === [] ? null : $classes;
+    }
+
+    /**
+     * Reset vote test di election tertentu.
+     *
+     * Fitur testing: menghapus baris `votings` + mereset flag one-vote
+     * (siswas.has_voted_osis, pemilihs.status) agar user yang sudah vote
+     * bisa vote ulang. Election, calons, dan pemilihs TIDAK dihapus.
+     *
+     * One-vote dicegah 3 lapis di OSISController::processVote():
+     *   1. Flag: siswas.has_voted_osis / pemilihs.status='sudah_memilih'
+     *   2. Existence check: row Voting (siswa_id/pemilih_id + election_id + is_valid)
+     *   3. Unique constraint DB: votings_siswa_election_unique /
+     *      votings_pemilih_election_unique
+     * Reset harus menghapus row Voting (lapis 3) DAN flag (lapis 1) — keduanya.
+     */
+    private function handleResetVote(): int
+    {
+        $idOption = trim((string) $this->option('id'));
+        if ($idOption === '') {
+            $this->error('❌ Opsi --id wajib diisi untuk action reset-vote (ID election).');
+            $this->line('   Contoh: php artisan osis:manage reset-vote --id=1 --user=661');
+            $this->line('           php artisan osis:manage reset-vote --id=1 --siswa=12');
+            $this->line('           php artisan osis:manage reset-vote --id=1 --all');
+
+            return self::FAILURE;
+        }
+
+        $election = OsisElection::find((int) $idOption);
+        if (! $election) {
+            $this->error("❌ Election dengan ID {$idOption} tidak ditemukan.");
+
+            return self::FAILURE;
+        }
+
+        $userOption = trim((string) $this->option('user'));
+        $siswaOption = trim((string) $this->option('siswa'));
+        $all = (bool) $this->option('all');
+
+        $targetCount = collect([$userOption !== '', $siswaOption !== '', $all])
+            ->filter()
+            ->count();
+
+        if ($targetCount === 0) {
+            $this->error('❌ Tentukan target reset: --user=, --siswa=, atau --all.');
+            $this->line('   Contoh: php artisan osis:manage reset-vote --id=1 --user=661');
+            $this->line('           php artisan osis:manage reset-vote --id=1 --siswa=12');
+            $this->line('           php artisan osis:manage reset-vote --id=1 --all');
+
+            return self::FAILURE;
+        }
+
+        if ($targetCount > 1) {
+            $this->error('❌ Kombinasi target tidak valid — gunakan hanya salah satu: --user=, --siswa=, atau --all.');
+
+            return self::FAILURE;
+        }
+
+        return match (true) {
+            $all => $this->resetAllVotes($election),
+            $userOption !== '' => $this->resetVotesByUser($election, (int) $userOption),
+            default => $this->resetVotesBySiswa($election, (int) $siswaOption),
+        };
+    }
+
+    /**
+     * Reset vote untuk 1 user di election tertentu.
+     *
+     * Relasi (diverifikasi dari struktur tabel — `votings` TIDAK punya kolom user_id):
+     *   - Siswa: siswas.user_id → votings.siswa_id
+     *   - Guru/Pemilih: pemilihs.user_id → votings.pemilih_id
+     * Keduanya ditangani agar akun siswa ATAU guru bisa di-reset.
+     */
+    private function resetVotesByUser(OsisElection $election, int $userId): int
+    {
+        if ($userId <= 0) {
+            $this->error('❌ Opsi --user harus berisi ID user yang valid (angka > 0).');
+
+            return self::FAILURE;
+        }
+
+        $siswa = Siswa::where('user_id', $userId)->first();
+        $pemilihs = Pemilih::where('user_id', $userId)->get();
+
+        if (! $siswa && $pemilihs->isEmpty()) {
+            $this->error("❌ Tidak ditemukan Siswa maupun Pemilih untuk user ID {$userId}.");
+            $this->line('   Pastikan user ID benar dan sudah memiliki baris di tabel siswas/pemilihs.');
+
+            return self::FAILURE;
+        }
+
+        $result = DB::transaction(function () use ($election, $siswa, $pemilihs): array {
+            $deletedVotes = 0;
+            $resetSiswas = 0;
+            $resetPemilihs = 0;
+
+            // Jalur siswa: hapus Voting via siswa_id + reset flag has_voted_osis
+            if ($siswa) {
+                $deletedVotes += Voting::where('siswa_id', $siswa->id)
+                    ->where('election_id', $election->id)
+                    ->delete();
+
+                if ($siswa->hasVotedOsis()) {
+                    $siswa->resetVotingStatus(); // has_voted_osis=false + nulls voted_at/ip/ua
+                    $resetSiswas = 1;
+                }
+            }
+
+            // Jalur pemilih (guru + dual-tracking marker 2 milik siswa):
+            // hapus Voting via pemilih_id + reset pemilihs.status → belum_memilih
+            $pemilihIds = $pemilihs->pluck('id');
+            if ($pemilihIds->isNotEmpty()) {
+                $deletedVotes += Voting::whereIn('pemilih_id', $pemilihIds)
+                    ->where('election_id', $election->id)
+                    ->delete();
+
+                $resetPemilihs = Pemilih::whereIn('id', $pemilihIds)
+                    ->where('status', 'sudah_memilih')
+                    ->update([
+                        'status' => 'belum_memilih',
+                        'waktu_memilih' => null,
+                        'ip_address' => null,
+                        'user_agent' => null,
+                    ]);
+            }
+
+            return [$deletedVotes, $resetSiswas, $resetPemilihs];
+        });
+
+        [$deletedVotes, $resetSiswas, $resetPemilihs] = $result;
+
+        // Invalidate cached dashboard stats (sama seperti setelah processVote)
+        cache()->forget('osis_dashboard_stats');
+
+        $this->newLine();
+        $this->info("✅ Reset vote selesai — Election ID {$election->id} ({$election->title})");
+        $this->table(
+            ['Item', 'Nilai'],
+            [
+                ['Target', $siswa
+                    ? "User ID {$userId} (Siswa ID {$siswa->id}: {$siswa->nama_lengkap})"
+                    : "User ID {$userId} (via Pemilih: {$pemilihs->pluck('nama')->implode(', ')})"],
+                ['Baris votings dihapus', (string) $deletedVotes],
+                ['Flag siswas.has_voted_osis di-reset', (string) $resetSiswas],
+                ['Pemilihs.status → belum_memilih', (string) $resetPemilihs],
+            ]
+        );
+        $this->line('   Election, calons, dan pemilihs TIDAK dihapus. User bisa voting test lagi.');
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * Reset vote untuk 1 siswa (via Siswa ID) di election tertentu.
+     */
+    private function resetVotesBySiswa(OsisElection $election, int $siswaId): int
+    {
+        if ($siswaId <= 0) {
+            $this->error('❌ Opsi --siswa harus berisi ID siswa yang valid (angka > 0).');
+
+            return self::FAILURE;
+        }
+
+        $siswa = Siswa::find($siswaId);
+        if (! $siswa) {
+            $this->error("❌ Siswa dengan ID {$siswaId} tidak ditemukan.");
+
+            return self::FAILURE;
+        }
+
+        $result = DB::transaction(function () use ($election, $siswa): array {
+            $deletedVotes = Voting::where('siswa_id', $siswa->id)
+                ->where('election_id', $election->id)
+                ->delete();
+
+            $resetSiswas = 0;
+            if ($siswa->hasVotedOsis()) {
+                $siswa->resetVotingStatus();
+                $resetSiswas = 1;
+            }
+
+            // Sinkronkan dual-tracking pemilihs (Marker 2 di processVote)
+            $resetPemilihs = 0;
+            if ($siswa->user_id) {
+                $resetPemilihs = Pemilih::where('user_id', $siswa->user_id)
+                    ->where(function ($query) {
+                        $query->where('user_type', 'siswa')->orWhereNull('user_type');
+                    })
+                    ->where('status', 'sudah_memilih')
+                    ->update([
+                        'status' => 'belum_memilih',
+                        'waktu_memilih' => null,
+                        'ip_address' => null,
+                        'user_agent' => null,
+                    ]);
+            }
+
+            return [$deletedVotes, $resetSiswas, $resetPemilihs];
+        });
+
+        [$deletedVotes, $resetSiswas, $resetPemilihs] = $result;
+
+        cache()->forget('osis_dashboard_stats');
+
+        $this->newLine();
+        $this->info("✅ Reset vote selesai — Election ID {$election->id} ({$election->title})");
+        $this->table(
+            ['Item', 'Nilai'],
+            [
+                ['Target', "Siswa ID {$siswa->id} ({$siswa->nama_lengkap}, user ID {$siswa->user_id})"],
+                ['Baris votings dihapus', (string) $deletedVotes],
+                ['Flag siswas.has_voted_osis di-reset', (string) $resetSiswas],
+                ['Pemilihs.status → belum_memilih', (string) $resetPemilihs],
+            ]
+        );
+        $this->line('   Election, calons, dan pemilihs TIDAK dihapus. Siswa bisa voting test lagi.');
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * Reset SEMUA vote di election tertentu (testing penuh).
+     *
+     * Hapus semua baris `votings` di election + reset flag one-vote yang
+     * masih aktif. Flag (siswas.has_voted_osis, pemilihs.status) bersifat
+     * global — bukan per-election — sehingga ikut di-reset agar semua user
+     * bisa voting test lagi. Election, calons, dan pemilihs TIDAK dihapus.
+     */
+    private function resetAllVotes(OsisElection $election): int
+    {
+        if (! $this->confirm("Hapus SEMUA vote di election ID {$election->id} ({$election->title}) dan reset flag terkait? (testing penuh)", true)) {
+            $this->info('❌ Dibatalkan. Tidak ada vote yang direset.');
+
+            return self::FAILURE;
+        }
+
+        $result = DB::transaction(function () use ($election): array {
+            // Kumpulkan ID terpengaruh SEBELUM delete (untuk laporan)
+            $affectedSiswaIds = Voting::where('election_id', $election->id)
+                ->whereNotNull('siswa_id')
+                ->pluck('siswa_id')
+                ->unique();
+
+            $affectedPemilihIds = Voting::where('election_id', $election->id)
+                ->whereNotNull('pemilih_id')
+                ->pluck('pemilih_id')
+                ->unique();
+
+            $deletedVotes = Voting::where('election_id', $election->id)->delete();
+
+            // Flag bersifat global: reset siswas terpengaruh + semua yang masih true
+            $resetSiswas = Siswa::query()
+                ->where(function ($query) use ($affectedSiswaIds) {
+                    $query->whereIn('id', $affectedSiswaIds)
+                        ->orWhere('has_voted_osis', true);
+                })
+                ->update([
+                    'has_voted_osis' => false,
+                    'voted_at' => null,
+                    'voting_ip' => null,
+                    'voting_user_agent' => null,
+                ]);
+
+            // Idem untuk pemilihs.status (dual-tracking + jalur guru)
+            $resetPemilihs = Pemilih::query()
+                ->where(function ($query) use ($affectedPemilihIds) {
+                    $query->whereIn('id', $affectedPemilihIds)
+                        ->orWhere('status', 'sudah_memilih');
+                })
+                ->update([
+                    'status' => 'belum_memilih',
+                    'waktu_memilih' => null,
+                    'ip_address' => null,
+                    'user_agent' => null,
+                ]);
+
+            return [
+                $deletedVotes,
+                $resetSiswas,
+                $resetPemilihs,
+                $affectedSiswaIds->count(),
+                $affectedPemilihIds->count(),
+            ];
+        });
+
+        [$deletedVotes, $resetSiswas, $resetPemilihs, $affectedSiswas, $affectedPemilihs] = $result;
+
+        cache()->forget('osis_dashboard_stats');
+
+        $this->newLine();
+        $this->info("✅ Reset vote TEST PENUH selesai — Election ID {$election->id} ({$election->title})");
+        $this->table(
+            ['Item', 'Nilai'],
+            [
+                ['Baris votings dihapus', (string) $deletedVotes],
+                ['Siswa terpengaruh (punya vote di election)', (string) $affectedSiswas],
+                ['Flag siswas.has_voted_osis di-reset', (string) $resetSiswas],
+                ['Pemilih terpengaruh (punya vote di election)', (string) $affectedPemilihs],
+                ['Pemilihs.status → belum_memilih', (string) $resetPemilihs],
+            ]
+        );
+        $this->line('   Election, calons, dan pemilihs TIDAK dihapus. Semua user bisa voting test lagi.');
+
+        return self::SUCCESS;
     }
 }

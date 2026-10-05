@@ -141,8 +141,8 @@
 <body>
     <div class="header">
         <h1>HASIL PEMILIHAN OSIS</h1>
-        <h2>{{ $election->nama }}</h2>
-        <p>Tahun: {{ $election->tahun }}</p>
+        <h2>{{ $election->title }}</h2>
+        <p>Tahun: {{ $election->start_date?->format('Y') ?? '-' }}</p>
         <p>Dicetak pada: {{ now()->format('d F Y, H:i') }} WIB</p>
     </div>
 
@@ -185,8 +185,8 @@
                         </span>
                     </td>
                     <td>
-                        <strong>{{ $calon->siswa->nama_lengkap ?? $calon->nama }}</strong><br>
-                        <small style="color: #666;">{{ $calon->siswa->kelas ?? '' }}</small>
+                        <strong>{{ $calon->full_candidate_name }}</strong><br>
+                        <small style="color: #666;">{{ $calon->pencalonan_type_display }}</small>
                     </td>
                     <td style="text-align: center; font-size: 14px; font-weight: bold; color: #2563eb;">
                         {{ $calon->votings_count }}

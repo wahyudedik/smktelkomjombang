@@ -4,7 +4,11 @@
     $seo            = is_array($page->seo_meta ?? null) ? $page->seo_meta : [];
     $pageTitle      = $seo['title'] ?? $page->title;
     $metaDescription = $seo['description'] ?? ($page->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($page->content), 160));
-    $metaImage      = $page->featured_image ? asset('storage/' . $page->featured_image) : null;
+    $metaImage      = !empty($seo['image'])
+        ? (\Illuminate\Support\Str::startsWith($seo['image'], ['http://', 'https://'])
+            ? $seo['image']
+            : asset('storage/' . ltrim($seo['image'], '/')))
+        : ($page->featured_image ? asset('storage/' . $page->featured_image) : null);
     $ogType         = ($page->category === 'berita' || $page->template === 'blog') ? 'article' : 'website';
 @endphp
 
