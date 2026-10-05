@@ -217,6 +217,76 @@
                 @endif
             </div>
 
+            <!-- OSIS Voting Shortcut Widget (siswa & guru — role yang diizinkan route voting) -->
+            @if (!empty($osisVotingWidget) && !empty($osisVotingWidget['election']))
+                @php
+                    $osisElection = $osisVotingWidget['election'];
+                    $osisHasVoted = $osisVotingWidget['hasVoted'] ?? false;
+                @endphp
+                <div class="mb-8">
+                    <div class="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-7 h-7 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">E-OSIS Voting</h3>
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $osisElection->status_badge_color }}">
+                                            {{ $osisElection->status_display }}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 dark:text-dark-300 mt-1">
+                                        {{ $osisElection->title }}
+                                    </p>
+                                    <p class="text-xs text-slate-500 dark:text-dark-400 mt-0.5">
+                                        {{ $osisElection->start_date?->format('d M Y') }} — {{ $osisElection->end_date?->format('d M Y') }}
+                                        @if ($osisElection->isCurrentlyActive() && $osisElection->time_until_end)
+                                            · Berakhir {{ $osisElection->time_until_end }}
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:items-end gap-2 flex-shrink-0">
+                                @if ($osisHasVoted)
+                                    <span
+                                        class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Anda sudah memilih
+                                    </span>
+                                    <a href="{{ route('admin.osis.results') }}"
+                                        class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        </svg>
+                                        Lihat Hasil
+                                    </a>
+                                @else
+                                    <a href="{{ route('admin.osis.voting') }}"
+                                        class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                        </svg>
+                                        Mulai Voting
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Guest Book Widget -->
             @can('buku-tamu.view')
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">

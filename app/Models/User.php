@@ -164,7 +164,9 @@ class User extends Authenticatable
      */
     public function isVerifiedByAdmin(): bool
     {
-        return $this->is_verified_by_admin;
+        // Null-safe: boolean cast pada atribut yang belum terisi (row factory / kolom default)
+        // menghasilkan null — paksa ke bool agar middleware EnsureEmailIsVerified tidak TypeError.
+        return (bool) $this->is_verified_by_admin;
     }
 
     /**

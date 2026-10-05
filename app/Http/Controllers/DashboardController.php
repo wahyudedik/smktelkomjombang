@@ -13,6 +13,7 @@ use App\Models\Page;
 use App\Models\InstagramSetting;
 use App\Models\Calon;
 use App\Models\Pemilih;
+use App\Models\OsisElection;
 use App\Models\GuestBook;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,34 @@ class DashboardController extends Controller
             $guestBookThisMonth = $this->safe(fn() => GuestBook::thisMonth()->count(), 0);
         }
 
+        // OSIS Voting shortcut widget — mengikuti akses route voting (role: siswa|guru, tanpa permission khusus).
+        // Data dihitung fresh (tanpa cache) karena status "sudah memilih" berubah setiap vote.
+        $osisVotingWidget = null;
+        if ($user->hasRole('siswa') || $user->hasRole('guru')) {
+            $osisVotingWidget = $this->safe(function () use ($user) {
+                // Scope active() = is_active + dalam rentang tanggal + belum di-lock (konsisten dgn voting page)
+                $election = OsisElection::active()->first();
+                if (!$election) {
+                    return null; // Tidak ada pemilihan berlangsung → widget disembunyikan
+                }
+
+                if ($user->hasRole('guru')) {
+                    $pemilih = Pemilih::where('user_id', $user->id)->where('user_type', 'guru')->first();
+                    $hasVoted = $pemilih?->hasVoted() ?? false;
+                } else {
+                    // Fallback aman: row siswa tidak ada → anggap belum memilih
+                    // (validasi submit vote tetap di-enforce server-side di processVote())
+                    $siswa = Siswa::where('user_id', $user->id)->first();
+                    $hasVoted = $siswa?->hasVotedOsis() ?? false;
+                }
+
+                return [
+                    'election' => $election,
+                    'hasVoted' => $hasVoted,
+                ];
+            });
+        }
+
         return view('dashboards.admin', [
             'statistics' => $stats,
             'recentActivities' => $stats['recent_activities'],
@@ -60,6 +89,7 @@ class DashboardController extends Controller
             'guestBookToday' => $guestBookToday,
             'guestBookCheckedIn' => $guestBookCheckedIn,
             'guestBookThisMonth' => $guestBookThisMonth,
+            'osisVotingWidget' => $osisVotingWidget,
         ]);
     }
 

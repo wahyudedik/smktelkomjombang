@@ -71,8 +71,9 @@ class DashboardControllerTest extends TestCase
 
         $response->assertStatus(200);
         $stats = $response->viewData('statistics');
-        $this->assertEquals(10, $stats['siswa_count']);
-        $this->assertEquals(5, $stats['guru_count']);
+        // Key mengikuti kontrak DashboardController::fetchCounts() (total_* — dipakai view & stats endpoint)
+        $this->assertEquals(10, $stats['total_siswa']);
+        $this->assertEquals(5, $stats['total_guru']);
     }
 
     /** @test */
