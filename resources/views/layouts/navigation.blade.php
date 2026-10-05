@@ -168,6 +168,17 @@
                                             <i class="fas fa-vote-yea mr-2"></i>E-OSIS Voting
                                         </a>
                                     @endif
+                                    {{-- Voting access: route admin.osis.voting/results berbasis role siswa|guru (tanpa permission) --}}
+                                    @if (Auth::check() && Auth::user()->hasAnyRole(['siswa', 'guru']))
+                                        <a href="{{ route('admin.osis.voting') }}"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                            <i class="fas fa-vote-yea mr-2"></i>E-OSIS Voting
+                                        </a>
+                                        <a href="{{ route('admin.osis.results') }}"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                            <i class="fas fa-chart-bar mr-2"></i>Hasil Voting
+                                        </a>
+                                    @endif
                                     @if (Auth::check() &&
                                             (Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru']) ||
                                                 Auth::user()->can('kelulusan.view') ||
@@ -846,6 +857,17 @@
                                     <a href="{{ route('admin.osis.index') }}"
                                         class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
                                         <i class="fas fa-vote-yea mr-2"></i>E-OSIS Voting
+                                    </a>
+                                @endif
+                                {{-- Voting access: route admin.osis.voting/results berbasis role siswa|guru (tanpa permission) --}}
+                                @if (Auth::user()->hasAnyRole(['siswa', 'guru']))
+                                    <a href="{{ route('admin.osis.voting') }}"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                        <i class="fas fa-vote-yea mr-2"></i>E-OSIS Voting
+                                    </a>
+                                    <a href="{{ route('admin.osis.results') }}"
+                                        class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                        <i class="fas fa-chart-bar mr-2"></i>Hasil Voting
                                     </a>
                                 @endif
                                 @if (Auth::user()->hasAnyRole(['admin', 'superadmin', 'guru']) ||

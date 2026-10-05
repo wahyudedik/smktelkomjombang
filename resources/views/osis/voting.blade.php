@@ -6,13 +6,24 @@
                 <p class="text-slate-600 mt-1">{{ __('common.election_description') }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <a href="{{ route('admin.osis.index') }}" class="btn btn-secondary">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    {{ __('common.back_to_osis') }}
-                </a>
+                {{-- Route admin.osis.index butuh role admin|superadmin|osis — siswa/guru diarahkan ke dashboard --}}
+                @if (Auth::user()->hasAnyRole(['siswa', 'guru']))
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        {{ __('common.back_to_osis') }}
+                    </a>
+                @else
+                    <a href="{{ route('admin.osis.index') }}" class="btn btn-secondary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        {{ __('common.back_to_osis') }}
+                    </a>
+                @endif
             </div>
         </div>
     </x-slot>

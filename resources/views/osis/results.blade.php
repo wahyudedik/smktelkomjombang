@@ -6,7 +6,8 @@
                 <p class="text-slate-600 mt-1">{{ __('common.election_results_description') }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                @if (Auth::user()->hasRole('siswa'))
+                {{-- Route admin.osis.voting/results terbuka untuk siswa & guru (role:siswa|guru tanpa permission) --}}
+                @if (Auth::user()->hasAnyRole(['siswa', 'guru']))
                     <a href="{{ route('admin.osis.voting') }}" class="btn btn-primary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -14,24 +15,27 @@
                         </svg>
                         {{ __('common.voting') }}
                     </a>
-                @else
-                    <a href="{{ route('admin.osis.voting') }}" class="btn btn-secondary"
-                        title="{{ __('common.only_students_can_vote') }}">
+                @endif
+                @if (Auth::user()->hasAnyRole(['siswa', 'guru']))
+                    {{-- Siswa/guru tidak punya akses ke admin.osis.index (butuh role admin|superadmin|osis) — arahkan ke dashboard --}}
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        {{ __('common.voting_student') }}
+                        {{ __('common.back_to_osis') }}
+                    </a>
+                @else
+                    <a href="{{ route('admin.osis.index') }}" class="btn btn-secondary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        {{ __('common.back_to_osis') }}
                     </a>
                 @endif
-                <a href="{{ route('admin.osis.index') }}" class="btn btn-secondary">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    {{ __('common.back_to_osis') }}
-                </a>
-                @if (!Auth::user()->hasRole('siswa'))
+                {{-- Export route butuh permission:osis.results (hanya admin|superadmin|osis) — guru tidak boleh melihat tombol ini --}}
+                @can('osis.results')
                     <a href="{{ route('admin.osis.results.export.pdf') }}" class="btn btn-secondary"
                         title="Download hasil pemilihan (PDF)">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +60,7 @@
                         </svg>
                         XML
                     </a>
-                @endif
+                @endcan
             </div>
         </div>
     </x-slot>
