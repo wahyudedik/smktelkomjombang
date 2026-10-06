@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use App\Models\AttendanceIdentity;
 use App\Models\User;
@@ -54,5 +55,13 @@ class AppServiceProvider extends ServiceProvider
 
         // Email verification rate limit: 3 requests/minute by IP (prevent email spam)
         RateLimiter::for('email-verify', fn (Request $request) => Limit::perMinute(3)->by($request->ip()));
+
+        // Login rate limit: 120 requests/minute by IP (shared IP lab sekolah) + 10/minute by email (anti-brute-force)
+        RateLimiter::for('login', function (Request $request) {
+            return [
+                Limit::perMinute(120)->by('login-ip|'.$request->ip()),
+                Limit::perMinute(10)->by('login-email|'.Str::lower((string) $request->input('email'))),
+            ];
+        });
     }
 }

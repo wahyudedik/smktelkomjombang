@@ -21,7 +21,7 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware('throttle:5,1'); // Max 5 login attempts per minute
+        ->middleware('throttle:login'); // Named limiter: 120/menit per-IP + 10/menit per-email (aman untuk IP bersama lab sekolah)
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
