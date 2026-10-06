@@ -88,14 +88,42 @@
                 <div class="space-y-6">
                     <h2 class="text-xl font-semibold text-slate-900">{{ __('common.candidate_list') }}</h2>
 
+                    @if (!empty($isGuru))
+                        <!-- Hint multi-select guru: maksimal 2 pasangan calon + counter live -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div class="flex items-start text-amber-800">
+                                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="ml-2 text-sm font-medium">Guru dapat memilih maksimal 2 pasangan
+                                        calon. Centang 1 atau 2 pilihan, lalu kirim.</span>
+                                </div>
+                                <span id="vote-counter"
+                                    class="self-start sm:self-auto text-sm font-semibold text-amber-800 bg-amber-100 px-3 py-1 rounded-full">0/2
+                                    dipilih</span>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         @forelse($calons as $candidate)
                             <div
                                 class="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-shadow">
                                 <div class="flex items-center space-x-4 mb-4">
-                                    <input type="radio" id="calon_{{ $candidate->id }}" name="calon_id"
-                                        value="{{ $candidate->id }}"
-                                        class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300">
+                                    @if (!empty($isGuru))
+                                        {{-- Guru: checkbox multi-select maksimal 2 pasangan calon --}}
+                                        <input type="checkbox" id="calon_{{ $candidate->id }}" name="calon_ids[]"
+                                            value="{{ $candidate->id }}"
+                                            class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300 calon-checkbox">
+                                    @else
+                                        {{-- Siswa: radio single-select (1 pasangan calon) — semantik TIDAK berubah --}}
+                                        <input type="radio" id="calon_{{ $candidate->id }}" name="calon_id"
+                                            value="{{ $candidate->id }}"
+                                            class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300">
+                                    @endif
                                     <label for="calon_{{ $candidate->id }}" class="flex-1 cursor-pointer">
                                         <h3 class="text-lg font-semibold text-slate-900">
                                             {{ $candidate->full_candidate_name }}</h3>
@@ -178,7 +206,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Kirim Pilihan
+                            {{-- Label menyesuaikan peran: guru multi-select vs siswa single-select --}}
+                            {{ !empty($isGuru) ? 'Kirim Pilihan' : 'Kirim Suara' }}
                         </button>
                     </div>
                 @endif
@@ -205,10 +234,63 @@
     </div>
 
     <script>
+        @if (!empty($isGuru))
+            // Multi-select guru: maksimal 2 pasangan calon (client-side enforcement)
+            // Helper global showConfirm/showError tersedia dari resources/js/app.js (SweetAlert2)
+            (function () {
+                var MAX_VOTES = 2;
+                var counter = document.getElementById('vote-counter');
+
+                function checkedCount() {
+                    return document.querySelectorAll('.calon-checkbox:checked').length;
+                }
+
+                function updateCounter() {
+                    if (counter) {
+                        counter.textContent = checkedCount() + '/' + MAX_VOTES + ' dipilih';
+                    }
+                }
+
+                document.querySelectorAll('.calon-checkbox').forEach(function (checkbox) {
+                    checkbox.addEventListener('change', function () {
+                        if (checkedCount() > MAX_VOTES) {
+                            // Tolak centang ke-3: batalkan + pesan error konsisten dengan UI
+                            this.checked = false;
+                            if (typeof showError !== 'undefined') {
+                                showError('Maksimal 2 Pilihan',
+                                    'Guru dapat memilih maksimal 2 pasangan calon. Silakan hapus salah satu centangan terlebih dahulu.');
+                            } else {
+                                alert('Guru dapat memilih maksimal 2 pasangan calon.');
+                            }
+                        }
+                        updateCounter();
+                    });
+                });
+
+                updateCounter();
+            })();
+        @endif
+
         function confirmVote() {
+            @if (!empty($isGuru))
+            var selectedCount = document.querySelectorAll('.calon-checkbox:checked').length;
+            if (selectedCount === 0) {
+                if (typeof showError !== 'undefined') {
+                    showError('Belum Ada Pilihan', 'Pilih minimal satu pasangan calon sebelum mengirim suara.');
+                } else {
+                    alert('Pilih minimal satu pasangan calon sebelum mengirim suara.');
+                }
+                return;
+            }
+            var voteConfirmText = selectedCount === 1
+                ? '{{ __('common.confirm_voting_message') }}'
+                : 'Anda memilih ' + selectedCount + ' pasangan calon. Kirim pilihan Anda sekarang?';
+            @else
+            var voteConfirmText = '{{ __('common.confirm_voting_message') }}';
+            @endif
             showConfirm(
                 '{{ __('common.confirm_voting') }}',
-                '{{ __('common.confirm_voting_message') }}',
+                voteConfirmText,
                 '{{ __('common.yes_vote') }}',
                 '{{ __('common.cancel') }}'
             ).then((result) => {

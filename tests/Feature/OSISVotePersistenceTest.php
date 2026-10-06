@@ -23,11 +23,18 @@ use Tests\TestCase;
  *    DAN flag `siswas.has_voted_osis` (voted_at, voting_ip, voting_user_agent) ter-update atomik.
  * 2. Vote kedua DITOLAK server-side (lockForUpdate + double-check) — jumlah baris tetap 1.
  * 3. Vote guru TERSIMPAN via `pemilihs.user_type='guru'` (votings.pemilih_id + pemilihs.status).
+ *    Aturan bisnis BARU (multi-select): guru submit `calon_ids` array 1–2 pasangan calon
+ *    DISTINCT → 1–2 baris Voting per election; setelah submit guru dianggap sudah memilih
+ *    (status='sudah_memilih'), submit ke-2 ditolak.
  * 4. Halaman results menampilkan "Sudah Memilih" >= 1 setelah vote (sinkronisasi dual-tracking).
  * 5. POST saat election tidak aktif / berakhir DITOLAK (tidak ada baris votings baru).
  * 6. Siswa tanpa row `siswas` (user_id belum ter-link) ditolak dengan pesan jelas
  *    "Data pemilih belum tersedia, hubungi admin" — TANPA auto-generate pemilih.
  * 7. Dashboard siswa menampilkan widget E-OSIS Voting + menu Student memuat link voting.
+ * 8. Guru multi-select: 2 pilihan → 2 baris tersimpan (pemilih_id + election_id benar,
+ *    calon_id berbeda); submit ke-2 ditolak (jumlah tetap 2); >2 calon / calon duplikat
+ *    DITOLAK validasi server (0 baris); backward-compat `calon_id` tunggal dari form
+ *    lama/cache tetap diterima sebagai 1 pilihan untuk guru.
  *
  * CATATAN schema: tabel `pemilihs` TIDAK punya kolom `has_voted` — flag vote guru
  * disimpan sebagai string `status = 'sudah_memilih'` (aksesor Pemilih::hasVoted()).
@@ -198,9 +205,10 @@ class OSISVotePersistenceTest extends TestCase
     {
         [$guruUser, $pemilih] = $this->createGuruVoter();
 
+        // Semantik BARU: guru submit via field `calon_ids[]` (multi-select, 1 pilihan)
         $response = $this->actingAs($guruUser)
             ->post(route('admin.osis.vote'), [
-                'calon_id' => $this->calonL->id,
+                'calon_ids' => [$this->calonL->id],
             ]);
 
         $response->assertRedirect(route('admin.osis.results'));
@@ -208,7 +216,7 @@ class OSISVotePersistenceTest extends TestCase
         $this->assertStringContainsString('Suara Anda telah tercatat', (string) session('success'));
 
         // Baris votings TERSIMPAN via pemilih_id (siswa_id null untuk vote guru)
-        $this->assertSame(1, Voting::count(), 'Vote guru harus menghasilkan 1 baris votings');
+        $this->assertSame(1, Voting::count(), 'Vote guru 1 pilihan harus menghasilkan 1 baris votings');
         $vote = Voting::first();
         $this->assertSame($this->calonL->id, $vote->calon_id);
         $this->assertSame($pemilih->id, $vote->pemilih_id, 'Vote guru dicatat via pemilih_id');
@@ -231,18 +239,39 @@ class OSISVotePersistenceTest extends TestCase
     {
         [$guruUser, $pemilih] = $this->createGuruVoter();
 
-        // Vote pertama — sukses
+        // Vote pertama (1 pilihan) — sukses
         $this->actingAs($guruUser)
-            ->post(route('admin.osis.vote'), ['calon_id' => $this->calonL->id])
+            ->post(route('admin.osis.vote'), ['calon_ids' => [$this->calonL->id]])
             ->assertRedirect(route('admin.osis.results'));
 
-        // Vote kedua guru — DITOLAK
+        // Vote kedua guru — DITOLAK (status pemilih sudah 'sudah_memilih')
         $response = $this->actingAs($guruUser)
-            ->post(route('admin.osis.vote'), ['calon_id' => $this->calonP->id]);
+            ->post(route('admin.osis.vote'), ['calon_ids' => [$this->calonP->id]]);
 
         $response->assertRedirect(route('admin.osis.results'));
         $response->assertSessionHas('info');
         $this->assertSame(1, Voting::count(), 'Vote kedua guru tidak boleh menambah baris votings');
+        $this->assertSame($pemilih->id, Voting::first()->pemilih_id);
+        $this->assertSame('sudah_memilih', $pemilih->fresh()->status);
+    }
+
+    /** @test */
+    public function guru_backward_compat_calon_id_tunggal_masih_diterima(): void
+    {
+        // Form lama / cache browser: user guru masih mengirim `calon_id` tunggal —
+        // harus diperlakukan sebagai array 1 elemen (backward compatibility).
+        [$guruUser, $pemilih] = $this->createGuruVoter();
+
+        $response = $this->actingAs($guruUser)
+            ->post(route('admin.osis.vote'), [
+                'calon_id' => $this->calonL->id,
+            ]);
+
+        $response->assertRedirect(route('admin.osis.results'));
+        $response->assertSessionHas('success');
+
+        $this->assertSame(1, Voting::count(), 'Fallback calon_id tunggal harus tetap menghasilkan 1 baris');
+        $this->assertSame($this->calonL->id, Voting::first()->calon_id);
         $this->assertSame($pemilih->id, Voting::first()->pemilih_id);
         $this->assertSame('sudah_memilih', $pemilih->fresh()->status);
     }
@@ -360,5 +389,126 @@ class OSISVotePersistenceTest extends TestCase
         // (E-Services dropdown sengaja TIDAK untuk siswa — gate admin|superadmin|guru|osis)
         $response->assertSee(route('admin.osis.voting'), false);
         $response->assertSee(route('admin.osis.results'), false);
+    }
+
+    /** @test */
+    public function guru_vote_dua_pilihan_dalam_satu_submit_tersimpan_dua_baris(): void
+    {
+        // Aturan bisnis BARU: guru centang maksimal 2 pasangan calon → satu submit
+        // menghasilkan 2 baris Voting untuk 2 calon berbeda.
+        [$guruUser, $pemilih] = $this->createGuruVoter();
+
+        $response = $this->actingAs($guruUser)
+            ->post(route('admin.osis.vote'), [
+                'calon_ids' => [$this->calonL->id, $this->calonP->id],
+            ]);
+
+        $response->assertRedirect(route('admin.osis.results'));
+        $response->assertSessionHas('success');
+        // Toast guru 2 pilihan mencerminkan jumlah vote
+        $this->assertStringContainsString('2 pilihan Anda telah tercatat', (string) session('success'));
+
+        // 2 baris Voting tercatat — keduanya pemilih_id guru + election_id benar,
+        // calon_id BERBEDA
+        $this->assertSame(2, Voting::count(), 'Guru memilih 2 calon harus menghasilkan 2 baris votings');
+        $votes = Voting::orderBy('id')->get();
+        $this->assertEqualsCanonicalizing(
+            [$this->calonL->id, $this->calonP->id],
+            $votes->pluck('calon_id')->all()
+        );
+        foreach ($votes as $vote) {
+            $this->assertSame($pemilih->id, $vote->pemilih_id, 'Vote guru dicatat via pemilih_id');
+            $this->assertNull($vote->siswa_id);
+            $this->assertSame($this->election->id, $vote->election_id);
+            $this->assertTrue((bool) $vote->is_valid);
+            $this->assertNotNull($vote->waktu_voting);
+            $this->assertNotNull($vote->ip_address);
+            $this->assertNotNull($vote->user_agent);
+        }
+
+        // Setelah submit guru dianggap sudah memilih (1 submit = selesai, tidak vote lagi)
+        $freshPemilih = $pemilih->fresh();
+        $this->assertSame('sudah_memilih', $freshPemilih->status);
+        $this->assertTrue($freshPemilih->hasVoted());
+    }
+
+    /** @test */
+    public function guru_vote_dua_pilihan_lalu_submit_lagi_ditolak_jumlah_tetap_dua(): void
+    {
+        [$guruUser, $pemilih] = $this->createGuruVoter();
+
+        // Submit pertama: 2 pilihan — sukses
+        $this->actingAs($guruUser)
+            ->post(route('admin.osis.vote'), [
+                'calon_ids' => [$this->calonL->id, $this->calonP->id],
+            ])
+            ->assertRedirect(route('admin.osis.results'));
+
+        $this->assertSame(2, Voting::count());
+
+        // Submit kedua — DITOLAK (guru sudah dianggap memilih)
+        $response = $this->actingAs($guruUser)
+            ->post(route('admin.osis.vote'), [
+                'calon_ids' => [$this->calonL->id],
+            ]);
+
+        $response->assertRedirect(route('admin.osis.results'));
+        $response->assertSessionHas('info');
+        $response->assertSessionMissing('success');
+
+        // Jumlah Voting TETAP 2 — tidak nambah
+        $this->assertSame(2, Voting::count(), 'Submit kedua tidak boleh menambah baris votings');
+        $this->assertSame('sudah_memilih', $pemilih->fresh()->status);
+    }
+
+    /** @test */
+    public function guru_submit_tiga_calon_ditolak_validasi_max_dua(): void
+    {
+        // Bypass client-side (curl/postman): server WAJIB menolak >2 pilihan
+        $calonExtra = Calon::factory()->create([
+            'nama_ketua' => 'Ketua Extra',
+            'nama_wakil' => 'Wakil Extra',
+            'jenis_kelamin' => 'L',
+            'is_active' => true,
+            'sort_order' => 3,
+        ]);
+
+        [$guruUser, $pemilih] = $this->createGuruVoter();
+
+        $response = $this->actingAs($guruUser)
+            ->from(route('admin.osis.voting'))
+            ->post(route('admin.osis.vote'), [
+                'calon_ids' => [$this->calonL->id, $this->calonP->id, $calonExtra->id],
+            ]);
+
+        // Redirect back + error validasi max:2 + 0 baris voting tersimpan
+        $response->assertRedirect(route('admin.osis.voting'));
+        $response->assertSessionHasErrors('calon_ids');
+        $this->assertSame(0, Voting::count(), 'Vote >2 calon tidak boleh tersimpan');
+        $this->assertSame('belum_memilih', $pemilih->fresh()->status);
+    }
+
+    /** @test */
+    public function guru_submit_calon_id_duplikat_ditolak(): void
+    {
+        // Calon yang sama dipilih 2 kali (array berisi nilai sama) → ditolak validasi distinct
+        [$guruUser, $pemilih] = $this->createGuruVoter();
+
+        $response = $this->actingAs($guruUser)
+            ->from(route('admin.osis.voting'))
+            ->post(route('admin.osis.vote'), [
+                'calon_ids' => [$this->calonL->id, $this->calonL->id],
+            ]);
+
+        $response->assertRedirect(route('admin.osis.voting'));
+        // Error validasi distinct — key bisa `calon_ids` atau `calon_ids.1` (elemen duplikat)
+        $response->assertSessionHasErrors();
+        $errorKeys = collect(session('errors')->getBag('default')->keys());
+        $this->assertTrue(
+            $errorKeys->contains(fn (string $key): bool => str_starts_with($key, 'calon_ids')),
+            'Error validasi harus menunjuk field calon_ids'
+        );
+        $this->assertSame(0, Voting::count(), 'Vote dengan calon duplikat tidak boleh tersimpan');
+        $this->assertSame('belum_memilih', $pemilih->fresh()->status);
     }
 }

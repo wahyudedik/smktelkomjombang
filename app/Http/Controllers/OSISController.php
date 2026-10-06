@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\CalonImport;
 use App\Exports\CalonExport;
@@ -499,12 +500,22 @@ class OSISController extends Controller
     /**
      * Process vote.
      */
+    /**
+     * Process vote.
+     *
+     * Aturan bisnis multi-select (dikonfirmasi user):
+     * - SISWA: satu `calon_id` tunggal (radio) → 1 baris Voting (semantik TIDAK berubah).
+     * - GURU: `calon_ids` array 1–2 pasangan calon DISTINCT → 1–2 baris Voting dalam satu
+     *   transaksi; setelah submit guru dianggap sudah memilih (status='sudah_memilih').
+     * - Backward compatibility: form lama/cache yang mengirim `calon_id` tunggal dari
+     *   user guru diperlakukan sebagai array 1 elemen.
+     *
+     * Pertahankan SEMUA perilaku keamanan: transaksi DB + lockForUpdate, dobel-check
+     * election aktif, dobel-check sudah voting, missing pemilih handling (tanpa
+     * auto-generate), dan gender enforcement khusus siswa (guru bebas semua gender).
+     */
     public function processVote(Request $request)
     {
-        $request->validate([
-            'calon_id' => 'required|exists:calons,id',
-        ]);
-
         $user = Auth::user();
 
         if (!$user->hasRole('siswa') && !$user->hasRole('guru')) {
@@ -515,8 +526,38 @@ class OSISController extends Controller
         $isGuru = $user->hasRole('guru');
         $siswa = null;
         $pemilih = null;
+        $calonIds = [];
 
         if ($isGuru) {
+            // Backward compatibility: form lama / cache browser mengirim calon_id tunggal
+            // dari user guru → perlakukan sebagai array 1 elemen.
+            if (!$request->filled('calon_ids') && $request->filled('calon_id')) {
+                $request->merge(['calon_ids' => array_filter([$request->input('calon_id')])]);
+            }
+
+            // Validasi multi-select guru: 1–2 pasangan calon, tiap elemen integer,
+            // DISTINCT (tolak calon sama dipilih 2 kali), dan calon AKTIF (scope active).
+            $request->validate([
+                'calon_ids' => ['required', 'array', 'min:1', 'max:2'],
+                'calon_ids.*' => [
+                    'integer',
+                    'distinct',
+                    Rule::exists('calons', 'id')->where('is_active', true),
+                ],
+            ], [
+                'calon_ids.required' => 'Pilih minimal satu pasangan calon.',
+                'calon_ids.min' => 'Pilih minimal satu pasangan calon.',
+                'calon_ids.max' => 'Guru dapat memilih maksimal 2 pasangan calon dalam satu pemungutan suara.',
+                'calon_ids.*.distinct' => 'Setiap pasangan calon yang dipilih harus berbeda.',
+                'calon_ids.*.exists' => 'Calon yang dipilih tidak ditemukan atau tidak aktif.',
+            ]);
+
+            $calonIds = collect($request->input('calon_ids'))
+                ->map(fn ($id): int => (int) $id)
+                ->unique()
+                ->values()
+                ->all();
+
             // Resolve guru voter record (user_type='guru')
             $pemilih = Pemilih::where('user_id', $user->id)->where('user_type', 'guru')->first();
             if (!$pemilih) {
@@ -532,6 +573,11 @@ class OSISController extends Controller
                     ->with('info', 'Anda sudah melakukan voting. Berikut hasil pemilihan OSIS.');
             }
         } else {
+            // Siswa: satu calon_id tunggal (radio) — semantik TIDAK berubah
+            $request->validate([
+                'calon_id' => 'required|exists:calons,id',
+            ]);
+
             // Resolve student record
             $siswa = Siswa::where('user_id', $user->id)->first();
             if (!$siswa) {
@@ -555,24 +601,12 @@ class OSISController extends Controller
                 ->with('error', 'Tidak ada pemilihan OSIS yang sedang berlangsung.');
         }
 
-        $calon = Calon::findOrFail($request->calon_id);
-
-        // Server-side gender enforcement (mencegah manipulasi request di luar UI):
-        // siswa hanya boleh memilih kandidat segender. Tolak hanya jika keduanya non-null dan
-        // berbeda; gender null (fallback: semua kandidat tampil) → vote tetap diterima.
-        if (!$isGuru
-            && $calon->jenis_kelamin
-            && $siswa->jenis_kelamin
-            && $siswa->jenis_kelamin !== $calon->jenis_kelamin) {
-            return redirect()->route('admin.osis.voting')
-                ->with('error', 'Anda hanya dapat memilih calon yang sesuai dengan jenis kelamin Anda.');
-        }
-
         if ($isGuru) {
-            // Guru voting path: record vote via pemilih_id (siswa_id stays null)
-            // Wrap in DB transaction with double-check pattern (lockForUpdate)
-            // to prevent concurrent double-votes.
-            $voteRecorded = DB::transaction(function () use ($request, $pemilih, $calon, $election) {
+            // Guru voting path: catat 1–2 vote (multi-select maksimal 2 pasangan calon)
+            // dalam SATU transaksi + lockForUpdate (pola double-check yang sudah ada).
+            $voteCount = count($calonIds);
+
+            $voteRecorded = DB::transaction(function () use ($request, $pemilih, $calonIds, $election) {
                 // Lock the pemilih row so concurrent requests queue up instead of racing
                 $lockedPemilih = Pemilih::whereKey($pemilih->id)->lockForUpdate()->first();
 
@@ -593,24 +627,42 @@ class OSISController extends Controller
                     return false;
                 }
 
-                // Create vote record (siswa_id is null for guru votes; vote tracked via pemilih_id)
-                Voting::create([
-                    'calon_id' => $calon->id,
-                    'pemilih_id' => $lockedPemilih->id,
-                    'siswa_id' => null,
-                    'election_id' => $election->id,
-                    'waktu_voting' => now(),
-                    'ip_address' => $request->ip(),
-                    'user_agent' => $request->userAgent(),
-                    'is_valid' => true,
-                ]);
+                // Insert N baris voting (1 atau 2) — masing-masing dengan calon BERBEDA,
+                // pemilih_id + election_id sama, waktu/ip/user-agent/is_valid lengkap
+                foreach ($calonIds as $calonId) {
+                    Voting::create([
+                        'calon_id' => $calonId,
+                        'pemilih_id' => $lockedPemilih->id,
+                        'siswa_id' => null,
+                        'election_id' => $election->id,
+                        'waktu_voting' => now(),
+                        'ip_address' => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                        'is_valid' => true,
+                    ]);
+                }
 
-                // Mark pemilih as voted (sets status = 'sudah_memilih')
+                // Mark pemilih as voted (sets status = 'sudah_memilih') — guru dianggap
+                // sudah memilih setelah submit, berapa pun jumlah pilihan (1 atau 2)
                 $lockedPemilih->markAsVoted($request->ip(), $request->userAgent());
 
                 return true;
             });
         } else {
+            // Siswa voting path — SEMANTIK TIDAK BERUBAH (satu calon_id, satu baris Voting)
+            $calon = Calon::findOrFail($request->calon_id);
+
+            // Server-side gender enforcement (mencegah manipulasi request di luar UI):
+            // siswa hanya boleh memilih kandidat segender. Tolak hanya jika keduanya non-null dan
+            // berbeda; gender null (fallback: semua kandidat tampil) → vote tetap diterima.
+            // Guru: TIDAK ada pembatasan gender (voting() menampilkan semua kandidat aktif).
+            if ($calon->jenis_kelamin
+                && $siswa->jenis_kelamin
+                && $siswa->jenis_kelamin !== $calon->jenis_kelamin) {
+                return redirect()->route('admin.osis.voting')
+                    ->with('error', 'Anda hanya dapat memilih calon yang sesuai dengan jenis kelamin Anda.');
+            }
+
             // Siswa voting path: record vote via siswa_id (existing logic)
             // Bug 1 & 2 fix: wrap the whole voting process in a DB transaction with a
             // double-check pattern (lockForUpdate) to prevent concurrent double-votes,
@@ -665,6 +717,8 @@ class OSISController extends Controller
 
                 return true;
             });
+
+            $voteCount = 1;
         }
 
         if (!$voteRecorded) {
@@ -677,9 +731,17 @@ class OSISController extends Controller
         // Invalidate cached dashboard stats so the new vote is reflected
         cache()->forget('osis_dashboard_stats');
 
-        // Toast sukses memakai pesan voting yang benar (bukan "Updated successfully" generic CRUD)
+        // Toast sukses memakai pesan voting yang benar (bukan "Updated successfully" generic CRUD).
+        // Guru dengan 2 pilihan → pesan mencerminkan jumlah vote; siswa & guru 1 pilihan tetap
+        // memakai pesan suara klasik.
+        $successMessage = match (true) {
+            !$isGuru => 'Terima kasih! Suara Anda telah tercatat.',
+            $voteCount >= 2 => "Terima kasih! {$voteCount} pilihan Anda telah tercatat.",
+            default => 'Terima kasih! Suara Anda telah tercatat.',
+        };
+
         return redirect()->route('admin.osis.results')
-            ->with('success', 'Terima kasih! Suara Anda telah tercatat.');
+            ->with('success', $successMessage);
     }
 
     /**
