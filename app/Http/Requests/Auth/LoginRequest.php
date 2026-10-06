@@ -59,7 +59,10 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        // 10 percobaan gagal per email+ip (dinaikkan dari 5 agar siswa yang
+        // salah ketik password sesekali tidak terkunci; key tetap email|ip,
+        // hit hanya saat login gagal, clear saat login sukses).
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 10)) {
             return;
         }
 
