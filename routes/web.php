@@ -486,7 +486,9 @@ Route::middleware(['auth', 'verified', 'role:guru|admin|superadmin'])->prefix('a
 });
 
 // OSIS Management (Access: admin, superadmin, osis)
-Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('admin/osis')->name('admin.osis.')->group(function () {
+// `verified.email` = EnsureEmailIsVerified custom (menghormati is_verified_by_admin),
+// bukan alias framework `verified` (hanya cek email_verified_at).
+Route::middleware(['auth', 'verified.email', 'role:admin|superadmin|osis'])->prefix('admin/osis')->name('admin.osis.')->group(function () {
     Route::get('/', [OSISController::class, 'index'])->name('index')->middleware('permission:osis.view');
 
     // Calon Import/Export routes
@@ -532,7 +534,9 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin|osis'])->prefix('a
 });
 
 // OSIS Voting Routes (Access: siswa, guru) - Voting and Results
-Route::middleware(['auth', 'verified', 'role:siswa|guru'])->prefix('admin/osis')->name('admin.osis.')->group(function () {
+// `verified.email` = EnsureEmailIsVerified custom (menghormati is_verified_by_admin),
+// bukan alias framework `verified` (hanya cek email_verified_at).
+Route::middleware(['auth', 'verified.email', 'role:siswa|guru'])->prefix('admin/osis')->name('admin.osis.')->group(function () {
     Route::get('/voting', [OSISController::class, 'voting'])->name('voting');
     Route::post('/vote', [OSISController::class, 'processVote'])
         ->middleware('throttle:voting') // Max 5 votes per minute (anti-fraud)

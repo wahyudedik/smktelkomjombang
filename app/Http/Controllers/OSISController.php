@@ -438,12 +438,19 @@ class OSISController extends Controller
             }
             $hasVoted = $pemilihData->hasVoted();
         } else {
-            // Resolve student record.
-            // Fallback aman: row siswa tidak ada → tetap render halaman dengan SEMUA kandidat
-            // (jangan blokir voting); validasi submit vote tetap di-enforce server-side di processVote().
+            // Resolve student record — siswa WAJIB punya baris `siswas` ter-link (user_id).
+            // Tanpa baris ini vote pasti ditolak di processVote() (resolve
+            // Siswa::where('user_id', ...) → null), jadi JANGAN render form
+            // (hindari user mengisi form lalu submit gagal diam-diam).
+            // Arahkan ke dashboard dengan pesan jelas agar siswa menghubungi admin
+            // untuk verifikasi/ linking data.
             $siswa = Siswa::where('user_id', $user->id)->first();
+            if (!$siswa) {
+                return redirect()->route('admin.dashboard')
+                    ->with('error', 'Akun Anda belum terdaftar sebagai siswa pada sistem voting OSIS. Silakan hubungi admin sekolah untuk proses verifikasi data.');
+            }
             $pemilihData = $siswa;
-            $hasVoted = $siswa?->hasVotedOsis() ?? false;
+            $hasVoted = $siswa->hasVotedOsis();
         }
 
         // Check if user has already voted
@@ -468,7 +475,8 @@ class OSISController extends Controller
         // Aturan bisnis filter gender kandidat:
         // - Guru → melihat SEMUA kandidat aktif
         // - Siswa L → hanya kandidat L; Siswi P → hanya kandidat P
-        // - Fallback aman: row siswa tidak ada / jenis_kelamin null atau kosong → SEMUA kandidat
+        // - Fallback aman: jenis_kelamin null/kosong → SEMUA kandidat
+        //   (row siswa sudah dijamin ada — guard siswa-null di atas meredirect)
         // NOTE: calons table has NO election_id column (schema is global, not per-election).
         // Ballot must show ALL active calons (incl. those with zero votes in this election),
         // so query Calon directly instead of $election->candidates() (resolves via votes pivot).
@@ -490,8 +498,8 @@ class OSISController extends Controller
             }
         }
 
-        // $siswa can be a Siswa object (siswa), Pemilih object (guru), or null (siswa tanpa row)
-        // — kept for view compatibility
+        // $siswa: Siswa object (siswa — dijamin non-null via guard di atas) atau
+        // Pemilih object (guru) — kept for view compatibility
         $siswa = $pemilihData;
 
         return view('osis.voting', compact('calons', 'siswa', 'election', 'hasVoted', 'isGuru', 'showAll', 'genderLabel'));

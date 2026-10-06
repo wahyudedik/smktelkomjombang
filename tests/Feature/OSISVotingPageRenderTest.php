@@ -17,13 +17,15 @@ use Tests\TestCase;
  * Aturan bisnis (dikonfirmasi user):
  * - Siswa L → hanya kandidat L; Siswi P → hanya kandidat P
  * - Guru → semua kandidat aktif
- * - Fallback: row siswa tidak ada / jenis_kelamin null atau kosong → semua kandidat (200, bukan 500).
+ * - Siswa TANPA baris `siswas` (user_id belum ter-link) → voting() MENOLAK render
+ *   form: redirect ke admin.dashboard + error "belum terdaftar"
+ *   (perilaku BARU — fix vote OSIS gagal diam-diam; lihat OSISVotingAccessFixTest).
+ * - Fallback gender: jenis_kelamin null/kosong → semua kandidat.
  *   CATATAN: `siswas.jenis_kelamin` = enum NOT NULL CHECK ('L','P') (migration
  *   2025_09_26_093230_create_siswas_table.php), sehingga gender null/kosong tidak
  *   bisa direpresentasikan lewat insert di test database. Guard controller
- *   ($gender === 'L' || $gender === 'P' → selain itu SEMUA kandidat, termasuk
- *   null-safety `$pemilihData?->jenis_kelamin`) berbagi cabang yang sama dengan
- *   "row siswa tidak ada" — jalur fallback itu yang diuji di test di bawah.
+ *   ($gender === 'L' || $gender === 'P' → selain itu SEMUA kandidat) tetap
+ *   dipertahankan sebagai defensive coding.
  *
  * Reproduksi bug production 500 "Undefined variable $calon": controller mengirim $calons
  * (plural) — view harus memakai $calons (plural) dan PERTAHANKAN rename tersebut.
@@ -174,12 +176,13 @@ class OSISVotingPageRenderTest extends TestCase
     }
 
     /** @test */
-    public function siswa_tanpa_row_siswa_fallback_ke_semua_kandidat()
+    public function siswa_tanpa_row_siswa_redirect_ke_dashboard_dengan_error()
     {
-        // Mewakili jalur fallback guard "$gender === 'L' || $gender === 'P' → semua
-        // kandidat": row siswa tidak ada sehingga gender tidak ter-resolve (pada
-        // schema test ini gender null/kosong tidak bisa di-insert — lihat catatan
-        // di doc-block class). Halaman harus tetap render dengan SEMUA kandidat.
+        // Perilaku BARU (fix vote OSIS gagal diam-diam): siswa tanpa baris `siswas`
+        // (user_id belum ter-link) TIDAK lagi dirender form voting — karena submit
+        // pasti ditolak processVote() (resolve Siswa::where('user_id') → null).
+        // voting() redirect ke admin.dashboard dengan error jelas.
+        // (Sebelumnya: 200 + fallback semua kandidat — perilaku ini sengaja diubah.)
         $orphanUser = User::factory()->create(['email' => 'siswa.orphan@test.com']);
         $orphanUser->syncRoles([$this->getOrCreateRole('siswa')]);
         $orphanUser->updateQuietly(['user_type' => 'siswa']);
@@ -188,13 +191,11 @@ class OSISVotingPageRenderTest extends TestCase
         $response = $this->actingAs($orphanUser)
             ->get(route('admin.osis.voting'));
 
-        // Fallback aman: 200 + semua kandidat tampil, bukan 500
-        $response->assertStatus(200);
-        $response->assertSee('Ketua Laki');
-        $response->assertSee('Ketua Perempuan');
-        $response->assertDontSee('Ketua Nonaktif');
-        // Notice kondisional fallback: showAll = true
-        $response->assertSee('Anda melihat semua calon');
+        // Perilaku baru: redirect + error, form voting TIDAK dirender
+        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertSessionHas('error');
+        $this->assertStringContainsString('belum terdaftar', (string) session('error'));
+        $response->assertDontSee('Kirim Suara');
     }
 
     /** @test */
