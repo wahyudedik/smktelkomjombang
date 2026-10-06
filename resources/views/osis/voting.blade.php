@@ -81,7 +81,9 @@
 
         @if (!$hasVoted)
             <!-- Voting Form -->
-            <form method="POST" action="{{ route('admin.osis.vote') }}" class="space-y-8">
+            {{-- id eksplisit: confirmVote() harus submit form ini, BUKAN form pertama di DOM
+                 (form timezone di navigation.blade.php dirender lebih dulu oleh layouts/app) --}}
+            <form method="POST" action="{{ route('admin.osis.vote') }}" id="voting-form" class="space-y-8">
                 @csrf
 
                 <!-- Candidates List -->
@@ -273,12 +275,13 @@
 
         function confirmVote() {
             @if (!empty($isGuru))
+            // Validasi client-side SEBELUM modal konfirmasi: minimal 1 checkbox tercentang
             var selectedCount = document.querySelectorAll('.calon-checkbox:checked').length;
             if (selectedCount === 0) {
                 if (typeof showError !== 'undefined') {
-                    showError('Belum Ada Pilihan', 'Pilih minimal satu pasangan calon sebelum mengirim suara.');
+                    showError('Belum Ada Pilihan', 'Silakan pilih minimal satu pasangan calon.');
                 } else {
-                    alert('Pilih minimal satu pasangan calon sebelum mengirim suara.');
+                    alert('Silakan pilih minimal satu pasangan calon.');
                 }
                 return;
             }
@@ -286,6 +289,16 @@
                 ? '{{ __('common.confirm_voting_message') }}'
                 : 'Anda memilih ' + selectedCount + ' pasangan calon. Kirim pilihan Anda sekarang?';
             @else
+            // Validasi client-side SEBELUM modal konfirmasi: radio calon_id wajib tercentang
+            var selectedRadio = document.querySelector('input[name="calon_id"]:checked');
+            if (!selectedRadio) {
+                if (typeof showError !== 'undefined') {
+                    showError('Belum Ada Pilihan', 'Silakan pilih satu pasangan calon terlebih dahulu.');
+                } else {
+                    alert('Silakan pilih satu pasangan calon terlebih dahulu.');
+                }
+                return;
+            }
             var voteConfirmText = '{{ __('common.confirm_voting_message') }}';
             @endif
             showConfirm(
@@ -295,7 +308,12 @@
                 '{{ __('common.cancel') }}'
             ).then((result) => {
                 if (result.isConfirmed) {
-                    document.querySelector('form').submit();
+                    // Submit form voting secara EKSPLISIT — jangan querySelector generik
+                    // yang salah menangkap form pertama di DOM (form timezone navigasi)
+                    var votingForm = document.getElementById('voting-form');
+                    if (votingForm) {
+                        votingForm.submit();
+                    }
                 }
             });
         }

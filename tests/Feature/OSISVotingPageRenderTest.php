@@ -254,4 +254,63 @@ class OSISVotingPageRenderTest extends TestCase
         $this->assertSame(1, Voting::count());
         $this->assertSame($this->calonL->id, Voting::first()->calon_id);
     }
+
+    /**
+     * Regression bug production (DOM-order): confirmVote() sebelumnya memanggil
+     * `document.querySelector('form').submit()` → form PERTAMA di DOM yang ter-submit,
+     * yaitu form timezone di navigation.blade.php (dirender SEBELUM $slot oleh
+     * layouts/app.blade.php) → POST ke /timezone, redirect back dengan toast
+     * "Berhasil: Updated successfully", dan processVote() tidak pernah tercapai
+     * sehingga tabel `votings` kosong.
+     *
+     * Fix: form voting punya `id="voting-form"` dan JS submit memakai
+     * `document.getElementById('voting-form')` secara eksplisit.
+     *
+     * @test
+     */
+    public function voting_form_memakai_id_eksplisit_dan_tidak_submit_form_pertama_dom(): void
+    {
+        $response = $this->actingAs($this->siswaUser)
+            ->get(route('admin.osis.voting'));
+
+        $response->assertStatus(200);
+
+        // Form voting dirender dengan id eksplisit
+        $response->assertSee('id="voting-form"', false);
+
+        // JS confirmVote() merujuk form voting via getElementById('voting-form')
+        $response->assertSee("getElementById('voting-form')", false);
+
+        // Pola submit generik ke "form pertama di DOM" tidak boleh ada lagi di halaman voting
+        // (escape=false: assert string literal, jangan sampai false-negative)
+        $response->assertDontSee("querySelector('form')", false);
+    }
+
+    /**
+     * Sama dengan test di atas tapi untuk jalur guru (checkbox multi-select) —
+     * memastikan form id eksplisit & JS submit juga berlaku di halaman voting guru.
+     *
+     * @test
+     */
+    public function voting_form_guru_juga_memakai_id_eksplisit(): void
+    {
+        $guruUser = User::factory()->create(['email' => 'guru.voting-render@test.com']);
+        $guruUser->syncRoles([$this->getOrCreateRole('guru')]);
+        $guruUser->updateQuietly(['user_type' => 'guru']);
+
+        Pemilih::factory()->create([
+            'user_id' => $guruUser->id,
+            'user_type' => 'guru',
+            'status' => 'belum_memilih',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($guruUser)
+            ->get(route('admin.osis.voting'));
+
+        $response->assertStatus(200);
+        $response->assertSee('id="voting-form"', false);
+        $response->assertSee("getElementById('voting-form')", false);
+        $response->assertDontSee("querySelector('form')", false);
+    }
 }
