@@ -290,12 +290,27 @@
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
+                            @php
+                                // Null-safe Recent Voting: vote siswa (siswa_id terisi,
+                                // pemilih_id null) vs vote guru (pemilih_id terisi, siswa_id
+                                // null — pemilih guru tanpa baris siswas). Relasi bisa null
+                                // (FK null tidak memicu query) → wajib fallback, jangan
+                                // akses ->nama langsung (crash production 500).
+                                $voterName = match (true) {
+                                    $vote->siswa_id !== null => $vote->siswa?->nama_lengkap ?? 'Siswa',
+                                    $vote->pemilih_id !== null => $vote->pemilih?->nama
+                                        ?? $vote->pemilih?->siswa?->nama_lengkap ?? 'Guru',
+                                    default => 'Pemilih',
+                                };
+                                $calonName = $vote->calon?->full_candidate_name
+                                    ?? $vote->calon?->nama_ketua ?? '—';
+                            @endphp
                             <p class="text-sm text-slate-900">
-                                <span class="font-medium">{{ $vote->pemilih->nama }}</span>
+                                <span class="font-medium">{{ $voterName }}</span>
                                 memilih
-                                <span class="font-medium">{{ $vote->calon->full_candidate_name }}</span>
+                                <span class="font-medium">{{ $calonName }}</span>
                             </p>
-                            <p class="text-xs text-slate-500">{{ $vote->created_at->diffForHumans() }}</p>
+                            <p class="text-xs text-slate-500">{{ $vote->created_at?->diffForHumans() ?? '' }}</p>
                         </div>
                     </div>
                 @empty
