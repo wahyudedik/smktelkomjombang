@@ -13,8 +13,12 @@
             </div>
         </div>
         <div class="row">
-            @if (count($blogs) > 0)
-                @foreach ($blogs->take(6) as $index => $blog)
+            @php
+                // Paginator (LengthAwarePaginator) exposes total(); fall back to count() for plain collections.
+                $hasBlogs = method_exists($blogs, 'total') ? $blogs->total() > 0 : count($blogs) > 0;
+            @endphp
+            @if ($hasBlogs)
+                @foreach ($blogs as $index => $blog)
                     @php
                         $delays = ['0.25s', '0.50s', '0.75s', '0.25s', '0.50s', '0.75s'];
                         $delay = $delays[$index % 6];
@@ -36,6 +40,12 @@
                                     <ul>
                                         <li><a href="#"><i class="far fa-user-circle"></i> {{ $blog->user->name ?? 'Admin' }}</a></li>
                                         <li><a href="#"><i class="far fa-comments"></i> {{ $blog->category ?? 'Berita' }}</a></li>
+                                        @php
+                                            $views = number_format($blog->views_count ?? 0, 0, ',', '.');
+                                        @endphp
+                                        <li title="{{ $views }} kali dilihat" aria-label="{{ $views }} kali dilihat">
+                                            <i class="fas fa-eye"></i> {{ $views }}
+                                        </li>
                                     </ul>
                                 </div>
                                 <h4 class="blog-title">
@@ -109,25 +119,55 @@
             @endif
         </div>
         <!-- pagination -->
-        <div class="pagination-area">
-            <div aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true"><i class="far fa-arrow-left"></i></span>
-                        </a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true"><i class="far fa-arrow-right"></i></span>
-                        </a>
-                    </li>
-                </ul>
+        @if (method_exists($blogs, 'hasPages') && $blogs->hasPages())
+            @php
+                $currentPage = $blogs->currentPage();
+                $lastPage = $blogs->lastPage();
+                // Window of up to 5 page numbers around the current page.
+                $start = max(1, $currentPage - 2);
+                $end = min($lastPage, $start + 4);
+                $start = max(1, $end - 4);
+            @endphp
+            <div class="pagination-area">
+                <div aria-label="Page navigation example">
+                    <ul class="pagination">
+                        @if ($blogs->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-label="Previous">
+                                    <span aria-hidden="true"><i class="far fa-arrow-left"></i></span>
+                                </span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $blogs->previousPageUrl() }}" aria-label="Previous">
+                                    <span aria-hidden="true"><i class="far fa-arrow-left"></i></span>
+                                </a>
+                            </li>
+                        @endif
+
+                        @for ($num = $start; $num <= $end; $num++)
+                            <li class="page-item {{ $num === $currentPage ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $blogs->url($num) }}">{{ $num }}</a>
+                            </li>
+                        @endfor
+
+                        @if ($blogs->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $blogs->nextPageUrl() }}" aria-label="Next">
+                                    <span aria-hidden="true"><i class="far fa-arrow-right"></i></span>
+                                </a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-label="Next">
+                                    <span aria-hidden="true"><i class="far fa-arrow-right"></i></span>
+                                </span>
+                            </li>
+                        @endif
+                    </ul>
+                </div>
             </div>
-        </div>
+        @endif
         <!-- pagination end -->
     </div>
 </div>

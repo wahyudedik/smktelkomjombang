@@ -122,6 +122,12 @@
                                         <span style="color: #999; font-size: 0.85rem;">
                                             <i class="fas fa-user me-1"></i> {{ $berita->user->name ?? 'Admin' }}
                                         </span>
+                                        <span class="mx-2" style="color: #ccc;">|</span>
+                                        <span style="color: #999; font-size: 0.85rem;"
+                                            title="{{ number_format($berita->views_count ?? 0, 0, ',', '.') }} kali dilihat">
+                                            <i class="fas fa-eye me-1"></i>
+                                            {{ number_format($berita->views_count ?? 0, 0, ',', '.') }}
+                                        </span>
                                     </div>
                                     <h5 class="blog-title" style="font-weight: 700;">
                                         <a href="{{ route('berita.public.show', $berita->slug) }}"

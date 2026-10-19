@@ -8,6 +8,7 @@ use App\Models\Testimonial;
 use App\Models\Page;
 use App\Models\Partner;
 use App\Services\InstagramService;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 
@@ -131,20 +132,49 @@ class LandingController extends Controller
     }
 
     /**
-     * Get published blog pages with caching
+     * Get published blog pages with pagination & caching.
+     *
+     * Returns a LengthAwarePaginator (6 items per page) so the landing
+     * page blog section can render working pagination (?page=N).
+     *
+     * Caching strategy: only the ordered IDs are cached (lightweight).
+     * The models themselves are re-queried per page on every request so
+     * views_count stays fresh despite the 24h ID cache. Cache key uses a
+     * NEW name ("landing_{theme}_blogs_ordered_ids") to avoid clashing with
+     * the legacy "landing_{theme}_blogs" key which cached full models.
      */
     private function getBlogs()
     {
         $theme = current_theme();
-        return Cache::remember("landing_{$theme}_blogs", 86400, function () {
+        $perPage = 6;
+        $page = max(1, (int) request()->query('page', 1));
+
+        $ids = Cache::remember("landing_{$theme}_blogs_ordered_ids", 86400, function () {
             return Page::where('status', 'published')
                 ->where('category', 'berita')
                 ->where('published_at', '<=', now())
-                ->with('user')
                 ->orderBy('published_at', 'desc')
-                ->limit(6)
-                ->get();
+                ->orderBy('id', 'desc')
+                ->pluck('id');
         });
+
+        $pageIds = $ids->forPage($page, $perPage)->values();
+
+        $items = $pageIds->isEmpty()
+            ? collect()
+            : Page::whereIn('id', $pageIds)
+                ->with('user')
+                ->get()
+                ->sortBy(fn (Page $blog) => $ids->search($blog->id))
+                ->values();
+
+        return (new LengthAwarePaginator(
+            $items,
+            $ids->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        ))->appends(request()->query());
     }
 
     /**
