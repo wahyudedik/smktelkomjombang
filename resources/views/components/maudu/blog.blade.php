@@ -34,7 +34,7 @@
                             <div class="blog-item-info">
                                 <div class="blog-item-meta">
                                     <ul>
-                                        <li><a href="#"><i class="far fa-user-circle"></i> {{ $blog->author ?? 'Admin' }}</a></li>
+                                        <li><a href="#"><i class="far fa-user-circle"></i> {{ $blog->user->name ?? 'Admin' }}</a></li>
                                         <li><a href="#"><i class="far fa-comments"></i> {{ $blog->category ?? 'Berita' }}</a></li>
                                     </ul>
                                 </div>

@@ -18,6 +18,7 @@ class OsisElection extends Model
         'is_locked',
         'max_votes_per_student',
         'allowed_classes',
+        'show_results',
         'settings',
     ];
 
@@ -27,6 +28,7 @@ class OsisElection extends Model
         'is_active' => 'boolean',
         'is_locked' => 'boolean',
         'allowed_classes' => 'array',
+        'show_results' => 'boolean',
         'settings' => 'array',
     ];
 
@@ -72,6 +74,19 @@ class OsisElection extends Model
     }
 
     /**
+     * Apakah perolehan suara per calon boleh ditampilkan?
+     *
+     * Hasil tersembunyi HANYA berlaku selama pemilihan masih berjalan
+     * (belum berakhir & belum terkunci) DAN admin mematikan `show_results`.
+     * Setelah election berakhir/terkunci → hasil SELALU tampil
+     * (pengumuman hasil pasca-pemungutan suara).
+     */
+    public function resultsVisible(): bool
+    {
+        return $this->is_locked || $this->hasEnded() || (bool) $this->show_results;
+    }
+
+    /**
      * Check if election is upcoming
      */
     public function isUpcoming(): bool
@@ -110,6 +125,49 @@ class OsisElection extends Model
             'ended' => 'Selesai',
             'locked' => 'Terkunci',
             default => 'Tidak Diketahui'
+        };
+    }
+
+    /**
+     * Label status ringkas untuk UI CRUD elections.
+     *
+     * Berbeda dari `status`: election non-aktif yang belum dimulai (is_active=false)
+     * dikategorikan sebagai 'draft' agar admin mudah membedakan election siap-pakai
+     * vs yang masih disiapkan.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        if ($this->is_locked) {
+            return 'locked';
+        }
+
+        if ($this->isCurrentlyActive()) {
+            return 'active';
+        }
+
+        if ($this->isUpcoming() && $this->is_active) {
+            return 'upcoming';
+        }
+
+        if ($this->end_date < now()) {
+            return 'ended';
+        }
+
+        return 'draft';
+    }
+
+    /**
+     * Teks label Indonesia untuk `status_label`.
+     */
+    public function getStatusLabelTextAttribute(): string
+    {
+        return match ($this->status_label) {
+            'locked' => 'Terkunci',
+            'active' => 'Aktif',
+            'upcoming' => 'Akan Datang',
+            'ended' => 'Berakhir',
+            'draft' => 'Draft',
+            default => 'Tidak Diketahui',
         };
     }
 

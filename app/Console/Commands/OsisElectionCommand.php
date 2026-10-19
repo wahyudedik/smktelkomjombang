@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\DB;
  *   php artisan osis:manage reset-vote --id=1 --user=661   # reset vote test 1 user
  *   php artisan osis:manage reset-vote --id=1 --siswa=12  # reset vote test via Siswa ID
  *   php artisan osis:manage reset-vote --id=1 --all       # reset semua vote (testing penuh)
+ *   php artisan osis:manage reset-vote --election=1 --all --force  # --all di production (harus eksplisit)
  */
 class OsisElectionCommand extends Command
 {
@@ -35,9 +36,11 @@ class OsisElectionCommand extends Command
                             {--classes= : Kelas yang diizinkan vote, pisahkan koma (opsional, contoh: "X-1,X-2")}
                             {--max-votes=1 : Maksimal vote per siswa}
                             {--id= : ID election (wajib untuk reset-vote, opsional untuk close)}
+                            {--election= : ID election — alias dari --id untuk reset-vote (lebih aman daripada --all)}
                             {--user= : ID user untuk reset vote test (reset-vote)}
                             {--siswa= : ID siswa untuk reset vote test (reset-vote)}
-                            {--all : Reset SEMUA vote di election untuk testing penuh (reset-vote)}';
+                            {--all : Reset SEMUA vote di election untuk testing penuh (reset-vote)}
+                            {--force : Wajibkan --all di environment production (reset-vote)}';
 
     protected $description = 'Buat dan kelola election OSIS (create|close|status|reset-vote) — tanpa UI CRUD';
 
@@ -295,9 +298,14 @@ class OsisElectionCommand extends Command
      */
     private function handleResetVote(): int
     {
+        // --election= adalah alias dari --id= (reset spesifik 1 election —
+        // lebih aman daripada --all yang mereset flags global).
         $idOption = trim((string) $this->option('id'));
         if ($idOption === '') {
-            $this->error('❌ Opsi --id wajib diisi untuk action reset-vote (ID election).');
+            $idOption = trim((string) $this->option('election'));
+        }
+        if ($idOption === '') {
+            $this->error('❌ Opsi --id (atau --election) wajib diisi untuk action reset-vote (ID election).');
             $this->line('   Contoh: php artisan osis:manage reset-vote --id=1 --user=661');
             $this->line('           php artisan osis:manage reset-vote --id=1 --siswa=12');
             $this->line('           php artisan osis:manage reset-vote --id=1 --all');
@@ -333,6 +341,24 @@ class OsisElectionCommand extends Command
             $this->error('❌ Kombinasi target tidak valid — gunakan hanya salah satu: --user=, --siswa=, atau --all.');
 
             return self::FAILURE;
+        }
+
+        // GUARD production: --all menghapus SEMUA vote + mereset flags one-vote
+        // global (implikasi data luas) — di production wajib --force eksplisit.
+        if ($all && app()->environment('production')) {
+            if (! $this->option('force')) {
+                $this->error('❌ --all DITOLAK di environment production tanpa --force.');
+                $this->line('   Reset vote bersifat DESTRUKTIF (menghapus baris votings + mereset');
+                $this->line('   flag one-vote global). Jika memang yakin, jalankan ulang dengan:');
+                $this->line("   php artisan osis:manage reset-vote --id={$election->id} --all --force");
+                $this->line('   Alternatif lebih aman: reset per user (--user=) atau per siswa (--siswa=).');
+
+                return self::FAILURE;
+            }
+
+            $this->warn("⚠️  PERINGATAN: environment PRODUCTION — --force diberikan.");
+            $this->warn("   SEMUA vote di election ID {$election->id} ({$election->title}) akan DIHAPUS PERMANEN");
+            $this->warn('   dan flag one-vote global (siswas.has_voted_osis, pemilihs.status) di-reset.');
         }
 
         return match (true) {

@@ -415,6 +415,37 @@ class OSISController extends Controller
     }
 
     /**
+     * Gate `pemilihs.is_active` untuk jalur vote SISWA login.
+     *
+     * Tabel `siswas` tidak punya kolom `is_active` — penanda "siswa aktif sebagai
+     * pemilih" ada di record `pemilihs` (user_type siswa, dibuat admin via
+     * generate/import pemilih). Jika record pemilih terkait ADA dan sudah
+     * dinonaktifkan admin → siswa ditolak vote (konsisten dengan voting publik
+     * di PublicOsisController yang menegakkan pemilihs.is_active).
+     *
+     * Return null jika siswa TIDAK punya record pemilih (jalur siswa tetap
+     * diperbolehkan vote via siswa_id — semantik lama tidak berubah).
+     *
+     * @return string|null Pesan error jika ditolak, null jika lolos gate.
+     */
+    private function siswaPemilihInactiveError(Siswa $siswa): ?string
+    {
+        // Konsisten dengan sinkronisasi marker di processVote():
+        // user_type 'siswa' ATAU null (legacy record tanpa user_type).
+        $pemilih = Pemilih::where('user_id', $siswa->user_id)
+            ->where(function ($query) {
+                $query->where('user_type', 'siswa')->orWhereNull('user_type');
+            })
+            ->first();
+
+        if ($pemilih && !$pemilih->is_active) {
+            return 'Akun Anda tidak aktif sebagai pemilih. Hubungi admin sekolah untuk mengaktifkan kembali akun Anda.';
+        }
+
+        return null;
+    }
+
+    /**
      * Display voting interface.
      */
     public function voting()
@@ -436,6 +467,12 @@ class OSISController extends Controller
                 return redirect()->route('admin.dashboard')
                     ->with('error', 'Data pemilih guru belum tersedia. Hubungi admin untuk generate data pemilih.');
             }
+            // Gate pemilihs.is_active (konsisten dengan processVote()): pemilih
+            // yang dinonaktifkan admin tidak boleh mengakses form voting.
+            if (!$pemilihData->is_active) {
+                return redirect()->route('admin.dashboard')
+                    ->with('error', 'Akun Anda tidak aktif sebagai pemilih. Hubungi admin sekolah untuk mengaktifkan kembali akun Anda.');
+            }
             $hasVoted = $pemilihData->hasVoted();
         } else {
             // Resolve student record — siswa WAJIB punya baris `siswas` ter-link (user_id).
@@ -448,6 +485,12 @@ class OSISController extends Controller
             if (!$siswa) {
                 return redirect()->route('admin.dashboard')
                     ->with('error', 'Akun Anda belum terdaftar sebagai siswa pada sistem voting OSIS. Silakan hubungi admin sekolah untuk proses verifikasi data.');
+            }
+            // Gate pemilihs.is_active (konsisten dengan processVote()): siswa
+            // dengan record pemilih non-aktif tidak boleh mengakses form voting.
+            $inactiveError = $this->siswaPemilihInactiveError($siswa);
+            if ($inactiveError !== null) {
+                return redirect()->route('admin.dashboard')->with('error', $inactiveError);
             }
             $pemilihData = $siswa;
             $hasVoted = $siswa->hasVotedOsis();
@@ -575,15 +618,27 @@ class OSISController extends Controller
                     ->with('error', 'Data pemilih belum tersedia, hubungi admin untuk generate data pemilih.');
             }
 
+            // Gate pemilihs.is_active (konsisten dengan voting publik): pemilih
+            // guru yang dinonaktifkan admin TIDAK boleh vote via login.
+            if (!$pemilih->is_active) {
+                return redirect()->route('admin.dashboard')
+                    ->with('error', 'Akun Anda tidak aktif sebagai pemilih. Hubungi admin sekolah untuk mengaktifkan kembali akun Anda.');
+            }
+
             if ($pemilih->hasVoted()) {
                 // Double-vote → redirect ke hasil voting dengan pesan info (bukan fake success)
                 return redirect()->route('admin.osis.results')
                     ->with('info', 'Anda sudah melakukan voting. Berikut hasil pemilihan OSIS.');
             }
         } else {
-            // Siswa: satu calon_id tunggal (radio) — semantik TIDAK berubah
+            // Siswa: satu calon_id tunggal (radio) — semantik TIDAK berubah.
+            // Hanya calon AKTIF yang boleh dipilih (konsisten dengan jalur guru
+            // & voting publik — fix audit keamanan: sebelumnya `exists:calons,id`
+            // tanpa filter is_active membolehkan vote ke calon non-aktif).
             $request->validate([
-                'calon_id' => 'required|exists:calons,id',
+                'calon_id' => ['required', Rule::exists('calons', 'id')->where('is_active', true)],
+            ], [
+                'calon_id.exists' => 'Calon yang dipilih tidak ditemukan atau tidak aktif.',
             ]);
 
             // Resolve student record
@@ -592,6 +647,13 @@ class OSISController extends Controller
                 // Pesan jelas: data siswa belum terdaftar sebagai pemilih
                 return redirect()->route('admin.dashboard')
                     ->with('error', 'Data pemilih belum tersedia, hubungi admin untuk mendaftarkan Anda sebagai pemilih.');
+            }
+
+            // Gate pemilihs.is_active (konsisten dengan voting publik): siswa
+            // dengan record pemilih non-aktif TIDAK boleh vote via login.
+            $inactiveError = $this->siswaPemilihInactiveError($siswa);
+            if ($inactiveError !== null) {
+                return redirect()->route('admin.dashboard')->with('error', $inactiveError);
             }
 
             if ($siswa->hasVotedOsis()) {
@@ -609,6 +671,18 @@ class OSISController extends Controller
                 ->with('error', 'Tidak ada pemilihan OSIS yang sedang berlangsung.');
         }
 
+        // Defense in depth: cek allowed_classes di POST (bukan hanya di GET voting()).
+        // Tanpa cek ini, request langsung ke POST /admin/osis/vote bisa bypass
+        // batasan kelas yang sudah ditampilkan/dicek di form voting().
+        // Guru tidak dibatasi kelas (konsisten dengan voting()).
+        if (!$isGuru
+            && $siswa
+            && $election->allowed_classes
+            && !in_array($siswa->kelas, $election->allowed_classes)) {
+            return redirect()->route('admin.osis.voting')
+                ->with('error', 'Kelas Anda tidak diizinkan untuk memilih dalam pemilihan ini.');
+        }
+
         if ($isGuru) {
             // Guru voting path: catat 1–2 vote (multi-select maksimal 2 pasangan calon)
             // dalam SATU transaksi + lockForUpdate (pola double-check yang sudah ada).
@@ -618,8 +692,10 @@ class OSISController extends Controller
                 // Lock the pemilih row so concurrent requests queue up instead of racing
                 $lockedPemilih = Pemilih::whereKey($pemilih->id)->lockForUpdate()->first();
 
-                // Double-check inside the transaction (another request may have voted first)
-                if (!$lockedPemilih || $lockedPemilih->hasVoted()) {
+                // Double-check inside the transaction (another request may have
+                // voted first / pemilih dinonaktifkan) — pola yang sama dengan
+                // PublicOsisController (lock + is_active + hasVoted).
+                if (!$lockedPemilih || !$lockedPemilih->is_active || $lockedPemilih->hasVoted()) {
                     return false;
                 }
 
@@ -754,22 +830,67 @@ class OSISController extends Controller
 
     /**
      * Display voting results.
+     *
+     * BUG FIX (scoped per-election): sebelumnya semua query menghitung
+     * Voting::valid() GLOBAL — campur vote dari semua election. Sekarang
+     * di-scope ke election aktif (fallback: election terakhir), memakai
+     * helper buildVotingResultsForElection() yang sudah dipakai export
+     * PDF/JSON/XML agar angka halaman hasil = angka export.
+     *
+     * Mode hasil tersembunyi: selama pemilihan berjalan DAN election
+     * show_results=false, perolehan per calon TIDAK ditampilkan — hanya
+     * ringkasan partisipasi anonim (total pemilih/sudah memilih/belum).
      */
     public function results()
     {
-        $calons = Calon::active()->ordered()->withCount('votings')->get();
-        $totalVotes = Voting::valid()->count();
+        // Election aktif, atau election terakhir sebagai fallback (pola index())
+        $election = OsisElection::active()->first() ?? OsisElection::query()->latest()->first();
+
+        // Ringkasan partisipasi anonim — SELALU dihitung & ditampilkan
+        // (tidak membocorkan perolehan per calon, aman untuk mode tersembunyi)
         $totalPemilih = Pemilih::active()->count();
         $sudahMemilih = Pemilih::sudahMemilih()->count();
         $belumMemilih = Pemilih::belumMemilih()->count();
-        $votingPercentage = $totalPemilih > 0 ? round(($totalVotes / $totalPemilih) * 100, 2) : 0;
-        $recentVotes = Voting::with(['calon', 'pemilih'])
-            ->valid()
-            ->latest()
-            ->limit(5)
-            ->get();
 
-        return view('osis.results', compact('calons', 'totalVotes', 'totalPemilih', 'sudahMemilih', 'belumMemilih', 'votingPercentage', 'recentVotes'));
+        $resultsHidden = false;
+        $calons = collect();
+        $totalVotes = 0;
+        $recentVotes = collect();
+
+        if ($election) {
+            // Perolehan per calon hanya tampil jika election ended/locked ATAU show_results=true
+            $resultsHidden = !$election->resultsVisible();
+
+            if ($resultsHidden) {
+                // Total vote tetap dihitung per-election untuk persentase partisipasi,
+                // tapi TANPA rincian per calon
+                $totalVotes = Voting::where('election_id', $election->id)->valid()->count();
+            } else {
+                ['results' => $calons, 'totalVoted' => $totalVotes] =
+                    $this->buildVotingResultsForElection($election);
+
+                $recentVotes = Voting::with(['calon', 'pemilih'])
+                    ->where('election_id', $election->id)
+                    ->valid()
+                    ->latest()
+                    ->limit(5)
+                    ->get();
+            }
+        }
+
+        $votingPercentage = $totalPemilih > 0 ? round(($totalVotes / $totalPemilih) * 100, 2) : 0;
+
+        return view('osis.results', compact(
+            'election',
+            'resultsHidden',
+            'calons',
+            'totalVotes',
+            'totalPemilih',
+            'sudahMemilih',
+            'belumMemilih',
+            'votingPercentage',
+            'recentVotes'
+        ));
     }
 
     /**

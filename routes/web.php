@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\OSISController;
+use App\Http\Controllers\PublicOsisController;
+use App\Http\Controllers\OsisElectionController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\LocaleController;
@@ -531,6 +533,38 @@ Route::middleware(['auth', 'verified.email', 'role:admin|superadmin|osis'])->pre
     Route::get('/results/export/xml', [OSISController::class, 'exportVotingResultsXml'])->name('results.export.xml')->middleware('permission:osis.results');
     Route::get('/analytics', [OSISController::class, 'analytics'])->name('analytics')->middleware('permission:osis.view');
     Route::get('/teacher-view', [OSISController::class, 'teacherView'])->name('teacher-view')->middleware('permission:osis.view');
+
+    // Election management (CRUD pemilihan) — sebelumnya hanya via CLI `osis:manage`.
+    // Route statis (/elections, /elections/create) didaftarkan SEBELUM
+    // route dengan parameter {election} agar tidak tertangkap wildcard.
+    Route::get('/elections', [OsisElectionController::class, 'index'])
+        ->name('elections.index')
+        ->middleware('permission:osis.view');
+    Route::get('/elections/create', [OsisElectionController::class, 'create'])
+        ->name('elections.create')
+        ->middleware('permission:osis.create');
+    Route::post('/elections', [OsisElectionController::class, 'store'])
+        ->name('elections.store')
+        ->middleware('permission:osis.create');
+    Route::get('/elections/{election}/edit', [OsisElectionController::class, 'edit'])
+        ->name('elections.edit')
+        ->middleware('permission:osis.edit');
+    Route::put('/elections/{election}', [OsisElectionController::class, 'update'])
+        ->name('elections.update')
+        ->middleware('permission:osis.edit');
+    Route::delete('/elections/{election}', [OsisElectionController::class, 'destroy'])
+        ->name('elections.destroy')
+        ->middleware('permission:osis.delete');
+    Route::post('/elections/{election}/activate', [OsisElectionController::class, 'activate'])
+        ->name('elections.activate')
+        ->middleware('permission:osis.edit');
+    Route::post('/elections/{election}/close', [OsisElectionController::class, 'close'])
+        ->name('elections.close')
+        ->middleware('permission:osis.edit');
+    // Reset votes = operasi destruktif → throttle ekstra (max 10/menit)
+    Route::post('/elections/{election}/reset', [OsisElectionController::class, 'resetVotes'])
+        ->name('elections.reset')
+        ->middleware(['permission:osis.edit', 'throttle:10,1']);
 });
 
 // OSIS Voting Routes (Access: siswa, guru) - Voting and Results
@@ -542,6 +576,22 @@ Route::middleware(['auth', 'verified.email', 'role:siswa|guru'])->prefix('admin/
         ->middleware('throttle:voting') // Max 5 votes per minute (anti-fraud)
         ->name('vote');
     Route::get('/results', [OSISController::class, 'results'])->name('results');
+});
+
+// E-OSIS Public Voting (TANPA login — verifikasi NIS/NISN siswa atau NIP guru)
+// Hanya middleware web + throttle osis-public (10 req/menit/IP) untuk endpoint
+// yang menerima input identifier; vote POST wajib session verifikasi (dicek di controller).
+Route::prefix('osis')->name('osis.public.')->group(function () {
+    Route::get('/', [PublicOsisController::class, 'index'])->name('landing');
+    Route::post('/verify', [PublicOsisController::class, 'verify'])
+        ->middleware('throttle:osis-public')
+        ->name('verify');
+    Route::get('/vote', [PublicOsisController::class, 'vote'])->name('vote');
+    Route::post('/vote', [PublicOsisController::class, 'processVote'])
+        ->middleware('throttle:osis-public')
+        ->name('vote.store');
+    Route::get('/thanks', [PublicOsisController::class, 'thanks'])->name('thanks');
+    Route::get('/results', [PublicOsisController::class, 'results'])->name('results');
 });
 
 // E-Lulus Management (Access: admin, superadmin, guru)

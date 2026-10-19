@@ -34,8 +34,10 @@
                         {{ __('common.back_to_osis') }}
                     </a>
                 @endif
-                {{-- Export route butuh permission:osis.results (hanya admin|superadmin|osis) — guru tidak boleh melihat tombol ini --}}
-                @can('osis.results')
+                {{-- Export hanya tersedia ketika hasil sudah boleh ditampilkan
+                     (election ended/locked ATAU show_results=true) --}}
+                @if (!($resultsHidden ?? false))
+                    @can('osis.results')
                     <a href="{{ route('admin.osis.results.export.pdf') }}" class="btn btn-secondary"
                         title="Download hasil pemilihan (PDF)">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +62,8 @@
                         </svg>
                         XML
                     </a>
-                @endcan
+                    @endcan
+                @endif
             </div>
         </div>
     </x-slot>
@@ -141,6 +144,29 @@
             </div>
         </div>
 
+        @if ($resultsHidden ?? false)
+            <!-- Mode hasil tersembunyi: hanya ringkasan partisipasi anonim di atas
+                 yang tampil; perolehan per calon diumumkan setelah pemilihan ditutup. -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+                <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-1">Hasil Sedang Dirahasiakan</h3>
+                <p class="text-slate-600">
+                    Perolehan suara per calon akan diumumkan setelah pemilihan ditutup.
+                    Ringkasan partisipasi di atas menampilkan jumlah pemilih yang sudah
+                    menggunakan hak pilihnya tanpa mengungkap pilihan masing-masing.
+                </p>
+                @if ($election?->end_date)
+                    <p class="text-sm text-slate-500 mt-2">
+                        Pemilihan berakhir: {{ $election->end_date->format('d M Y H:i') }}
+                    </p>
+                @endif
+            </div>
+        @else
         <!-- Results -->
         <div class="space-y-6">
             <h2 class="text-xl font-semibold text-slate-900">{{ __('common.election_results_title') }}</h2>
@@ -162,8 +188,14 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-2xl font-bold text-slate-900">{{ $candidate->total_votes }}</p>
-                                    <p class="text-sm text-slate-600">{{ __('common.votes') }} ({{ $candidate->vote_percentage }}%)</p>
+                                    {{-- Angka scoped per-election (votings_count dari
+                                         buildVotingResultsForElection) — bukan accessor
+                                         global total_votes yang mencampur semua election --}}
+                                    <p class="text-2xl font-bold text-slate-900">{{ $candidate->votings_count }}</p>
+                                    <p class="text-sm text-slate-600">
+                                        {{ __('common.votes') }}
+                                        ({{ $totalVotes > 0 ? round(($candidate->votings_count / $totalVotes) * 100, 2) : 0 }}%)
+                                    </p>
                                 </div>
                             </div>
 
@@ -171,7 +203,7 @@
                             <div class="mb-4">
                                 <div class="w-full bg-slate-200 rounded-full h-3">
                                     <div class="bg-blue-600 h-3 rounded-full transition-all duration-500"
-                                        style="width: {{ $candidate->vote_percentage }}%"></div>
+                                        style="width: {{ $totalVotes > 0 ? round(($candidate->votings_count / $totalVotes) * 100, 2) : 0 }}%"></div>
                                 </div>
                             </div>
 
@@ -233,9 +265,10 @@
                 </div>
             @endif
         </div>
+        @endif
 
         <!-- Recent Votes -->
-        @if ($recentVotes->count() > 0)
+        @if (!($resultsHidden ?? false) && $recentVotes->count() > 0)
             <div class="mt-8">
                 <h2 class="text-xl font-semibold text-slate-900 mb-4">{{ __('common.recent_voting') }}</h2>
                 <div class="bg-white rounded-xl border border-slate-200 p-6">

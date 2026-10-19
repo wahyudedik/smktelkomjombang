@@ -56,6 +56,10 @@ class AppServiceProvider extends ServiceProvider
         // Email verification rate limit: 3 requests/minute by IP (prevent email spam)
         RateLimiter::for('email-verify', fn (Request $request) => Limit::perMinute(3)->by($request->ip()));
 
+        // Public E-OSIS voting rate limit: 10 requests/minute by IP
+        // (anti brute-force identifier NIS/NISN/NIP pada halaman publik tanpa login)
+        RateLimiter::for('osis-public', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
+
         // Login rate limit: 120 requests/minute by IP (shared IP lab sekolah) + 10/minute by email (anti-brute-force)
         RateLimiter::for('login', function (Request $request) {
             return [
