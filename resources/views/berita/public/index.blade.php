@@ -98,6 +98,12 @@
                             <ul class="blog-meta" style="margin-bottom: 25px;">
                                 <li><i class="fa fa-user-o"></i> {{ $featured->user->name ?? 'Admin' }}</li>
                                 <li><i class="fa fa-calendar"></i> {{ $featured->published_at?->format('d M Y') }}</li>
+                                @php
+                                    $featuredViews = number_format($featured->views_count ?? 0, 0, ',', '.');
+                                @endphp
+                                <li title="{{ $featuredViews }} kali dilihat" aria-label="{{ $featuredViews }} kali dilihat">
+                                    <i class="fas fa-eye"></i> {{ $featuredViews }}
+                                </li>
                             </ul>
                             <div>
                                 <a href="{{ route('berita.public.show', $featured->slug) }}" class="readon2">
@@ -128,6 +134,12 @@
                                 <ul class="blog-meta">
                                     <li><i class="fa fa-user-o"></i> {{ $berita->user->name ?? 'Admin' }}</li>
                                     <li><i class="fa fa-calendar"></i> {{ $berita->published_at?->format('d M Y') }}</li>
+                                    @php
+                                        $views = number_format($berita->views_count ?? 0, 0, ',', '.');
+                                    @endphp
+                                    <li title="{{ $views }} kali dilihat" aria-label="{{ $views }} kali dilihat">
+                                        <i class="fas fa-eye"></i> {{ $views }}
+                                    </li>
                                 </ul>
                                 <h3 class="title">
                                     <a href="{{ route('berita.public.show', $berita->slug) }}">

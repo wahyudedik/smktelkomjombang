@@ -1,5 +1,5 @@
 <!-- Section Gray bg Wrap start -->
-<div class="gray-bg">
+<div id="berita" class="gray-bg">
 <!-- Blog Section Start -->
 <div id="rs-blog" class="rs-blog style2 pt-94 pb-100 md-pt-64 md-pb-70">
     <div class="container">
@@ -27,6 +27,12 @@
                         <ul class="blog-meta">
                             <li><i class="fa fa-user-o"></i> {{ $blog->user->name ?? 'Admin' }}</li>
                             <li><i class="fa fa-calendar"></i> {{ $blog->published_at ? $blog->published_at->format('M d, Y') : 'N/A' }}</li>
+                            @php
+                                $views = number_format($blog->views_count ?? 0, 0, ',', '.');
+                            @endphp
+                            <li title="{{ $views }} kali dilihat" aria-label="{{ $views }} kali dilihat">
+                                <i class="fas fa-eye"></i> {{ $views }}
+                            </li>
                         </ul>
                         <h3 class="title"><a href="{{ route('berita.public.show', $blog->slug) }}">{{ $blog->title ?? 'Blog Title' }}</a></h3>
                         <div class="desc">{{ Str::limit($blog->excerpt ?: strip_tags($blog->content ?? ''), 100) }}</div>
@@ -102,6 +108,74 @@
                 </div>
             @endforelse
         </div>
+
+        {{-- Pagination — functional links from the $blogs paginator (window of up to 5 pages) --}}
+        @if (method_exists($blogs, 'hasPages') && $blogs->hasPages())
+            @php
+                $currentPage = $blogs->currentPage();
+                $lastPage = $blogs->lastPage();
+                // Window of up to 5 page numbers around the current page.
+                $start = max(1, $currentPage - 2);
+                $end = min($lastPage, $start + 4);
+                $start = max(1, $end - 4);
+            @endphp
+            <div class="pagination-area text-center mt-50">
+                <nav>
+                    <ul class="pagination-part" style="list-style: none; padding: 0; margin: 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                        {{-- Previous --}}
+                        @if ($blogs->onFirstPage())
+                            <li style="opacity: 0.4; cursor: not-allowed;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 2px solid #e0e0e0; border-radius: 5px; color: #999;">
+                                    <i class="fa fa-angle-left"></i>
+                                </span>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ $blogs->previousPageUrl() }}#berita" aria-label="Previous"
+                                    style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 2px solid #e0e0e0; border-radius: 5px; color: #333; text-decoration: none; transition: all 0.3s;">
+                                    <i class="fa fa-angle-left"></i>
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- Pages --}}
+                        @for ($num = $start; $num <= $end; $num++)
+                            @if ($num === $currentPage)
+                                <li>
+                                    <span class="readon2" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; font-size: 14px;">
+                                        {{ $num }}
+                                    </span>
+                                </li>
+                            @else
+                                <li>
+                                    <a href="{{ $blogs->url($num) }}#berita"
+                                        style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 2px solid #e0e0e0; border-radius: 5px; color: #333; text-decoration: none; font-size: 14px; transition: all 0.3s;">
+                                        {{ $num }}
+                                    </a>
+                                </li>
+                            @endif
+                        @endfor
+
+                        {{-- Next --}}
+                        @if ($blogs->hasMorePages())
+                            <li>
+                                <a href="{{ $blogs->nextPageUrl() }}#berita" aria-label="Next"
+                                    style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 2px solid #e0e0e0; border-radius: 5px; color: #333; text-decoration: none; transition: all 0.3s;">
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            </li>
+                        @else
+                            <li style="opacity: 0.4; cursor: not-allowed;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 2px solid #e0e0e0; border-radius: 5px; color: #999;">
+                                    <i class="fa fa-angle-right"></i>
+                                </span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+            </div>
+        @endif
+
         <!-- View All Button — configurable via backend -->
         @if(!empty($siteSettings['show_view_all_news']))
         <div class="text-center mt-50">

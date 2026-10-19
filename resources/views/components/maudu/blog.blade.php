@@ -1,7 +1,7 @@
 <!-- Blog / Berita -->
 @props(['blogs' => []])
 
-<div class="portfolio-area py-120">
+<div id="berita" class="portfolio-area py-120">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 mx-auto">
@@ -139,7 +139,7 @@
                             </li>
                         @else
                             <li class="page-item">
-                                <a class="page-link" href="{{ $blogs->previousPageUrl() }}" aria-label="Previous">
+                                <a class="page-link" href="{{ $blogs->previousPageUrl() }}#berita" aria-label="Previous">
                                     <span aria-hidden="true"><i class="far fa-arrow-left"></i></span>
                                 </a>
                             </li>
@@ -147,13 +147,13 @@
 
                         @for ($num = $start; $num <= $end; $num++)
                             <li class="page-item {{ $num === $currentPage ? 'active' : '' }}">
-                                <a class="page-link" href="{{ $blogs->url($num) }}">{{ $num }}</a>
+                                <a class="page-link" href="{{ $blogs->url($num) }}#berita">{{ $num }}</a>
                             </li>
                         @endfor
 
                         @if ($blogs->hasMorePages())
                             <li class="page-item">
-                                <a class="page-link" href="{{ $blogs->nextPageUrl() }}" aria-label="Next">
+                                <a class="page-link" href="{{ $blogs->nextPageUrl() }}#berita" aria-label="Next">
                                     <span aria-hidden="true"><i class="far fa-arrow-right"></i></span>
                                 </a>
                             </li>
