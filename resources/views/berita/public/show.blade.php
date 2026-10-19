@@ -45,16 +45,20 @@
                         <!-- Meta -->
                         <ul class="single-post-meta mb-25" style="list-style: none; padding: 0; display: flex; gap: 20px; flex-wrap: wrap; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 25px;">
                             <li style="color: #666; font-size: 14px;">
-                                <i class="fa fa-user-o mr-1" style="color: #1c3988;"></i>
+                                <i class="fas fa-user me-1" style="color: #1c3988;"></i>
                                 {{ $berita->user->name ?? 'Admin' }}
                             </li>
                             <li style="color: #666; font-size: 14px;">
-                                <i class="fa fa-calendar mr-1" style="color: #1c3988;"></i>
+                                <i class="fas fa-calendar me-1" style="color: #1c3988;"></i>
                                 {{ $berita->published_at?->translatedFormat('d F Y') }}
                             </li>
                             <li style="color: #666; font-size: 14px;">
-                                <i class="fa fa-tag mr-1" style="color: #1c3988;"></i>
+                                <i class="fas fa-tag me-1" style="color: #1c3988;"></i>
                                 Berita
+                            </li>
+                            <li style="color: #666; font-size: 14px;" title="Jumlah dilihat">
+                                <i class="fas fa-eye me-1" style="color: #1c3988;"></i>
+                                Dilihat {{ number_format($berita->views_count ?? 0, 0, ',', '.') }} kali
                             </li>
                         </ul>
 
@@ -78,15 +82,15 @@
                                 <span style="font-weight: 600; color: #333; margin-right: 10px;">Bagikan:</span>
                                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}"
                                     target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; background: #3b5998; color: white; border-radius: 50%; margin-right: 5px; text-decoration: none;">
-                                    <i class="fa fa-facebook"></i>
+                                    <i class="fab fa-facebook"></i>
                                 </a>
                                 <a href="https://wa.me/?text={{ urlencode($berita->title . ' - ' . request()->url()) }}"
                                     target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; background: #25d366; color: white; border-radius: 50%; margin-right: 5px; text-decoration: none;">
-                                    <i class="fa fa-whatsapp"></i>
+                                    <i class="fab fa-whatsapp"></i>
                                 </a>
                                 <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($berita->title) }}"
                                     target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; background: #1da1f2; color: white; border-radius: 50%; text-decoration: none;">
-                                    <i class="fa fa-twitter"></i>
+                                    <i class="fab fa-twitter"></i>
                                 </a>
                             </div>
                             <a href="{{ route('berita.public.index') }}" class="readon2" style="font-size: 13px; padding: 8px 20px;">
@@ -115,7 +119,7 @@
                                                 style="width: 80px; height: 60px; object-fit: cover; border-radius: 5px;">
                                         @else
                                             <div style="width: 80px; height: 60px; background: #e8eaf6; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="fa fa-newspaper-o" style="color: #9fa8da;"></i>
+                                                <i class="fas fa-newspaper" style="color: #9fa8da;"></i>
                                             </div>
                                         @endif
                                     </div>
@@ -126,7 +130,7 @@
                                             </a>
                                         </h5>
                                         <span style="font-size: 12px; color: #999;">
-                                            <i class="fa fa-calendar mr-1"></i>
+                                            <i class="fas fa-calendar me-1"></i>
                                             {{ $item->published_at?->format('d M Y') }}
                                         </span>
                                     </div>

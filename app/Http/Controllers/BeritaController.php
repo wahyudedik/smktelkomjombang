@@ -190,6 +190,8 @@ class BeritaController extends Controller
     {
         abort_if($berita->category !== self::CATEGORY || $berita->status !== 'published', 404);
 
+        $this->trackView($berita);
+
         $related = Page::where('category', self::CATEGORY)
             ->where('status', 'published')
             ->where('id', '!=', $berita->id)
@@ -220,6 +222,33 @@ class BeritaController extends Controller
     // =========================================================
     // HELPERS
     // =========================================================
+
+    /**
+     * Minutes before the same visitor may counted again for one berita.
+     */
+    private const VIEW_TRACKING_WINDOW_MINUTES = 30;
+
+    /**
+     * Atomically increment the berita view counter.
+     *
+     * Anti-refresh: the same session only counts once per
+     * self::VIEW_TRACKING_WINDOW_MINUTES window, so page reloads
+     * from the same visitor do not inflate the counter.
+     */
+    private function trackView(Page $berita): void
+    {
+        $sessionKey = 'berita_viewed_' . $berita->id;
+        $expiresAt  = (int) session($sessionKey, 0);
+
+        if ($expiresAt > now()->timestamp) {
+            return; // Already counted within the tracking window.
+        }
+
+        // Atomic UPDATE — safe under concurrent traffic, no mass-assignment involved.
+        $berita->increment('views_count');
+
+        session([$sessionKey => now()->addMinutes(self::VIEW_TRACKING_WINDOW_MINUTES)->timestamp]);
+    }
 
     /**
      * Clear blogs cache for ALL themes.

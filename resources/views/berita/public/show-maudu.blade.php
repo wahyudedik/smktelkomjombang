@@ -52,6 +52,10 @@
                                     <i class="fas fa-tag me-1" style="color: #1a5632;"></i>
                                     Berita
                                 </span>
+                                <span style="color: #666; font-size: 14px;">
+                                    <i class="fas fa-eye me-1" style="color: #1a5632;"></i>
+                                    Dilihat {{ number_format($berita->views_count ?? 0, 0, ',', '.') }} kali
+                                </span>
                             </div>
                         </div>
 
