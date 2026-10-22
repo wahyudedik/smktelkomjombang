@@ -42,6 +42,12 @@ class LandingController extends Controller
      */
     public function telkom()
     {
+        // Set theme override untuk request ini — pola yang sama dengan route /theme/{theme}.
+        // Memastikan theme_config(), theme_info(), theme_image(), theme_view(),
+        // current_theme(), dan cache key buildData() resolve ke config TELKOM,
+        // bukan DEFAULT_THEME (yang bisa saja 'maudu' di production).
+        config(['app.theme_override' => 'telkom']);
+
         View::share('themeConfig', theme_config());
         View::share('currentTheme', 'telkom');
 
@@ -55,6 +61,12 @@ class LandingController extends Controller
      */
     public function maudu()
     {
+        // Set theme override untuk request ini — pola yang sama dengan route /theme/{theme}.
+        // Memastikan theme_config(), theme_info(), theme_image(), theme_view(),
+        // current_theme(), dan cache key buildData() resolve ke config MAUDU,
+        // bukan DEFAULT_THEME (yang bisa saja 'telkom' di production).
+        config(['app.theme_override' => 'maudu']);
+
         View::share('themeConfig', theme_config());
         View::share('currentTheme', 'maudu');
 
