@@ -147,8 +147,10 @@ Route::post('/timezone', [LocaleController::class, 'switchTimezone'])->name('tim
 // Public Attendance Self-Service (no auth required)
 Route::get('/absensi/saya', [\App\Http\Controllers\PublicAttendanceController::class, 'index'])->name('public.attendance.index');
 Route::post('/absensi/saya', [\App\Http\Controllers\PublicAttendanceController::class, 'check'])
-    ->middleware('throttle:10,1') // Max 10 checks per minute
+    ->middleware('throttle:attendance-pin') // Brute-force protection: 5/min per IP + 10/min per PIN + lockout 10 gagal
     ->name('public.attendance.check');
+Route::post('/absensi/saya/logout', [\App\Http\Controllers\PublicAttendanceController::class, 'logout'])
+    ->name('public.attendance.logout');
 
 // Public Guest Book - Self Check-In (no auth required)
 Route::prefix('guest-book')->name('guest-book.')->group(function () {

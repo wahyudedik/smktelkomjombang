@@ -55,8 +55,8 @@
                     <div class="contact-wrap absensi-card"
                         style="background: #fff; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.10); padding: 48px 44px;">
 
-                        @if (empty($attendances))
-                            {{-- PIN Form --}}
+                        @if (empty($identity))
+                            {{-- PIN Form (tanpa data — hanya tampil sebelum sesi terikat) --}}
                             <form method="POST" action="{{ route('public.attendance.check') }}">
                                 @csrf
                                 <div class="mb-30">
@@ -66,7 +66,6 @@
                                     <input type="text" id="pin" name="pin"
                                         class="form-control"
                                         placeholder="Masukkan PIN absensi kamu"
-                                        value="{{ $pin ?? '' }}"
                                         required autofocus
                                         style="border-radius: 8px; border: 2px solid #e2e8f0; padding: 14px 16px; font-size: 16px; transition: border-color 0.3s;"
                                         onfocus="this.style.borderColor='#f4821f'"
@@ -86,7 +85,6 @@
                                 <div style="display: inline-block; background: linear-gradient(135deg, #1c2b4a 0%, #2d4a7a 100%); color: #fff; border-radius: 10px; padding: 16px 32px; margin-bottom: 20px;">
                                     <i class="fa fa-user" style="margin-right: 8px;"></i>
                                     <strong>{{ $name }}</strong>
-                                    <span style="opacity: 0.7; margin-left: 8px;">PIN: {{ $pin }}</span>
                                 </div>
                             </div>
 
@@ -184,14 +182,17 @@
                                 </table>
                             </div>
 
-                            {{-- Back Button --}}
+                            {{-- Ganti PIN / Keluar — putuskan sesi self-service --}}
                             <div class="text-center mt-30">
-                                <a href="{{ route('public.attendance.index') }}"
-                                    style="display: inline-block; background: #e2e8f0; color: #1c2b4a; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.3s;"
-                                    onmouseover="this.style.background='#cbd5e1'"
-                                    onmouseout="this.style.background='#e2e8f0'">
-                                    <i class="fa fa-arrow-left" style="margin-right: 6px;"></i> Cek PIN Lain
-                                </a>
+                                <form method="POST" action="{{ route('public.attendance.logout') }}" style="display: inline;">
+                                    @csrf
+                                    <button type="submit"
+                                        style="display: inline-block; background: #e2e8f0; color: #1c2b4a; padding: 12px 28px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: background 0.3s;"
+                                        onmouseover="this.style.background='#cbd5e1'"
+                                        onmouseout="this.style.background='#e2e8f0'">
+                                        <i class="fa fa-sign-out-alt" style="margin-right: 6px;"></i> Ganti PIN / Keluar
+                                    </button>
+                                </form>
                             </div>
                         @endif
                     </div>

@@ -67,5 +67,20 @@ class AppServiceProvider extends ServiceProvider
                 Limit::perMinute(10)->by('login-email|'.Str::lower((string) $request->input('email'))),
             ];
         });
+
+        // Attendance self-service PIN rate limit (anti brute-force /absensi/saya):
+        // - 5 request/menit per IP — membatasi serangan dari satu klien
+        // - 10 request/menit per PIN yang dicoba — membatasi brute-force satu PIN
+        // Ditambah lockout counter per PIN di PublicAttendanceController
+        // (lihat PublicAttendanceController::pinFailCacheKey() — 10 kegagalan → blokir 10 menit).
+        // Key PIN di-hash agar PIN tidak tersimpan plaintext di cache store.
+        RateLimiter::for('attendance-pin', function (Request $request) {
+            $pinKey = hash('sha256', (string) $request->input('pin', ''));
+
+            return [
+                Limit::perMinute(5)->by('attendance-pin|'.$request->ip()),
+                Limit::perMinute(10)->by('attendance-pin-attempt|'.$pinKey),
+            ];
+        });
     }
 }
