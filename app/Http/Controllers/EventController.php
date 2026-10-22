@@ -153,16 +153,13 @@ class EventController extends Controller
     }
 
     /**
-     * Clear events cache for ALL themes.
+     * Clear the shared events landing cache.
      *
-     * Admin CRUD operations are theme-agnostic — events data is shared across all themes.
-     * LandingController caches events per-theme as "landing_{theme}_events",
-     * so we must clear cache for every registered theme.
+     * Admin CRUD operations are theme-agnostic — events data is shared across all themes,
+     * so LandingController caches it under a single generic key ("landing_events").
      */
     private function clearEventsCache(): void
     {
-        foreach (available_themes() as $theme) {
-            Cache::forget("landing_{$theme}_events");
-        }
+        Cache::forget('landing_events');
     }
 }

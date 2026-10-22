@@ -44,7 +44,7 @@ class LandingController extends Controller
     {
         // Set theme override untuk request ini — pola yang sama dengan route /theme/{theme}.
         // Memastikan theme_config(), theme_info(), theme_image(), theme_view(),
-        // current_theme(), dan cache key buildData() resolve ke config TELKOM,
+        // dan current_theme() resolve ke config TELKOM,
         // bukan DEFAULT_THEME (yang bisa saja 'maudu' di production).
         config(['app.theme_override' => 'telkom']);
 
@@ -63,7 +63,7 @@ class LandingController extends Controller
     {
         // Set theme override untuk request ini — pola yang sama dengan route /theme/{theme}.
         // Memastikan theme_config(), theme_info(), theme_image(), theme_view(),
-        // current_theme(), dan cache key buildData() resolve ke config MAUDU,
+        // dan current_theme() resolve ke config MAUDU,
         // bukan DEFAULT_THEME (yang bisa saja 'telkom' di production).
         config(['app.theme_override' => 'maudu']);
 
@@ -76,6 +76,10 @@ class LandingController extends Controller
     /**
      * Build shared landing page data for all themes.
      * Avoids code duplication across index(), telkom(), and maudu().
+     *
+     * All cached datasets here are theme-independent (queries carry no theme
+     * filter), so generic cache keys WITHOUT a theme suffix are used — one
+     * cache entry is shared by every theme instead of N duplicated entries.
      */
     private function buildData(): array
     {
@@ -98,8 +102,7 @@ class LandingController extends Controller
      */
     private function getSiswaCount()
     {
-        $theme = current_theme();
-        return Cache::remember("landing_{$theme}_siswa_count", 86400, function () {
+        return Cache::remember('landing_siswa_count', 86400, function () {
             return Siswa::where('status', 'aktif')->count();
         });
     }
@@ -109,8 +112,7 @@ class LandingController extends Controller
      */
     private function getKelulusanPercentage()
     {
-        $theme = current_theme();
-        return Cache::remember("landing_{$theme}_kelulusan_percentage", 86400, function () {
+        return Cache::remember('landing_kelulusan_percentage', 86400, function () {
             $total = Kelulusan::count();
             if ($total === 0) return 0;
             // Count graduates who continued to higher education (have tempat_kuliah filled)
@@ -127,8 +129,7 @@ class LandingController extends Controller
      */
     private function getTestimonials()
     {
-        $theme = current_theme();
-        return Cache::remember("landing_{$theme}_testimonials", 86400, function () {
+        return Cache::remember('landing_testimonials', 86400, function () {
             $testimonials = Testimonial::where('is_approved', true)
                 ->orderBy('created_at', 'desc')
                 ->limit(4)
@@ -151,17 +152,16 @@ class LandingController extends Controller
      *
      * Caching strategy: only the ordered IDs are cached (lightweight).
      * The models themselves are re-queried per page on every request so
-     * views_count stays fresh despite the 24h ID cache. Cache key uses a
-     * NEW name ("landing_{theme}_blogs_ordered_ids") to avoid clashing with
-     * the legacy "landing_{theme}_blogs" key which cached full models.
+     * views_count stays fresh despite the 24h ID cache. The generic key
+     * ("landing_blogs_ordered_ids") replaced the legacy per-theme
+     * "landing_{theme}_blogs" key which cached full models.
      */
     private function getBlogs()
     {
-        $theme = current_theme();
         $perPage = 6;
         $page = max(1, (int) request()->query('page', 1));
 
-        $ids = Cache::remember("landing_{$theme}_blogs_ordered_ids", 86400, function () {
+        $ids = Cache::remember('landing_blogs_ordered_ids', 86400, function () {
             return Page::where('status', 'published')
                 ->where('category', 'berita')
                 ->where('published_at', '<=', now())
@@ -194,8 +194,7 @@ class LandingController extends Controller
      */
     private function getPartners()
     {
-        $theme = current_theme();
-        return Cache::remember("landing_{$theme}_partners", 86400, function () {
+        return Cache::remember('landing_partners', 86400, function () {
             return Partner::where('is_active', true)
                 ->orderBy('sort_order')
                 ->get();
@@ -207,8 +206,7 @@ class LandingController extends Controller
      */
     private function getEvents()
     {
-        $theme = current_theme();
-        return Cache::remember("landing_{$theme}_events", 43200, function () {
+        return Cache::remember('landing_events', 43200, function () {
             if (class_exists('App\Models\Events')) {
                 // Show active events: upcoming first, then recent past events as fallback
                 $events = \App\Models\Events::where('status', 'active')

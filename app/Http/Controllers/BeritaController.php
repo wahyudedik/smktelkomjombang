@@ -251,19 +251,15 @@ class BeritaController extends Controller
     }
 
     /**
-     * Clear blogs cache for ALL themes.
+     * Clear the shared blogs landing cache.
      *
-     * Admin CRUD operations are theme-agnostic — berita data is shared across all themes.
-     * LandingController caches blog IDs per-theme as "landing_{theme}_blogs_ordered_ids"
-     * (plus the legacy "landing_{theme}_blogs" key), so we must clear cache for
-     * every registered theme.
+     * Admin CRUD operations are theme-agnostic — berita data is shared across all themes,
+     * so LandingController caches the ordered blog IDs under a single generic key
+     * ("landing_blogs_ordered_ids").
      */
     private function clearBlogsCache(): void
     {
-        foreach (available_themes() as $theme) {
-            Cache::forget("landing_{$theme}_blogs");
-            Cache::forget("landing_{$theme}_blogs_ordered_ids");
-        }
+        Cache::forget('landing_blogs_ordered_ids');
     }
 
     private function uniqueSlug(string $title): string
