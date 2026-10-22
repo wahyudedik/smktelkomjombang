@@ -25,10 +25,24 @@
             <h2 class="text-lg font-semibold text-slate-900 mb-4">Status Device</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach ($devices as $device)
+                    @php
+                        // Health-check iClock (berbasis last_seen_at, TANPA socket port 4370)
+                        $health = \App\Services\ZKTeco\BiometricEnrollmentService::testConnection($device);
+                    @endphp
                     <div class="border border-slate-200 rounded-lg p-4">
-                        <p class="font-medium text-slate-900">{{ $device->name }}</p>
+                        <div class="flex items-start justify-between gap-2">
+                            <p class="font-medium text-slate-900">{{ $device->name }}</p>
+                            <span
+                                class="px-2 py-0.5 text-xs font-semibold rounded-full {{ $health['status'] === 'online' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600' }}">
+                                {{ $health['status'] === 'online' ? 'Online' : 'Offline' }}
+                            </span>
+                        </div>
                         <p class="text-sm text-slate-600">{{ $device->serial_number }}</p>
                         <p class="text-sm text-slate-600">{{ $device->ip_address }}:{{ $device->port ?? 4370 }}</p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Terakhir terlihat (iClock):
+                            {{ $device->last_seen_at?->diffForHumans() ?? 'belum pernah' }}
+                        </p>
                         <button type="button" class="btn btn-sm btn-secondary mt-2 test-connection" data-device-id="{{ $device->id }}">
                             Test Connection
                         </button>
@@ -97,10 +111,11 @@
                     });
 
                     const data = await response.json();
+                    const label = (data.status || (data.success ? 'online' : 'offline')).toUpperCase();
                     if (data.success) {
-                        alert('✓ ' + data.message);
+                        alert('✓ [' + label + '] ' + data.message);
                     } else {
-                        alert('✗ ' + data.message);
+                        alert('✗ [' + label + '] ' + data.message);
                     }
                 } catch (error) {
                     alert('Error: ' + error.message);

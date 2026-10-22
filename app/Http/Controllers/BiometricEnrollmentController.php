@@ -78,19 +78,14 @@ class BiometricEnrollmentController extends BaseController
 
         $device = AttendanceDevice::findOrFail($validated['device_id']);
 
-        // Connect ke device
-        if (!$this->enrollmentService->connect($device)) {
-            return back()->withErrors(['device' => 'Gagal terhubung ke device']);
-        }
-
-        // Enroll fingerprint
+        // Enroll fingerprint — langsung enqueue ke attendance_commands.
+        // Tidak butuh koneksi socket: command akan dieksekusi device via iClock
+        // saat polling /iclock/getrequest.
         $result = $this->enrollmentService->enrollFingerprint(
             $identity->device_pin,
             $identity->user?->name ?? $identity->guru?->nama_lengkap ?? $identity->siswa?->nama_lengkap ?? "User",
             $validated['finger_index']
         );
-
-        $this->enrollmentService->disconnect();
 
         if ($result['success']) {
             return redirect()->route('admin.absensi.biometric.index')
@@ -137,18 +132,11 @@ class BiometricEnrollmentController extends BaseController
 
         $device = AttendanceDevice::findOrFail($validated['device_id']);
 
-        // Connect ke device
-        if (!$this->enrollmentService->connect($device)) {
-            return back()->withErrors(['device' => 'Gagal terhubung ke device']);
-        }
-
-        // Enroll face
+        // Enroll face — langsung enqueue ke attendance_commands (tanpa socket).
         $result = $this->enrollmentService->enrollFace(
             $identity->device_pin,
             $identity->user?->name ?? $identity->guru?->nama_lengkap ?? $identity->siswa?->nama_lengkap ?? "User"
         );
-
-        $this->enrollmentService->disconnect();
 
         if ($result['success']) {
             return redirect()->route('admin.absensi.biometric.index')
@@ -196,19 +184,12 @@ class BiometricEnrollmentController extends BaseController
 
         $device = AttendanceDevice::findOrFail($validated['device_id']);
 
-        // Connect ke device
-        if (!$this->enrollmentService->connect($device)) {
-            return back()->withErrors(['device' => 'Gagal terhubung ke device']);
-        }
-
-        // Enroll RFID
+        // Enroll RFID — langsung enqueue ke attendance_commands (tanpa socket).
         $result = $this->enrollmentService->enrollRFID(
             $identity->device_pin,
             $identity->user?->name ?? $identity->guru?->nama_lengkap ?? $identity->siswa?->nama_lengkap ?? "User",
             $validated['card_number']
         );
-
-        $this->enrollmentService->disconnect();
 
         if ($result['success']) {
             return redirect()->route('admin.absensi.biometric.index')
@@ -219,7 +200,10 @@ class BiometricEnrollmentController extends BaseController
     }
 
     /**
-     * Test connection ke device
+     * Test connection ke device (health-check iClock, tanpa socket)
+     *
+     * Status device diturunkan dari last_seen_at (aktivitas polling iClock),
+     * bukan dari probe TCP port 4370.
      */
     public function testConnection(Request $request)
     {
@@ -231,22 +215,17 @@ class BiometricEnrollmentController extends BaseController
 
         $device = AttendanceDevice::findOrFail($validated['device_id']);
 
-        $connected = BiometricEnrollmentService::testConnection(
-            $device->ip_address,
-            $device->port ?? 4370
-        );
-
-        if ($connected) {
-            return response()->json([
-                'success' => true,
-                'message' => "Device {$device->name} terhubung",
-            ]);
-        }
+        $result = BiometricEnrollmentService::testConnection($device);
 
         return response()->json([
-            'success' => false,
-            'message' => "Gagal terhubung ke device {$device->name}",
-        ], 400);
+            'success' => $result['success'],
+            'status' => $result['status'],
+            'message' => $result['message'],
+            'method' => $result['method'],
+            'last_seen_at' => $result['last_seen_at'],
+            'minutes_since_last_seen' => $result['minutes_since_last_seen'],
+            'threshold_minutes' => $result['threshold_minutes'],
+        ]);
     }
 
 }

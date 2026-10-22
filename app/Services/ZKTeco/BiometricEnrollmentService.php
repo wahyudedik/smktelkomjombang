@@ -10,85 +10,18 @@ use Illuminate\Support\Facades\Log;
 /**
  * Service untuk enroll biometric (fingerprint/face/RFID) dari web
  * Menggunakan IClockCommandQueue untuk queue command ke device
+ *
+ * Jalur komunikasi SATU-SATUNYA dengan device adalah HTTP iClock
+ * (device poll /iclock/getrequest → ambil command dari tabel attendance_commands).
+ * Socket legacy protokol ZKTeco lama (port 4370) sudah dipensiunkan.
  */
 class BiometricEnrollmentService
 {
-    private ?AttendanceDevice $device = null;
-    private $connection;
     private IClockCommandQueue $commandQueue;
 
     public function __construct(?IClockCommandQueue $commandQueue = null)
     {
         $this->commandQueue = $commandQueue ?? new IClockCommandQueue();
-    }
-
-    /**
-     * Connect ke device ZKTeco
-     */
-    public function connect(AttendanceDevice $device): bool
-    {
-        try {
-            $this->device = $device;
-
-            // Buka socket connection ke device
-            $this->connection = @fsockopen(
-                $device->ip_address,
-                $device->port ?? 4370,
-                $errno,
-                $errstr,
-                5
-            );
-
-            if (!$this->connection) {
-                Log::error("Failed to connect to device {$device->serial_number}: {$errstr}");
-                return false;
-            }
-
-            Log::info("Connected to device {$device->serial_number}");
-            return true;
-        } catch (\Exception $e) {
-            Log::error("Connection error: {$e->getMessage()}");
-            return false;
-        }
-    }
-
-    /**
-     * Disconnect dari device
-     */
-    public function disconnect(): bool
-    {
-        if ($this->connection) {
-            fclose($this->connection);
-            $this->connection = null;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Get semua user dari device
-     */
-    public function getUsers(): array
-    {
-        if (!$this->connection) {
-            return [];
-        }
-
-        try {
-            // Command untuk get user list
-            $command = $this->buildCommand('GET_USER_LIST');
-            fwrite($this->connection, $command);
-
-            $response = '';
-            while (!feof($this->connection)) {
-                $response .= fgets($this->connection, 128);
-            }
-
-            return $this->parseUserList($response);
-        } catch (\Exception $e) {
-            Log::error("Get users error: {$e->getMessage()}");
-            return [];
-        }
     }
 
     /**
@@ -327,113 +260,64 @@ class BiometricEnrollmentService
     }
 
     /**
-     * Get device info
+     * Health-check device berbasis iClock (TANPA socket / port 4370).
+     *
+     * Device ZKTeco iClock melakukan polling HTTP berkala ke /iclock/cdata,
+     * yang memperbarui last_seen_at pada record device. Status "online"
+     * diturunkan dari aktivitas iClock tersebut — bukan dari probe TCP legacy,
+     * sehingga tetap berfungsi di jaringan yang memblokir port 4370.
+     *
+     * @param AttendanceDevice $device        Device yang dicek
+     * @param int              $thresholdMinutes Ambang waktu (menit) sejak
+     *                                          last_seen_at untuk dianggap "online"
+     * @return array{
+     *     success: bool,
+     *     status: 'online'|'offline',
+     *     message: string,
+     *     method: 'iclock',
+     *     last_seen_at: string|null,
+     *     minutes_since_last_seen: float|null,
+     *     threshold_minutes: int
+     * }
      */
-    public function getDeviceInfo(): array
+    public static function testConnection(AttendanceDevice $device, int $thresholdMinutes = 5): array
     {
-        if (!$this->device) {
-            return [];
-        }
+        $lastSeen = $device->last_seen_at;
 
-        try {
+        if ($lastSeen === null) {
+            Log::info("iClock health check for {$device->serial_number}: never connected");
+
             return [
-                'serial_number' => $this->device->serial_number,
-                'ip_address' => $this->device->ip_address,
-                'port' => $this->device->port,
-                'name' => $this->device->name,
-                'is_active' => $this->device->is_active,
-                'last_seen_at' => $this->device->last_seen_at,
-            ];
-        } catch (\Exception $e) {
-            Log::error("Get device info error: {$e->getMessage()}");
-            return [];
-        }
-    }
-
-    /**
-     * Test connection ke device via TCP socket
-     *
-     * Mencoba membuka koneksi TCP ke device pada port yang dikonfigurasi.
-     * Jika berhasil, berarti device dapat diakses dari jaringan.
-     *
-     * Mendukung 2 signature:
-     * - testConnection(AttendanceDevice $device): array  (recommended)
-     * - testConnection(string $ipAddress, int $port): bool  (backward compat)
-     *
-     * @param AttendanceDevice|string $device Device atau IP address
-     * @param int $port Port (hanya digunakan jika $device adalah string)
-     * @return array|bool
-     */
-    public static function testConnection(AttendanceDevice|string $device, int $port = 4370): array|bool
-    {
-        // Backward compatible: string IP + port → return bool
-        if (is_string($device)) {
-            $ipAddress = $device;
-        } else {
-            $ipAddress = $device->ip_address;
-            $port = $device->port ?? 4370;
-        }
-
-        $fp = @fsockopen($ipAddress, $port, $errno, $errstr, 5);
-        if ($fp) {
-            fclose($fp);
-            Log::info("Connection test successful to {$ipAddress}:{$port}");
-
-            // Return based on input type
-            if (is_string(func_get_arg(0))) {
-                return true;
-            }
-            return [
-                'success' => true,
-                'message' => 'Connection successful',
+                'success' => false,
+                'status' => 'offline',
+                'message' => "Device {$device->name} belum pernah terhubung via iClock (tidak ada aktivitas)",
+                'method' => 'iclock',
+                'last_seen_at' => null,
+                'minutes_since_last_seen' => null,
+                'threshold_minutes' => $thresholdMinutes,
             ];
         }
 
-        Log::warning("Connection test failed to {$ipAddress}:{$port}: {$errstr} ({$errno})");
+        // Carbon 3: diffInMinutes bersifat signed — hitung dari lastSeen menuju now
+        // agar positif untuk last_seen_at di masa lampau.
+        $minutesSince = round(max(0, (float) $lastSeen->diffInMinutes(now())), 1);
+        $isOnline = $minutesSince <= $thresholdMinutes;
 
-        if (is_string(func_get_arg(0))) {
-            return false;
-        }
+        Log::info("iClock health check for {$device->serial_number}: " . ($isOnline ? 'online' : 'offline'), [
+            'minutes_since_last_seen' => $minutesSince,
+            'threshold_minutes' => $thresholdMinutes,
+        ]);
+
         return [
-            'success' => false,
-            'message' => "Connection failed: {$errstr} ({$errno})",
+            'success' => $isOnline,
+            'status' => $isOnline ? 'online' : 'offline',
+            'message' => $isOnline
+                ? "Device {$device->name} online — terakhir terlihat via iClock {$minutesSince} menit lalu"
+                : "Device {$device->name} offline/tidak aktif — terakhir terlihat via iClock {$minutesSince} menit lalu (ambang {$thresholdMinutes} menit)",
+            'method' => 'iclock',
+            'last_seen_at' => $lastSeen->toIso8601String(),
+            'minutes_since_last_seen' => $minutesSince,
+            'threshold_minutes' => $thresholdMinutes,
         ];
-    }
-
-    /**
-     * Build command untuk device
-     */
-    private function buildCommand(string $command): string
-    {
-        // Format command sesuai ZKTeco protocol
-        return $command . "\r\n";
-    }
-
-    /**
-     * Parse user list dari response
-     */
-    private function parseUserList(string $response): array
-    {
-        $users = [];
-        $lines = explode("\n", $response);
-
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (empty($line)) {
-                continue;
-            }
-
-            // Parse format: PIN,NAME,ROLE
-            $parts = explode(',', $line);
-            if (count($parts) >= 2) {
-                $users[] = [
-                    'pin' => $parts[0],
-                    'name' => $parts[1],
-                    'role' => $parts[2] ?? 'user',
-                ];
-            }
-        }
-
-        return $users;
     }
 }
