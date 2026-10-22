@@ -2,7 +2,7 @@
 
 > File ini membantu AI assistant memahami project ini saat memulai chat baru atau pindah ke chat baru.
 > Mirip dengan `CLAUDE.md`, `.cursorrules`, atau `copilot-instructions.md`.
-> Diperbarui: 2026-08-21
+> Diperbarui: 2026-10-22
 
 ---
 
@@ -54,7 +54,7 @@ app/
 │   ├── AttendanceExportService.php
 │   └── ZKTeco/               # ZKTeco iClock attendance integration
 ├── Helpers/                   # Custom helper functions
-│   ├── ThemeHelper.php        # ⭐ theme_info(), theme_image(), theme_view(), theme_config(), current_theme(), resolve_theme_url(), available_themes()
+│   ├── ThemeHelper.php        # ⭐ theme_config(), theme_config_set(), current_theme(), theme_info(), available_themes(), theme_image(), theme_view(), resolve_theme_url()
 │   ├── helpers.php            # General helpers
 │   ├── RoleHelper.php         # Role-based helpers
 │   ├── NotificationHelper.php # Notification dispatch helpers
@@ -109,31 +109,33 @@ Database theme_settings    ← Admin-editable overrides (upload logo/favicon)
 
 | Fungsi | Deskripsi |
 |--------|-----------|
-| [`theme_info($key)`](app/Helpers/ThemeHelper.php:165) | Ambil data dari registry `config/themes.php` |
-| [`theme_image($key)`](app/Helpers/ThemeHelper.php:226) | 4-tier resolution: per-theme DB → global setting → registry default → hardcoded |
-| [`theme_view($base)`](app/Helpers/ThemeHelper.php:285) | Convention-based: `{base}-{theme}.blade.php` → fallback `{base}.blade.php` |
-| [`theme_config($key)`](app/Helpers/ThemeHelper.php:34) | Ambil config tema (priority: DB → Config file → Default) |
-| [`current_theme()`](app/Helpers/ThemeHelper.php:108) | Get active theme (supports route override) |
-| [`theme_asset($path)`](app/Helpers/ThemeHelper.php:204) | Generate themed asset URL |
-| [`resolve_theme_url($url)`](app/Helpers/ThemeHelper.php:319) | Resolve `route:name` syntax dari config files |
-| [`available_themes()`](app/Helpers/ThemeHelper.php:188) | List semua registered theme names |
-| [`is_theme($theme)`](app/Helpers/ThemeHelper.php:123) | Generic theme check |
-| `is_telkom()` / `is_maudu()` | Backward compat (deprecated) |
+| [`theme_config($key, $default)`](app/Helpers/ThemeHelper.php) | Ambil config tema (priority: DB `theme_settings` → Config file → Default) |
+| [`theme_config_set($theme, $key, $value)`](app/Helpers/ThemeHelper.php) | Set config tema ke DB `theme_settings` + clear cache |
+| [`current_theme()`](app/Helpers/ThemeHelper.php) | Get active theme (route override `app.theme_override` → `DEFAULT_THEME` env) |
+| [`theme_info($key, $default)`](app/Helpers/ThemeHelper.php) | Ambil data dari registry `config/themes.php` |
+| [`available_themes()`](app/Helpers/ThemeHelper.php) | List semua registered theme names |
+| [`theme_image($key, $defaultPath)`](app/Helpers/ThemeHelper.php) | 4-tier resolution: per-theme DB → global setting → registry default → hardcoded |
+| [`theme_view($base, $overrides)`](app/Helpers/ThemeHelper.php) | Convention-based: `{base}-{theme}.blade.php` → fallback `{base}.blade.php` |
+| [`resolve_theme_url($url)`](app/Helpers/ThemeHelper.php) | Resolve `route:name` syntax dari config files (delimiter `\|` disarankan; `,` legacy) |
+
+> Tautan sengaja **tanpa nomor baris** agar tidak stale saat [`app/Helpers/ThemeHelper.php`](app/Helpers/ThemeHelper.php) berubah.
 
 ### Controller Landing Page
 [`LandingController`](app/Http/Controllers/LandingController.php) adalah controller utama (GENERIC — tidak hardcode tema):
 - `index()` → route `GET /` → render berdasarkan `current_theme()`
-- `telkom()` → route `GET /telkom` → force telkom theme (deprecated)
-- `maudu()` → route `GET /maudu` → force maudu theme (deprecated)
+- `telkom()` → route `GET /telkom` → set `config(['app.theme_override' => 'telkom'])` lalu render (deprecated)
+- `maudu()` → route `GET /maudu` → set `config(['app.theme_override' => 'maudu'])` lalu render (deprecated)
 - `buildData()` → private method yang mengumpulkan semua data untuk landing page
 
 ### Routes
 ```php
 Route::get('/', [LandingController::class, 'index'])->name('landing');              // Default theme
-Route::get('/telkom', [LandingController::class, 'telkom'])->name('landing.telkom'); // Backward compat
-Route::get('/maudu', [LandingController::class, 'maudu'])->name('landing.maudu');    // Backward compat
+Route::get('/telkom', [LandingController::class, 'telkom'])->name('landing.telkom'); // Backward compat (deprecated)
+Route::get('/maudu', [LandingController::class, 'maudu'])->name('landing.maudu');    // Backward compat (deprecated)
 Route::get('/theme/{theme}', function (string $theme) { ... })->name('landing.theme'); // Dynamic
 ```
+
+> **Penting**: Route `GET /telkom` & `GET /maudu` (deprecated) kini **men-set [`config(['app.theme_override' => ...])`](app/Http/Controllers/LandingController.php)** per request di [`LandingController::telkom()`](app/Http/Controllers/LandingController.php) / [`LandingController::maudu()`](app/Http/Controllers/LandingController.php) — `GET /theme/{theme}` di [`routes/web.php`](routes/web.php) juga sama. Efeknya [`current_theme()`](app/Helpers/ThemeHelper.php) beserta [`theme_config()`](app/Helpers/ThemeHelper.php), [`theme_info()`](app/Helpers/ThemeHelper.php), [`theme_image()`](app/Helpers/ThemeHelper.php), [`theme_view()`](app/Helpers/ThemeHelper.php) selalu resolve ke tema yang diminta, meski `DEFAULT_THEME` berbeda.
 
 ### View Naming Convention
 
@@ -192,17 +194,11 @@ Pattern: `{path}/{base}-{theme}.blade.php` → fallback `{path}/{base}.blade.php
 
 ## ⚙️ Environment Variables Penting
 
-```env
-DEFAULT_THEME=telkom          # atau 'maudu'
-APP_NAME="SMK Telekomunikasi Darul Ulum"
-APP_LOCALE=id
-APP_TIMEZONE=Asia/Jakarta
-APP_CURRENCY=IDR              # Default currency (used by config/i18n.php)
-DB_DATABASE=telkom_db
-FILESYSTEM_DISK=local
-CACHE_STORE=database
-QUEUE_CONNECTION=database
-```
+Daftar lengkap variabel + nilai default ada di [`.env.example`](.env.example) — **rujuk file tersebut, jangan menduplikasi nilainya di sini** agar tidak drift.
+
+Variabel yang khas untuk project ini (perlu konteks tambahan):
+
+- `DEFAULT_THEME` — menentukan tema aktif landing page (`telkom` / `maudu`); registry tema di [`config/themes.php`](config/themes.php)
 
 ---
 
@@ -213,16 +209,20 @@ Semua routes sensitif sudah dilindungi oleh `throttle` middleware. Total 42+ rou
 
 | Rate Limit | Routes | Keterangan |
 |------------|--------|------------|
-| `throttle:5,1` | Login, user invite, user create, testimonial, Instagram test-connection | 5 requests/menit |
+| `throttle:5,1` | User invite, user create, testimonial, Instagram/biometric test-connection, guest book check-in | 5 requests/menit |
+| `throttle:login` | Login (`POST /login`) | Named limiter: 120 requests/menit per-IP + 10/menit per-email (aman untuk IP bersama lab sekolah) |
 | `throttle:10,1` | Import/export semua modul, excuses store, bulk ops, role sync | 10 requests/menit |
 | `throttle:20,1` | Excuses approve/reject | 20 requests/menit |
 | `throttle:30,1` | Image upload, push subscribe/unsubscribe | 30 requests/menit |
 | `throttle:3,1` | Password reset | 3 requests/menit |
 | `throttle:6,1` | Email verification | 6 requests/menit |
 | `throttle:voting` | OSIS voting (custom) | 5 votes/menit (anti-fraud) |
+| `throttle:attendance-pin` | Attendance self-service (`POST /absensi/saya`) | 5/menit per-IP + 10/menit per-PIN + lockout sementara setelah 10 kali gagal |
 | `throttle:webhook` | Instagram webhook (custom) | 120 requests/menit |
 | `throttle:device-api` | ZKTeco iClock endpoints (custom) | 120 requests/menit |
 | `throttle:bulk` | Bulk import/seed/clone/generate (custom) | 5 operations/menit |
+
+> **Attendance self-service** (`/absensi/saya`): setelah PIN tervalidasi, identitas disimpan ke **sesi** (session-binding) — data absensi hanya dilayani dari sesi, PIN tidak pernah dikirim balik ke view/response. Lihat [`PublicAttendanceController`](app/Http/Controllers/PublicAttendanceController.php).
 
 ### Security Headers (`SecurityHeaders` Middleware)
 Middleware [`SecurityHeaders`](app/Http/Middleware/SecurityHeaders.php) otomatis menambahkan:
@@ -638,6 +638,8 @@ php artisan serve
 13. **Attendance Config** — Semua config absensi di `config/attendance.php`, override via env vars `ATTENDANCE_*`
 14. **Attendance Scheduler** — `attendance:mark-alpha` berjalan jam 23:00, `attendance:notify --summary` jam 16:00
 15. **Breadcrumb Components** — Tersedia per tema: `<x-telkom.breadcrumb>`, `<x-maudu.breadcrumb>`, `<x-admin.breadcrumb>`
+16. **Attendance `overtime_minutes`** — Kolom [`attendances.overtime_minutes`](database/migrations/2026_10_22_000001_add_overtime_minutes_to_attendances_table.php) (menit, default 0) diisi otomatis oleh [`AttendanceSync`](app/Console/Commands/AttendanceSync.php) saat lembur terdeteksi, ikut diekspor oleh [`AttendanceExportService`](app/Services/AttendanceExportService.php)
+17. **ZKTeco tanpa socket 4370** — Komunikasi device via iClock HTTP (device poll `/iclock/getrequest`); health-check [`BiometricEnrollmentService::testConnection()`](app/Services/ZKTeco/BiometricEnrollmentService.php) berbasis `last_seen_at`. Socket legacy port 4370 sudah dipensiunkan — jangan menambahkan kode yang membuka koneksi TCP ke port 4370
 
 ---
 
