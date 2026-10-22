@@ -37,6 +37,7 @@ class AttendanceExportService
             'Jam Pulang',
             'Durasi',
             'Status',
+            'Lembur (menit)',
         ];
 
         // Data
@@ -67,6 +68,7 @@ class AttendanceExportService
                 $lastOut,
                 $durasi,
                 $attendance->status,
+                $attendance->overtime_minutes,
             ];
         }
 
@@ -100,6 +102,7 @@ class AttendanceExportService
             'Jam Pulang',
             'Durasi',
             'Status',
+            'Lembur (menit)',
         ];
 
         // Data
@@ -130,6 +133,7 @@ class AttendanceExportService
                 $lastOut,
                 $durasi,
                 $attendance->status,
+                $attendance->overtime_minutes,
             ];
         }
 
@@ -256,6 +260,7 @@ class AttendanceExportService
             'Jam Pulang',
             'Durasi',
             'Status',
+            'Lembur (menit)',
         ];
 
         // Data
@@ -278,6 +283,7 @@ class AttendanceExportService
                 $lastOut,
                 $durasi,
                 $attendance->status,
+                $attendance->overtime_minutes,
             ];
         }
 

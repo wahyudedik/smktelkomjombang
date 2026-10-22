@@ -101,7 +101,10 @@ class AttendanceSync extends Command
                     $overtimeStartTime = $date->copy()->setTimeFromTimeString($overtimeStart);
 
                     if ($lastOut->gt($overtimeStartTime)) {
-                        $overtimeMinutes = (int) $lastOut->diffInMinutes($overtimeStartTime);
+                        // Carbon 3: diffInMinutes() signed by default → pakai abs() agar
+                        // selalu menit POSITIF (kasus ini lastOut > overtimeStart, hasil
+                        // mentah = negatif). round() untuk aman dari float pecahan.
+                        $overtimeMinutes = (int) round(abs($lastOut->diffInMinutes($overtimeStartTime)));
                         Log::info("Overtime detected", [
                             'attendance_id' => $attendance->id,
                             'last_out' => $lastOut->toDateTimeString(),
@@ -111,10 +114,13 @@ class AttendanceSync extends Command
                     }
                 }
 
+                // Persist hasil hitungan lembur (SATUAN MENIT) — konsisten dengan
+                // nilai yang di-log di atas. 0 saat overtime tidak aktif / tidak ada lembur.
                 $attendance->forceFill([
                     'first_in_at' => $firstIn,
                     'last_out_at' => $lastOut,
                     'status' => $status,
+                    'overtime_minutes' => $overtimeMinutes,
                 ])->save();
 
                 $log->forceFill(['processed_at' => now()])->save();
