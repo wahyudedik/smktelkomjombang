@@ -11,6 +11,17 @@ class AttendanceSettingSeeder extends Seeder
      * Default settings mapped from config/attendance.php
      *
      * Each entry: key => ['value' => ..., 'type' => ...]
+     *
+     * SEED = MATERIALISASI DEFAULT, BUKAN OVERRIDE DIAM-DIAM:
+     * - `run()` memakai firstOrCreate → hanya mengisi key yang BELUM ADA di
+     *   tabel `attendance_settings`; value yang sudah ada (hasil set admin
+     *   lewat UI Attendance Settings) TIDAK pernah ditimpa saat deploy.
+     * - Nilai hardcoded di bawah dipakai hanya sebagai fallback materialisasi.
+     * - Khusus group Overtime, value di-resolve dari `config('attendance.*')`
+     *   (yang membaca env `ATTENDANCE_OVERTIME_*`) — sehingga seed SELALU
+     *   konsisten dengan default config, bukan menimpa env produksi.
+     *   (Ketidakcocokan ini pernah menyebabkan `ATTENDANCE_OVERTIME_ENABLED=true`
+     *   di production ter-override oleh seed `false` → lembur nonaktif.)
      */
     private array $defaults = [
         // ── ZKTeco iClock ──────────────────────────────
@@ -70,8 +81,13 @@ class AttendanceSettingSeeder extends Seeder
      */
     public function run(): void
     {
-        foreach ($this->defaults as $key => $config) {
-            AttendanceSetting::updateOrCreate(
+        $defaults = array_replace($this->defaults, $this->overtimeDefaults());
+
+        foreach ($defaults as $key => $config) {
+            // firstOrCreate: materialisasi default untuk key yang belum ada;
+            // TIDAK menimpa value yang sudah di-set admin (updateOrCreate
+            // sebelumnya mereset override admin setiap kali seeder dijalankan).
+            AttendanceSetting::firstOrCreate(
                 ['key' => $key],
                 [
                     'value' => $config['value'],
@@ -80,6 +96,34 @@ class AttendanceSettingSeeder extends Seeder
             );
         }
 
-        $this->command->info("✅ " . count($this->defaults) . " attendance settings berhasil di-seed.");
+        $this->command->info("✅ " . count($defaults) . " attendance settings berhasil di-seed.");
+    }
+
+    /**
+     * Resolve default group Overtime dari config/attendance.php (env-aware).
+     *
+     * Mengapa khusus overtime: config default `overtime_enabled` = false,
+     * tapi env `ATTENDANCE_OVERTIME_ENABLED` di production = true. Dengan
+     * resolve dari config, seed mengikuti nilai efektif (env jika diset,
+     * default config jika tidak) sehingga tidak pernah "menimpa diam-diam".
+     *
+     * @return array<string, array{value: string, type: string}>
+     */
+    private function overtimeDefaults(): array
+    {
+        return [
+            'overtime_enabled'       => [
+                'value' => ((bool) config('attendance.overtime_enabled', false)) ? 'true' : 'false',
+                'type'  => 'boolean',
+            ],
+            'overtime_start'         => [
+                'value' => (string) config('attendance.overtime_start', '16:00'),
+                'type'  => 'time',
+            ],
+            'overtime_rate_per_hour' => [
+                'value' => (string) (int) config('attendance.overtime_rate_per_hour', 0),
+                'type'  => 'integer',
+            ],
+        ];
     }
 }
