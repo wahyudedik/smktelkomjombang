@@ -91,9 +91,10 @@
                             {{-- Summary Cards --}}
                             @php
                                 $totalDays = $attendances->count();
-                                $hadirCount = $attendances->where('status', 'Hadir')->count();
-                                $terlambatCount = $attendances->where('status', 'Terlambat')->count();
-                                $tidakHadirCount = $attendances->where('status', 'Tidak Hadir')->count();
+                                $hadirCount = $attendances->where('status', 'present')->count();
+                                $terlambatCount = $attendances->where('status', 'late')->count();
+                                $izinCount = $attendances->where('status', 'excused')->count();
+                                $tidakHadirCount = $attendances->whereIn('status', ['alpha', 'absent'])->count();
                             @endphp
                             <div class="row mb-30">
                                 <div class="col-6 col-md-3 mb-2">
@@ -106,6 +107,12 @@
                                     <div style="background: #fff3e0; border-radius: 8px; padding: 14px; text-align: center;">
                                         <p style="margin: 0; font-size: 12px; color: #e65100; font-weight: 600;">Terlambat</p>
                                         <p style="margin: 4px 0 0; font-size: 24px; font-weight: 700; color: #e65100;">{{ $terlambatCount }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-2">
+                                    <div style="background: #e3f2fd; border-radius: 8px; padding: 14px; text-align: center;">
+                                        <p style="margin: 0; font-size: 12px; color: #1565c0; font-weight: 600;">Izin/Sakit</p>
+                                        <p style="margin: 4px 0 0; font-size: 24px; font-weight: 700; color: #1565c0;">{{ $izinCount }}</p>
                                     </div>
                                 </div>
                                 <div class="col-6 col-md-3 mb-2">
@@ -137,22 +144,8 @@
                                     <tbody>
                                         @forelse ($attendances as $i => $att)
                                             @php
-                                                $statusColor = match ($att->status) {
-                                                    'Hadir' => '#2e7d32',
-                                                    'Terlambat' => '#e65100',
-                                                    'Tidak Hadir' => '#c62828',
-                                                    'Izin' => '#1565c0',
-                                                    'Sakit' => '#6a1b9a',
-                                                    default => '#666',
-                                                };
-                                                $statusBg = match ($att->status) {
-                                                    'Hadir' => '#e8f5e9',
-                                                    'Terlambat' => '#fff3e0',
-                                                    'Tidak Hadir' => '#ffebee',
-                                                    'Izin' => '#e3f2fd',
-                                                    'Sakit' => '#f3e5f5',
-                                                    default => '#f5f5f5',
-                                                };
+                                                $statusColor = attendance_status_color($att->status);
+                                                $statusBg = attendance_status_bg($att->status);
                                             @endphp
                                             <tr style="border-bottom: 1px solid #eee;">
                                                 <td style="padding: 12px 16px; color: #666;">{{ $i + 1 }}</td>
@@ -167,7 +160,7 @@
                                                 </td>
                                                 <td style="padding: 12px 16px;">
                                                     <span style="background: {{ $statusBg }}; color: {{ $statusColor }}; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
-                                                        {{ $att->status }}
+                                                        {{ attendance_status_label($att->status) }}
                                                     </span>
                                                 </td>
                                             </tr>

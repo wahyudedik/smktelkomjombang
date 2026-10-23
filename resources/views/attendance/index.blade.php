@@ -98,7 +98,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
                                     {{ $attendance->last_out_at?->format('H:i:s') ?? '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                                    {{ $attendance->status }}</td>
+                                    {{ attendance_status_label($attendance->status) }}</td>
                             </tr>
                         @empty
                             <tr>

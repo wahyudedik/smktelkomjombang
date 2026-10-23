@@ -64,11 +64,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $lastOut }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $durasi }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    @if ($attendance->status === 'present')
-                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Hadir</span>
-                                    @else
-                                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Tidak Hadir</span>
-                                    @endif
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium {{ attendance_status_badge_class($attendance->status) }}">{{ attendance_status_label($attendance->status) }}</span>
                                 </td>
                             </tr>
                         @empty
