@@ -94,24 +94,20 @@ class AttendanceSync extends Command
                 $thresholdTime = $date->copy()->setTimeFromTimeString($lateThreshold);
                 $status = ($firstIn && $firstIn->gt($thresholdTime)) ? 'late' : 'present';
 
-                // Overtime calculation
-                $overtimeMinutes = 0;
-                if (attendance_config('overtime_enabled', false) && $lastOut) {
-                    $overtimeStart = attendance_config('overtime_start', '16:00');
-                    $overtimeStartTime = $date->copy()->setTimeFromTimeString($overtimeStart);
+                // Overtime calculation — rumus dibagi bersama dengan backfill
+                // data historis (attendance:backfill-overtime) lewat helper
+                // attendance_overtime_minutes() agar identik & deterministik.
+                $overtimeMinutes = attendance_overtime_minutes($date, $lastOut);
 
-                    if ($lastOut->gt($overtimeStartTime)) {
-                        // Carbon 3: diffInMinutes() signed by default → pakai abs() agar
-                        // selalu menit POSITIF (kasus ini lastOut > overtimeStart, hasil
-                        // mentah = negatif). round() untuk aman dari float pecahan.
-                        $overtimeMinutes = (int) round(abs($lastOut->diffInMinutes($overtimeStartTime)));
-                        Log::info("Overtime detected", [
-                            'attendance_id' => $attendance->id,
-                            'last_out' => $lastOut->toDateTimeString(),
-                            'overtime_start' => $overtimeStartTime->toDateTimeString(),
-                            'overtime_minutes' => $overtimeMinutes,
-                        ]);
-                    }
+                if ($overtimeMinutes > 0) {
+                    Log::info("Overtime detected", [
+                        'attendance_id' => $attendance->id,
+                        'last_out' => $lastOut->toDateTimeString(),
+                        'overtime_start' => $date->copy()
+                            ->setTimeFromTimeString((string) attendance_config('overtime_start', '16:00'))
+                            ->toDateTimeString(),
+                        'overtime_minutes' => $overtimeMinutes,
+                    ]);
                 }
 
                 // Persist hasil hitungan lembur (SATUAN MENIT) — konsisten dengan

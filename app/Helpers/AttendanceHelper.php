@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\AttendanceSetting;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Cache;
 
 if (!function_exists('attendance_config')) {
@@ -136,5 +137,44 @@ if (!function_exists('attendance_config')) {
         {
             return attendance_status_map($status)['badge_class'];
         }
+    }
+}
+
+if (!function_exists('attendance_overtime_minutes')) {
+    /**
+     * Hitung menit lembur sebuah hari absensi — SATU-SATUNYA sumber rumus lembur.
+     *
+     * Dipakai oleh AttendanceSync (sinkronisasi harian) dan
+     * AttendanceBackfillOvertime (backfill data historis) agar hasilnya
+     * identik, deterministik, dan konsisten. Rumusnya persis seperti
+     * implementasi asli di AttendanceSync:
+     *
+     *  - bila overtime nonaktif / tanpa tanggal / tanpa last_out_at → 0
+     *  - lembur = last_out_at − overtime_start (pada tanggal yang sama)
+     *  - Carbon 3 diffInMinutes() SIGNED → dinormalisasi abs() + round()
+     *    agar selalu menghasilkan menit POSITIF
+     *
+     * @param  CarbonInterface|null  $date     Tanggal absensi (hanya bagian tanggalnya yang dipakai)
+     * @param  CarbonInterface|null  $lastOut  Waktu pulang terakhir (last_out_at)
+     * @return int Menit lembur (0 bila tidak ada lembur / overtime nonaktif)
+     */
+    function attendance_overtime_minutes(?CarbonInterface $date, ?CarbonInterface $lastOut): int
+    {
+        if (!$date || !$lastOut || !attendance_config('overtime_enabled', false)) {
+            return 0;
+        }
+
+        $overtimeStartTime = $date->copy()->setTimeFromTimeString(
+            (string) attendance_config('overtime_start', '16:00')
+        );
+
+        if (!$lastOut->gt($overtimeStartTime)) {
+            return 0;
+        }
+
+        // Carbon 3: diffInMinutes() signed by default → abs() agar selalu
+        // menit POSITIF (kasus ini lastOut > overtimeStart, hasil mentah =
+        // negatif). round() untuk aman dari float pecahan.
+        return (int) round(abs($lastOut->diffInMinutes($overtimeStartTime)));
     }
 }
