@@ -60,7 +60,8 @@
                         </div>
 
                         <div>
-                            <h4 class="text-sm font-medium text-slate-600 mb-2">{{ __('common.nis_label') }}</h4>
+                            {{-- Label identitas dinamis: nilai kolom `nis` berisi NIS (siswa) atau NIP (guru). --}}
+                            <h4 class="text-sm font-medium text-slate-600 mb-2">{{ $pemilih->user_type === 'guru' ? 'NIP' : __('common.nis_label') }}</h4>
                             <p class="text-lg font-semibold text-slate-900">{{ $pemilih->nis }}</p>
                         </div>
 

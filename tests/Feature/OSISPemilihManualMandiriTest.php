@@ -539,4 +539,57 @@ class OSISPemilihManualMandiriTest extends TestCase
         $this->assertSame(DataType::TYPE_STRING, $nipCell->getDataType());
         $this->assertSame('198703122010011003', $nipCell->getValue());
     }
+
+    /** @test */
+    public function show_pemilih_displays_dynamic_nis_nip_label_by_user_type(): void
+    {
+        // Perbaikan UI: halaman detail pemilih bertipe GURU menampilkan label
+        // "NIP" (bukan "NIS" statis) tepat pada value NIP-nya; pemilih SISWA
+        // tetap "NIS". Label = heading h4 sebelum <p> value di show.blade.php.
+        $guru = Pemilih::create([
+            'nama' => 'Guru Label Dinamis',
+            'nis' => '198703122010011675',
+            'kelas' => 'Guru',
+            'jenis_kelamin' => 'L',
+            'email' => 'guru.label.dinamis@test.com',
+            'user_type' => 'guru',
+            'status' => 'belum_memilih',
+            'is_active' => true,
+        ]);
+        $siswa = Pemilih::create([
+            'nama' => 'Siswa Label Dinamis',
+            'nis' => '24001',
+            'kelas' => 'XII IPA 1',
+            'jenis_kelamin' => 'P',
+            'email' => 'siswa.label.dinamis@test.com',
+            'user_type' => 'siswa',
+            'status' => 'belum_memilih',
+            'is_active' => true,
+        ]);
+
+        // Detail pemilih GURU: label "NIP" menempel langsung pada value NIP.
+        $guruShow = $this->actingAs($this->admin)->get(route('admin.osis.pemilih.show', $guru));
+        $guruShow->assertOk();
+        $this->assertMatchesRegularExpression(
+            '/<h4[^>]*>\s*NIP\s*<\/h4>\s*<p[^>]*>\s*198703122010011675\s*<\/p>/',
+            $guruShow->getContent(),
+            'Label identitas pemilih guru harus "NIP" tepat sebelum value NIP-nya.'
+        );
+        // Tidak ada heading label "NIS" sama sekali di halaman show pemilih guru
+        // (menangkap regresi label statis "NIS" pada konteks NIP).
+        $this->assertDoesNotMatchRegularExpression(
+            '/<h4[^>]*>\s*NIS\s*<\/h4>/',
+            $guruShow->getContent(),
+            'Halaman show pemilih guru tidak boleh menampilkan label heading "NIS".'
+        );
+
+        // Detail pemilih SISWA: label identitas tetap "NIS".
+        $siswaShow = $this->actingAs($this->admin)->get(route('admin.osis.pemilih.show', $siswa));
+        $siswaShow->assertOk();
+        $this->assertMatchesRegularExpression(
+            '/<h4[^>]*>\s*NIS\s*<\/h4>\s*<p[^>]*>\s*24001\s*<\/p>/',
+            $siswaShow->getContent(),
+            'Label identitas pemilih siswa harus tetap "NIS".'
+        );
+    }
 }
