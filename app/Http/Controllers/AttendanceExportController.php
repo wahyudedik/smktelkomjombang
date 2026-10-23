@@ -175,10 +175,15 @@ class AttendanceExportController extends BaseController
             ->groupBy('status')
             ->pluck('total', 'status');
 
+        // Key 'alpha' menggabungkan alias legacy 'absent' (tidak pernah ditulis
+        // oleh AttendanceSync/MarkAlphaCommand; mungkin ada di baris data lama).
         $stats = [
             'total' => (int) $statusCounts->sum(),
             'present' => (int) $statusCounts->get('present', 0),
-            'absent' => (int) $statusCounts->get('absent', 0),
+            'alpha' => (int) $statusCounts->get('alpha', 0) + (int) $statusCounts->get('absent', 0),
+            'total_overtime_minutes' => (int) \App\Models\Attendance::query()
+                ->whereDate('date', $date)
+                ->sum('overtime_minutes'),
         ];
 
         $pdf = Pdf::loadView('attendance.pdf.daily', compact('attendances', 'date', 'stats'));

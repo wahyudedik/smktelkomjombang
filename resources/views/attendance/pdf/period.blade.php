@@ -125,6 +125,7 @@
                     <th>Jam Masuk</th>
                     <th>Jam Pulang</th>
                     <th>Durasi</th>
+                    <th>Lembur (menit)</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -159,7 +160,8 @@
                         <td>{{ $firstIn }}</td>
                         <td>{{ $lastOut }}</td>
                         <td>{{ $durasi }}</td>
-                        <td class="{{ $statusClass }}">{{ ucfirst($attendance->status) }}</td>
+                        <td>{{ $attendance->overtime_minutes ?: '-' }}</td>
+                        <td class="{{ $statusClass }}">{{ attendance_status_label($attendance->status) }}</td>
                     </tr>
                 @endforeach
             </tbody>

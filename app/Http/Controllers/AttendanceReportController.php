@@ -52,13 +52,17 @@ class AttendanceReportController extends BaseController
             ->groupBy('status')
             ->pluck('total', 'status');
 
+        // Key 'alpha' menggabungkan alias legacy 'absent' (tidak pernah ditulis
+        // oleh AttendanceSync/MarkAlphaCommand; mungkin ada di baris data lama).
         $stats = [
             'total' => (int) $statusCounts->sum(),
             'present' => (int) $statusCounts->get('present', 0),
-            'absent' => (int) $statusCounts->get('absent', 0),
             'late' => (int) $statusCounts->get('late', 0),
             'excused' => (int) $statusCounts->get('excused', 0),
-            'alpha' => (int) $statusCounts->get('alpha', 0),
+            'alpha' => (int) $statusCounts->get('alpha', 0) + (int) $statusCounts->get('absent', 0),
+            'total_overtime_minutes' => (int) Attendance::query()
+                ->whereDate('date', $date)
+                ->sum('overtime_minutes'),
         ];
 
         return view('attendance.report.daily', compact('attendances', 'date', 'stats'));
@@ -79,18 +83,22 @@ class AttendanceReportController extends BaseController
         $start = Carbon::createFromFormat('Y-m-d', $validated['start_date'])->startOfDay();
         $end = Carbon::createFromFormat('Y-m-d', $validated['end_date'])->endOfDay();
 
-        // Group by date
-        $attendances = Attendance::query()
+        $allAttendances = Attendance::query()
             ->with(['identity.guru', 'identity.siswa', 'identity.user'])
             ->whereBetween('date', [$start, $end])
             ->orderBy('date')
-            ->get()
-            ->groupBy(fn($a) => $a->date->format('Y-m-d'));
+            ->get();
+
+        // Group by date
+        $attendances = $allAttendances->groupBy(fn($a) => $a->date->format('Y-m-d'));
+
+        $totalRecords = $allAttendances->count();
 
         $stats = [
             'total_days' => $attendances->count(),
-            'total_records' => Attendance::whereBetween('date', [$start, $end])->count(),
-            'avg_per_day' => round(Attendance::whereBetween('date', [$start, $end])->count() / max($attendances->count(), 1), 2),
+            'total_records' => $totalRecords,
+            'avg_per_day' => round($totalRecords / max($attendances->count(), 1), 2),
+            'total_overtime_minutes' => (int) $allAttendances->sum('overtime_minutes'),
         ];
 
         return view('attendance.report.weekly', compact('attendances', 'start', 'end', 'stats'));
@@ -190,6 +198,10 @@ class AttendanceReportController extends BaseController
             'hadir' => $attendances->count(),
             'tidak_hadir' => ($end->diffInDays($start) + 1) - $attendances->count(),
             'persentase' => round(($attendances->count() / max($end->diffInDays($start) + 1, 1)) * 100, 2),
+            'total_overtime_minutes' => (int) Attendance::query()
+                ->where('attendance_identity_id', $identity->id)
+                ->whereBetween('date', [$start, $end])
+                ->sum('overtime_minutes'),
         ];
 
         return view('attendance.report.user-detail', compact(
@@ -231,6 +243,7 @@ class AttendanceReportController extends BaseController
         $stats = [
             'total_latecomers' => $attendances->count(),
             'threshold_time' => $thresholdTime->format('H:i'),
+            'total_overtime_minutes' => (int) $attendances->sum('overtime_minutes'),
         ];
 
         return view('attendance.report.latecomers', compact('attendances', 'start', 'end', 'stats'));

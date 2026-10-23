@@ -174,6 +174,7 @@ class AttendanceExportService
             'Persentase',
             'Rata-rata Jam Masuk',
             'Rata-rata Jam Pulang',
+            'Total Lembur (menit)',
         ];
 
         // Data
@@ -216,6 +217,7 @@ class AttendanceExportService
                 "{$persentase}%",
                 $avgFirstIn,
                 $avgLastOut,
+                (int) $attendances->sum('overtime_minutes'),
             ];
         }
 

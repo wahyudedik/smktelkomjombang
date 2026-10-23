@@ -11,7 +11,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Statistik -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div class="bg-white rounded-xl border border-slate-200 p-6">
                 <p class="text-sm font-medium text-slate-600">Total Keterlambatan</p>
                 <p class="text-2xl font-bold text-red-600 mt-1">{{ $stats['total_latecomers'] }}</p>
@@ -23,6 +23,10 @@
             <div class="bg-white rounded-xl border border-slate-200 p-6">
                 <p class="text-sm font-medium text-slate-600">Periode</p>
                 <p class="text-lg font-bold text-slate-900 mt-1">{{ $start->diffInDays($end) + 1 }} hari</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <p class="text-sm font-medium text-slate-600">Total Lembur (menit)</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['total_overtime_minutes'] }}</p>
             </div>
         </div>
 
@@ -39,6 +43,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">PIN</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Masuk</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Pulang</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Lembur (menit)</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Keterlambatan</th>
                         </tr>
                     </thead>
@@ -64,6 +69,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $identity->device_pin }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">{{ $firstIn }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $lastOut }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $attendance->overtime_minutes ?: '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                     <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
                                         +{{ $lateStr }}
@@ -72,7 +78,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-6 py-8 text-center text-sm text-slate-600">
+                                <td colspan="9" class="px-6 py-8 text-center text-sm text-slate-600">
                                     Tidak ada data keterlambatan untuk periode ini 🎉
                                 </td>
                             </tr>

@@ -122,6 +122,7 @@
                     <th>Persentase</th>
                     <th>Avg Masuk</th>
                     <th>Avg Pulang</th>
+                    <th>Total Lembur (menit)</th>
                 </tr>
             </thead>
             <tbody>
@@ -141,6 +142,7 @@
                         <td class="{{ $pctClass }}">{{ $row[6] }}</td>
                         <td>{{ $row[7] }}</td>
                         <td>{{ $row[8] }}</td>
+                        <td>{{ $row[9] }}</td>
                     </tr>
                 @endforeach
             </tbody>

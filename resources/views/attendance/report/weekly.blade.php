@@ -11,7 +11,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Statistik -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div class="bg-white rounded-xl border border-slate-200 p-6">
                 <p class="text-sm font-medium text-slate-600">Total Hari</p>
                 <p class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['total_days'] }}</p>
@@ -24,6 +24,10 @@
                 <p class="text-sm font-medium text-slate-600">Rata-rata/Hari</p>
                 <p class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['avg_per_day'] }}</p>
             </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <p class="text-sm font-medium text-slate-600">Total Lembur (menit)</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['total_overtime_minutes'] }}</p>
+            </div>
         </div>
 
         <!-- Data per Hari -->
@@ -32,7 +36,7 @@
                 <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
                     <h3 class="text-sm font-semibold text-slate-900">
                         {{ \Carbon\Carbon::parse($dateKey)->translatedFormat('l, d F Y') }}
-                        <span class="ml-2 text-xs font-normal text-slate-500">({{ $dailyRecords->count() }} record)</span>
+                        <span class="ml-2 text-xs font-normal text-slate-500">({{ $dailyRecords->count() }} record, lembur {{ $dailyRecords->sum('overtime_minutes') }} menit)</span>
                     </h3>
                 </div>
                 <div class="overflow-x-auto">
@@ -45,6 +49,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Masuk</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Pulang</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Durasi</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Lembur (menit)</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
@@ -70,6 +75,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $firstIn }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $lastOut }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $durasi }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $attendance->overtime_minutes ?: '-' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <span class="px-2 py-1 rounded-full text-xs font-medium {{ attendance_status_badge_class($attendance->status) }}">{{ attendance_status_label($attendance->status) }}</span>
                                     </td>

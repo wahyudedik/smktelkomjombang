@@ -11,7 +11,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Statistik -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div class="bg-white rounded-xl border border-slate-200 p-6">
                 <p class="text-sm font-medium text-slate-600">Total Absensi</p>
                 <p class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['total'] }}</p>
@@ -22,7 +22,11 @@
             </div>
             <div class="bg-white rounded-xl border border-slate-200 p-6">
                 <p class="text-sm font-medium text-slate-600">Tidak Hadir</p>
-                <p class="text-2xl font-bold text-red-600 mt-1">{{ $stats['absent'] }}</p>
+                <p class="text-2xl font-bold text-red-600 mt-1">{{ $stats['alpha'] }}</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <p class="text-sm font-medium text-slate-600">Total Lembur (menit)</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['total_overtime_minutes'] }}</p>
             </div>
         </div>
 
@@ -38,6 +42,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Masuk</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Pulang</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Durasi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Lembur (menit)</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                         </tr>
                     </thead>
@@ -63,13 +68,14 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $firstIn }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $lastOut }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $durasi }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $attendance->overtime_minutes ?: '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     <span class="px-2 py-1 rounded-full text-xs font-medium {{ attendance_status_badge_class($attendance->status) }}">{{ attendance_status_label($attendance->status) }}</span>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-8 text-center text-sm text-slate-600">Tidak ada data</td>
+                                <td colspan="8" class="px-6 py-8 text-center text-sm text-slate-600">Tidak ada data</td>
                             </tr>
                         @endforelse
                     </tbody>

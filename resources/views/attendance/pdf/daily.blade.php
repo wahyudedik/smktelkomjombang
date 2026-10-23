@@ -67,20 +67,22 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            table-layout: fixed;
         }
 
         table th {
             background-color: #1e293b;
             color: white;
-            padding: 8px 4px;
+            padding: 6px 3px;
             text-align: left;
-            font-size: 9px;
+            font-size: 8px;
         }
 
         table td {
             border: 1px solid #e2e8f0;
-            padding: 6px 4px;
-            font-size: 9px;
+            padding: 5px 3px;
+            font-size: 8px;
+            word-wrap: break-word;
         }
 
         table tr:nth-child(even) {
@@ -136,7 +138,11 @@
         </div>
         <div class="stat-box">
             <div class="label">Tidak Hadir</div>
-            <div class="value red">{{ $stats['absent'] }}</div>
+            <div class="value red">{{ $stats['alpha'] }}</div>
+        </div>
+        <div class="stat-box">
+            <div class="label">Total Lembur (menit)</div>
+            <div class="value">{{ $stats['total_overtime_minutes'] ?? 0 }}</div>
         </div>
     </div>
 
@@ -144,14 +150,15 @@
         <table>
             <thead>
                 <tr>
-                    <th>No</th>
-                    <th>Jenis</th>
-                    <th>Nama</th>
-                    <th>PIN</th>
-                    <th>Jam Masuk</th>
-                    <th>Jam Pulang</th>
-                    <th>Durasi</th>
-                    <th>Status</th>
+                    <th style="width: 4%;">No</th>
+                    <th style="width: 8%;">Jenis</th>
+                    <th style="width: 19%;">Nama</th>
+                    <th style="width: 9%;">PIN</th>
+                    <th style="width: 11%;">Jam Masuk</th>
+                    <th style="width: 11%;">Jam Pulang</th>
+                    <th style="width: 10%;">Durasi</th>
+                    <th style="width: 10%;">Lembur (menit)</th>
+                    <th style="width: 18%;">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -184,7 +191,8 @@
                         <td>{{ $firstIn }}</td>
                         <td>{{ $lastOut }}</td>
                         <td>{{ $durasi }}</td>
-                        <td class="{{ $statusClass }}">{{ ucfirst($attendance->status) }}</td>
+                        <td>{{ $attendance->overtime_minutes ?: '-' }}</td>
+                        <td class="{{ $statusClass }}">{{ attendance_status_label($attendance->status) }}</td>
                     </tr>
                 @endforeach
             </tbody>
