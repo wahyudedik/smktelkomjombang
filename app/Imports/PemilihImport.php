@@ -69,10 +69,28 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
                 }
             }
 
+            $userType = !empty($row['user_type']) ? strtolower(trim($row['user_type'])) : 'siswa';
+            if (!in_array($userType, ['siswa', 'guru'], true)) {
+                $userType = 'siswa';
+            }
+
             // Accept both 'kelas' and legacy 'kelas_jabatan' headings
             $kelas = !empty($row['kelas'])
                 ? trim($row['kelas'])
                 : (!empty($row['kelas_jabatan']) ? trim($row['kelas_jabatan']) : '-');
+
+            // Guru rows always use kelas 'Guru' (same rule as manual create on the server)
+            if ($userType === 'guru') {
+                $kelas = 'Guru';
+            }
+
+            // Optional `nis` column: NIS for siswa / NIP for guru.
+            // Backward compatible — old files without the column get NULL.
+            // is_scalar: sel numerik Excel terbaca int/float — dinormalkan ke
+            // string; array/garbage diabaikan.
+            $nis = (isset($row['nis']) && is_scalar($row['nis']) && trim((string) $row['nis']) !== '')
+                ? trim((string) $row['nis'])
+                : null;
 
             $this->rowCount++;
 
@@ -81,8 +99,9 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
             return new Pemilih([
                 'user_id' => $userId,
                 'nama' => trim($row['nama']),
+                'nis' => $nis,
                 'email' => trim($row['email']),
-                'user_type' => !empty($row['user_type']) ? trim($row['user_type']) : 'siswa',
+                'user_type' => $userType,
                 'jenis_kelamin' => $jenisKelamin,
                 'kelas' => $kelas, // kelas column is NOT NULL
                 'status' => $status,
@@ -106,6 +125,11 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
     {
         return [
             '*.nama' => 'required|string|max:255',
+            // NIS (siswa) / NIP (guru) — opsional, backward compatible.
+            // Sengaja TANPA batasan tipe: sel numerik Excel terbaca sebagai int
+            // (NIS/NIP tanpa format "Text") — nilai dinormalisasi ke string
+            // oleh guard is_scalar di model().
+            '*.nis' => 'nullable',
             '*.email' => 'required|email|max:255',
             '*.user_type' => 'nullable|in:guru,siswa',
             '*.jenis_kelamin' => 'nullable|in:L,P,Laki-laki,Perempuan,laki-laki,perempuan,l,p',

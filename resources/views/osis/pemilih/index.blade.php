@@ -208,7 +208,14 @@
                                             </svg>
                                         </div>
                                         <div>
-                                            <p class="font-medium text-slate-900">{{ $p->nama }}</p>
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <p class="font-medium text-slate-900">{{ $p->nama }}</p>
+                                                @if ($p->user_type === 'guru')
+                                                    <span class="badge badge-warning">Guru</span>
+                                                @elseif ($p->user_type === 'siswa')
+                                                    <span class="badge badge-success">Siswa</span>
+                                                @endif
+                                            </div>
                                             <p class="text-sm text-slate-500">{{ $p->nis }}</p>
                                         </div>
                                     </div>

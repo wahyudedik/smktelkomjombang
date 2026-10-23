@@ -116,15 +116,30 @@
                         <p class="mb-2">File Excel harus memiliki kolom berikut:</p>
                         <ul class="list-disc list-inside space-y-1 ml-4">
                             <li><strong>nama</strong> - Nama lengkap pemilih (wajib)</li>
+                            <li><strong>nis</strong> - NIS untuk siswa / NIP untuk guru (opsional, default: kosong).
+                                Wajib terisi bila pemilih ingin melakukan verifikasi publik tanpa login
+                                (halaman E-Voting OSIS) — untuk guru, isi dengan NIP
+                            </li>
                             <li><strong>email</strong> - Email pemilih (wajib)</li>
-                            <li><strong>user_type</strong> - guru atau siswa (opsional, default: siswa) - digunakan untuk tracking di tabel pemilihs</li>
+                            <li><strong>user_type</strong> - <code>siswa</code> atau <code>guru</code> (opsional,
+                                default: siswa). Baris dengan <code>user_type</code> = <code>guru</code> wajib
+                                menggunakan <strong>kelas = Guru</strong> (kolom kelas akan otomatis diisi
+                                <code>Guru</code> oleh sistem) — digunakan untuk tracking di tabel pemilihs
+                            </li>
                             <li><strong>jenis_kelamin</strong> - L atau P (opsional)</li>
                             <li><strong>kelas</strong> - Kelas siswa (opsional, default: -; judul lama
-                                'kelas_jabatan' masih didukung)
+                                'kelas_jabatan' masih didukung). Untuk baris guru, selalu diisi
+                                <code>Guru</code> oleh sistem
                             </li>
                             <li><strong>status</strong> - belum_memilih atau sudah_memilih (opsional, default:
                                 belum_memilih; juga menerima active/inactive, ya/tidak, 1/0)</li>
                         </ul>
+                        <p class="mt-3 text-slate-500">
+                            Import bersifat mandiri — data pemilih bisa ditambahkan tanpa harus ada di tabel
+                            siswa/guru terlebih dahulu. File lama tanpa kolom <strong>nis</strong> tetap bisa
+                            diimport (kolom nis akan kosong, sehingga verifikasi publik untuk baris tersebut tidak
+                            bisa dilakukan).
+                        </p>
                     </div>
                 </div>
 

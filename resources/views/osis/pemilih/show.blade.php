@@ -33,6 +33,12 @@
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <h3 class="text-lg font-semibold text-slate-900">{{ __('common.voter_information') }}</h3>
                         <div class="flex flex-wrap items-center gap-2">
+                            @if ($pemilih->user_type === 'guru')
+                                <span class="badge badge-warning">Guru</span>
+                            @elseif ($pemilih->user_type === 'siswa')
+                                <span class="badge badge-success">Siswa</span>
+                            @endif
+
                             @if ($pemilih->is_active)
                                 <span class="badge badge-success">{{ __('common.status_active') }}</span>
                             @else

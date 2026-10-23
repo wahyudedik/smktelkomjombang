@@ -349,12 +349,24 @@ class OSISController extends Controller
 
     /**
      * Store a newly created pemilih.
+     *
+     * Mendukung `user_type` (siswa/guru, nullable — NULL = record legacy/lama):
+     * - Mode guru: `nis` = NIP (verifikasi publik tanpa login) + `kelas` DIPAKSA
+     *   'Guru' server-side (input mode guru di form bisa disabled/readonly pair).
+     * - Form lama tanpa field `user_type` → kolom diisi default DB (NULL).
      */
     public function storePemilih(Request $request)
     {
+        // Paksa kelas='Guru' SEBELUM validasi bila tipe guru — jangan percaya
+        // nilai kiriman client (input bisa disabled/readonly di form mode guru).
+        if ($request->input('user_type') === 'guru') {
+            $request->merge(['kelas' => 'Guru']);
+        }
+
         $request->validate([
             'nama' => 'required|string|max:255',
             'nis' => 'required|string|unique:pemilihs,nis',
+            'user_type' => 'nullable|string|in:siswa,guru',
             'kelas' => 'required|string|max:50',
             'jenis_kelamin' => 'required|in:L,P',
             'email' => 'nullable|email|max:255',
@@ -373,6 +385,17 @@ class OSISController extends Controller
             $data['waktu_memilih'] = null;
         }
         unset($data['status_sudah_memilih']); // Remove the checkbox field
+
+        // Backward compat: '' (kosong) → NULL. Jika field tidak dikirim sama
+        // sekali (request lama), key tidak ada di $data → default DB (NULL).
+        if (array_key_exists('user_type', $data) && $data['user_type'] === '') {
+            $data['user_type'] = null;
+        }
+
+        // Defensif (konsisten generatePemilihFromUsers): guru → kelas 'Guru'.
+        if (($data['user_type'] ?? null) === 'guru') {
+            $data['kelas'] = 'Guru';
+        }
 
         Pemilih::create($data);
 
@@ -403,12 +426,23 @@ class OSISController extends Controller
 
     /**
      * Update the specified pemilih.
+     *
+     * Strategi aman untuk `user_type`: hidden input di form edit mengirim
+     * '' (→ NULL) bila admin TIDAK mengubah tipe → record legacy
+     * `user_type=NULL` TIDAK dipaksa overwrite ke 'siswa' tanpa perubahan
+     * eksplisit. Nilai hanya berubah saat admin memilih tipe berbeda.
      */
     public function updatePemilih(Request $request, Pemilih $pemilih)
     {
+        // Paksa kelas='Guru' SEBELUM validasi bila tipe guru (konsisten storePemilih).
+        if ($request->input('user_type') === 'guru') {
+            $request->merge(['kelas' => 'Guru']);
+        }
+
         $request->validate([
             'nama' => 'required|string|max:255',
             'nis' => 'required|string|unique:pemilihs,nis,' . $pemilih->id,
+            'user_type' => 'nullable|string|in:siswa,guru',
             'kelas' => 'required|string|max:50',
             'jenis_kelamin' => 'required|in:L,P',
             'email' => 'nullable|email|max:255',
@@ -427,6 +461,17 @@ class OSISController extends Controller
             $data['waktu_memilih'] = null;
         }
         unset($data['status_sudah_memilih']); // Remove the checkbox field
+
+        // Tipe tidak diubah ('' → NULL via middleware) → JANGAN timpa nilai
+        // tersimpan (record legacy user_type=NULL tetap NULL).
+        if (array_key_exists('user_type', $data) && $data['user_type'] === null) {
+            unset($data['user_type']);
+        }
+
+        // Defensif (konsisten storePemilih): guru → kelas 'Guru'.
+        if (($data['user_type'] ?? null) === 'guru') {
+            $data['kelas'] = 'Guru';
+        }
 
         $pemilih->update($data);
 
@@ -1328,10 +1373,13 @@ class OSISController extends Controller
      */
     public function downloadPemilihTemplate()
     {
-        // Create sample data for template
+        // Create sample data for template.
+        // `nis` is optional: NIS for siswa / NIP for guru — required in practice for
+        // public verification (POST /osis/verify) without login.
         $sampleData = [
             [
                 'nama' => 'Ahmad Rizki',
+                'nis' => '24001', // NIS untuk siswa (opsional, dipakai verifikasi publik)
                 'email' => 'ahmad.rizki@email.com',
                 'user_type' => 'siswa', // Keep user_type in pemilihs table for tracking
                 'jenis_kelamin' => 'L',
@@ -1340,6 +1388,7 @@ class OSISController extends Controller
             ],
             [
                 'nama' => 'Siti Nurhaliza',
+                'nis' => '24002', // NIS untuk siswa (opsional, dipakai verifikasi publik)
                 'email' => 'siti.nurhaliza@email.com',
                 'user_type' => 'siswa', // Keep user_type in pemilihs table for tracking
                 'jenis_kelamin' => 'P',
@@ -1348,9 +1397,19 @@ class OSISController extends Controller
             ],
             [
                 'nama' => 'Dr. Budi Santoso, S.Pd',
+                'nis' => '198703122010011003', // NIP untuk guru (wajib terisi agar bisa verifikasi publik)
                 'email' => 'budi.santoso@email.com',
                 'user_type' => 'guru', // Keep user_type in pemilihs table for tracking
                 'jenis_kelamin' => 'L',
+                'kelas' => 'Guru',
+                'status' => 'belum_memilih',
+            ],
+            [
+                'nama' => 'Rina Wulandari, S.Pd',
+                'nis' => '199005152015032004', // NIP untuk guru (wajib terisi agar bisa verifikasi publik)
+                'email' => 'rina.wulandari@email.com',
+                'user_type' => 'guru', // Keep user_type in pemilihs table for tracking
+                'jenis_kelamin' => 'P',
                 'kelas' => 'Guru',
                 'status' => 'belum_memilih',
             ],
@@ -1373,6 +1432,7 @@ class OSISController extends Controller
             {
                 return [
                     'nama',
+                    'nis',
                     'email',
                     'user_type',
                     'jenis_kelamin',
@@ -1391,12 +1451,13 @@ class OSISController extends Controller
             public function columnWidths(): array
             {
                 return [
-                    'A' => 30,
-                    'B' => 30,
-                    'C' => 15,
-                    'D' => 15,
-                    'E' => 25,
-                    'F' => 12,
+                    'A' => 30, // nama
+                    'B' => 22, // nis (NIS siswa / NIP guru)
+                    'C' => 30, // email
+                    'D' => 15, // user_type
+                    'E' => 15, // jenis_kelamin
+                    'F' => 25, // kelas
+                    'G' => 12, // status
                 ];
             }
         };

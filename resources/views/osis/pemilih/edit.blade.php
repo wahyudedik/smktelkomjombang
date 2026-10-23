@@ -28,7 +28,17 @@
 
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="bg-white rounded-xl border border-slate-200 p-8">
-            <form method="POST" action="{{ route('admin.osis.pemilih.update', $pemilih) }}" class="space-y-6">
+            {{--
+                Form edit manual pemilih 2 mode tipe (Alpine.js) — sinkron dengan create.
+                - Hidden `user_type` mengirim '' (→ NULL) BILA tipe tidak diubah →
+                  record legacy `user_type=NULL` TIDAK dipaksa overwrite ke 'siswa'
+                  tanpa perubahan eksplisit dari admin.
+                - Pasangan input `kelas`: mode non-aktif selalu `disabled` (tidak
+                  ikut ter-submit); input mode guru `readonly` agar value 'Guru'
+                  tetap terkirim.
+            --}}
+            <form method="POST" action="{{ route('admin.osis.pemilih.update', $pemilih) }}" class="space-y-6"
+                x-data="pemilihEditForm('{{ old('user_type', $pemilih->user_type ?? 'siswa') }}', '{{ $pemilih->user_type ?? 'siswa' }}')">
                 @csrf
                 @method('PUT')
 
@@ -36,6 +46,21 @@
                 <div class="border-b border-slate-200 pb-6">
                     <h3 class="text-lg font-semibold text-slate-900 mb-4">{{ __('common.basic_info') }}</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="user_type" class="form-label">Tipe Pemilih</label>
+                            {{-- Select display-only (tanpa name): hanya hidden `user_type`
+                                 yang mengirim nilai — '' bila sama dengan nilai asli. --}}
+                            <select id="user_type" x-model="userType" class="form-select">
+                                <option value="siswa">Siswa</option>
+                                <option value="guru">Guru</option>
+                            </select>
+                            <input type="hidden" name="user_type"
+                                :value="userType === original ? '' : userType">
+                            <p class="text-sm text-slate-600 mt-1">
+                                Siswa: pakai NIS/NISN — Guru: pakai NIP (Nomor Induk Pegawai).
+                            </p>
+                        </div>
+
                         <div>
                             <label for="nama" class="form-label">{{ __('common.full_name') }}</label>
                             <input type="text" id="nama" name="nama"
@@ -48,21 +73,35 @@
                         </div>
 
                         <div>
-                            <label for="nis" class="form-label">{{ __('common.nis_student_number') }}</label>
+                            <label for="nis" class="form-label">
+                                <span x-show="userType !== 'guru'">{{ __('common.nis_student_number') }}</span>
+                                <span x-show="userType === 'guru'" style="display: none;">NIP (Nomor Induk
+                                    Pegawai)</span>
+                            </label>
                             <input type="text" id="nis" name="nis" value="{{ old('nis', $pemilih->nis) }}"
                                 class="form-input @error('nis') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
                                 placeholder="{{ __('common.enter_nis') }}" required>
                             @error('nis')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
+                            <p class="text-sm text-slate-600 mt-1" x-show="userType === 'guru'"
+                                style="display: none;">
+                                NIP (Nomor Induk Pegawai) — dipakai untuk verifikasi
+                            </p>
                         </div>
 
                         <div>
                             <label for="kelas" class="form-label">{{ __('common.class_label') }}</label>
+                            {{-- Mode Siswa: teks bebas (dinonaktifkan saat mode guru) --}}
                             <input type="text" id="kelas" name="kelas"
                                 value="{{ old('kelas', $pemilih->kelas) }}"
+                                x-bind:disabled="userType === 'guru'"
                                 class="form-input @error('kelas') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
                                 placeholder="{{ __('common.enter_class') }}" required>
+                            {{-- Mode Guru: value 'Guru' — readonly agar TETAP ter-submit --}}
+                            <input type="text" id="kelas_guru" name="kelas" value="Guru" readonly disabled
+                                x-bind:disabled="userType !== 'guru'"
+                                class="form-input bg-slate-50 text-slate-600">
                             @error('kelas')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
@@ -205,4 +244,18 @@
             });
         </script>
     @endif
+
+    <script>
+        // Alpine component: state tipe pemilih di form edit.
+        // `original` = nilai asli record (NULL legacy → 'siswa' sebagai fallback
+        // tampilan). Hidden `user_type` hanya mengirim nilai saat berbeda dari
+        // `original`, sehingga tipe yang tidak diubah tidak menimpa DB.
+        function pemilihEditForm(userType, original) {
+            const normalize = (v) => ['siswa', 'guru'].includes(v) ? v : 'siswa';
+            return {
+                original: normalize(original),
+                userType: normalize(userType),
+            };
+        }
+    </script>
 </x-app-layout>
