@@ -25,6 +25,7 @@ class Calon extends Model
         'nama_wakil',
         'foto_wakil',
         'jenis_kelamin',
+        'user_type',
         'visi_misi',
         'jenis_pencalonan',
         'program_kerja',
@@ -35,6 +36,7 @@ class Calon extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'user_type' => 'string',
     ];
 
     /**

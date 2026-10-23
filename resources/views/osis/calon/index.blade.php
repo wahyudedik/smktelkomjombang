@@ -121,6 +121,13 @@
                                             class="badge {{ $calon->is_active ? 'badge-success' : 'badge-warning' }}">
                                             {{ $calon->is_active ? __('common.status_active') : __('common.status_inactive') }}
                                         </span>
+                                        @if ($calon->user_type)
+                                            {{-- Badge penanda asal calon (opsional; NULL = legacy/manual) --}}
+                                            <span
+                                                class="badge {{ $calon->user_type === 'guru' ? 'badge-warning' : 'badge-info' }}">
+                                                {{ $calon->user_type === 'guru' ? 'Guru' : 'Siswa' }}
+                                            </span>
+                                        @endif
                                         <span class="text-sm text-slate-500">{{ $calon->votings_count }} {{ __('common.votes') }}</span>
                                     </div>
                                 </div>

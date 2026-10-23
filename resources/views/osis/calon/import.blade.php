@@ -115,13 +115,17 @@
                     <div class="text-sm text-slate-600">
                         <p class="mb-2">{{ __('common.excel_columns_info') }}</p>
                         <ul class="list-disc list-inside space-y-1 ml-4">
-                            <li><strong>nama_ketua</strong> - {{ __('common.full_name_label') }} {{ __('common.ketua') }} ({{ __('common.required') }})</li>
-                            <li><strong>nama_wakil</strong> - {{ __('common.full_name_label') }} {{ __('common.wakil') }} ({{ __('common.no') }})</li>
+                            <li><strong>nama_ketua</strong> - {{ __('common.full_name_label') }} {{ __('common.ketua') }} ({{ __('common.required') }}) — siswa ATAU guru</li>
+                            <li><strong>nama_wakil</strong> - {{ __('common.full_name_label') }} {{ __('common.wakil') }} ({{ __('common.no') }}) — siswa ATAU guru</li>
                             <li><strong>jenis_kelamin</strong> - {{ __('common.laki_laki') }} {{ __('common.or') }} {{ __('common.perempuan') }} ({{ __('common.no') }})</li>
+                            <li><strong>user_type</strong> - opsional: <code>siswa</code> atau <code>guru</code>, untuk penanda asal calon
+                                ({{ __('common.no') }} — kosong = tanpa penanda)</li>
                             <li><strong>visi_misi</strong> - {{ __('common.vision_mission') }} ({{ __('common.no') }})</li>
                             <li><strong>jenis_pencalonan</strong> - {{ __('common.ketua') }}, {{ __('common.wakil') }}, {{ __('common.or') }} {{ __('common.pasangan') }} ({{ __('common.no') }})</li>
                             <li><strong>status_aktif</strong> - 1 ({{ __('common.active') }}) {{ __('common.or') }} 0 ({{ __('common.inactive') }}) ({{ __('common.no') }})</li>
                         </ul>
+                        <p class="mt-2">Nama ketua/wakil boleh siswa ATAU guru — data siswa/guru TIDAK harus ada di
+                            sistem (import mandiri, cukup ketik nama lengkap).</p>
                     </div>
                 </div>
 

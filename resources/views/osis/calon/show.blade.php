@@ -32,9 +32,17 @@
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                         <h3 class="text-lg font-semibold text-slate-900">{{ __('common.candidate_information') }}</h3>
-                        <span class="badge {{ $calon->is_active ? 'badge-success' : 'badge-warning' }}">
-                            {{ $calon->is_active ? __('common.status_active') : __('common.status_inactive') }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                            @if ($calon->user_type)
+                                {{-- Badge penanda asal calon (opsional; NULL = legacy/manual) --}}
+                                <span class="badge {{ $calon->user_type === 'guru' ? 'badge-warning' : 'badge-info' }}">
+                                    {{ $calon->user_type === 'guru' ? 'Guru' : 'Siswa' }}
+                                </span>
+                            @endif
+                            <span class="badge {{ $calon->is_active ? 'badge-success' : 'badge-warning' }}">
+                                {{ $calon->is_active ? __('common.status_active') : __('common.status_inactive') }}
+                            </span>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -112,7 +112,17 @@ class OSISController extends Controller
                 ->values();
         });
 
-        return view('osis.calon.create', compact('siswas', 'kelas'));
+        // Get active gurus for dropdown (cached for 5 minutes) — mode sumber "Guru".
+        // Menggunakan scope Guru::active() (status_aktif = 'aktif'). Form calon tetap
+        // mandiri: select guru hanya opsi bantuan, nama teks bebas tetap diperbolehkan
+        // (mode Manual) tanpa baris di tabel gurus.
+        $gurus = cache()->remember('active_gurus_dropdown', 300, function () {
+            return \App\Models\Guru::active()
+                ->orderBy('nama_lengkap')
+                ->get(['id', 'nama_lengkap', 'nip', 'jenis_kelamin', 'jabatan']);
+        });
+
+        return view('osis.calon.create', compact('siswas', 'kelas', 'gurus'));
     }
 
     /**
@@ -129,6 +139,10 @@ class OSISController extends Controller
             'visi_misi' => 'required|string',
             'jenis_pencalonan' => 'required|in:ketua,wakil,pasangan',
             'is_active' => 'boolean',
+            // Penanda asal calon dari form 3-mode sumber (Siswa/Guru/Manual).
+            // 'manual' tidak dikirim (hidden field kosong) → null di DB.
+            'user_type_ketua' => 'nullable|string|in:siswa,guru',
+            'user_type_wakil' => 'nullable|string|in:siswa,guru',
         ]);
 
         // Whitelist: hanya field yang divalidasi yang boleh ter-assign (hindari mass assignment)
@@ -140,6 +154,12 @@ class OSISController extends Controller
             'jenis_pencalonan',
             'is_active',
         ]);
+
+        // Derive user_type server-side (paling sederhana & aman): prioritaskan
+        // penanda ketua, fallback ke wakil; keduanya kosong (mode Manual) → null.
+        // TIDAK memengaruhi logika voting — kolom ini murni label/tampilan.
+        $userType = $request->input('user_type_ketua') ?: $request->input('user_type_wakil') ?: null;
+        $data['user_type'] = in_array($userType, ['siswa', 'guru'], true) ? $userType : null;
 
         // Handle photo uploads (path hanya diset jika benar-benar ada file baru)
         if ($request->hasFile('foto_ketua')) {
@@ -191,7 +211,14 @@ class OSISController extends Controller
                 ->values();
         });
 
-        return view('osis.calon.edit', compact('calon', 'siswas', 'kelas'));
+        // Get active gurus for dropdown (cached for 5 minutes) — mode sumber "Guru".
+        $gurus = cache()->remember('active_gurus_dropdown', 300, function () {
+            return \App\Models\Guru::active()
+                ->orderBy('nama_lengkap')
+                ->get(['id', 'nama_lengkap', 'nip', 'jenis_kelamin', 'jabatan']);
+        });
+
+        return view('osis.calon.edit', compact('calon', 'siswas', 'kelas', 'gurus'));
     }
 
     /**
@@ -208,6 +235,10 @@ class OSISController extends Controller
             'visi_misi' => 'required|string',
             'jenis_pencalonan' => 'required|in:ketua,wakil,pasangan',
             'is_active' => 'boolean',
+            // Penanda asal calon dari form 3-mode sumber (Siswa/Guru/Manual).
+            // 'manual' tidak dikirim (hidden field kosong) → null di DB.
+            'user_type_ketua' => 'nullable|string|in:siswa,guru',
+            'user_type_wakil' => 'nullable|string|in:siswa,guru',
         ]);
 
         // Whitelist: hanya field yang divalidasi yang boleh ter-assign (hindari mass assignment)
@@ -219,6 +250,12 @@ class OSISController extends Controller
             'jenis_pencalonan',
             'is_active',
         ]);
+
+        // Derive user_type server-side (paling sederhana & aman): prioritaskan
+        // penanda ketua, fallback ke wakil; keduanya kosong (mode Manual) → null.
+        // TIDAK memengaruhi logika voting — kolom ini murni label/tampilan.
+        $userType = $request->input('user_type_ketua') ?: $request->input('user_type_wakil') ?: null;
+        $data['user_type'] = in_array($userType, ['siswa', 'guru'], true) ? $userType : null;
 
         // Handle photo uploads (hapus foto lama hanya jika ada file baru yang diunggah)
         if ($request->hasFile('foto_ketua')) {
@@ -996,12 +1033,16 @@ class OSISController extends Controller
      */
     public function downloadCalonTemplate()
     {
-        // Create sample data for template
+        // Create sample data for template.
+        // Kolom `user_type` (opsional, siswa/guru) hanya PENANDA asal calon — nama
+        // ketua/wakil boleh teks bebas (siswa ATAU guru, tidak harus ada di sistem).
+        // Contoh: baris pasangan siswa, ketua siswa, dan ketua guru.
         $sampleData = [
             [
                 'nama_ketua' => 'Ahmad Rizki',
                 'nama_wakil' => 'Siti Nurhaliza',
                 'jenis_kelamin' => 'L',
+                'user_type' => 'siswa',
                 'visi_misi' => 'Mewujudkan OSIS yang berprestasi dan berkarakter. Misi: 1. Meningkatkan prestasi akademik 2. Mengembangkan bakat dan minat siswa 3. Menjalin kerjasama yang baik dengan semua pihak',
                 'jenis_pencalonan' => 'pasangan',
                 'status_aktif' => 'aktif'
@@ -1010,16 +1051,18 @@ class OSISController extends Controller
                 'nama_ketua' => 'Budi Santoso',
                 'nama_wakil' => '',
                 'jenis_kelamin' => 'L',
+                'user_type' => 'siswa',
                 'visi_misi' => 'Menjadi ketua OSIS yang melayani dengan hati. Misi: 1. Melayani kebutuhan siswa 2. Menjadi contoh yang baik 3. Membangun komunikasi yang efektif',
                 'jenis_pencalonan' => 'ketua',
                 'status_aktif' => 'aktif'
             ],
             [
-                'nama_ketua' => 'Sari Indah',
+                'nama_ketua' => 'Siti Aminah, S.Pd.',
                 'nama_wakil' => '',
                 'jenis_kelamin' => 'P',
-                'visi_misi' => 'Menjadi wakil ketua OSIS yang kreatif dan inovatif. Misi: 1. Mengembangkan program kreatif 2. Mendorong inovasi siswa 3. Membangun teamwork yang solid',
-                'jenis_pencalonan' => 'wakil',
+                'user_type' => 'guru',
+                'visi_misi' => 'Menjadi ketua OSIS dari kalangan guru yang membimbing siswa berprestasi. Misi: 1. Membina kedisiplinan 2. Mendorong prestasi akademik dan non-akademik 3. Menjadi jembatan aspirasi siswa',
+                'jenis_pencalonan' => 'ketua',
                 'status_aktif' => 'aktif'
             ]
         ];
@@ -1044,6 +1087,7 @@ class OSISController extends Controller
                     'nama_ketua',
                     'nama_wakil',
                     'jenis_kelamin',
+                    'user_type',
                     'visi_misi',
                     'jenis_pencalonan',
                     'status_aktif'
@@ -1063,9 +1107,10 @@ class OSISController extends Controller
                     'A' => 25,
                     'B' => 25,
                     'C' => 15,
-                    'D' => 50,
-                    'E' => 20,
-                    'F' => 15,
+                    'D' => 12,
+                    'E' => 50,
+                    'F' => 20,
+                    'G' => 15,
                 ];
             }
         };

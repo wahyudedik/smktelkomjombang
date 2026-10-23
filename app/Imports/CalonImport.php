@@ -46,10 +46,20 @@ class CalonImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
             $jenisKelamin = 'P';
         }
 
+        // Kolom `user_type` opsional (backward compat): file LAMA tanpa kolom ini
+        // menghasilkan null → biarkan null (tanpa penanda).
+        $userType = isset($row['user_type']) && $row['user_type'] !== null
+            ? strtolower(trim((string) $row['user_type']))
+            : null;
+        if (! in_array($userType, ['siswa', 'guru'], true)) {
+            $userType = null;
+        }
+
         return new Calon([
             'nama_ketua' => trim($row['nama_ketua']),
             'nama_wakil' => !empty($row['nama_wakil']) ? trim($row['nama_wakil']) : null,
             'jenis_kelamin' => $jenisKelamin,
+            'user_type' => $userType,
             'visi_misi' => !empty($row['visi_misi']) ? trim($row['visi_misi']) : 'Belum ada visi misi',
             'jenis_pencalonan' => !empty($row['jenis_pencalonan']) ? trim($row['jenis_pencalonan']) : 'pasangan',
             'is_active' => isset($row['status_aktif']) ?
@@ -66,6 +76,7 @@ class CalonImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
             '*.nama_ketua' => 'required|string|max:255',
             '*.nama_wakil' => 'nullable|string|max:255',
             '*.jenis_kelamin' => 'nullable|in:L,P,Laki-laki,Perempuan',
+            '*.user_type' => 'nullable|string|in:siswa,guru',
             '*.visi_misi' => 'nullable|string',
             '*.jenis_pencalonan' => 'nullable|in:ketua,wakil,pasangan',
             '*.status_aktif' => 'nullable|in:aktif,tidak_aktif,yes,no,1,0',
