@@ -18,12 +18,14 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="bg-white rounded-xl border border-slate-200 p-8">
             {{--
-                Form calon 3-mode sumber data (Alpine.js):
+                Form calon 2-mode sumber data (Alpine.js):
                 - siswa  (default) : select nama dari $siswas + kelas auto-fill display-only
-                - guru             : select nama dari $gurus + kelas display "Guru"
-                - manual           : text input nama bebas (tanpa baris di siswas/gurus)
+                - manual           : text input nama bebas (tanpa baris di siswas)
 
-                Field nama_ketua/nama_wakil memakai `name` yang sama di ketiga mode,
+                Calon HANYA Siswa/Manual — guru TIDAK menjadi calon OSIS
+                (validasi server-side `user_type_* => in:siswa` menolak 'guru').
+
+                Field nama_ketua/nama_wakil memakai `name` yang sama di kedua mode,
                 namun field mode non-aktif selalu `disabled` (statis sebelum Alpine
                 load + x-bind:disabled sesudahnya) sehingga TIDAK ikut ter-submit
                 dan required pada field tersembunyi tidak memblokir submit.
@@ -78,12 +80,11 @@
                             <select name="sumber_ketua" id="sumber_ketua" x-model="sumberKetua"
                                 class="form-input">
                                 <option value="siswa">Siswa</option>
-                                <option value="guru">Guru</option>
                                 <option value="manual">Manual (ketik nama)</option>
                             </select>
                             {{-- Penanda asal calon → kolom calons.user_type (null = manual/legacy) --}}
                             <input type="hidden" name="user_type_ketua"
-                                :value="sumberKetua === 'siswa' ? 'siswa' : (sumberKetua === 'guru' ? 'guru' : '')">
+                                :value="sumberKetua === 'siswa' ? 'siswa' : ''">
                         </div>
 
                         <!-- Mode: Siswa -->
@@ -108,37 +109,6 @@
                             <p class="text-sm text-slate-600 mt-1">{{ __('common.select_from_active_students') }}</p>
                         </div>
 
-                        <!-- Mode: Guru -->
-                        <div x-show="sumberKetua === 'guru'" style="display: none;">
-                            <label for="nama_ketua_guru" class="form-label">{{ __('common.name') }} {{ __('common.ketua') }} *</label>
-                            <select name="nama_ketua" id="nama_ketua_guru" disabled
-                                x-bind:disabled="sumberKetua !== 'guru'"
-                                x-bind:required="sumberKetua === 'guru'"
-                                class="form-input @error('nama_ketua') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
-                                <option value="">{{ ($gurus ?? collect())->isEmpty() ? 'Belum ada data guru aktif' : 'Pilih nama guru' }}</option>
-                                @foreach ($gurus ?? [] as $guru)
-                                    <option value="{{ $guru->nama_lengkap }}" data-jenis-kelamin="{{ $guru->jenis_kelamin }}"
-                                        {{ old('nama_ketua') == $guru->nama_lengkap ? 'selected' : '' }}>
-                                        {{ $guru->nama_lengkap }}{{ $guru->nip ? ' - ' . $guru->nip : '' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('nama_ketua')
-                                <p class="form-error">{{ $message }}</p>
-                            @enderror
-                            @if (($gurus ?? collect())->isEmpty())
-                                <p class="text-sm text-amber-600 mt-1">Belum ada data guru aktif di sistem. Pilih
-                                    <strong>Manual (ketik nama)</strong> untuk memasukkan nama guru secara bebas.</p>
-                            @else
-                                <p class="text-sm text-slate-600 mt-1">Pilih dari daftar guru aktif</p>
-                            @endif
-                            <div class="mt-4">
-                                <label class="form-label">{{ __('common.select_class') }} {{ __('common.ketua') }}</label>
-                                <input type="text" value="Guru" readonly
-                                    class="form-input bg-slate-50 text-slate-600">
-                            </div>
-                        </div>
-
                         <!-- Mode: Manual -->
                         <div x-show="sumberKetua === 'manual'" style="display: none;">
                             <label for="nama_ketua_manual" class="form-label">{{ __('common.name') }} {{ __('common.ketua') }} *</label>
@@ -150,8 +120,8 @@
                             @error('nama_ketua')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
-                            <p class="text-sm text-slate-600 mt-1">Nama bebas, boleh siswa atau guru — data siswa/guru
-                                tidak harus ada di sistem.</p>
+                            <p class="text-sm text-slate-600 mt-1">Nama bebas — tidak harus ada di data siswa (ketik
+                                manual).</p>
                         </div>
 
                         <div x-show="sumberKetua === 'siswa'">
@@ -189,12 +159,11 @@
                             <select name="sumber_wakil" id="sumber_wakil" x-model="sumberWakil"
                                 class="form-input">
                                 <option value="siswa">Siswa</option>
-                                <option value="guru">Guru</option>
                                 <option value="manual">Manual (ketik nama)</option>
                             </select>
                             {{-- Penanda asal wakil → fallback derive server-side bila ketua manual --}}
                             <input type="hidden" name="user_type_wakil"
-                                :value="sumberWakil === 'siswa' ? 'siswa' : (sumberWakil === 'guru' ? 'guru' : '')">
+                                :value="sumberWakil === 'siswa' ? 'siswa' : ''">
                         </div>
 
                         <!-- Mode: Siswa -->
@@ -219,37 +188,6 @@
                             <p class="text-sm text-slate-600 mt-1">{{ __('common.select_from_active_students') }}</p>
                         </div>
 
-                        <!-- Mode: Guru -->
-                        <div x-show="sumberWakil === 'guru'" style="display: none;">
-                            <label for="nama_wakil_guru" class="form-label">{{ __('common.name') }} {{ __('common.wakil') }} *</label>
-                            <select name="nama_wakil" id="nama_wakil_guru" disabled
-                                x-bind:disabled="sumberWakil !== 'guru'"
-                                x-bind:required="sumberWakil === 'guru'"
-                                class="form-input @error('nama_wakil') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
-                                <option value="">{{ ($gurus ?? collect())->isEmpty() ? 'Belum ada data guru aktif' : 'Pilih nama guru' }}</option>
-                                @foreach ($gurus ?? [] as $guru)
-                                    <option value="{{ $guru->nama_lengkap }}" data-jenis-kelamin="{{ $guru->jenis_kelamin }}"
-                                        {{ old('nama_wakil') == $guru->nama_lengkap ? 'selected' : '' }}>
-                                        {{ $guru->nama_lengkap }}{{ $guru->nip ? ' - ' . $guru->nip : '' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('nama_wakil')
-                                <p class="form-error">{{ $message }}</p>
-                            @enderror
-                            @if (($gurus ?? collect())->isEmpty())
-                                <p class="text-sm text-amber-600 mt-1">Belum ada data guru aktif di sistem. Pilih
-                                    <strong>Manual (ketik nama)</strong> untuk memasukkan nama guru secara bebas.</p>
-                            @else
-                                <p class="text-sm text-slate-600 mt-1">Pilih dari daftar guru aktif</p>
-                            @endif
-                            <div class="mt-4">
-                                <label class="form-label">{{ __('common.select_class') }} {{ __('common.wakil') }}</label>
-                                <input type="text" value="Guru" readonly
-                                    class="form-input bg-slate-50 text-slate-600">
-                            </div>
-                        </div>
-
                         <!-- Mode: Manual -->
                         <div x-show="sumberWakil === 'manual'" style="display: none;">
                             <label for="nama_wakil_manual" class="form-label">{{ __('common.name') }} {{ __('common.wakil') }} *</label>
@@ -261,8 +199,8 @@
                             @error('nama_wakil')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
-                            <p class="text-sm text-slate-600 mt-1">Nama bebas, boleh siswa atau guru — data siswa/guru
-                                tidak harus ada di sistem.</p>
+                            <p class="text-sm text-slate-600 mt-1">Nama bebas — tidak harus ada di data siswa (ketik
+                                manual).</p>
                         </div>
 
                         <div x-show="sumberWakil === 'siswa'">
@@ -372,14 +310,16 @@
     @endif
 
     <script>
-        // Alpine component: toggle visibility 3 mode sumber (Siswa/Guru/Manual).
+        // Alpine component: toggle visibility 2 mode sumber (Siswa/Manual).
+        // Guru bukan opsi calon — nilai legacy 'guru' (old input/data lama)
+        // di-fallback ke default mode.
         // Field mode non-aktif di-`disabled` (statis saat render + x-bind:disabled
         // sesudah Alpine init) sehingga tidak ikut ter-submit dan `required` pada
         // field tersembunyi tidak memblokir submit browser.
         function calonForm(sumberKetua, sumberWakil) {
             return {
-                sumberKetua: ['siswa', 'guru', 'manual'].includes(sumberKetua) ? sumberKetua : 'siswa',
-                sumberWakil: ['siswa', 'guru', 'manual'].includes(sumberWakil) ? sumberWakil : 'siswa',
+                sumberKetua: ['siswa', 'manual'].includes(sumberKetua) ? sumberKetua : 'siswa',
+                sumberWakil: ['siswa', 'manual'].includes(sumberWakil) ? sumberWakil : 'siswa',
             };
         }
 

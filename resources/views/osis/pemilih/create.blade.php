@@ -25,10 +25,12 @@
                 - guru            : NIP (di kolom `nis`) + kelas otomatis 'Guru'
 
                 Pasangan input `kelas` (dua input name sama, saling exclusive):
-                mode non-aktif selalu `disabled` (statis sebelum Alpine load +
-                x-bind:disabled sesudahnya) sehingga TIDAK ikut ter-submit —
-                input mode guru memakai `readonly` (bukan disabled) agar value
-                'Guru' tetap terkirim ke server.
+                yang non-aktif selalu `disabled` (statis sebelum Alpine load +
+                x-bind:disabled sesudahnya) sehingga TIDAK ikut ter-submit DAN
+                disembunyikan via `x-show` (+ display:none statis) agar tidak
+                tampil nyasar pada mode yang salah — input mode guru memakai
+                `readonly` (bukan disabled) agar value 'Guru' tetap terkirim
+                ke server saat mode guru aktif.
             --}}
             <form method="POST" action="{{ route('admin.osis.pemilih.store') }}" class="space-y-6"
                 x-data="pemilihForm('{{ old('user_type', 'siswa') }}')">
@@ -41,7 +43,7 @@
                         <div>
                             <label for="user_type" class="form-label">Tipe Pemilih</label>
                             <select id="user_type" name="user_type" x-model="userType"
-                                class="form-select @error('user_type') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
+                                class="form-input @error('user_type') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror">
                                 <option value="siswa">Siswa</option>
                                 <option value="guru">Guru</option>
                             </select>
@@ -49,7 +51,8 @@
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
                             <p class="text-sm text-slate-600 mt-1">
-                                Siswa: pakai NIS/NISN — Guru: pakai NIP (Nomor Induk Pegawai).
+                                <span class="block">Siswa: gunakan NIS / NISN</span>
+                                <span class="block">Guru: gunakan NIP (Nomor Induk Pegawai)</span>
                             </p>
                         </div>
 
@@ -82,14 +85,17 @@
                         </div>
 
                         <div>
-                            <label for="kelas" class="form-label">Kelas</label>
-                            {{-- Mode Siswa: teks bebas (dinonaktifkan saat mode guru) --}}
+                            <label for="kelas" class="form-label">{{ __('common.class_label') }}</label>
+                            {{-- Mode Siswa: teks bebas (disembunyikan + dinonaktifkan saat mode guru) --}}
                             <input type="text" id="kelas" name="kelas" value="{{ old('kelas') }}"
+                                x-show="userType !== 'guru'"
                                 x-bind:disabled="userType === 'guru'"
                                 class="form-input @error('kelas') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
                                 placeholder="{{ __('common.enter_class') }}" required>
-                            {{-- Mode Guru: value 'Guru' — readonly agar TETAP ter-submit (disabled tidak submit) --}}
+                            {{-- Mode Guru: value 'Guru' — readonly agar TETAP ter-submit (disabled tidak submit);
+                                 x-show + display:none statis agar TIDAK tampil nyasar di mode siswa --}}
                             <input type="text" id="kelas_guru" name="kelas" value="Guru" readonly disabled
+                                x-show="userType === 'guru'" style="display: none;"
                                 x-bind:disabled="userType !== 'guru'"
                                 class="form-input bg-slate-50 text-slate-600">
                             @error('kelas')
@@ -100,9 +106,9 @@
                         <div>
                             <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
                             <select id="jenis_kelamin" name="jenis_kelamin"
-                                class="form-select @error('jenis_kelamin') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
+                                class="form-input @error('jenis_kelamin') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
                                 required>
-                                <option value="">{{ __('common.select_status') }}</option>
+                                <option value="">{{ __('common.select_gender') }}</option>
                                 <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>{{ __('common.laki_laki') }}
                                 </option>
                                 <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>{{ __('common.perempuan') }}

@@ -48,10 +48,12 @@ class CalonImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
 
         // Kolom `user_type` opsional (backward compat): file LAMA tanpa kolom ini
         // menghasilkan null → biarkan null (tanpa penanda).
+        // Calon OSIS hanya boleh "siswa"; nilai lain (termasuk "guru") dinormalisasi
+        // ke null. Nilai "guru" sendiri sudah di-skip oleh validasi (SkipsOnFailure).
         $userType = isset($row['user_type']) && $row['user_type'] !== null
             ? strtolower(trim((string) $row['user_type']))
             : null;
-        if (! in_array($userType, ['siswa', 'guru'], true)) {
+        if ($userType !== 'siswa') {
             $userType = null;
         }
 
@@ -76,7 +78,10 @@ class CalonImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
             '*.nama_ketua' => 'required|string|max:255',
             '*.nama_wakil' => 'nullable|string|max:255',
             '*.jenis_kelamin' => 'nullable|in:L,P,Laki-laki,Perempuan',
-            '*.user_type' => 'nullable|string|in:siswa,guru',
+            // Calon OSIS hanya Siswa/Manual — guru TIDAK menjadi calon.
+            // Nilai selain "siswa" (mis. "guru") membuat baris gagal validasi dan
+            // di-skip oleh SkipsOnFailure tanpa menggagalkan seluruh impor.
+            '*.user_type' => 'nullable|string|in:siswa',
             '*.visi_misi' => 'nullable|string',
             '*.jenis_pencalonan' => 'nullable|in:ketua,wakil,pasangan',
             '*.status_aktif' => 'nullable|in:aktif,tidak_aktif,yes,no,1,0',

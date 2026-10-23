@@ -125,6 +125,23 @@ class OSISPemilihManualMandiriTest extends TestCase
         $response->assertSee('user_type');
         $response->assertSee('Siswa');
         $response->assertSee('Guru');
+
+        // Perbaikan feedback UI: placeholder Jenis Kelamin memakai kunci
+        // `select_gender` (locale-agnostic; di locale id → "Pilih Jenis
+        // Kelamin"), bukan `select_status` ("Select Status").
+        $response->assertSee(
+            '<option value="">' . e(__('common.select_gender')) . '</option>',
+            false
+        );
+
+        // Input "Guru" untuk field Kelas hanya tampil di mode guru: wajib
+        // punya penyembunyian statis `style="display: none;"` agar tidak
+        // nyasar terlihat saat mode siswa (sebelum Alpine init).
+        $this->assertMatchesRegularExpression(
+            '/id="kelas_guru"[^>]*style="display:\s*none;"/',
+            $response->getContent(),
+            'Input kelas_guru harus tersembunyi statis (display:none) di form pemilih create.'
+        );
     }
 
     /** @test */

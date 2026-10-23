@@ -115,17 +115,26 @@
                     <div class="text-sm text-slate-600">
                         <p class="mb-2">{{ __('common.excel_columns_info') }}</p>
                         <ul class="list-disc list-inside space-y-1 ml-4">
-                            <li><strong>nama_ketua</strong> - {{ __('common.full_name_label') }} {{ __('common.ketua') }} ({{ __('common.required') }}) — siswa ATAU guru</li>
-                            <li><strong>nama_wakil</strong> - {{ __('common.full_name_label') }} {{ __('common.wakil') }} ({{ __('common.no') }}) — siswa ATAU guru</li>
+                            <li><strong>nama_ketua</strong> - {{ __('common.full_name_label') }} {{ __('common.ketua') }} ({{ __('common.required') }}) — siswa ATAU ketik manual</li>
+                            <li><strong>nama_wakil</strong> - {{ __('common.full_name_label') }} {{ __('common.wakil') }} ({{ __('common.no') }}) — siswa ATAU ketik manual</li>
                             <li><strong>jenis_kelamin</strong> - {{ __('common.laki_laki') }} {{ __('common.or') }} {{ __('common.perempuan') }} ({{ __('common.no') }})</li>
-                            <li><strong>user_type</strong> - opsional: <code>siswa</code> atau <code>guru</code>, untuk penanda asal calon
-                                ({{ __('common.no') }} — kosong = tanpa penanda)</li>
+                            <li><strong>user_type</strong> - opsional: hanya <code>siswa</code>, untuk penanda asal calon
+                                ({{ __('common.no') }} — kosong = tanpa penanda / pendaftaran manual)</li>
                             <li><strong>visi_misi</strong> - {{ __('common.vision_mission') }} ({{ __('common.no') }})</li>
                             <li><strong>jenis_pencalonan</strong> - {{ __('common.ketua') }}, {{ __('common.wakil') }}, {{ __('common.or') }} {{ __('common.pasangan') }} ({{ __('common.no') }})</li>
                             <li><strong>status_aktif</strong> - 1 ({{ __('common.active') }}) {{ __('common.or') }} 0 ({{ __('common.inactive') }}) ({{ __('common.no') }})</li>
                         </ul>
-                        <p class="mt-2">Nama ketua/wakil boleh siswa ATAU guru — data siswa/guru TIDAK harus ada di
-                            sistem (import mandiri, cukup ketik nama lengkap).</p>
+                        <p class="mt-2">Nama ketua/wakil boleh dari data siswa ATAU diketik manual — data siswa TIDAK
+                            harus ada di sistem (import mandiri, cukup ketik nama lengkap).</p>
+                        <div class="mt-3 flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 p-3">
+                            <svg class="w-4 h-4 mt-0.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                            <p class="text-sm text-amber-800"><strong>Catatan:</strong> calon OSIS hanya Siswa/Manual —
+                                <strong>guru tidak menjadi calon OSIS</strong>. Baris dengan <code>user_type</code> =
+                                <code>guru</code> akan dilewati (tidak menggagalkan seluruh impor).</p>
+                        </div>
                     </div>
                 </div>
 

@@ -33,9 +33,10 @@
                 - Hidden `user_type` mengirim '' (→ NULL) BILA tipe tidak diubah →
                   record legacy `user_type=NULL` TIDAK dipaksa overwrite ke 'siswa'
                   tanpa perubahan eksplisit dari admin.
-                - Pasangan input `kelas`: mode non-aktif selalu `disabled` (tidak
-                  ikut ter-submit); input mode guru `readonly` agar value 'Guru'
-                  tetap terkirim.
+                - Pasangan input `kelas`: yang non-aktif selalu `disabled` (tidak
+                  ikut ter-submit) DAN disembunyikan via `x-show` (+ display:none
+                  statis) agar tidak tampil nyasar pada mode yang salah; input mode
+                  guru `readonly` agar value 'Guru' tetap terkirim saat mode guru.
             --}}
             <form method="POST" action="{{ route('admin.osis.pemilih.update', $pemilih) }}" class="space-y-6"
                 x-data="pemilihEditForm('{{ old('user_type', $pemilih->user_type ?? 'siswa') }}', '{{ $pemilih->user_type ?? 'siswa' }}')">
@@ -50,14 +51,15 @@
                             <label for="user_type" class="form-label">Tipe Pemilih</label>
                             {{-- Select display-only (tanpa name): hanya hidden `user_type`
                                  yang mengirim nilai — '' bila sama dengan nilai asli. --}}
-                            <select id="user_type" x-model="userType" class="form-select">
+                            <select id="user_type" x-model="userType" class="form-input">
                                 <option value="siswa">Siswa</option>
                                 <option value="guru">Guru</option>
                             </select>
                             <input type="hidden" name="user_type"
                                 :value="userType === original ? '' : userType">
                             <p class="text-sm text-slate-600 mt-1">
-                                Siswa: pakai NIS/NISN — Guru: pakai NIP (Nomor Induk Pegawai).
+                                <span class="block">Siswa: gunakan NIS / NISN</span>
+                                <span class="block">Guru: gunakan NIP (Nomor Induk Pegawai)</span>
                             </p>
                         </div>
 
@@ -92,14 +94,17 @@
 
                         <div>
                             <label for="kelas" class="form-label">{{ __('common.class_label') }}</label>
-                            {{-- Mode Siswa: teks bebas (dinonaktifkan saat mode guru) --}}
+                            {{-- Mode Siswa: teks bebas (disembunyikan + dinonaktifkan saat mode guru) --}}
                             <input type="text" id="kelas" name="kelas"
                                 value="{{ old('kelas', $pemilih->kelas) }}"
+                                x-show="userType !== 'guru'"
                                 x-bind:disabled="userType === 'guru'"
                                 class="form-input @error('kelas') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
                                 placeholder="{{ __('common.enter_class') }}" required>
-                            {{-- Mode Guru: value 'Guru' — readonly agar TETAP ter-submit --}}
+                            {{-- Mode Guru: value 'Guru' — readonly agar TETAP ter-submit;
+                                 x-show + display:none statis agar TIDAK tampil nyasar di mode siswa --}}
                             <input type="text" id="kelas_guru" name="kelas" value="Guru" readonly disabled
+                                x-show="userType === 'guru'" style="display: none;"
                                 x-bind:disabled="userType !== 'guru'"
                                 class="form-input bg-slate-50 text-slate-600">
                             @error('kelas')
@@ -108,9 +113,9 @@
                         </div>
 
                         <div>
-                            <label for="jenis_kelamin" class="form-label">{{ __('common.select_gender') }}</label>
+                            <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
                             <select id="jenis_kelamin" name="jenis_kelamin"
-                                class="form-select @error('jenis_kelamin') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
+                                class="form-input @error('jenis_kelamin') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
                                 required>
                                 <option value="">{{ __('common.select_gender') }}</option>
                                 <option value="L"
@@ -130,7 +135,7 @@
                             <input type="email" id="email" name="email"
                                 value="{{ old('email', $pemilih->email) }}"
                                 class="form-input @error('email') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
-                                placeholder="{{ __('common.email_label') }}">
+                                placeholder="Masukkan email">
                             @error('email')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
@@ -154,10 +159,10 @@
                         </div>
 
                         <div>
-                            <label for="alamat" class="form-label">{{ __('common.address_label') }}</label>
+                            <label for="alamat" class="form-label">Alamat</label>
                             <textarea id="alamat" name="alamat" rows="3"
                                 class="form-input @error('alamat') border-red-300 focus:border-red-500 focus:ring-red-500 @enderror"
-                                placeholder="{{ __('common.address_label') }}">{{ old('alamat', $pemilih->alamat) }}</textarea>
+                                placeholder="Masukkan alamat">{{ old('alamat', $pemilih->alamat) }}</textarea>
                             @error('alamat')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
