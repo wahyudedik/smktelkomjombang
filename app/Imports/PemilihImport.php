@@ -86,11 +86,9 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
 
             // Optional `nis` column: NIS for siswa / NIP for guru.
             // Backward compatible — old files without the column get NULL.
-            // is_scalar: sel numerik Excel terbaca int/float — dinormalkan ke
-            // string; array/garbage diabaikan.
-            $nis = (isset($row['nis']) && is_scalar($row['nis']) && trim((string) $row['nis']) !== '')
-                ? trim((string) $row['nis'])
-                : null;
+            // Sel numerik Excel terbaca int/float — dinormalkan lewat
+            // normalizeNis() agar tidak pernah berakhir sebagai notasi ilmiah.
+            $nis = $this->normalizeNis($row['nis'] ?? null);
 
             $this->rowCount++;
 
@@ -119,6 +117,45 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
     }
 
     /**
+     * Normalisasi nilai kolom `nis` (NIS siswa / NIP guru) menjadi string utuh.
+     *
+     * Sel numerik Excel terbaca sebagai int/float. Cast `(string) $float` di
+     * PHP >= 8.0 mengikuti `precision` (default 14) sehingga NIP 18 digit bisa
+     * berubah jadi notasi ilmiah ("1.9870312201001E+17") dan verifikasi publik
+     * (exact match ke pemilihs.nis) gagal. Bilangan bulat (NIS/NIP) selalu
+     * ditulis penuh tanpa notasi ilmiah; nilai kosong/non-scalar → NULL agar
+     * file lama tanpa kolom `nis` tetap kompatibel.
+     */
+    private function normalizeNis(mixed $value): ?string
+    {
+        if (!is_scalar($value) || is_bool($value)) {
+            return null;
+        }
+
+        if (is_float($value)) {
+            if (!is_finite($value)) {
+                return null;
+            }
+            // NIS/NIP bilangan bulat: number_format(..., 0) membuang bagian
+            // desimal tanpa pernah memakai notasi ilmiah, dan tetap aman
+            // melebihi rentang int64.
+            $value = number_format($value, 0, '', '');
+        } elseif (is_int($value)) {
+            // int64 PHP (maks ±9.2×10^18) muat untuk NIP 18 digit (~2×10^17).
+            $value = (string) $value;
+        } else {
+            $value = trim((string) $value);
+            // Buang sisa ".0" hasil ekspor spreadsheet ("24001.0" → "24001");
+            // nilai berawalan 0 (mis. "0024001") tidak disentuh.
+            if (preg_match('/^[+-]?\d+\.0+$/', $value) === 1) {
+                $value = preg_replace('/\.0+$/', '', $value);
+            }
+        }
+
+        return $value !== '' ? $value : null;
+    }
+
+    /**
      * @return array
      */
     public function rules(): array
@@ -127,8 +164,8 @@ class PemilihImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
             '*.nama' => 'required|string|max:255',
             // NIS (siswa) / NIP (guru) — opsional, backward compatible.
             // Sengaja TANPA batasan tipe: sel numerik Excel terbaca sebagai int
-            // (NIS/NIP tanpa format "Text") — nilai dinormalisasi ke string
-            // oleh guard is_scalar di model().
+            // / float (NIS/NIP tanpa format "Text") — nilai dinormalisasi ke
+            // string utuh oleh normalizeNis() di model().
             '*.nis' => 'nullable',
             '*.email' => 'required|email|max:255',
             '*.user_type' => 'nullable|in:guru,siswa',

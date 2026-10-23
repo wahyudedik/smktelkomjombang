@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -26,6 +27,8 @@ use Tests\TestCase;
  *   — file lama tanpa kolom `nis` tetap terimport (`nis` NULL).
  * - Pemilih guru hasil create/import BISA diverifikasi via verifikasi publik
  *   (`POST /osis/verify`) tanpa login.
+ * - Hardening NIP 18 digit: template `nis` berformat Text (@) + konversi
+ *   sel numerik (int/float) ke string utuh tanpa notasi ilmiah.
  *
  * Jalur route: admin.osis.pemilih.* (role admin + permission osis.*)
  * dan osis.public.verify (publik, throttle:osis-public).
@@ -422,5 +425,101 @@ class OSISPemilihManualMandiriTest extends TestCase
             static fn ($row): bool => in_array('siswa', $row, true)
         ));
         $this->assertGreaterThanOrEqual(2, count($siswaRows));
+    }
+
+    /** @test */
+    public function import_with_numeric_18_digit_nis_keeps_every_digit_exactly(): void
+    {
+        // NIP 18 digit sebagai SEL ANGKA (bukan teks) — digit terakhir wajib
+        // tersimpan persis di pemilihs.nis (int64 PHP muat, tanpa notasi ilmiah).
+        $nip = '198703122010011003';
+        $upload = $this->makeXlsxUpload(
+            ['nama', 'nis', 'email', 'user_type', 'jenis_kelamin', 'kelas', 'status'],
+            [
+                ['Guru NIP Angka', (int) $nip, 'guru.nip.angka@test.com', 'guru', 'L', 'Guru', 'belum_memilih'],
+                ['Siswa NIS Angka', 24010, 'siswa.nis.angka@test.com', 'siswa', 'L', 'XII IPA 1', 'belum_memilih'],
+            ]
+        );
+
+        $response = $this->actingAs($this->admin)
+            ->post(route('admin.osis.pemilih.processImport'), ['file' => $upload]);
+
+        $response->assertRedirect(route('admin.osis.pemilih.index'));
+
+        $guru = Pemilih::where('email', 'guru.nip.angka@test.com')->firstOrFail();
+        $this->assertSame($nip, $guru->nis);
+        $this->assertSame(18, strlen((string) $guru->nis));
+
+        $siswa = Pemilih::where('email', 'siswa.nis.angka@test.com')->firstOrFail();
+        $this->assertSame('24010', $siswa->nis);
+    }
+
+    /** @test */
+    public function import_with_float_nis_stores_plain_digits_without_scientific_notation(): void
+    {
+        // NIP diisi sebagai ANGKA desimal (Excel menyimpan sebagai double) —
+        // hasil import wajib digit polos, bukan "1.9870312201001E+17".
+        // Catatan: presisi IEEE 754 sudah membulatkan 18 digit ke float
+        // terdekat (198703122010009984) SEBELUM file masuk; konversi import
+        // hanya bertanggung jawab menyajikan float itu sebagai digit utuh.
+        $nip = '198703122010011003';
+        $upload = $this->makeXlsxUpload(
+            ['nama', 'nis', 'email', 'user_type', 'jenis_kelamin', 'kelas', 'status'],
+            [
+                ['Guru NIP Float', (float) $nip, 'guru.nip.float@test.com', 'guru', 'L', 'Guru', 'belum_memilih'],
+            ]
+        );
+
+        $response = $this->actingAs($this->admin)
+            ->post(route('admin.osis.pemilih.processImport'), ['file' => $upload]);
+
+        $response->assertRedirect(route('admin.osis.pemilih.index'));
+
+        $guru = Pemilih::where('email', 'guru.nip.float@test.com')->firstOrFail();
+        $nis = (string) $guru->nis;
+        // Digit polos 18 angka — tanpa notasi ilmiah ("E+"), desimal, atau
+        // karakter non-digit apa pun. Regex ini langsung menangkap bug lama
+        // ((string) $float → "1.9870312201001E+17").
+        $this->assertMatchesRegularExpression('/^\d{18}$/', $nis);
+        $this->assertStringNotContainsStringIgnoringCase('E', $nis);
+        // Nilai tetap very close ke NIP asli (noise IEEE 754 + presisi
+        // serialisasi XLSX yang memang tak bisa dihindari untuk float) —
+        // menangkap korupsi skala besar / pembulatan keliru, bukan selisih
+        // 32-ULP di digit terakhir.
+        $this->assertEqualsWithDelta((float) $nip, (float) $nis, (float) $nip * 1e-13);
+    }
+
+    /** @test */
+    public function download_pemilih_template_formats_nis_column_as_text(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.osis.pemilih.downloadTemplate'));
+
+        $response->assertDownload('template-import-pemilih.xlsx');
+
+        $baseResponse = $response->baseResponse;
+        $this->assertTrue(
+            method_exists($baseResponse, 'getFile'),
+            'Expected BinaryFileResponse from Excel::download().'
+        );
+        $filePath = $baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $sheet = IOFactory::load($filePath)->getActiveSheet();
+
+        // Kolom `nis` (B) wajib format Text (@): baris contoh & seluruh kolom
+        // agar NIP 18 digit tampil utuh, bukan notasi ilmiah (1,98703E+17).
+        foreach (['B2', 'B4', 'B5'] as $coordinate) {
+            $this->assertSame(
+                '@',
+                $sheet->getStyle($coordinate)->getNumberFormat()->getFormatCode(),
+                "Expected Text number format (@) on cell {$coordinate}."
+            );
+        }
+
+        // Sampel NIP guru tersimpan sebagai TEKS 18 digit utuh (bukan angka).
+        $nipCell = $sheet->getCell('B4');
+        $this->assertSame(DataType::TYPE_STRING, $nipCell->getDataType());
+        $this->assertSame('198703122010011003', $nipCell->getValue());
     }
 }

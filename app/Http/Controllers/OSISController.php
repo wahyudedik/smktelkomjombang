@@ -1443,8 +1443,29 @@ class OSISController extends Controller
 
             public function styles(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet)
             {
+                // Kolom `nis` (B) harus bertipe teks. Sheet::close() memanggil
+                // styles() SETELAH data ditulis, jadi sel contoh dipaksa jadi
+                // teks eksplisit di sini: NIP 18 digit yang disimpan sebagai
+                // angka (IEEE 754 double) tampil sebagai notasi ilmiah
+                // (1,98703E+17) dan digit terakhirnya bisa berubah.
+                $lastRow = count($this->data) + 1;
+                for ($row = 2; $row <= $lastRow; $row++) {
+                    $coordinate = 'B' . $row;
+                    $value = $sheet->getCell($coordinate)->getValue();
+                    if (is_scalar($value) && $value !== '') {
+                        $sheet->getCell($coordinate)->setValueExplicit(
+                            (string) $value,
+                            \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+                        );
+                    }
+                }
+
                 return [
                     1 => ['font' => ['bold' => true]],
+                    // Format Text (@) di seluruh kolom B — sel baru (baris yang
+                    // diisi user) ikut menyimpan NIS/NIP sebagai teks sehingga
+                    // 18 digit NIP tampil utuh, bukan notasi ilmiah.
+                    'B1:B1048576' => ['numberFormat' => ['formatCode' => '@']],
                 ];
             }
 

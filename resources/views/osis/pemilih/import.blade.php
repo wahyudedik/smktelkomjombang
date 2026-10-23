@@ -118,7 +118,10 @@
                             <li><strong>nama</strong> - Nama lengkap pemilih (wajib)</li>
                             <li><strong>nis</strong> - NIS untuk siswa / NIP untuk guru (opsional, default: kosong).
                                 Wajib terisi bila pemilih ingin melakukan verifikasi publik tanpa login
-                                (halaman E-Voting OSIS) — untuk guru, isi dengan NIP
+                                (halaman E-Voting OSIS) — untuk guru, isi dengan NIP.
+                                <strong>NIS/NIP harus diisi sebagai Teks</strong> (format sel Text, atau awali
+                                dengan tanda kutip <code>'</code>) agar 18 digit NIP tidak berubah jadi
+                                notasi ilmiah di Excel
                             </li>
                             <li><strong>email</strong> - Email pemilih (wajib)</li>
                             <li><strong>user_type</strong> - <code>siswa</code> atau <code>guru</code> (opsional,
